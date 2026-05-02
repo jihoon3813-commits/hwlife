@@ -11,6 +11,21 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState("전체");
   const [isGridView, setIsGridView] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+  const formatPhoneNumber = (value: string) => {
+    if (!value) return value;
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 7) {
+      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+    }
+    if (phoneNumberLength < 11) {
+      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6)}`;
+    }
+    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`;
+  };
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -144,7 +159,7 @@ export default function App() {
   ];
 
   return (
-    <div className="max-w-[430px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden">
+    <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
       
       {/* Header */}
       <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-5 flex justify-between items-center h-[60px]">
@@ -202,12 +217,13 @@ export default function App() {
 
              <form className="space-y-3" onSubmit={(e) => {
                  e.preventDefault();
-                 document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                 setIsContactModalOpen(true);
              }}>
                 <div className="flex bg-white rounded-[16px] overflow-hidden p-1">
                   <input 
                     type="tel" 
                     placeholder="휴대폰 번호만 남겨주세요" 
+                    onChange={(e) => e.target.value = formatPhoneNumber(e.target.value)}
                     className="flex-1 bg-transparent px-4 py-3 text-[15px] text-[#191F28] font-medium focus:outline-none placeholder:text-[#8B95A1] min-w-0" 
                   />
                   <button type="submit" className="bg-[#3182F6] hover:bg-[#1B64DA] text-white font-bold text-[15px] px-5 py-3 rounded-[12px] whitespace-nowrap shrink-0 transition-colors">
@@ -728,6 +744,9 @@ export default function App() {
 
       {/* 10. FAQ */}
       <section className="bg-white py-12 px-6 rounded-[32px] my-2">
+         {/* 11. Contact Form Area (Removed and replaced with Modal) */}
+         <div id="contact" className="h-0 opacity-0 pointer-events-none"></div>
+
          <h2 className="text-[22px] font-bold mb-6">자주 묻는 질문</h2>
          <div className="space-y-4">
            {[{
@@ -830,17 +849,21 @@ export default function App() {
           <p className="text-[12px] text-[#8B95A1] font-medium px-1">
             주식회사 효원상조 | 대표자 OOO<br/>사업자등록번호 000-00-00000 | 고객센터 1588-0000
           </p>
+          <a href="/admin" target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#E5E8EB] hover:text-[#D1D6DB] mt-8 block text-center transition-colors">Admin</a>
         </div>
       </section>
 
       {/* Sticky Bottom CTA */}
-      <div className="fixed bottom-0 w-full max-w-[430px] bg-white border-t border-[#F2F4F6] px-5 py-4 pb-6 flex gap-3 z-40">
+      <div className="fixed bottom-0 w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] bg-white border-t border-[#F2F4F6] px-5 py-4 pb-6 flex gap-3 z-40 sm:border-x sm:border-[#E5E8EB]">
         <a href="tel:1588-0000" className="flex-1 bg-[#F2F4F6] text-[#333D4B] text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#D1D6DB] transition-colors">
           전화하기
         </a>
-        <a href="#contact" className="flex-[2] bg-[#3182F6] text-white text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#1B64DA] transition-colors">
+        <button 
+          onClick={() => setIsContactModalOpen(true)}
+          className="flex-[2] bg-[#3182F6] text-white text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#1B64DA] transition-colors"
+        >
           상담 신청하기
-        </a>
+        </button>
       </div>
 
       {/* Shorts Modal */}
@@ -880,7 +903,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }} 
             exit={{ opacity: 0, y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-50 bg-white flex flex-col mx-auto w-full max-w-[430px]"
+            className="fixed inset-0 z-50 bg-white flex flex-col mx-auto w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]"
           >
             {/* Modal Header */}
             <div className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-10 px-5 flex justify-between items-center h-[60px] border-b border-[#F2F4F6] shrink-0">
@@ -999,7 +1022,7 @@ export default function App() {
                 onClick={() => {
                   setSelectedProduct(null);
                   setTimeout(() => {
-                    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                    setIsContactModalOpen(true);
                   }, 400);
                 }} 
                 className="w-full bg-[#3182F6] text-white text-center py-[16px] rounded-[16px] text-[16px] font-bold active:bg-[#1B64DA] transition-transform active:scale-[0.98] shadow-lg shadow-[#3182F6]/20"
@@ -1007,6 +1030,108 @@ export default function App() {
                 이 제품으로 무료 상담받기
               </button>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Consultation Request Modal */}
+      <AnimatePresence>
+        {isContactModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white rounded-[24px] w-full max-w-[400px] overflow-hidden shadow-2xl relative no-scrollbar"
+            >
+              <button 
+                onClick={() => setIsContactModalOpen(false)} 
+                className="absolute top-4 right-4 p-2 hover:bg-[#F2F4F6] rounded-full transition-colors z-10"
+              >
+                <X className="w-5 h-5 text-[#8B95A1]" />
+              </button>
+
+              <div className="p-6 pt-10">
+                <div className="mb-6">
+                  <h2 className="text-[22px] font-bold mb-2">무료 상담 신청</h2>
+                  <p className="text-[#4E5968] text-[14px] leading-relaxed break-keep">
+                    담당자가 구조를 투명하게 설명해 드립니다.<br/>부담 없이 신청해 보세요.
+                  </p>
+                </div>
+
+                <form className="space-y-4" onSubmit={(e) => {
+                  e.preventDefault();
+                  alert('상담 신청이 접수되었습니다.');
+                  setIsContactModalOpen(false);
+                }}>
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">이름</label>
+                    <input type="text" required placeholder="이름을 입력해주세요" className="w-full bg-[#F2F4F6] px-4 py-3.5 rounded-[16px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 placeholder:text-[#8B95A1]" />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">연락처</label>
+                    <input 
+                      type="tel" 
+                      required
+                      placeholder="010-0000-0000" 
+                      onChange={(e) => e.target.value = formatPhoneNumber(e.target.value)}
+                      className="w-full bg-[#F2F4F6] px-4 py-3.5 rounded-[16px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 placeholder:text-[#8B95A1]" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">문의 사항</label>
+                    <div className="relative mb-3">
+                      <select 
+                        required
+                        defaultValue=""
+                        onChange={(e) => {
+                          const target = e.target as HTMLSelectElement;
+                          const directInput = document.getElementById('direct-input-container');
+                          if (directInput) {
+                            directInput.style.display = target.value === '직접 입력하기' ? 'block' : 'none';
+                          }
+                        }}
+                        className="w-full bg-[#F2F4F6] px-4 py-3.5 rounded-[16px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 appearance-none text-[#191F28]"
+                      >
+                        <option value="" disabled>선택하세요</option>
+                        <option>원하는 구좌나 가전이 있어요</option>
+                        <option>일반 렌탈과 비교해보고 싶어요</option>
+                        <option>만기 조건에 대해 알고 싶어요</option>
+                        <option>직접 입력하기</option>
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8B95A1] pointer-events-none" />
+                    </div>
+                    <div id="direct-input-container" style={{ display: 'none' }}>
+                      <textarea 
+                        placeholder="문의 내용을 입력해주세요"
+                        className="w-full bg-[#F2F4F6] px-4 py-3.5 rounded-[16px] text-[15px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 placeholder:text-[#8B95A1] min-h-[100px]"
+                      ></textarea>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-2 pb-1">
+                    <label className="flex items-start gap-3 cursor-pointer group px-1">
+                      <div className="relative flex items-center justify-center w-[20px] h-[20px] rounded-[5px] bg-[#F2F4F6] border border-[#D1D6DB] group-hover:border-[#3182F6] transition-colors shrink-0 mt-0.5">
+                        <input type="checkbox" required className="opacity-0 absolute" defaultChecked />
+                        <Check className="w-3 h-3 text-[#3182F6]" strokeWidth={4} />
+                      </div>
+                      <span className="text-[12px] text-[#8B95A1] leading-[1.6]">
+                        [필수] 개인정보 수집·이용 및 제공에 동의합니다.
+                      </span>
+                    </label>
+                  </div>
+                  
+                  <button type="submit" className="w-full bg-[#3182F6] hover:bg-[#1B64DA] text-white font-bold text-[16px] py-4 rounded-[16px] transition-colors mt-2 shadow-lg shadow-[#3182F6]/20">
+                    신청 완료
+                  </button>
+                </form>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

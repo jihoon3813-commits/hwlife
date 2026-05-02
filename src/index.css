@@ -11,11 +11,11 @@ html, body {
   color: #191F28;
 }
 
-/* Hide scrollbar for Toss-like horizontal scrolls */
-.hide-scrollbar::-webkit-scrollbar {
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.hide-scrollbar {
+.no-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
