@@ -8,6 +8,6 @@ const path = window.location.pathname;
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {path.startsWith('/admin') ? <AdminApp /> : <App />}
+    {path.includes('/admin') ? <AdminApp /> : <App />}
   </StrictMode>,
 );

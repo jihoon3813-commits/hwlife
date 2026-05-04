@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 export default function AdminLogin({ onLogin }: { onLogin: () => void }) {
-  const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
+  const [id, setId] = useState('admin');
+  const [password, setPassword] = useState('admin1234');
   const [error, setError] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
@@ -25,6 +25,7 @@ export default function AdminLogin({ onLogin }: { onLogin: () => void }) {
               type="text"
               value={id}
               onChange={(e) => setId(e.target.value)}
+              autoComplete="off"
               className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50"
               placeholder="admin"
             />
@@ -35,6 +36,7 @@ export default function AdminLogin({ onLogin }: { onLogin: () => void }) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="off"
               className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50"
               placeholder="••••••••"
             />

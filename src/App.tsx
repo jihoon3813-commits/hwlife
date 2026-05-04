@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Check, X, ChevronDown, ArrowRight, Play, Info, LayoutGrid, List
+  Check, X, ChevronDown, ArrowRight, Play, Info, LayoutGrid, List,
+  ShieldAlert, Coins, LockKeyhole, Megaphone,
+  Search, FileText, Smartphone, Gift
 } from 'lucide-react';
 
 export default function App() {
@@ -146,6 +148,76 @@ export default function App() {
         { company: "KG 이니렌탈", target: "KG 이니렌탈", price: "89,000원", period: "60개월", isOurs: false },
       ],
       detailImage: "https://images.unsplash.com/photo-1593025219500-2f3b9c7cf6df?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      id: 5,
+      category: "TV/시청각",
+      brand: "LG전자",
+      model: "OLED65C3KNA",
+      name: "65형 올레드 evo C3",
+      price: "57,000원",
+      discountPrice: "27,000원",
+      image: "https://images.unsplash.com/photo-1593784991095-a205039470b6?auto=format&fit=crop&q=80&w=400",
+      tag: "최고 화질",
+      priceLabel: "초특가",
+      shippingFee: "전국 무료설치",
+      comparisons: [
+        { company: "효원상조", target: "효원상조 설계", price: "57,000원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
+        { company: "현대유버스", target: "현대유버스", price: "61,200원", period: "60개월", isOurs: false },
+      ],
+      detailImage: "https://images.unsplash.com/photo-1593784991095-a205039470b6?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      id: 6,
+      category: "냉장고/김치냉장고",
+      brand: "삼성전자",
+      model: "RF85C9001AP",
+      name: "비스포크 4도어 키친핏",
+      price: "58,200원",
+      discountPrice: "28,200원",
+      image: "https://images.unsplash.com/photo-1571175432270-ef0260ca7302?auto=format&fit=crop&q=80&w=400",
+      priceLabel: "인기 모델",
+      shippingFee: "기본 설치비 무료",
+      comparisons: [
+        { company: "효원상조", target: "효원상조 설계", price: "58,200원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
+        { company: "스마트렌탈", target: "스마트렌탈", price: "62,500원", period: "60개월", isOurs: false },
+      ],
+      detailImage: "https://images.unsplash.com/photo-1571175432270-ef0260ca7302?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      id: 7,
+      category: "세탁기/건조기",
+      brand: "삼성전자",
+      model: "WF24B9600KP",
+      name: "비스포크 그랑데 AI 세탁기",
+      price: "55,000원",
+      discountPrice: "25,000원",
+      image: "https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&q=80&w=400",
+      tag: "베스트",
+      priceLabel: "최저가",
+      shippingFee: "전국 무료설치",
+      comparisons: [
+        { company: "효원상조", target: "효원상조 설계", price: "55,000원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
+        { company: "KG 이니렌탈", target: "KG 이니렌탈", price: "59,800원", period: "60개월", isOurs: false },
+      ],
+      detailImage: "https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      id: 8,
+      category: "안마의자/건강",
+      brand: "코지마",
+      model: "CMC-A305",
+      name: "코지마 뉴트로 안마의자",
+      price: "56,900원",
+      discountPrice: "26,900원",
+      image: "https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=400",
+      priceLabel: "가성비 추천",
+      shippingFee: "전국 무료설치",
+      comparisons: [
+        { company: "효원상조", target: "효원상조 설계", price: "56,900원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
+        { company: "BS ON", target: "BS ON", price: "64,000원", period: "60개월", isOurs: false },
+      ],
+      detailImage: "https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=600"
     }
   ];
 
@@ -163,7 +235,11 @@ export default function App() {
       
       {/* Header */}
       <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-5 flex justify-between items-center h-[60px]">
-        <div className="font-bold text-[18px] tracking-tight">효원상조</div>
+        <img 
+          src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
+          alt="효원상조 로고" 
+          className="h-[24px] w-auto object-contain"
+        />
         <a href="tel:1588-0000" className="text-[13px] font-semibold text-[#4E5968] bg-[#F2F4F6] px-3 py-1.5 rounded-full hover:bg-[#E5E8EB] transition-colors">
           상담 1588-0000
         </a>
@@ -172,72 +248,68 @@ export default function App() {
       {/* 1. Hero Section (Toss Style Focus on Typography) */}
       <section className="bg-white px-6 pt-10 pb-12 rounded-b-[32px]">
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <h2 className="text-[28px] font-bold leading-[1.3] mb-4 tracking-tight break-keep text-[#191F28]">
-            렌탈료 그대로<br/>
-            가전도 쓰고,<br/>
-            <span className="text-[#3182F6]">상조 혜택까지.</span>
+          <h2 className="text-[30px] font-bold leading-[1.2] mb-5 tracking-tight break-keep text-[#191F28]">
+            가전결합상조는 비싸다?<br/>
+            그 인식을 바꾸기 위해<br/>
+            <span className="text-[#3182F6] text-[38px] mt-1 block">다시 설계했습니다.</span>
           </h2>
-          <p className="text-[#4E5968] text-[16px] leading-[1.5] mb-8 break-keep">
-            가전 계약과 상조 계약은 별도예요.<br/>투명하게 설명해드릴 테니, 내게 맞는지 먼저 확인해보세요.
+
+          <p className="text-[#4E5968] text-[16px] leading-[1.6] mb-8 break-keep">
+            기존 가전결합상조는 만기 혜택은 분명했지만, 월 납입금 부담이 컸습니다. 
+            효원상조는 그 혜택은 유지하면서도, <strong className="text-[#191F28]">일반 렌탈과 비슷하거나 더 저렴한 상품</strong>을 새롭게 출시했습니다.
           </p>
 
           <img 
-            src="https://images.unsplash.com/photo-1626808642875-0aa545482dfb?q=80&w=800&auto=format&fit=crop" 
-            alt="프리미엄 가전 인테리어" 
-            className="w-full h-[200px] object-cover rounded-2xl mb-8 lazyload"
+            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777896370/Generated_Image_May_04_2026_-_9_04PM_l3o3ph.jpg" 
+            alt="프리미엄 가전 결합 서비스" 
+            className="w-full aspect-[4/3] object-cover rounded-2xl mb-8 shadow-lg"
           />
+          <div className="space-y-4 mb-10">
+            <h3 className="text-[18px] font-bold text-[#191F28] px-1 mb-4">효원상조 가전결합상조는</h3>
+            <div className="grid gap-3">
+              <div className="bg-[#191F28] p-5 rounded-[24px] shadow-lg shadow-blue-900/10 border border-white/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="bg-[#3182F6]/20 p-1 rounded-lg">
+                    <Check className="w-4 h-4 text-[#3182F6]" strokeWidth={3} />
+                  </div>
+                  <span className="font-bold text-[16px] text-white">결합구조</span>
+                </div>
+                <p className="text-[14px] text-[#A3B1C6] leading-relaxed break-keep font-medium">가전 렌탈과 상조 계약을 동시에 진행하는 결합 구조입니다.</p>
+              </div>
 
-          <div className="space-y-4 mb-8 text-[15px] font-medium text-[#333D4B]">
-            <div className="flex items-center gap-3">
-              <div className="bg-[#1B64DA] p-1.5 rounded-full"><Check className="w-4 h-4 text-white" strokeWidth={3} /></div>
-              <span>일반 렌탈과 비슷한 월 납입 구조</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="bg-[#1B64DA] p-1.5 rounded-full"><Check className="w-4 h-4 text-white" strokeWidth={3} /></div>
-              <span>가입 전 모든 해지 조건을 미리 안내</span>
+              <div className="bg-[#191F28] p-5 rounded-[24px] shadow-lg shadow-blue-900/10 border border-white/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="bg-[#3182F6]/20 p-1 rounded-lg">
+                    <Check className="w-4 h-4 text-[#3182F6]" strokeWidth={3} />
+                  </div>
+                  <span className="font-bold text-[16px] text-white">합리적 월 납입금</span>
+                </div>
+                <p className="text-[14px] text-[#A3B1C6] leading-relaxed break-keep font-medium">그런데도 월 납입금은 일반 가전 렌탈과 비슷하거나 더 부담 없게 구성했습니다.</p>
+              </div>
+
+              <div className="bg-[#191F28] p-5 rounded-[24px] shadow-lg shadow-blue-900/10 border border-white/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="bg-[#3182F6]/20 p-1 rounded-lg">
+                    <Check className="w-4 h-4 text-[#3182F6]" strokeWidth={3} />
+                  </div>
+                  <span className="font-bold text-[16px] text-white">만기 환급 혜택</span>
+                </div>
+                <p className="text-[14px] text-[#A3B1C6] leading-relaxed break-keep font-medium">여기에 상조 만기 시에는 가전 렌탈료 전액 환급 지원 혜택까지 받을 수 있습니다.</p>
+              </div>
+
+              <div className="bg-[#FFF5F5] p-5 rounded-[24px] border border-[#FFEBEB]">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="bg-[#FF4D4F]/10 p-1 rounded-lg">
+                    <Info className="w-4 h-4 text-[#FF4D4F]" strokeWidth={3} />
+                  </div>
+                  <span className="font-bold text-[16px] text-[#FF4D4F]">선택 가능 품목 안내</span>
+                </div>
+                <p className="text-[14px] text-[#4E5968] leading-relaxed break-keep">단, 가전제품은 지정된 품목에 한해 선택 가능하니 아래 리스트를 꼭 확인해 주세요.</p>
+              </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Hero Form Section */}
-        <div className="bg-[#191F28] -mx-6 px-6 py-10 mt-8 rounded-t-[32px] rounded-b-[0] text-center text-white relative overflow-hidden">
-           <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-[#3182F6]/20 blur-[60px] rounded-full pointer-events-none"></div>
-           <div className="absolute bottom-0 left-0 w-[150px] h-[150px] bg-[#3182F6]/10 blur-[60px] rounded-full pointer-events-none"></div>
-           
-           <div className="relative z-10">
-             <div className="inline-block bg-[#3182F6]/20 text-[#3182F6] text-[12px] font-bold px-3 py-1.5 rounded-full mb-4">
-                무료 비교 진단
-             </div>
-             <h3 className="text-[24px] font-bold mb-3 leading-snug">
-               내 상황에 맞는지<br/>상담 전 핵심 비교표 받기
-             </h3>
-             <p className="text-[#A3B1C6] text-[15px] mb-8 leading-relaxed break-keep">
-                연락처를 남겨주시면, 일반 렌탈과 비교 가능한 형태로 정리해서 제일 먼저 안내해 드립니다.
-             </p>
-
-             <form className="space-y-3" onSubmit={(e) => {
-                 e.preventDefault();
-                 setIsContactModalOpen(true);
-             }}>
-                <div className="flex bg-white rounded-[16px] overflow-hidden p-1">
-                  <input 
-                    type="tel" 
-                    placeholder="휴대폰 번호만 남겨주세요" 
-                    onChange={(e) => e.target.value = formatPhoneNumber(e.target.value)}
-                    className="flex-1 bg-transparent px-4 py-3 text-[15px] text-[#191F28] font-medium focus:outline-none placeholder:text-[#8B95A1] min-w-0" 
-                  />
-                  <button type="submit" className="bg-[#3182F6] hover:bg-[#1B64DA] text-white font-bold text-[15px] px-5 py-3 rounded-[12px] whitespace-nowrap shrink-0 transition-colors">
-                    비교표 받기
-                  </button>
-                </div>
-                <div className="text-left px-2">
-                   <p className="text-[12px] text-[#8B95A1]">
-                     * 상담 전 단순 비교 자료 제공 목적입니다.
-                   </p>
-                </div>
-             </form>
-           </div>
-        </div>
       </section>
 
       {/* 2. 10 Second Understanding */}
@@ -344,31 +416,72 @@ export default function App() {
         </p>
 
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-white/10 rounded-[16px] p-4">
-            <h3 className="font-bold text-[15px] text-white mb-2">고지 부족</h3>
+          <div className="bg-white/5 border border-white/10 rounded-[20px] p-5">
+            <div className="w-10 h-10 bg-red-400/10 rounded-full flex items-center justify-center mb-4">
+              <ShieldAlert className="w-5 h-5 text-red-400" />
+            </div>
+            <h3 className="font-bold text-[16px] text-white mb-2">고지 부족</h3>
             <p className="text-[#A3B1C6] text-[13px] leading-relaxed break-keep">가전 계약과 상조 계약이 별도라는 사실을 숨김</p>
           </div>
-          <div className="bg-white/10 rounded-[16px] p-4">
-            <h3 className="font-bold text-[15px] text-white mb-2">과도한 납입액</h3>
+
+          <div className="bg-white/5 border border-white/10 rounded-[20px] p-5">
+            <div className="w-10 h-10 bg-red-400/10 rounded-full flex items-center justify-center mb-4">
+              <Coins className="w-5 h-5 text-red-400" />
+            </div>
+            <h3 className="font-bold text-[16px] text-white mb-2">과도한 납입액</h3>
             <p className="text-[#A3B1C6] text-[13px] leading-relaxed break-keep">일반 가전 렌탈보다 비정상적으로 높은 월 납입 조건</p>
           </div>
-          <div className="bg-white/10 rounded-[16px] p-4">
-            <h3 className="font-bold text-[15px] text-white mb-2">해약 구조</h3>
+
+          <div className="bg-white/5 border border-white/10 rounded-[20px] p-5">
+            <div className="w-10 h-10 bg-red-400/10 rounded-full flex items-center justify-center mb-4">
+              <LockKeyhole className="w-5 h-5 text-red-400" />
+            </div>
+            <h3 className="font-bold text-[16px] text-white mb-2">해약 구조</h3>
             <p className="text-[#A3B1C6] text-[13px] leading-relaxed break-keep">중도 해지 시 불리한 위약금 구조 설명 누락</p>
           </div>
-          <div className="bg-white/10 rounded-[16px] p-4">
-            <h3 className="font-bold text-[15px] text-white mb-2">오해 유발</h3>
+
+          <div className="bg-white/5 border border-white/10 rounded-[20px] p-5">
+            <div className="w-10 h-10 bg-red-400/10 rounded-full flex items-center justify-center mb-4">
+              <Megaphone className="w-5 h-5 text-red-400" />
+            </div>
+            <h3 className="font-bold text-[16px] text-white mb-2">오해 유발</h3>
             <p className="text-[#A3B1C6] text-[13px] leading-relaxed break-keep">'사은품', '적금형' 등 위험한 표현 사용</p>
           </div>
         </div>
 
-        <div className="bg-[#3182F6]/20 rounded-[16px] p-4 flex items-start gap-3">
-          <Info className="w-5 h-5 text-[#3182F6] shrink-0 mt-0.5" />
-          <p className="text-[13px] text-[#A3B1C6] leading-relaxed break-keep">
-            <strong className="text-white">효원상조는 숨기지 않습니다.</strong><br/>
-            이중 계약 구조, 위약금 발생 가능성을 계약 전에 먼저 투명하게 안내합니다.
-          </p>
-        </div>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="relative mt-8 p-0.5 rounded-[22px] overflow-hidden bg-gradient-to-r from-[#3182F6] via-[#A3B1C6] to-[#3182F6] bg-[length:200%_auto] animate-gradient-x shadow-[0_0_20px_rgba(49,130,246,0.3)]"
+        >
+          <div className="bg-[#191F28] rounded-[21px] p-6 flex flex-col items-center text-center">
+            <motion.div
+              animate={{ 
+                scale: [1, 1.1, 1],
+                opacity: [0.7, 1, 0.7]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="bg-[#3182F6]/20 p-2 rounded-full mb-4"
+            >
+              <Check className="w-6 h-6 text-[#3182F6]" strokeWidth={3} />
+            </motion.div>
+            
+            <h3 className="text-[20px] font-bold text-white mb-2 tracking-tight">
+              효원상조는 <span className="text-[#3182F6]">숨기지 않습니다.</span>
+            </h3>
+            
+            <p className="text-[#A3B1C6] text-[15px] leading-relaxed break-keep">
+              이중 계약 구조, 위약금 발생 가능성을<br/>
+              <span className="text-white font-semibold">계약 전 시점별 시나리오</span>를 통해<br/>
+              가장 투명하게 먼저 안내해 드립니다.
+            </p>
+          </div>
+        </motion.div>
       </section>
 
       {/* 4. Products & Accounts Section */}
@@ -398,12 +511,12 @@ export default function App() {
         </div>
 
         {/* Categories */}
-        <div className="flex overflow-x-auto gap-2 px-6 pb-2 hide-scrollbar mb-4">
+        <div className="flex flex-wrap justify-center gap-2 px-6 mb-4">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`shrink-0 px-4 py-2 rounded-full text-[14px] font-bold transition-all ${activeCategory === cat ? 'bg-[#333D4B] text-white shadow-md' : 'bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]'}`}
+              className={`px-4 py-2 rounded-full text-[14px] font-bold transition-all ${activeCategory === cat ? 'bg-[#333D4B] text-white shadow-md' : 'bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]'}`}
             >
               {cat}
             </button>
@@ -411,7 +524,7 @@ export default function App() {
         </div>
 
         {/* Product List */}
-        <div className={`${isGridView ? 'px-6 space-y-4' : 'flex overflow-x-auto gap-4 px-6 pb-6 snap-x hide-scrollbar'}`}>
+        <div className={`${isGridView ? 'px-6 space-y-4' : 'grid grid-rows-2 grid-flow-col auto-cols-max gap-4 px-6 pb-6 overflow-x-auto snap-x hide-scrollbar'}`}>
           <AnimatePresence mode="popLayout">
             {filteredProducts.map((item) => (
               <motion.div 
@@ -422,9 +535,9 @@ export default function App() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
-                className={`cursor-pointer ${isGridView ? 'w-full' : 'shrink-0 w-[260px] snap-center'} bg-white rounded-[20px] overflow-hidden flex ${isGridView ? 'flex-row gap-4 border border-[#F2F4F6] p-3 shadow-sm' : 'flex-col border border-[#F2F4F6] shadow-sm'}`}
+                className={`cursor-pointer ${isGridView ? 'w-full' : 'w-[240px] snap-center'} bg-white rounded-[20px] overflow-hidden flex ${isGridView ? 'flex-row gap-4 border border-[#F2F4F6] p-3 shadow-sm' : 'flex-col border border-[#F2F4F6] shadow-sm'}`}
               >
-                <div className={`relative ${isGridView ? 'w-[100px] h-[100px] shrink-0 rounded-[12px] overflow-hidden bg-[#F2F4F6]' : 'w-full h-[180px] bg-[#F2F4F6]'}`}>
+                <div className={`relative ${isGridView ? 'w-[100px] h-[100px] shrink-0 rounded-[12px] overflow-hidden bg-[#F2F4F6]' : 'w-full h-[160px] bg-[#F2F4F6]'}`}>
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   <div className="absolute top-2 left-2 flex flex-col gap-1.5 items-start">
                     {item.tag && (
@@ -469,25 +582,30 @@ export default function App() {
       </section>
 
       {/* 5. What makes us different */}
-      <section id="comparison" className="bg-white py-12 px-6 rounded-[32px] mt-2 mb-2">
-        <h2 className="text-[22px] font-bold mb-3 leading-snug break-keep text-center">
-          효원상조는 '<span className="text-[#3182F6]">비싸게 묶는 상품</span>'이<br/>아닙니다
+      <section id="comparison" className="bg-white py-16 px-6 rounded-[32px] mt-2 mb-2">
+        <h2 className="text-[22px] font-bold mb-3 leading-tight break-keep text-center text-[#191F28]">
+          효원의 결합상조는 단순히<br/>
+          ‘가전 혜택을 내세워 상조를 <span className="text-[#3182F6]">비싸게 묶는 상품</span>’이 아닙니다.
         </h2>
-        <p className="text-[#4E5968] text-[15px] mb-8 leading-relaxed break-keep text-center">
-          단순히 혜택만 강조하지 않고,<br/>'비교 가능한 월 납입 구조'를 지향합니다.
+        <p className="text-[#4E5968] text-[15px] mb-10 leading-relaxed break-keep text-center">
+          단순한 혜택 강조보다,<br/>
+          일반 렌탈과도 비교해볼 수 있는 월 납입 구조와<br/>
+          <span className="text-[#191F28] font-semibold">투명한 설명을 먼저 생각했습니다.</span>
         </p>
 
-        <div className="space-y-3 mb-8">
+        <div className="space-y-3 mb-10">
           {[
             "일반 렌탈과 비교 가능한 월 납입 구조",
-            "가전/상조 별도 계약 구조를 먼저 설명",
-            "렌탈 종료 시점 이후 선택 구조 명확히 안내",
-            "계약 전 시점별 시나리오 투명하게 공개"
-          ].map((item, idx) => (
-             <div key={idx} className="flex items-center gap-3 bg-[#191F28] text-white p-4 rounded-[16px] shadow-sm">
-               <div className="bg-[#1B64DA] p-1 rounded-full shrink-0 shadow-sm"><Check className="w-4 h-4 text-white" strokeWidth={3} /></div>
-               <span className="text-[15px] font-bold text-white leading-snug">{item}</span>
-             </div>
+            "가전 계약과 상조 계약을 분리해 투명하게 설명",
+            "렌탈 종료 이후 유지·해지 선택 구조를 명확히 안내",
+            "계약 전 시점별 흐름과 조건을 투명하게 공개"
+          ].map((text, idx) => (
+            <div key={idx} className="bg-[#191F28] py-4 px-6 rounded-[16px] flex items-center gap-4 shadow-sm">
+              <div className="bg-[#3182F6] p-1 rounded-full shrink-0">
+                <Check className="w-4 h-4 text-white" strokeWidth={3} />
+              </div>
+              <span className="text-white font-bold text-[15px] break-keep">{text}</span>
+            </div>
           ))}
         </div>
 
@@ -501,7 +619,7 @@ export default function App() {
               </div>
               <div className="w-[30px] h-[1px] bg-[#D1D6DB] mx-auto"></div>
               <div className="text-center">
-                <div className="text-[13px] text-[#8B95A1] mb-1">상담 방식</div>
+                <div className="text-[13px] text-[#8B95A1] mb-1">주요 안내</div>
                 <div className="text-[15px] font-bold text-[#333D4B]">가전 스펙 위주</div>
               </div>
             </div>
@@ -509,7 +627,7 @@ export default function App() {
 
           <div className="flex-1 bg-[#1B64DA] text-white rounded-[20px] p-5 shadow-[0_8px_16px_rgb(27,100,218,0.2)] relative">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#191F28] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-sm whitespace-nowrap border border-white/10">
-              효원상조 설계
+              효원상조 가전결합
             </div>
             <h3 className="text-white font-bold text-[15px] mb-4 text-center mt-1">가전 + 상조 결합</h3>
             <div className="space-y-4 pt-2">
@@ -519,7 +637,7 @@ export default function App() {
               </div>
               <div className="w-[30px] h-[1px] bg-white/30 mx-auto"></div>
               <div className="text-center">
-                 <div className="text-[13px] text-white/80 mb-1">상담 방식</div>
+                 <div className="text-[13px] text-white/80 mb-1">주요 안내</div>
                  <div className="text-[15px] font-bold text-white break-keep">해지 조건<br/>이중계약 투명안내</div>
               </div>
             </div>
@@ -538,8 +656,8 @@ export default function App() {
           <div className="flex items-start gap-3">
             <X className="w-5 h-5 text-red-400 mt-1 shrink-0" />
             <div>
-              <div className="font-bold text-[16px] text-white mb-1">할부 기간을 채우기 어렵다면</div>
-              <div className="text-[#A3B1C6] text-[14px]">렌탈 위약금과 결합 할인 혜택이 취소되어 손실이 큽니다. 일반 렌탈이 낫습니다.</div>
+              <div className="font-bold text-[16px] text-white mb-1">렌탈 기간을 채우기 어렵다면</div>
+              <div className="text-[#A3B1C6] text-[14px]">잔여 렌탈료를 일시 완납을 해야하기 때문에 일반 가전렌탈과 마찬가지로 중도해약에 대한 부담이 있습니다.</div>
             </div>
           </div>
           <div className="w-full h-[1px] bg-white/10"></div>
@@ -547,54 +665,101 @@ export default function App() {
             <Check className="w-5 h-5 text-[#3182F6] mt-1 shrink-0" strokeWidth={3}/>
             <div>
               <div className="font-bold text-[16px] text-white mb-1">꾸준히 유지할 수 있다면</div>
-              <div className="text-[#A3B1C6] text-[14px]">가전 잔여 대금이 끝난 후(상조 납입 지속), 만기 시 혜택까지 받아 훨씬 유리합니다.</div>
+              <div className="text-[#A3B1C6] text-[14px]">가전 렌탈 기간이 끝난 후(상조 납입 지속), 상조 만기 시 가전 렌탈료 전액을 지원받아 훨씬 유리합니다.</div>
             </div>
           </div>
         </div>
+
+        {/* New Neon Highlight Box */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mt-8 p-[2px] rounded-[24px] bg-gradient-to-r from-[#3182F6] via-[#A78BFA] to-[#3182F6] bg-[length:200%_200%] animate-gradient-x shadow-[0_0_20px_rgba(49,130,246,0.3)]"
+        >
+          <div className="bg-[#191F28] rounded-[22px] p-6">
+            <div className="inline-block bg-[#3182F6] text-white text-[12px] font-bold px-3 py-1 rounded-full mb-4 animate-pulse">
+              그런데!
+            </div>
+            <p className="text-[15px] leading-[1.7] break-keep font-medium text-white/95">
+              가전 렌탈로만 비교해도, <span className="text-[#3182F6] font-bold text-[16px]">효원상조 가전결합 상품은 일반 가전 렌탈과 비슷한 수준</span>의 월 납입금으로 이용할 수 있습니다. 
+              <br/><br/>
+              여기에 렌탈 종료 후 상조를 계속 유지할지 결정할 수 있어, 고객은 부담 없이 시작하면서도 <span className="text-white font-extrabold underline underline-offset-4 decoration-[#3182F6]">만기 유지 시 가전 렌탈료 지원 혜택</span>을 받을 수 있는 가능성까지 확보할 수 있습니다.
+            </p>
+          </div>
+        </motion.div>
       </section>
 
-      {/* 6. Step-by-Step Process */}
-      <section className="bg-white py-12 px-6 rounded-[32px] my-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)]">
-        <h2 className="text-[22px] font-bold mb-3 leading-snug break-keep text-center">
-          가입부터 선택까지,<br/>구조는 이렇게 진행됩니다
-        </h2>
-        <p className="text-[#4E5968] text-[15px] mb-8 leading-relaxed break-keep text-center">
-          어느 시점에 어떤 선택을 할 수 있는지<br/>미리 확인하세요.
-        </p>
+      {/* 6. Step-by-Step Process - Infographic Version */}
+      <section className="bg-[#F8FAFB] py-16 px-6 rounded-[40px] my-4 shadow-sm border border-[#F2F4F6]">
+        <div className="text-center mb-12">
+          <h2 className="text-[24px] font-bold mb-3 leading-tight text-[#191F28] break-keep">
+            가입부터 선택까지,<br/>구조는 이렇게 진행됩니다
+          </h2>
+          <p className="text-[#8B95A1] text-[15px] leading-relaxed break-keep">
+            어느 시점에 어떤 선택을 할 수 있는지 미리 확인하세요.
+          </p>
+        </div>
 
-        <div className="relative border-l-2 border-[#F2F4F6] ml-4 space-y-6">
-          <div className="relative pl-6">
-            <div className="absolute w-4 h-4 bg-[#3182F6] rounded-full -left-[9px] top-1"></div>
-            <h3 className="font-bold text-[16px] text-[#191F28] mb-1">1. 비교 판단 및 상담</h3>
-            <p className="text-[14px] text-[#4E5968] leading-relaxed break-keep">
-              가입 전, 당사의 시뮬레이션과 일반 렌탈 조건을 상세히 비교해보고 나에게 맞는지 먼저 판단합니다.
-            </p>
-          </div>
-          
-          <div className="relative pl-6">
-            <div className="absolute w-3 h-3 bg-[#D1D6DB] rounded-full -left-[7px] top-1.5"></div>
-            <h3 className="font-bold text-[16px] text-[#191F28] mb-1">2. 계약 체결 및 납입 시작</h3>
-            <p className="text-[14px] text-[#4E5968] leading-relaxed break-keep">
-              충분히 이해하셨다면 가전+상조 결합 혜택으로 납입을 시작합니다. (중도 해지 시 불리할 수 있음)
-            </p>
-          </div>
-
-          <div className="relative pl-6">
-            <div className="absolute w-3 h-3 bg-[#D1D6DB] rounded-full -left-[7px] top-1.5"></div>
-            <h3 className="font-bold text-[16px] text-[#191F28] mb-1">3. 가전 할부 종료 (보통 60개월)</h3>
-            <p className="text-[14px] text-[#4E5968] leading-relaxed break-keep">
-              가전 할부 납부액이 끝나고, 가전은 완전한 고객님의 소유가 됩니다. 상조 납입액은 계속 누적됩니다.
-            </p>
-          </div>
-
-          <div className="relative pl-6">
-            <div className="absolute w-4 h-4 bg-[#3182F6] rounded-full -left-[9px] top-1"></div>
-            <div className="absolute top-[5px] -left-[5px] w-2 h-2 bg-white rounded-full"></div>
-            <h3 className="font-bold text-[16px] text-[#191F28] mb-1">4. 상조 만기 달성</h3>
-            <p className="text-[14px] text-[#4E5968] leading-relaxed break-keep">
-              환급을 받거나 크루즈/웨딩 등 상조 서비스로 활용하는 것을 선택합니다.
-            </p>
-          </div>
+        <div className="space-y-4">
+          {[
+            {
+              step: "01",
+              title: "비교 판단 및 상담",
+              desc: "가입 전, 당사의 시뮬레이션과 일반 렌탈 조건을 상세히 비교해보고 나에게 맞는지 먼저 판단합니다.",
+              icon: <Search className="w-6 h-6 text-[#3182F6]" />,
+              color: "bg-[#3182F6]/10"
+            },
+            {
+              step: "02",
+              title: "계약 체결 및 납입 시작",
+              desc: "충분히 이해하셨다면 가전+상조 결합 혜택으로 납입을 시작합니다. (중도 해지 시 일시 완납 부담이 있을 수 있음)",
+              icon: <FileText className="w-6 h-6 text-[#1B64DA]" />,
+              color: "bg-[#1B64DA]/10"
+            },
+            {
+              step: "03",
+              title: "가전 렌탈 종료 (60개월)",
+              desc: "가전 렌탈료 납입이 끝나고 가전은 완전히 고객님 소유가 됩니다. 상조 납입액은 계속 누적됩니다.",
+              icon: <Smartphone className="w-6 h-6 text-[#191F28]" />,
+              color: "bg-[#191F28]/10"
+            },
+            {
+              step: "04",
+              title: "상조 만기 달성",
+              desc: "100% 환급(상품별 상이)을 받거나 크루즈, 웨딩 등 프리미엄 상조 서비스로 전환하여 활용합니다.",
+              icon: <Gift className="w-6 h-6 text-[#3182F6]" />,
+              color: "bg-[#3182F6]/10"
+            }
+          ].map((item, idx) => (
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-white rounded-[24px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#F2F4F6] flex gap-5 items-start relative overflow-hidden"
+            >
+              <div className={`w-12 h-12 ${item.color} rounded-[16px] flex items-center justify-center shrink-0`}>
+                {item.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="mb-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[#3182F6] font-bold text-[12px] tracking-wider uppercase">Step {item.step}</span>
+                  </div>
+                  <h3 className="font-bold text-[17px] text-[#191F28] leading-tight break-keep">{item.title}</h3>
+                </div>
+                <p className="text-[14px] text-[#4E5968] leading-[1.6] break-keep font-medium">
+                  {item.desc}
+                </p>
+              </div>
+              {idx < 3 && (
+                <div className="absolute bottom-0 left-[36px] w-[2px] h-4 bg-gradient-to-b from-[#F2F4F6] to-transparent translate-y-full"></div>
+              )}
+            </motion.div>
+          ))}
         </div>
       </section>
 
