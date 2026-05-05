@@ -298,8 +298,8 @@ export default function App() {
           alt="효원상조 로고" 
           className="h-[24px] w-auto object-contain"
         />
-        <a href="tel:1588-0883" className="text-[13px] font-semibold text-[#4E5968] bg-[#F2F4F6] px-3 py-1.5 rounded-full hover:bg-[#E5E8EB] transition-colors">
-          상담 1588-0883
+        <a href="tel:1588-8873" className="text-[13px] font-semibold text-[#4E5968] bg-[#F2F4F6] px-3 py-1.5 rounded-full hover:bg-[#E5E8EB] transition-colors">
+          상담 1588-8873
         </a>
       </header>
 
@@ -1294,14 +1294,55 @@ export default function App() {
             </ul>
           </div>
 
-          <div className="border-t border-white/5 pt-8">
-            <p className="text-[12px] text-[#8B95A1] font-medium leading-relaxed mb-8 px-1">
-              주식회사 효원상조 | 대표자 OOO<br/>
-              사업자등록번호 000-00-00000 | 고객센터 <span className="text-white font-bold text-[13px]">1588-0883</span><br/>
-              서울특별시 OOO구 OOO로 OOO 효원빌딩
-            </p>
+          <div className="border-t border-white/5 pt-10">
+            {/* Distributor Info */}
+            <div className="mb-10 px-1">
+              <h5 className="text-[13px] font-bold text-white mb-3 flex items-center gap-2">
+                <span className="w-1 h-3 bg-[#3182F6] rounded-full"></span>
+                총판사
+              </h5>
+              <div className="text-[12px] text-[#8B95A1] leading-[1.8] font-medium break-keep">
+                <span className="text-white font-bold">(주)라이프앤조이</span> | 대표 : 김지훈<br/>
+                경기도 하남시 미사대로 510, 624호(아이에스비즈타워)<br/>
+                사업자등록번호: 388-86-02921 | 통신판매신고번호: 2024-경기하남-1853호<br/>
+                E-mail: lifenjoy0296@gmail.com | 개인정보보호책임자: 김지훈(lifenjoy0296@gmail.co.kr)<br/>
+                <span className="text-[11px] text-white/20 mt-1 block uppercase">Copyright(c)2026 LIFE&JOY Co.,Ltd. All Right Reserved.</span>
+              </div>
+            </div>
+
+            {/* Service Provider Info */}
+            <div className="mb-10 px-1 border-t border-white/5 pt-8">
+              <h5 className="text-[13px] font-bold text-white mb-3 flex items-center gap-2">
+                <span className="w-1 h-3 bg-[#A3B1C6] rounded-full"></span>
+                상조서비스 주관사
+              </h5>
+              <div className="text-[12px] text-[#8B95A1] leading-[1.8] font-medium break-keep">
+                <span className="text-white font-bold">(주)효원상조</span> 대표이사 : 이선주<br/>
+                서울시 강동구 풍성로 38길 9, 바로빌딩 3층<br/>
+                사업자등록번호 : 126-81-81624 | 선불식할부거래업등록번호 : 서울-2010-제28<br/>
+                <span className="text-[11px] text-white/20 mt-1 block uppercase">COPYRIGHT ⓒ (주)효원상조 Co. All Rights Reserved.</span>
+              </div>
+            </div>
+
+            {/* Customer Center Info */}
+            <div className="mb-12 px-1 bg-white/5 rounded-2xl p-5 border border-white/5">
+              <h5 className="text-[13px] font-bold text-[#3182F6] mb-4">(주)효원상조 고객센터</h5>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-[12px] text-[#8B95A1]">고객센터</span>
+                  <a href="tel:1588-8873" className="text-[18px] font-black text-white hover:text-[#3182F6] transition-colors">1588-8873</a>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex flex-col">
+                    <span className="text-[12px] text-[#8B95A1]">24시 긴급행사</span>
+                    <span className="text-[10px] text-[#3182F6]">(장례접수)</span>
+                  </div>
+                  <a href="tel:1577-8873" className="text-[18px] font-black text-white hover:text-[#3182F6] transition-colors">1577-8873</a>
+                </div>
+              </div>
+            </div>
             
-            <div className="mb-8 px-1">
+            <div className="mb-10 px-1">
               <a 
                 href="admin" 
                 target="_blank" 
@@ -1314,12 +1355,15 @@ export default function App() {
               </a>
             </div>
 
-            <div className="flex items-center justify-between px-1">
+            <div className="flex items-center justify-between px-1 pt-4 border-t border-white/5">
               <p className="text-[11px] text-white/20 font-medium tracking-tight">© HYOWON. All rights reserved.</p>
               <div className="flex gap-4">
-                 {/* Dummy icons/links */}
-                 <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10"></div>
-                 <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10"></div>
+                 <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                   <div className="w-2 h-2 bg-white/10 rounded-full"></div>
+                 </div>
+                 <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                   <div className="w-2 h-2 bg-white/10 rounded-full"></div>
+                 </div>
               </div>
             </div>
           </div>
@@ -1328,7 +1372,7 @@ export default function App() {
 
       {/* Sticky Bottom CTA */}
       <div className="fixed bottom-0 w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] bg-white border-t border-[#F2F4F6] px-5 py-4 pb-6 flex gap-3 z-40 sm:border-x sm:border-[#E5E8EB]">
-        <a href="tel:1588-0883" className="flex-1 bg-[#F2F4F6] text-[#333D4B] text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#D1D6DB] transition-colors">
+        <a href="tel:1588-8873" className="flex-1 bg-[#F2F4F6] text-[#333D4B] text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#D1D6DB] transition-colors">
           전화하기
         </a>
         <button 
