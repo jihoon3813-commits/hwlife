@@ -18,6 +18,7 @@ export default function App() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [isProductFullView, setIsProductFullView] = useState(false);
 
   const createInquiry = useMutation(api.inquiries.create);
 
