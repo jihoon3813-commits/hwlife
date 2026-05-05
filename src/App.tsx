@@ -24,20 +24,29 @@ export default function App() {
   // --- Browser Back Button Support ---
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
-      if (selectedProduct) {
+      const state = event.state;
+      
+      if (!state) {
+        // Back to landing
         setSelectedProduct(null);
-        // If we were in full view, keep it, otherwise we're back at landing
-      } else if (isProductFullView) {
         setIsProductFullView(false);
         // Scroll to product list section on landing page
-        const productSection = document.getElementById('product-list');
-        if (productSection) productSection.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+          const productSection = document.getElementById('product-list');
+          if (productSection) productSection.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+        return;
+      }
+
+      if (state.view === 'full') {
+        setSelectedProduct(null);
+        setIsProductFullView(true);
       }
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [selectedProduct, isProductFullView]);
+  }, []);
 
   // Handle View Changes
   const openFullView = () => {
@@ -46,8 +55,7 @@ export default function App() {
   };
 
   const closeFullView = () => {
-    setIsProductFullView(false);
-    window.history.back(); // Trigger popstate or just go back
+    window.history.back();
   };
 
   const openProductDetail = (item: any) => {
@@ -56,7 +64,6 @@ export default function App() {
   };
 
   const closeProductDetail = () => {
-    setSelectedProduct(null);
     window.history.back();
   };
 
