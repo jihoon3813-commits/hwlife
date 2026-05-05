@@ -11,16 +11,13 @@ html, body {
   color: #191F28;
 }
 
-/* Hide scrollbar utility - Mobile only */
-@media (max-width: 1024px) {
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .hide-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
-
+/* Hide scrollbar utility - Global */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 @keyframes neon-pulse {

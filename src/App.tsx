@@ -541,20 +541,6 @@ export default function App() {
           </div>
           <div className="flex justify-between items-end mb-2">
             <h2 className="text-[22px] font-bold leading-snug">일반 렌탈가전과<br/>가격비교 해보세요! 자신있습니다.</h2>
-            <div className="flex bg-[#F2F4F6] p-1 rounded-lg">
-              <button 
-                onClick={() => setIsGridView(false)} 
-                className={`p-1.5 rounded-md ${!isGridView ? 'bg-white shadow-sm text-[#191F28]' : 'text-[#8B95A1]'}`}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button 
-                onClick={() => setIsGridView(true)} 
-                className={`p-1.5 rounded-md ${isGridView ? 'bg-white shadow-sm text-[#191F28]' : 'text-[#8B95A1]'}`}
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
           </div>
           <p className="text-[#4E5968] text-[15px]">{planInfo.desc}</p>
         </div>
@@ -662,7 +648,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[100] bg-white flex flex-col sm:hidden"
+            className="fixed inset-0 z-[100] bg-white flex flex-col mx-auto w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]"
           >
             {/* Full Screen Header */}
             <div className="sticky top-0 bg-white/90 backdrop-blur-md z-10 px-6 py-4 flex justify-between items-center border-b border-[#F2F4F6]">
@@ -696,7 +682,7 @@ export default function App() {
             </div>
 
             {/* Immersive Grid View */}
-            <div className="flex-1 overflow-y-auto px-6 py-6 bg-[#F9FAFB]">
+            <div className="flex-1 overflow-y-auto px-6 py-6 bg-[#F9FAFB] hide-scrollbar">
               <div className="grid grid-cols-2 gap-4">
                 {filteredProducts.map((item) => (
                   <motion.div
