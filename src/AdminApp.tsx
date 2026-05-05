@@ -5,6 +5,7 @@ import CustomerManagement from './pages/CustomerManagement';
 import ProductManagement from './pages/ProductManagement';
 import Statistics from './pages/Statistics';
 import Settings from './pages/Settings';
+import VideoManagement from './pages/VideoManagement';
 
 export default function AdminApp() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,6 +21,8 @@ export default function AdminApp() {
         return <CustomerManagement />;
       case 'products':
         return <ProductManagement />;
+      case 'videos':
+        return <VideoManagement />;
       case 'statistics':
         return <Statistics />;
       case 'settings':

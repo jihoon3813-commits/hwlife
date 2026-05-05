@@ -10,6 +10,7 @@
 
 import type * as inquiries from "../inquiries.js";
 import type * as products from "../products.js";
+import type * as shorts from "../shorts.js";
 
 import type {
   ApiFromModules,
@@ -20,6 +21,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   inquiries: typeof inquiries;
   products: typeof products;
+  shorts: typeof shorts;
 }>;
 
 /**

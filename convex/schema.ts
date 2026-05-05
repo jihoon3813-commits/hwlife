@@ -34,4 +34,13 @@ export default defineSchema({
     status: v.string(), // "대기", "상담완료", "거절"
     createdAt: v.number(),
   }),
+  shorts: defineTable({
+    title: v.string(),
+    youtubeId: v.string(),
+    length: v.string(),
+    tag: v.string(),
+    views: v.string(),
+    order: v.number(),
+    isVisible: v.boolean(),
+  }),
 });

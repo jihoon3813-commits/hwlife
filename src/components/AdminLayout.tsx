@@ -1,4 +1,4 @@
-import { LayoutGrid, Users, Box, BarChart3, Settings as SettingsIcon, LogOut } from 'lucide-react';
+import { LayoutGrid, Users, Box, BarChart3, Settings as SettingsIcon, LogOut, Play } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -10,6 +10,7 @@ export default function AdminLayout({ children, activeMenu, setActiveMenu }: Adm
   const menuItems = [
     { id: 'customers', label: '고객관리', icon: Users },
     { id: 'products', label: '제품관리', icon: Box },
+    { id: 'videos', label: '영상관리', icon: Play },
     { id: 'statistics', label: '통계분석', icon: BarChart3 },
     { id: 'settings', label: '설정', icon: SettingsIcon },
   ];
