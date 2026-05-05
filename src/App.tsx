@@ -21,6 +21,7 @@ export default function App() {
   const [inquiryType, setInquiryType] = useState('');
   const [message, setMessage] = useState('');
   const [isProductFullView, setIsProductFullView] = useState(false);
+  const [isNoticeModalOpen, setIsNoticeModalOpen] = useState(false);
   const [lastViewedSection, setLastViewedSection] = useState<string | null>(null);
 
   // --- Browser Back Button Support ---
@@ -1321,7 +1322,12 @@ export default function App() {
           <div className="flex flex-wrap gap-x-5 gap-y-2 mb-10 px-1">
             <a href="#" className="text-[13px] font-bold text-[#D1D6DB] hover:text-white transition-colors">이용약관</a>
             <a href="#" className="text-[13px] font-bold text-white hover:text-white transition-colors underline underline-offset-4 decoration-white/30">개인정보처리방침</a>
-            <a href="#" className="text-[13px] font-bold text-[#D1D6DB] hover:text-white transition-colors">중요정보고시사항</a>
+            <button 
+              onClick={() => setIsNoticeModalOpen(true)}
+              className="text-[13px] font-bold text-[#D1D6DB] hover:text-white transition-colors"
+            >
+              중요정보고시사항
+            </button>
           </div>
 
           <div className="border-t border-white/5 pt-10">
@@ -1702,6 +1708,96 @@ export default function App() {
                     신청 완료
                   </button>
                 </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Important Notice Modal */}
+      <AnimatePresence>
+        {isNoticeModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 z-[70] flex items-end sm:items-center justify-center"
+            onClick={() => setIsNoticeModalOpen(false)}
+          >
+            <motion.div 
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="w-full max-w-[430px] sm:max-w-[480px] bg-white rounded-t-[32px] sm:rounded-[32px] max-h-[90vh] overflow-hidden flex flex-col"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-6 border-b border-[#F2F4F6] flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 className="text-[18px] font-bold">중요정보고시사항</h3>
+                <button 
+                  onClick={() => setIsNoticeModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-[#F2F4F6] flex items-center justify-center"
+                >
+                  <X className="w-5 h-5 text-[#8B95A1]" />
+                </button>
+              </div>
+              
+              <div className="p-6 overflow-y-auto space-y-8 pb-20 custom-scrollbar">
+                <div className="space-y-3">
+                  <h4 className="text-[15px] font-bold text-[#1B64DA] flex items-center gap-2">
+                    <Check className="w-4 h-4" />
+                    중도 해약환급금 및 환급시기
+                  </h4>
+                  <div className="bg-[#F9FAFB] rounded-2xl p-4 text-[13px] leading-[1.6] text-[#4E5968] space-y-2">
+                    <p>• <span className="font-bold">환급기준:</span> 공정거래위원회 상조업 표준약관에 따라 환급 가능</p>
+                    <p>• <span className="font-bold">환급시기:</span> 해약신청 후 3영업일 이내 지급</p>
+                    <p>• <span className="font-bold">분쟁해결:</span> 공정거래위원회 소비자분쟁해결기준에 따름</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-[15px] font-bold text-[#1B64DA] flex items-center gap-2">
+                    <Check className="w-4 h-4" />
+                    주요 제공물품 및 서비스 내용
+                  </h4>
+                  <div className="space-y-4">
+                    <div className="border-l-2 border-[#F2F4F6] pl-4 space-y-2">
+                      <p className="text-[13px] font-bold text-[#191F28]">가. 수의 원단 및 제조 방법</p>
+                      <p className="text-[12px] text-[#8B95A1] leading-[1.6]">
+                        저마(모시) 90%, 자연섬유 10% (중국산) / 기계직 제조
+                      </p>
+                    </div>
+                    <div className="border-l-2 border-[#F2F4F6] pl-4 space-y-2">
+                      <p className="text-[13px] font-bold text-[#191F28]">나. 관의 재질 및 두께 (중국산)</p>
+                      <p className="text-[12px] text-[#8B95A1] leading-[1.6]">
+                        매장 시: 오동나무 (4.3~4.5cm) / 화장 시: 오동나무 (1.6~1.8cm)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="text-[15px] font-bold text-[#1B64DA] flex items-center gap-2">
+                    <Check className="w-4 h-4" />
+                    재무 현황 및 고객불입금 관리
+                  </h4>
+                  <div className="bg-[#191F28] rounded-2xl p-5 text-white space-y-3">
+                    <div className="flex justify-between items-center border-b border-white/10 pb-3">
+                      <span className="text-[12px] text-white/60">총 고객 환급 의무액</span>
+                      <span className="text-[15px] font-bold">88,468,030,000원</span>
+                    </div>
+                    <div className="flex justify-between items-center border-b border-white/10 pb-3">
+                      <span className="text-[12px] text-white/60">선수금 보전 기관</span>
+                      <span className="text-[14px] font-bold">상조보증공제조합</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-[12px] text-white/60">선수금 보전 비율</span>
+                      <span className="text-[14px] font-bold text-[#3182F6]">50% (법정 기준)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-[#F2F4F6]">
+                  <p className="text-[11px] text-[#8B95A1] leading-[1.8] text-center break-keep">
+                    주식회사 효원상조는 관련 법률을 엄격히 준수하며 고객님의 소중한 자산을 안전하게 보호합니다.
+                  </p>
+                </div>
               </div>
             </motion.div>
           </motion.div>
