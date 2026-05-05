@@ -532,7 +532,7 @@ export default function App() {
             </h3>
             
             <p className="text-[#A3B1C6] text-[15px] leading-relaxed break-keep">
-              이중 계약 구조, 위약금 발생 가능성을<br/>
+              결합 계약 구조, 위약금 발생 가능성을<br/>
               <span className="text-white font-semibold">계약 전 시점별 시나리오</span>를 통해<br/>
               가장 투명하게 먼저 안내해 드립니다.
             </p>
@@ -904,7 +904,7 @@ export default function App() {
               <div className="w-[30px] h-[1px] bg-white/30 mx-auto"></div>
               <div className="text-center">
                  <div className="text-[13px] text-white/80 mb-1">주요 안내</div>
-                 <div className="text-[15px] font-bold text-white break-keep">해지 조건<br/>이중계약 투명안내</div>
+                 <div className="text-[15px] font-bold text-white break-keep">해지 조건<br/>결합계약 투명안내</div>
               </div>
             </div>
           </div>
@@ -1108,7 +1108,7 @@ export default function App() {
               <h3 className="font-bold text-[16px]">구조 및 조건 안내</h3>
             </div>
             <p className="text-[#A3B1C6] text-[14px] leading-relaxed pl-9">
-              이중 계약(가전+상조) 구조, 렌탈 기간, 만기 조건 등 꼭 알아야 할 핵심 정보를 숨김없이 설명합니다.
+              결합 계약(가전+상조) 구조, 렌탈 기간, 만기 조건 등 꼭 알아야 할 핵심 정보를 숨김없이 설명합니다.
             </p>
           </div>
 
