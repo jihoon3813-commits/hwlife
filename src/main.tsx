@@ -8,10 +8,9 @@ import './index.css';
 // Convex Client Setup
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
 
-// GitHub Pages Routing Logic
+// Precise Routing Logic for GitHub Pages & Vercel
 const path = window.location.pathname;
-const isHwlifeSubpath = path.includes('/hwlife');
-const isAdmin = path.includes('/admin');
+const isAdmin = path.endsWith('/admin') || path.endsWith('/admin/') || path.includes('/admin?');
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

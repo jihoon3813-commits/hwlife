@@ -561,15 +561,13 @@ export default function App() {
         {/* Product Card List (Horizontal Scroll in Section) */}
         <div 
           className="grid grid-rows-2 grid-flow-col auto-cols-max gap-3 px-6 pb-2 overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-px-6"
-          onClick={() => {
-            if (window.innerWidth < 640) setIsProductFullView(true);
-          }}
         >
           {filteredProducts.map((item) => (
             <motion.div
               key={item.id}
+              onClick={() => setSelectedProduct(item)}
               layoutId={`product-${item.id}`}
-              className="w-[200px] bg-white rounded-[24px] border border-[#F2F4F6] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-transform"
+              className="w-[200px] bg-white rounded-[24px] border border-[#F2F4F6] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-transform cursor-pointer"
             >
               <div className="relative h-[125px]">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
