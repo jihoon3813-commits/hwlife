@@ -23,6 +23,23 @@ html, body {
 
 }
 
+@keyframes neon-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 5px #3182f6, 0 0 10px #3182f6, 0 0 15px #3182f6;
+    opacity: 1;
+  }
+  50% { 
+    box-shadow: 0 0 2px #3182f6, 0 0 4px #3182f6, 0 0 6px #3182f6;
+    opacity: 0.8;
+  }
+  98% { opacity: 1; }
+  99% { opacity: 0.5; } /* Slight blink effect */
+}
+
+.animate-neon {
+  animation: neon-pulse 1.5s ease-in-out infinite;
+}
+
 @keyframes gradient-x {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }

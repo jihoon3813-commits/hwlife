@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Check, X, ChevronDown, ArrowRight, Play, Info, LayoutGrid, List,
@@ -19,6 +19,46 @@ export default function App() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [isProductFullView, setIsProductFullView] = useState(false);
+  const [lastViewedSection, setLastViewedSection] = useState<string | null>(null);
+
+  // --- Browser Back Button Support ---
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (selectedProduct) {
+        setSelectedProduct(null);
+        // If we were in full view, keep it, otherwise we're back at landing
+      } else if (isProductFullView) {
+        setIsProductFullView(false);
+        // Scroll to product list section on landing page
+        const productSection = document.getElementById('product-list');
+        if (productSection) productSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [selectedProduct, isProductFullView]);
+
+  // Handle View Changes
+  const openFullView = () => {
+    setIsProductFullView(true);
+    window.history.pushState({ view: 'full' }, '');
+  };
+
+  const closeFullView = () => {
+    setIsProductFullView(false);
+    window.history.back(); // Trigger popstate or just go back
+  };
+
+  const openProductDetail = (item: any) => {
+    setSelectedProduct(item);
+    window.history.pushState({ view: 'detail' }, '');
+  };
+
+  const closeProductDetail = () => {
+    setSelectedProduct(null);
+    window.history.back();
+  };
 
   const createInquiry = useMutation(api.inquiries.create);
 
@@ -520,7 +560,7 @@ export default function App() {
         </div>
 
         {/* Categories & Product Focus View Trigger */}
-        <div className="px-6 flex justify-between items-end mb-6">
+        <div className="px-6 flex justify-between items-end mb-6" id="product-list">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -533,10 +573,13 @@ export default function App() {
           </motion.div>
           {!isProductFullView && (
             <button 
-              onClick={() => setIsProductFullView(true)}
-              className="text-[#3182F6] text-[13px] font-bold flex items-center gap-1 mb-1 px-3 py-1.5 bg-[#F2F8FF] rounded-full"
+              onClick={openFullView}
+              className="relative overflow-visible group"
             >
-              전체보기 <ArrowRight className="w-3.5 h-3.5" />
+              <div className="absolute inset-0 bg-[#3182F6] blur-md opacity-40 animate-neon rounded-full group-hover:opacity-60 transition-opacity"></div>
+              <div className="relative text-white text-[14px] font-extrabold flex items-center gap-1.5 px-5 py-2.5 bg-[#3182F6] rounded-full shadow-[0_4px_15px_rgba(49,130,246,0.4)] active:scale-95 transition-transform">
+                전체보기 <ArrowRight className="w-4 h-4" />
+              </div>
             </button>
           )}
         </div>
@@ -565,7 +608,7 @@ export default function App() {
           {filteredProducts.map((item) => (
             <motion.div
               key={item.id}
-              onClick={() => setSelectedProduct(item)}
+              onClick={() => openProductDetail(item)}
               layoutId={`product-${item.id}`}
               className="w-[200px] bg-white rounded-[24px] border border-[#F2F4F6] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-transform cursor-pointer"
             >
@@ -628,7 +671,7 @@ export default function App() {
                 <p className="text-[12px] text-[#8B95A1]">{filteredProducts.length}개의 상품</p>
               </div>
               <button 
-                onClick={() => setIsProductFullView(false)}
+                onClick={closeFullView}
                 className="p-2 bg-[#F2F4F6] rounded-full"
               >
                 <X className="w-5 h-5 text-[#4E5968]" />
@@ -663,8 +706,7 @@ export default function App() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="bg-white rounded-[24px] border border-[#E5E8EB] overflow-hidden shadow-sm flex flex-col h-full"
                     onClick={() => {
-                      setSelectedProduct(item);
-                      setIsProductFullView(false); // Close viewer when selecting a product to show detail
+                      openProductDetail(item);
                     }}
                   >
                     <div className="relative aspect-square">
@@ -695,7 +737,7 @@ export default function App() {
               <div className="mt-8 text-center pb-12">
                 <p className="text-[13px] text-[#8B95A1] mb-4">원하시는 상품을 선택해 무료 상담을 받아보세요</p>
                 <button 
-                  onClick={() => setIsProductFullView(false)}
+                  onClick={closeFullView}
                   className="px-6 py-3 bg-[#E5E8EB] text-[#4E5968] font-bold rounded-full text-[14px]"
                 >
                   메인으로 돌아가기
@@ -1198,7 +1240,7 @@ export default function App() {
             {/* Modal Header */}
             <div className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-10 px-5 flex justify-between items-center h-[60px] border-b border-[#F2F4F6] shrink-0">
               <div className="font-bold text-[16px] truncate pr-4">{selectedProduct.name}</div>
-              <button onClick={() => setSelectedProduct(null)} className="p-2 -mr-2 text-[#8B95A1] hover:text-[#191F28] bg-[#F2F4F6] rounded-full transition-colors">
+              <button onClick={closeProductDetail} className="p-2 -mr-2 text-[#8B95A1] hover:text-[#191F28] bg-[#F2F4F6] rounded-full transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1310,7 +1352,7 @@ export default function App() {
             <div className="absolute bottom-0 w-full bg-white/90 backdrop-blur-md border-t border-[#F2F4F6] px-5 py-4 pb-6 flex gap-3 shadow-[0_-10px_30px_rgb(0,0,0,0.05)] shrink-0 z-20">
               <button 
                 onClick={() => {
-                  setSelectedProduct(null);
+                  closeProductDetail();
                   setTimeout(() => {
                     setIsContactModalOpen(true);
                   }, 400);
