@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "public": true,
+  "name": "hwlife",
+  "cleanUrls": true,
+  "framework": null,
+  "buildCommand": "echo 'Deploying static assets...'",
+  "installCommand": "echo 'No dependencies needed'",
+  "outputDirectory": "."
+}

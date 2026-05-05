@@ -5,6 +5,8 @@ import {
   ShieldAlert, Coins, LockKeyhole, Megaphone,
   Search, FileText, Smartphone, Gift
 } from 'lucide-react';
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../convex/_generated/api";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('12');
@@ -14,6 +16,10 @@ export default function App() {
   const [isGridView, setIsGridView] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+
+  const createInquiry = useMutation(api.inquiries.create);
 
   const formatPhoneNumber = (value: string) => {
     if (!value) return value;
@@ -221,7 +227,9 @@ export default function App() {
     }
   ];
 
-  const filteredProducts = activeCategory === "전체" ? productList : productList.filter(p => p.category === activeCategory);
+  const convexProducts = useQuery(api.products.getVisibleProducts);
+  const products = (convexProducts && convexProducts.length > 0) ? convexProducts : productList;
+  const filteredProducts = activeCategory === "전체" ? products : products.filter(p => p.category === activeCategory);
 
   const shorts = [
     { id: '1', title: '가전결합상조,\n왜 오해를 받을까?', length: '0:58', tag: '필수 시청', views: '2.1만' },
@@ -485,7 +493,7 @@ export default function App() {
       </section>
 
       {/* 4. Products & Accounts Section */}
-      <section className="bg-white py-12 px-0 rounded-[32px] mb-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)]">
+      <section className="bg-white pt-10 pb-6 px-0 rounded-[32px] mb-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)]">
         <div className="px-6 mb-6">
           <div className="inline-block bg-[#1B64DA] text-white text-[11px] font-bold px-2.5 py-1 rounded-full mb-3 shadow-sm">
             {planInfo.name}
@@ -511,7 +519,7 @@ export default function App() {
         </div>
 
         {/* Categories */}
-        <div className="flex flex-wrap justify-center gap-2 px-6 mb-4">
+        <div className="flex flex-wrap justify-center gap-2 px-6 mb-3">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -524,7 +532,7 @@ export default function App() {
         </div>
 
         {/* Product List */}
-        <div className={`${isGridView ? 'px-6 space-y-4' : 'grid grid-rows-2 grid-flow-col auto-cols-max gap-4 px-6 pb-6 overflow-x-auto snap-x hide-scrollbar'}`}>
+        <div className={`${isGridView ? 'px-6 space-y-4' : 'grid grid-rows-2 grid-flow-col auto-cols-max gap-3 px-6 pb-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-px-6'}`}>
           <AnimatePresence mode="popLayout">
             {filteredProducts.map((item) => (
               <motion.div 
@@ -535,40 +543,40 @@ export default function App() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
-                className={`cursor-pointer ${isGridView ? 'w-full' : 'w-[240px] snap-center'} bg-white rounded-[20px] overflow-hidden flex ${isGridView ? 'flex-row gap-4 border border-[#F2F4F6] p-3 shadow-sm' : 'flex-col border border-[#F2F4F6] shadow-sm'}`}
+                className={`cursor-pointer ${isGridView ? 'w-full' : 'w-[200px] snap-start'} bg-white rounded-[20px] overflow-hidden flex ${isGridView ? 'flex-row gap-4 border border-[#F2F4F6] p-3 shadow-sm' : 'flex-col border border-[#F2F4F6] shadow-sm'}`}
               >
-                <div className={`relative ${isGridView ? 'w-[100px] h-[100px] shrink-0 rounded-[12px] overflow-hidden bg-[#F2F4F6]' : 'w-full h-[160px] bg-[#F2F4F6]'}`}>
+                <div className={`relative ${isGridView ? 'w-[100px] h-[100px] shrink-0 rounded-[12px] overflow-hidden bg-[#F2F4F6]' : 'w-full h-[125px] bg-[#F2F4F6]'}`}>
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                  <div className="absolute top-2 left-2 flex flex-col gap-1.5 items-start">
+                  <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
                     {item.tag && (
-                      <div className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-[4px] leading-tight">
+                      <div className="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[4px] leading-tight">
                         {item.tag}
                       </div>
                     )}
-                    <div className={`${item.priceLabel.includes('최저가') ? 'bg-[#3182F6]' : 'bg-[#191F28]'} text-white text-[10.5px] font-bold px-2 py-1 rounded-[6px] shadow-sm leading-tight inline-block`}>
+                    <div className={`${item.priceLabel.includes('최저가') ? 'bg-[#3182F6]' : 'bg-[#191F28]'} text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] shadow-sm leading-tight inline-block`}>
                       {item.priceLabel}
                     </div>
                   </div>
                 </div>
                 
-                <div className={`flex flex-col justify-between ${isGridView ? 'py-1 pr-1' : 'p-5'}`}>
+                <div className={`flex flex-col justify-between ${isGridView ? 'py-1 pr-1' : 'p-4'}`}>
                   <div>
                     <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-[11px] font-bold text-[#8B95A1]">{item.brand}</span>
-                      <span className="text-[11px] text-[#A3B1C6]">|</span>
-                      <span className="text-[11px] font-medium text-[#8B95A1]">{item.model}</span>
+                      <span className="text-[10px] font-bold text-[#8B95A1]">{item.brand}</span>
+                      <span className="text-[10px] text-[#A3B1C6]">|</span>
+                      <span className="text-[10px] font-medium text-[#8B95A1]">{item.model}</span>
                     </div>
-                    <h3 className={`font-bold text-[#191F28] mb-3 leading-snug line-clamp-2 ${isGridView ? 'text-[15px]' : 'text-[16px]'}`}>{item.name}</h3>
+                    <h3 className={`font-bold text-[#191F28] mb-2 leading-snug line-clamp-2 ${isGridView ? 'text-[15px]' : 'text-[14px]'}`}>{item.name}</h3>
                   </div>
                   
                   <div className="space-y-1">
-                    <div className="flex justify-between items-center bg-[#333D4B] px-2.5 py-1.5 rounded-[8px] mb-1">
-                      <span className="text-[12px] text-white/80 font-medium">월 납입금</span>
-                      <span className="text-[13px] text-white font-bold">{item.price}</span>
+                    <div className="flex justify-between items-center bg-[#333D4B] px-2 py-1 rounded-[6px] mb-0.5">
+                      <span className="text-[11px] text-white/80 font-medium">월 납입금</span>
+                      <span className="text-[12px] text-white font-bold">{item.price}</span>
                     </div>
-                    <div className="flex justify-between items-center bg-[#BE123C] px-2.5 py-1.5 rounded-[8px]">
-                      <span className="text-[12px] text-white/90 font-medium">제휴카드 혜택가</span>
-                      <span className="text-[13px] text-white font-bold">{item.discountPrice}</span>
+                    <div className="flex justify-between items-center bg-[#BE123C] px-2 py-1 rounded-[6px]">
+                      <span className="text-[11px] text-white/90 font-medium">제휴카드</span>
+                      <span className="text-[12px] text-white font-bold">{item.discountPrice}</span>
                     </div>
                   </div>
                 </div>
@@ -1014,7 +1022,7 @@ export default function App() {
           <p className="text-[12px] text-[#8B95A1] font-medium px-1">
             주식회사 효원상조 | 대표자 OOO<br/>사업자등록번호 000-00-00000 | 고객센터 1588-0000
           </p>
-          <a href="/admin" target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#E5E8EB] hover:text-[#D1D6DB] mt-8 block text-center transition-colors">Admin</a>
+          <a href="admin" target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#E5E8EB] hover:text-[#D1D6DB] mt-8 block text-center transition-colors">Admin</a>
         </div>
       </section>
 
@@ -1229,22 +1237,41 @@ export default function App() {
                   </p>
                 </div>
 
-                <form className="space-y-4" onSubmit={(e) => {
+                <form className="space-y-4" onSubmit={async (e) => {
                   e.preventDefault();
-                  alert('상담 신청이 접수되었습니다.');
-                  setIsContactModalOpen(false);
+                  try {
+                    await createInquiry({
+                      name,
+                      phone,
+                      productName: selectedProduct?.name || "전체 상담",
+                    });
+                    alert('상담 신청이 접수되었습니다.');
+                    setName('');
+                    setPhone('');
+                    setIsContactModalOpen(false);
+                  } catch (err) {
+                    alert('상담 신청 중 오류가 발생했습니다.');
+                  }
                 }}>
                   <div>
                     <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">이름</label>
-                    <input type="text" required placeholder="이름을 입력해주세요" className="w-full bg-[#F2F4F6] px-4 py-3.5 rounded-[16px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 placeholder:text-[#8B95A1]" />
+                    <input 
+                      type="text" 
+                      required 
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="이름을 입력해주세요" 
+                      className="w-full bg-[#F2F4F6] px-4 py-3.5 rounded-[16px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 placeholder:text-[#8B95A1]" 
+                    />
                   </div>
                   <div>
                     <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">연락처</label>
                     <input 
                       type="tel" 
                       required
+                      value={phone}
+                      onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
                       placeholder="010-0000-0000" 
-                      onChange={(e) => e.target.value = formatPhoneNumber(e.target.value)}
                       className="w-full bg-[#F2F4F6] px-4 py-3.5 rounded-[16px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 placeholder:text-[#8B95A1]" 
                     />
                   </div>
