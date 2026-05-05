@@ -867,7 +867,7 @@ export default function App() {
             {
               step: "01",
               title: "비교 판단 및 상담",
-              desc: "가입 전, 당사의 시뮬레이션과 일반 렌탈 조건을 상세히 비교해보고 나에게 맞는지 먼저 판단합니다.",
+              desc: "가입 전, 효원상조 상품과 일반 렌탈 상품을 상세히 비교해보고 나에게 맞는지 먼저 판단합니다.",
               icon: <Search className="w-6 h-6 text-[#3182F6]" />,
               color: "bg-[#3182F6]/10"
             },
