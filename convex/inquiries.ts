@@ -7,6 +7,7 @@ export const create = mutation({
     name: v.string(),
     phone: v.string(),
     productName: v.string(),
+    message: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("inquiries", {

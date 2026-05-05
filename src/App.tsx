@@ -18,6 +18,8 @@ export default function App() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [inquiryType, setInquiryType] = useState('');
+  const [message, setMessage] = useState('');
   const [isProductFullView, setIsProductFullView] = useState(false);
   const [lastViewedSection, setLastViewedSection] = useState<string | null>(null);
 
@@ -1127,9 +1129,6 @@ export default function App() {
 
       {/* 10. FAQ */}
       <section className="bg-white py-12 px-6 rounded-[32px] my-2">
-         {/* 11. Contact Form Area (Removed and replaced with Modal) */}
-         <div id="contact" className="h-0 opacity-0 pointer-events-none"></div>
-
          <h2 className="text-[22px] font-bold mb-6">자주 묻는 질문</h2>
          <div className="space-y-4">
            {[{
@@ -1170,69 +1169,128 @@ export default function App() {
          </div>
       </section>
 
-      {/* 11. Contact Form */}
-      <section id="contact" className="bg-white py-12 px-6 rounded-t-[32px] mt-2 relative pb-28 text-[#191F28]">
-        <div className="mb-8">
-          <h2 className="text-[26px] font-bold mb-3">설명 먼저 듣기</h2>
-          <p className="text-[#4E5968] text-[15px] leading-relaxed break-keep">
-            담당자가 가입을 강요하지 않습니다. 투명하게 구조를 설명하고 비교를 도와드립니다.
-          </p>
-        </div>
+      {/* 11. Footer Consultation Form */}
+      <section id="contact" className="bg-[#191F28] py-16 px-6 rounded-[40px] my-4 text-white">
+        <div className="max-w-[400px] mx-auto">
+          <div className="mb-10 text-center">
+            <span className="inline-block px-3 py-1 bg-[#3182F6] text-white text-[11px] font-bold rounded-full mb-4 animate-pulse">
+              QUICK CONSULTATION
+            </span>
+            <h2 className="text-[26px] font-bold mb-3">무료 상담 신청하기</h2>
+            <p className="text-[#A3B1C6] text-[15px] leading-relaxed break-keep">
+              가입 전 궁금한 점이 있으신가요?<br/>
+              전담 상담원이 친절하고 투명하게 안내해 드립니다.
+            </p>
+          </div>
 
-        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-          <div>
-            <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">이름</label>
-            <input type="text" placeholder="이름을 입력해주세요" className="w-full bg-[#F2F4F6] px-5 py-4 rounded-[16px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 placeholder:text-[#8B95A1]" />
-          </div>
-          <div>
-            <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">연락처</label>
-            <input type="tel" placeholder="010-0000-0000" className="w-full bg-[#F2F4F6] px-5 py-4 rounded-[16px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 placeholder:text-[#8B95A1]" />
-          </div>
-          <div>
-             <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">문의 사항</label>
-             <div className="relative">
-               <select className="w-full bg-[#F2F4F6] px-5 py-4 rounded-[16px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 appearance-none text-[#191F28]">
-                 <option>원하는 구좌나 가전이 있어요</option>
-                 <option>일반 렌탈과 비교해보고 싶어요</option>
-                 <option>만기 조건에 대해 알고 싶어요</option>
-               </select>
-               <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8B95A1] pointer-events-none" />
-             </div>
-          </div>
-          
-          <div className="pt-4 pb-2">
-            <label className="flex items-start gap-3 cursor-pointer group px-1">
-              <div className="relative flex items-center justify-center w-[22px] h-[22px] rounded-[6px] bg-[#F2F4F6] border border-[#D1D6DB] group-hover:border-[#3182F6] transition-colors shrink-0">
-                <input type="checkbox" className="opacity-0 absolute" defaultChecked />
-                <Check className="w-3.5 h-3.5 text-[#3182F6]" strokeWidth={4} />
+          <form className="space-y-5" onSubmit={async (e) => {
+            e.preventDefault();
+            try {
+              const finalMessage = inquiryType === '직접 입력하기' ? message : inquiryType;
+              await createInquiry({
+                name,
+                phone,
+                productName: "랜딩 하단 상담",
+                message: finalMessage || undefined
+              });
+              alert('상담 신청이 접수되었습니다.');
+              setName('');
+              setPhone('');
+              setInquiryType('');
+              setMessage('');
+            } catch (err) {
+              alert('상담 신청 중 오류가 발생했습니다.');
+            }
+          }}>
+            <div>
+              <label className="block text-[13px] font-bold text-[#A3B1C6] mb-2 px-1">이름</label>
+              <input 
+                type="text" 
+                required 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="이름을 입력해주세요" 
+                className="w-full bg-white/10 px-5 py-4 rounded-[18px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6] placeholder:text-white/20 border border-white/5" 
+              />
+            </div>
+            <div>
+              <label className="block text-[13px] font-bold text-[#A3B1C6] mb-2 px-1">연락처</label>
+              <input 
+                type="tel" 
+                required
+                value={phone}
+                onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
+                placeholder="010-0000-0000" 
+                className="w-full bg-white/10 px-5 py-4 rounded-[18px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6] placeholder:text-white/20 border border-white/5" 
+              />
+            </div>
+            <div>
+              <label className="block text-[13px] font-bold text-[#A3B1C6] mb-2 px-1">문의 사항</label>
+              <div className="relative mb-3">
+                <select 
+                  required
+                  value={inquiryType}
+                  onChange={(e) => setInquiryType(e.target.value)}
+                  className="w-full bg-white/10 px-5 py-4 rounded-[18px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6] appearance-none text-white border border-white/5"
+                >
+                  <option value="" disabled className="bg-[#191F28]">선택하세요</option>
+                  <option className="bg-[#191F28]">원하는 구좌나 가전이 있어요</option>
+                  <option className="bg-[#191F28]">일반 렌탈과 비교해보고 싶어요</option>
+                  <option className="bg-[#191F28]">만기 조건에 대해 알고 싶어요</option>
+                  <option className="bg-[#191F28]">직접 입력하기</option>
+                </select>
+                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 pointer-events-none" />
               </div>
-              <span className="text-[13px] text-[#4E5968] leading-[1.6]">
-                [필수] 개인정보 수집·이용 및 제공에 동의합니다.
-              </span>
-            </label>
-          </div>
-          
-          <button type="submit" className="w-full bg-[#3182F6] hover:bg-[#1B64DA] active:bg-[#1B64DA] text-white font-bold text-[16px] py-4 rounded-[16px] transition-colors mt-2">
-            무료 상담 신청하기
-          </button>
-        </form>
+              {inquiryType === '직접 입력하기' && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                >
+                  <textarea 
+                    required
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="문의 내용을 상세히 입력해주세요"
+                    className="w-full bg-white/10 px-5 py-4 rounded-[18px] text-[15px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6] placeholder:text-white/20 min-h-[120px] border border-white/5"
+                  ></textarea>
+                </motion.div>
+              )}
+            </div>
+            
+            <div className="pt-3 pb-2">
+              <label className="flex items-start gap-3 cursor-pointer group px-1">
+                <div className="relative flex items-center justify-center w-[22px] h-[22px] rounded-[6px] bg-white/10 border border-white/10 group-hover:border-[#3182F6] transition-colors shrink-0 mt-0.5">
+                  <input type="checkbox" required className="opacity-0 absolute" defaultChecked />
+                  <Check className="w-3.5 h-3.5 text-[#3182F6]" strokeWidth={4} />
+                </div>
+                <span className="text-[13px] text-[#8B95A1] leading-[1.6]">
+                  [필수] 개인정보 수집·이용 및 제공에 동의합니다.
+                </span>
+              </label>
+            </div>
+            
+            <button type="submit" className="w-full bg-[#3182F6] hover:bg-[#1B64DA] text-white font-black text-[17px] py-5 rounded-[20px] transition-all mt-4 shadow-[0_8px_20px_rgba(49,130,246,0.3)] active:scale-[0.98]">
+              상담 신청 완료
+            </button>
+          </form>
 
-        {/* Footer Disclaimers */}
-        <div className="mt-16 pt-8 border-t border-[#F2F4F6]">
-          <div className="flex items-center gap-2 mb-3">
-            <Info className="w-4 h-4 text-[#8B95A1]" />
-            <h4 className="font-bold text-[#8B95A1] text-[13px]">가입 전 꼭 확인하세요</h4>
+          {/* Footer Disclaimers */}
+          <div className="mt-16 pt-8 border-t border-white/10">
+            <div className="flex items-center gap-2 mb-3">
+              <Info className="w-4 h-4 text-[#8B95A1]" />
+              <h4 className="font-bold text-[#8B95A1] text-[13px]">가입 전 꼭 확인하세요</h4>
+            </div>
+            <ul className="space-y-2 text-[12px] text-[#8B95A1] leading-[1.6] mb-8 break-keep px-1">
+              <li>• 가전 계약(렌탈/할부)과 상조 계약은 별도의 독립된 계약입니다.</li>
+              <li>• 해약환급금은 납입 기간 및 회차에 따라 상이하며, 중도 해지 시 납입한 금액보다 적거나 없을 수 있습니다.</li>
+              <li>• 가전 대금 납입 중 해지 시, 가전 잔여 할부금 및 위약금이 일시 청구될 수 있습니다.</li>
+              <li>• 반드시 상품 설명서 및 계약 약관을 확인하시기 바랍니다.</li>
+            </ul>
+            <p className="text-[12px] text-[#8B95A1] font-medium px-1">
+              주식회사 효원상조 | 대표자 OOO<br/>사업자등록번호 000-00-00000 | 고객센터 1588-0000
+            </p>
+            <a href="admin" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/5 hover:text-white/20 mt-8 block text-center transition-colors">Admin</a>
           </div>
-          <ul className="space-y-2 text-[12px] text-[#8B95A1] leading-[1.6] mb-8 break-keep px-1">
-            <li>• 가전 계약(렌탈/할부)과 상조 계약은 별도의 독립된 계약입니다.</li>
-            <li>• 해약환급금은 납입 기간 및 회차에 따라 상이하며, 중도 해지 시 납입한 금액보다 적거나 없을 수 있습니다.</li>
-            <li>• 가전 대금 납입 중 해지 시, 가전 잔여 할부금 및 위약금이 일시 청구될 수 있습니다.</li>
-            <li>• 반드시 상품 설명서 및 계약 약관을 확인하시기 바랍니다.</li>
-          </ul>
-          <p className="text-[12px] text-[#8B95A1] font-medium px-1">
-            주식회사 효원상조 | 대표자 OOO<br/>사업자등록번호 000-00-00000 | 고객센터 1588-0000
-          </p>
-          <a href="admin" target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#E5E8EB] hover:text-[#D1D6DB] mt-8 block text-center transition-colors">Admin</a>
         </div>
       </section>
 
@@ -1450,14 +1508,18 @@ export default function App() {
                 <form className="space-y-4" onSubmit={async (e) => {
                   e.preventDefault();
                   try {
+                    const finalMessage = inquiryType === '직접 입력하기' ? message : inquiryType;
                     await createInquiry({
                       name,
                       phone,
                       productName: selectedProduct?.name || "전체 상담",
+                      message: finalMessage || undefined
                     });
                     alert('상담 신청이 접수되었습니다.');
                     setName('');
                     setPhone('');
+                    setInquiryType('');
+                    setMessage('');
                     setIsContactModalOpen(false);
                   } catch (err) {
                     alert('상담 신청 중 오류가 발생했습니다.');
@@ -1490,14 +1552,8 @@ export default function App() {
                     <div className="relative mb-3">
                       <select 
                         required
-                        defaultValue=""
-                        onChange={(e) => {
-                          const target = e.target as HTMLSelectElement;
-                          const directInput = document.getElementById('direct-input-container');
-                          if (directInput) {
-                            directInput.style.display = target.value === '직접 입력하기' ? 'block' : 'none';
-                          }
-                        }}
+                        value={inquiryType}
+                        onChange={(e) => setInquiryType(e.target.value)}
                         className="w-full bg-[#F2F4F6] px-4 py-3.5 rounded-[16px] text-[16px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 appearance-none text-[#191F28]"
                       >
                         <option value="" disabled>선택하세요</option>
@@ -1508,12 +1564,20 @@ export default function App() {
                       </select>
                       <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8B95A1] pointer-events-none" />
                     </div>
-                    <div id="direct-input-container" style={{ display: 'none' }}>
-                      <textarea 
-                        placeholder="문의 내용을 입력해주세요"
-                        className="w-full bg-[#F2F4F6] px-4 py-3.5 rounded-[16px] text-[15px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 placeholder:text-[#8B95A1] min-h-[100px]"
-                      ></textarea>
-                    </div>
+                    {inquiryType === '직접 입력하기' && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                      >
+                        <textarea 
+                          required
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          placeholder="문의 내용을 입력해주세요"
+                          className="w-full bg-[#F2F4F6] px-4 py-3.5 rounded-[16px] text-[15px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/50 placeholder:text-[#8B95A1] min-h-[100px]"
+                        ></textarea>
+                      </motion.div>
+                    )}
                   </div>
                   
                   <div className="pt-2 pb-1">

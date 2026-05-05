@@ -30,6 +30,7 @@ export default defineSchema({
     name: v.string(),
     phone: v.string(),
     productName: v.string(),
+    message: v.optional(v.string()),
     status: v.string(), // "대기", "상담완료", "거절"
     createdAt: v.number(),
   }),
