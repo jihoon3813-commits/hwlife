@@ -707,7 +707,6 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
-      </section>
 
       {/* 5. What makes us different */}
       <section id="comparison" className="bg-white py-16 px-6 rounded-[32px] mt-2 mb-2">
