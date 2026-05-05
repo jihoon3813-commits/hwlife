@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Check, X, ChevronDown, ChevronRight, ArrowRight, Play, Info, LayoutGrid, List,
+  Check, X, ChevronDown, ArrowRight, Play, Info, LayoutGrid, List,
   ShieldAlert, Coins, LockKeyhole, Megaphone,
   Search, FileText, Smartphone, Gift
 } from 'lucide-react';
@@ -605,7 +605,7 @@ export default function App() {
               onClick={() => setIsContactModalOpen(true)}
               className="text-[12px] text-[#3182F6] font-bold flex items-center gap-1"
             >
-              상담원에게 물어보기 <ChevronRight className="w-4 h-4" />
+              상담원에게 물어보기 <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
