@@ -855,7 +855,7 @@ export default function App() {
       <section className="bg-[#F8FAFB] py-16 px-6 rounded-[40px] my-4 shadow-sm border border-[#F2F4F6]">
         <div className="text-center mb-12">
           <h2 className="text-[24px] font-bold mb-3 leading-tight text-[#191F28] break-keep">
-            가입부터 선택까지,
+            가입부터 선택까지,<br/>이렇게 진행됩니다
           </h2>
           <p className="text-[#8B95A1] text-[15px] leading-relaxed break-keep">
             어느 시점에 어떤 선택을 할 수 있는지 미리 확인하세요.
