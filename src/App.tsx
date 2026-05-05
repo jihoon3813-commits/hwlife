@@ -1221,7 +1221,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }} 
             exit={{ opacity: 0, y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-50 bg-white flex flex-col mx-auto w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]"
+            className="fixed inset-0 z-[110] bg-white flex flex-col mx-auto w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]"
           >
             {/* Modal Header */}
             <div className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-10 px-5 flex justify-between items-center h-[60px] border-b border-[#F2F4F6] shrink-0">
@@ -1359,7 +1359,7 @@ export default function App() {
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
+            className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 p-4"
           >
             <motion.div 
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
