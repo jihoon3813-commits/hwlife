@@ -11,7 +11,6 @@ import { api } from "../convex/_generated/api";
 export default function App() {
   const [activeTab, setActiveTab] = useState('12');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState("전체");
   const [isGridView, setIsGridView] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
@@ -128,166 +127,20 @@ export default function App() {
 
   const categories = ["전체", "TV/시청각", "냉장고/김치냉장고", "세탁기/건조기", "안마의자/건강", "기타"];
 
-  const productList = [
-    {
-      id: 1,
-      category: "TV/시청각",
-      brand: "삼성전자",
-      model: "KQ75QCE1AFXKR",
-      name: "75형 QLED 4K TV",
-      price: "59,800원",
-      discountPrice: "29,800원",
-      image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&q=80&w=400",
-      tag: "최고 인기",
-      priceLabel: "최저가 보장",
-      shippingFee: "전국 무료설치",
-      comparisons: [
-        { company: "효원상조", target: "효원상조 설계", price: "59,800원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
-        { company: "BS ON", target: "스마트렌탈", price: "60,200원", period: "60개월", isOurs: false },
-        { company: "현대유버스", target: "BS ON", price: "63,500원", period: "60개월", isOurs: false },
-        { company: "KG 이니렌탈", target: "현대유버스", price: "68,400원", period: "60개월", isOurs: false },
-        { company: "KT가전구독", target: "KT가전구독", price: "63,600원", period: "60개월", isOurs: false }
-      ],
-      detailImage: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&q=80&w=600"
-    },
-    {
-      id: 2,
-      category: "냉장고/김치냉장고",
-      brand: "LG전자",
-      model: "W822GBBR152",
-      name: "LG 디오스 오브제컬렉션 노크온",
-      price: "59,000원",
-      discountPrice: "29,000원",
-      image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=400",
-      priceLabel: "일반 렌탈과 비슷해요",
-      shippingFee: "기본 설치비 무료",
-      comparisons: [
-        { company: "BS ON", target: "BS ON", price: "58,500원", period: "60개월", isOurs: false },
-        { company: "효원상조", target: "효원상조 설계", price: "59,000원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
-        { company: "KG 이니렌탈", target: "KG 이니렌탈", price: "61,000원", period: "60개월", isOurs: false },
-      ],
-      detailImage: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=600"
-    },
-    {
-      id: 3,
-      category: "세탁기/건조기",
-      brand: "LG전자",
-      model: "FX23WNA",
-      name: "LG 트롬 워시타워 프리미엄",
-      price: "62,000원",
-      discountPrice: "32,000원",
-      image: "https://images.unsplash.com/photo-1626808642875-0aa545482dfb?auto=format&fit=crop&q=80&w=400",
-      tag: "신모델",
-      priceLabel: "최저가",
-      shippingFee: "전국 무료설치",
-      comparisons: [
-        { company: "효원상조", target: "효원상조 설계", price: "62,000원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
-        { company: "현대유버스", target: "현대유버스", price: "66,000원", period: "60개월", isOurs: false },
-        { company: "스마트렌탈", target: "스마트렌탈", price: "75,000원", period: "60개월", isOurs: false },
-      ],
-      detailImage: "https://images.unsplash.com/photo-1626808642875-0aa545482dfb?auto=format&fit=crop&q=80&w=600"
-    },
-    {
-      id: 4,
-      category: "안마의자/건강",
-      brand: "바디프랜드",
-      model: "BF-2024",
-      name: "파라오 2024년형 메디컬 안마의자",
-      price: "65,000원",
-      discountPrice: "35,000원",
-      image: "https://images.unsplash.com/photo-1593025219500-2f3b9c7cf6df?auto=format&fit=crop&q=80&w=400",
-      priceLabel: "최저가 보장",
-      shippingFee: "전국 무료설치 / 폐가전 수거",
-      comparisons: [
-        { company: "효원상조", target: "효원상조 설계", price: "65,000원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
-        { company: "BS ON", target: "BS ON", price: "72,000원", period: "60개월", isOurs: false },
-        { company: "KG 이니렌탈", target: "KG 이니렌탈", price: "89,000원", period: "60개월", isOurs: false },
-      ],
-      detailImage: "https://images.unsplash.com/photo-1593025219500-2f3b9c7cf6df?auto=format&fit=crop&q=80&w=600"
-    },
-    {
-      id: 5,
-      category: "TV/시청각",
-      brand: "LG전자",
-      model: "OLED65C3KNA",
-      name: "65형 올레드 evo C3",
-      price: "57,000원",
-      discountPrice: "27,000원",
-      image: "https://images.unsplash.com/photo-1593784991095-a205039470b6?auto=format&fit=crop&q=80&w=400",
-      tag: "최고 화질",
-      priceLabel: "초특가",
-      shippingFee: "전국 무료설치",
-      comparisons: [
-        { company: "효원상조", target: "효원상조 설계", price: "57,000원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
-        { company: "현대유버스", target: "현대유버스", price: "61,200원", period: "60개월", isOurs: false },
-      ],
-      detailImage: "https://images.unsplash.com/photo-1593784991095-a205039470b6?auto=format&fit=crop&q=80&w=600"
-    },
-    {
-      id: 6,
-      category: "냉장고/김치냉장고",
-      brand: "삼성전자",
-      model: "RF85C9001AP",
-      name: "비스포크 4도어 키친핏",
-      price: "58,200원",
-      discountPrice: "28,200원",
-      image: "https://images.unsplash.com/photo-1571175432270-ef0260ca7302?auto=format&fit=crop&q=80&w=400",
-      priceLabel: "인기 모델",
-      shippingFee: "기본 설치비 무료",
-      comparisons: [
-        { company: "효원상조", target: "효원상조 설계", price: "58,200원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
-        { company: "스마트렌탈", target: "스마트렌탈", price: "62,500원", period: "60개월", isOurs: false },
-      ],
-      detailImage: "https://images.unsplash.com/photo-1571175432270-ef0260ca7302?auto=format&fit=crop&q=80&w=600"
-    },
-    {
-      id: 7,
-      category: "세탁기/건조기",
-      brand: "삼성전자",
-      model: "WF24B9600KP",
-      name: "비스포크 그랑데 AI 세탁기",
-      price: "55,000원",
-      discountPrice: "25,000원",
-      image: "https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&q=80&w=400",
-      tag: "베스트",
-      priceLabel: "최저가",
-      shippingFee: "전국 무료설치",
-      comparisons: [
-        { company: "효원상조", target: "효원상조 설계", price: "55,000원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
-        { company: "KG 이니렌탈", target: "KG 이니렌탈", price: "59,800원", period: "60개월", isOurs: false },
-      ],
-      detailImage: "https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&q=80&w=600"
-    },
-    {
-      id: 8,
-      category: "안마의자/건강",
-      brand: "코지마",
-      model: "CMC-A305",
-      name: "코지마 뉴트로 안마의자",
-      price: "56,900원",
-      discountPrice: "26,900원",
-      image: "https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=400",
-      priceLabel: "가성비 추천",
-      shippingFee: "전국 무료설치",
-      comparisons: [
-        { company: "효원상조", target: "효원상조 설계", price: "56,900원", period: "60개월", isOurs: true, benefit: "만기시 100% 환급" },
-        { company: "BS ON", target: "BS ON", price: "64,000원", period: "60개월", isOurs: false },
-      ],
-      detailImage: "https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=600"
-    }
-  ];
+  const products = useQuery(api.products.getVisibleProducts) || [];
+  const competitors = useQuery(api.competitors.get) || [];
+  const filteredProducts = activeCategory === "전체" 
+    ? products 
+    : products.filter(p => p.category === activeCategory);
 
-  const convexProducts = useQuery(api.products.getVisibleProducts);
-  const products = (convexProducts && convexProducts.length > 0) ? convexProducts : productList;
-  const filteredProducts = activeCategory === "전체" ? products : products.filter(p => p.category === activeCategory);
+  const shorts = useQuery(api.shorts.get) || [];
 
-  const convexShorts = useQuery(api.shorts.getVisible);
-  const shorts = (convexShorts && convexShorts.length > 0) ? convexShorts : [
-    { id: '1', title: '가전결합상조,\n왜 오해를 받을까?', length: '0:58', tag: '필수 시청', views: '2.1만', youtubeId: 'dQw4w9WgXcQ' },
-    { id: '2', title: '공짜 가전이\n아닌 확실한 이유', length: '1:12', tag: '팩트 체크', views: '1.5만', youtubeId: 'dQw4w9WgXcQ' },
-    { id: '3', title: '일반 렌탈과\n비교하면 뭐가 다를까?', length: '0:45', tag: '비교 분석', views: '3.4만', youtubeId: 'dQw4w9WgXcQ' },
-    { id: '4', title: '60개월 이후\n달라지는 엄청난 차이', length: '1:05', tag: '핵심 혜택', views: '4.2만', youtubeId: 'dQw4w9WgXcQ' },
-  ];
+  const formatNumber = (val: string | number) => {
+    if (!val) return "0";
+    return val.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const [activeVideoItem, setActiveVideoItem] = useState<any | null>(null);
 
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
@@ -435,14 +288,14 @@ export default function App() {
           {shorts.map((short, idx) => (
             <motion.div 
               whileTap={{ scale: 0.96 }}
-              key={short.id} 
-              onClick={() => setActiveVideo(short.title)}
+              key={short._id} 
+              onClick={() => setActiveVideoItem(short)}
               className="relative shrink-0 w-[150px] aspect-[9/16] snap-center cursor-pointer rounded-2xl overflow-hidden shadow-[0_4px_16px_rgb(0,0,0,0.06)] bg-[#191F28]"
             >
               <img 
-                src={`https://images.unsplash.com/photo-${1500000000000 + idx}?w=300&q=80&auto=format&fit=crop`} 
+                src={short.thumbnail || `https://images.unsplash.com/photo-${1500000000000 + idx}?w=300&q=80&auto=format&fit=crop`} 
                 alt="영상 썸네일" 
-                className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay"
+                className="absolute inset-0 w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80"></div>
               
@@ -458,7 +311,7 @@ export default function App() {
               
               <div className="absolute bottom-3 left-3 right-3">
                 <p className="font-bold text-white text-[14px] leading-[1.3] mb-1.5 whitespace-pre-line">{short.title}</p>
-                <p className="text-[11px] text-white/70 font-medium">{short.views}회 시청 • {short.length}</p>
+                <p className="text-[11px] text-white/70 font-medium">{short.length}</p>
               </div>
             </motion.div>
           ))}
@@ -507,6 +360,14 @@ export default function App() {
             <p className="text-[#A3B1C6] text-[13px] leading-relaxed break-keep">'사은품', '적금형' 등 위험한 표현 사용</p>
           </div>
         </div>
+        
+        <div className="mt-10 mb-8 rounded-[22px] overflow-hidden shadow-2xl border border-white/5">
+          <img 
+            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777964414/Generated_Image_May_05_2026_-_3_59PM_hw1sge.jpg" 
+            alt="의심하는 시장" 
+            className="w-full h-auto object-cover opacity-90"
+          />
+        </div>
 
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
@@ -553,6 +414,13 @@ export default function App() {
             <h2 className="text-[22px] font-bold leading-snug">일반 렌탈가전과<br/>가격비교 해보세요! 자신있습니다.</h2>
           </div>
           <p className="text-[#4E5968] text-[15px]">{planInfo.desc}</p>
+          <div className="mt-6 rounded-[24px] overflow-hidden shadow-sm border border-[#F2F4F6]">
+            <img 
+              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777964857/Generated_Image_May_05_2026_-_4_01PM_cwwwlq.jpg" 
+              alt="가격비교 혜택" 
+              className="w-full h-auto"
+            />
+          </div>
         </div>
 
         {/* Categories & Product Focus View Trigger */}
@@ -603,12 +471,12 @@ export default function App() {
         >
           {filteredProducts.map((item) => (
             <motion.div
-              key={item.id}
+              key={(item as any)._id || (item as any).id}
               onClick={() => openProductDetail(item)}
-              layoutId={`product-${item.id}`}
-              className="w-[200px] bg-white rounded-[24px] border border-[#F2F4F6] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-transform cursor-pointer"
+              layoutId={`product-${(item as any)._id || (item as any).id}`}
+              className="w-[200px] bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1"
             >
-              <div className="relative h-[125px]">
+              <div className="relative h-[125px] bg-[#F9FAFB]">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 {item.tag && (
                   <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">
@@ -625,11 +493,14 @@ export default function App() {
                 <h3 className="text-[14px] font-bold text-[#191F28] mb-3 line-clamp-2 h-10 leading-tight">
                   {item.name}
                 </h3>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[11px] text-[#8B95A1] line-through decoration-[#8B95A1]/40">월 {item.price}</span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[16px] font-bold text-[#191F28]">월 {item.discountPrice}</span>
-                    <span className="text-[11px] font-bold text-[#F04452]">0원</span>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] text-[#8B95A1] line-through decoration-[#8B95A1]/40 leading-none">월납입금 {item.price}</span>
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[17px] font-black text-[#191F28]">월 {item.discountPrice}</span>
+                      <span className="text-[9px] font-bold text-[#3182F6] bg-[#3182F6]/5 px-1 py-0.5 rounded-md">제휴카드 혜택가</span>
+                    </div>
+                    <span className="text-[11px] font-bold text-[#F04452]">상조 만기 시 전액지원</span>
                   </div>
                 </div>
               </div>
@@ -802,8 +673,8 @@ export default function App() {
               <div className="grid grid-cols-2 gap-4">
                 {filteredProducts.map((item) => (
                   <motion.div
-                    key={`full-${item.id}`}
-                    layoutId={`product-${item.id}`}
+                    key={`full-${(item as any)._id || (item as any).id}`}
+                    layoutId={`product-${(item as any)._id || (item as any).id}`}
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="bg-white rounded-[24px] border border-[#E5E8EB] overflow-hidden shadow-sm flex flex-col h-full"
@@ -824,11 +695,12 @@ export default function App() {
                       <h3 className="text-[13px] font-bold text-[#191F28] mb-2 line-clamp-2 leading-snug flex-1">
                         {item.name}
                       </h3>
-                      <div className="mt-auto">
-                        <span className="text-[10px] text-[#8B95A1] line-through">월 {item.price}</span>
-                        <div className="flex items-baseline justify-between">
-                          <span className="text-[15px] font-bold text-[#191F28]">월 {item.discountPrice}</span>
-                          <span className="text-[10px] font-bold text-[#F04452]">0원</span>
+                      <div className="mt-auto space-y-0.5">
+                        <span className="text-[9px] text-[#8B95A1] line-through">월납입금 {formatNumber(item.price)}</span>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] font-bold text-[#3182F6] bg-[#3182F6]/5 px-1.5 py-0.5 rounded w-fit">제휴카드 혜택가</span>
+                          <span className="text-[14px] font-black text-[#191F28]">월 {formatNumber(item.discountPrice)}</span>
+                          <span className="text-[10px] font-bold text-[#F04452]">상조 만기 시 전액지원</span>
                         </div>
                       </div>
                     </div>
@@ -856,11 +728,18 @@ export default function App() {
           효원의 결합상조는 단순히<br/>
           ‘가전 혜택을 내세워 상조를 <span className="text-[#3182F6]">비싸게 묶는 상품</span>’이 아닙니다.
         </h2>
-        <p className="text-[#4E5968] text-[15px] mb-10 leading-relaxed break-keep text-center">
+        <p className="text-[#4E5968] text-[15px] mb-8 leading-relaxed break-keep text-center">
           단순한 혜택 강조보다,<br/>
           일반 렌탈과도 비교해볼 수 있는 월 납입 구조와<br/>
           <span className="text-[#191F28] font-semibold">투명한 설명을 먼저 생각했습니다.</span>
         </p>
+        <div className="mb-10 rounded-[24px] overflow-hidden shadow-sm border border-[#F2F4F6]">
+          <img 
+            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777964960/Generated_Image_May_05_2026_-_4_07PM_op1mfs.jpg" 
+            alt="효원 차별화" 
+            className="w-full h-auto"
+          />
+        </div>
 
         <div className="space-y-3 mb-10">
           {[
@@ -1039,6 +918,14 @@ export default function App() {
         <h2 className="text-[22px] font-bold mb-6 leading-snug break-keep text-center">
           이런 분께는 맞고,<br/>이런 분께는 맞지 않습니다
         </h2>
+        
+        <div className="mb-8 rounded-[24px] overflow-hidden shadow-sm border border-[#F2F4F6]">
+          <img 
+            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777965369/Generated_Image_May_05_2026_-_4_14PM_hqrq75.jpg" 
+            alt="적합도 가이드" 
+            className="w-full h-auto"
+          />
+        </div>
         
         <div className="space-y-4">
           <div className="bg-[#1B64DA] rounded-[24px] p-6 shadow-lg">
@@ -1416,47 +1303,41 @@ export default function App() {
 
       {/* Shorts Modal */}
       <AnimatePresence>
-        {activeVideo && (
+        {activeVideoItem && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 z-[60] flex flex-col justify-center items-center px-4"
+            className="fixed inset-0 bg-black/95 z-[150] flex flex-col justify-center items-center"
           >
             <button 
-              onClick={() => setActiveVideo(null)}
-              className="absolute top-5 right-5 text-white/50 hover:text-white p-2 z-10"
+              onClick={() => setActiveVideoItem(null)}
+              className="absolute top-5 right-5 text-white/50 hover:text-white p-2 z-[160]"
             >
                <X className="w-8 h-8" />
             </button>
             <motion.div 
               initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }}
-              className="w-full max-w-[340px] aspect-[9/16] bg-[#191F28] rounded-[24px] flex items-center justify-center flex-col overflow-hidden border border-white/10"
+              className="w-full max-w-[430px] aspect-[9/16] bg-black rounded-[24px] overflow-hidden flex items-center justify-center flex-col relative"
             >
-               {(() => {
-                 const currentShort = shorts.find((s: any) => s.title === activeVideo);
-                 if (currentShort && currentShort.youtubeId) {
-                   return (
-                     <iframe 
-                       className="w-full h-full"
-                       src={`https://www.youtube.com/embed/${currentShort.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
-                       title="YouTube video player"
-                       frameBorder="0"
-                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                       allowFullScreen
-                     ></iframe>
-                   );
-                 }
-                 return (
-                   <div className="p-6 text-center">
-                     <div className="w-16 h-16 bg-[#3182F6]/20 rounded-full flex items-center justify-center mb-6 mx-auto">
-                       <Play className="w-8 h-8 text-[#3182F6] ml-1" fill="currentColor" />
-                     </div>
-                     <h3 className="text-white font-bold text-[20px] mb-3 leading-snug whitespace-pre-line">{activeVideo}</h3>
-                     <p className="text-white/50 text-[14px] leading-relaxed">
-                       영상을 준비 중입니다.
-                     </p>
-                   </div>
-                 );
-               })()}
+               {activeVideoItem.videoUrl ? (
+                 <iframe 
+                   src={activeVideoItem.videoUrl.includes('youtube.com') || activeVideoItem.videoUrl.includes('youtu.be') 
+                     ? `https://www.youtube.com/embed/${activeVideoItem.videoUrl.split('/').pop()?.split('v=')[1] || activeVideoItem.videoUrl.split('/').pop()}?autoplay=1`
+                     : activeVideoItem.videoUrl}
+                   className="w-full h-full"
+                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                   allowFullScreen
+                 ></iframe>
+               ) : (
+                 <div className="text-center p-6">
+                    <div className="w-16 h-16 bg-[#3182F6]/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                      <Play className="w-8 h-8 text-[#3182F6] ml-1" fill="currentColor" />
+                    </div>
+                    <h3 className="text-white font-bold text-[20px] mb-3 leading-snug whitespace-pre-line">{activeVideoItem.title}</h3>
+                    <p className="text-white/50 text-[14px] leading-relaxed">
+                      영상을 불러올 수 없습니다.
+                    </p>
+                 </div>
+               )}
             </motion.div>
           </motion.div>
         )}
@@ -1487,9 +1368,11 @@ export default function App() {
               <div className="bg-[#F2F4F6] w-full aspect-square relative">
                 <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
                 <div className="absolute top-4 left-4">
-                  <div className={`${selectedProduct.priceLabel.includes('최저가') ? 'bg-[#3182F6]' : 'bg-[#191F28]'} text-white text-[12px] font-bold px-3 py-1.5 rounded-[8px] shadow-sm inline-block`}>
-                    {selectedProduct.priceLabel}
-                  </div>
+                  {selectedProduct.priceLabel && (
+                    <div className={`${selectedProduct.priceLabel?.includes('최저가') ? 'bg-[#3182F6]' : 'bg-[#191F28]'} text-white text-[12px] font-bold px-3 py-1.5 rounded-[8px] shadow-sm inline-block`}>
+                      {selectedProduct.priceLabel}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1503,10 +1386,12 @@ export default function App() {
                   {selectedProduct.name}
                 </h2>
 
-                <div className="bg-[#F2F4F6] rounded-[16px] p-4 flex items-center justify-between mb-2">
-                  <span className="text-[14px] text-[#4E5968] font-medium">배송/설치안내</span>
-                  <span className="text-[14px] text-[#191F28] font-bold">{selectedProduct.shippingFee}</span>
-                </div>
+                {selectedProduct.shippingFee && (
+                  <div className="bg-[#F2F4F6] rounded-[16px] p-4 flex items-center justify-between mb-2">
+                    <span className="text-[14px] text-[#4E5968] font-medium">배송/설치안내</span>
+                    <span className="text-[14px] text-[#191F28] font-bold">{selectedProduct.shippingFee}</span>
+                  </div>
+                )}
                 
                 <div className="bg-white border rounded-[20px] p-0 shadow-sm mt-6 overflow-hidden">
                   <div className="bg-[#F9FAFB] px-5 py-4 border-b border-[#F2F4F6]">
@@ -1518,46 +1403,66 @@ export default function App() {
                     </h3>
                   </div>
                   
-                  <div className="px-5 py-2">
-                    <div className="flex text-[12px] font-bold text-[#8B95A1] border-b border-[#F2F4F6] py-3">
+                  <div className="px-3 py-2">
+                    <div className="flex text-[11px] font-bold text-[#8B95A1] border-b border-[#F2F4F6] py-3">
                       <div className="flex-1">렌탈사</div>
-                      <div className="w-[100px] text-right">월 렌탈료</div>
-                      <div className="w-[80px] text-center">납입기간</div>
+                      <div className="w-[85px] text-right">월 렌탈료</div>
+                      <div className="w-[65px] text-center">납입기간</div>
                     </div>
                     
                     <div className="divide-y divide-[#F2F4F6]">
-                      {selectedProduct.comparisons?.map((comp: any, idx: number) => (
-                        <div key={idx} className={`flex items-center py-4 ${comp.isOurs ? 'bg-[#1B64DA] text-white -mx-5 px-5 my-1 rounded-lg shadow-md' : ''}`}>
-                          <div className="flex-1 flex flex-col">
-                            {/* Dummy logo representations */}
-                            <div className="flex items-center gap-2 mb-1">
-                              {!comp.isOurs ? (
-                                <span className="bg-gray-100 text-gray-500 font-bold text-[10px] px-1.5 py-0.5 rounded border border-gray-200 uppercase whitespace-nowrap">
+                      {[
+                        {
+                          company: "효원상조",
+                          price: selectedProduct.price,
+                          period: "60개월",
+                          isOurs: true,
+                          benefit: "만기 시 전액 지원"
+                        },
+                        ...(selectedProduct.comparisons || []).filter((c: any) => !c.isOurs)
+                      ].map((comp: any, idx: number) => {
+                        const partner = competitors.find(c => c.name === comp.company);
+                        return (
+                          <div key={idx} className={`flex items-center py-4 ${comp.isOurs ? 'bg-[#1B64DA] text-white -mx-3 px-3 my-1 rounded-lg shadow-md' : ''}`}>
+                            <div className="flex-1 flex items-center gap-2.5 min-w-0">
+                              {comp.isOurs ? (
+                                <div className="w-[40px] h-[40px] bg-white rounded-[10px] border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" className="w-full h-full object-contain p-1" alt="hyowon" />
+                                </div>
+                              ) : partner?.logo ? (
+                                <div className="w-[40px] h-[40px] bg-white rounded-[10px] border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                                  <img src={partner.logo} className="w-full h-full object-contain" alt="logo" />
+                                </div>
+                              ) : (
+                                <span className="bg-gray-100 text-gray-500 font-bold text-[9px] px-1.5 py-0.5 rounded border border-gray-200 uppercase whitespace-nowrap shrink-0">
                                   {comp.company.substring(0, 4)}
                                 </span>
-                              ) : (
-                                <span className="bg-white text-[#1B64DA] font-bold text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap shadow-sm">
-                                  효원
-                                </span>
                               )}
-                              <span className={`font-bold text-[14px] ${comp.isOurs ? 'text-white' : 'text-[#333D4B]'}`}>
-                                {comp.company}
-                              </span>
+                              <div className="flex flex-col min-w-0">
+                                <span className={`font-bold text-[13px] whitespace-nowrap ${comp.isOurs ? 'text-white' : 'text-[#191F28]'}`}>
+                                  {comp.company}
+                                </span>
+                                {comp.benefit && !comp.isOurs && (
+                                  <span className={`text-[10px] font-medium leading-tight text-[#3182F6]`}>{comp.benefit}</span>
+                                )}
+                              </div>
                             </div>
-                            {comp.benefit && (
-                              <span className={`text-[11px] font-medium ${comp.isOurs ? 'text-white/80' : 'text-[#3182F6]'}`}>{comp.benefit}</span>
-                            )}
+                            
+                            <div className="w-[85px] text-right flex flex-col">
+                              <span className={`text-[15px] ${comp.isOurs ? 'font-extrabold text-white' : 'font-bold text-[#191F28]'}`}>
+                                월 {formatNumber(comp.price)}원
+                              </span>
+                              {comp.isOurs && (
+                                <span className="text-[9px] font-bold text-white/90 leading-tight">만기 시 전액 지원</span>
+                              )}
+                            </div>
+                            
+                            <div className={`w-[65px] text-center text-[11px] ${comp.isOurs ? 'font-bold text-white/90' : 'text-[#4E5968]'}`}>
+                              {comp.period}
+                            </div>
                           </div>
-                          
-                          <div className={`w-[100px] text-right text-[15px] ${comp.isOurs ? 'font-extrabold text-white' : 'font-bold text-[#191F28]'}`}>
-                            월 {comp.price}
-                          </div>
-                          
-                          <div className={`w-[80px] text-center text-[13px] ${comp.isOurs ? 'font-bold text-white/90' : 'text-[#4E5968]'}`}>
-                            {comp.period}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -1573,7 +1478,9 @@ export default function App() {
                 </div>
                 {/* Fake long product detail string */}
                 <div className="space-y-2 mt-4 px-4 pb-8 relative z-10">
-                  <img src={selectedProduct.detailImage} alt="상세1" className="w-full rounded-[16px] shadow-sm mb-4" />
+                  {selectedProduct.detailImage && (
+                    <img src={selectedProduct.detailImage} alt="상세1" className="w-full rounded-[16px] shadow-sm mb-4" />
+                  )}
                   <div className="h-[400px] bg-[#F2F4F6] rounded-[16px] flex flex-col items-center justify-center text-[#8B95A1] font-medium border border-[#E5E8EB] shadow-sm">
                     <ChevronDown className="w-8 h-8 text-[#D1D6DB] mb-2" />
                     상세페이지 연동 영역

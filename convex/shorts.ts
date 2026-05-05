@@ -8,25 +8,14 @@ export const get = query({
   },
 });
 
-export const getVisible = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db
-      .query("shorts")
-      .filter((q) => q.eq(q.field("isVisible"), true))
-      .collect();
-  },
-});
-
 export const create = mutation({
   args: {
     title: v.string(),
-    youtubeId: v.string(),
     length: v.string(),
     tag: v.string(),
-    views: v.string(),
+    thumbnail: v.optional(v.string()),
+    videoUrl: v.string(),
     order: v.number(),
-    isVisible: v.boolean(),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("shorts", args);
@@ -36,17 +25,16 @@ export const create = mutation({
 export const update = mutation({
   args: {
     id: v.id("shorts"),
-    title: v.string(),
-    youtubeId: v.string(),
-    length: v.string(),
-    tag: v.string(),
-    views: v.string(),
-    order: v.number(),
-    isVisible: v.boolean(),
+    title: v.optional(v.string()),
+    length: v.optional(v.string()),
+    tag: v.optional(v.string()),
+    thumbnail: v.optional(v.string()),
+    videoUrl: v.optional(v.string()),
+    order: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { id, ...rest } = args;
-    await ctx.db.patch(id, rest);
+    const { id, ...fields } = args;
+    await ctx.db.patch(id, fields);
   },
 });
 
@@ -54,12 +42,5 @@ export const remove = mutation({
   args: { id: v.id("shorts") },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id);
-  },
-});
-
-export const toggleVisibility = mutation({
-  args: { id: v.id("shorts"), isVisible: v.boolean() },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.id, { isVisible: args.isVisible });
   },
 });

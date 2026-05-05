@@ -1,5 +1,7 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square } from 'lucide-react';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 
 interface Plan {
   id: number;
@@ -10,36 +12,23 @@ interface Plan {
   isMainActive: boolean;
 }
 
-interface Product {
-  id: number;
-  planId: number;
-  brand: string;
-  category: string;
-  name: string;
-  model: string;
-  price: string;
-  isVisible: boolean;
-  thumbnail?: string;
-  detailImage?: string;
-  comparisons?: { name: string; price: string; months: number }[];
-}
-
 export default function ProductManagement() {
   const [plans, setPlans] = useState<Plan[]>([
     { id: 1, name: '스페셜 299 더블', basePrice: '59,800', benefitPrice: '29,800', mainCount: 4, isMainActive: true },
     { id: 2, name: '스페셜 399 실속', basePrice: '69,800', benefitPrice: '39,800', mainCount: 4, isMainActive: false },
   ]);
 
-  const [products, setProducts] = useState<Product[]>([
-    { id: 1, planId: 1, brand: 'LG전자', category: '냉장고/김치냉장고', name: 'LG 디오스 오브제컬렉션 노크온', model: 'W822GBBR152', price: '59000', isVisible: true },
-    { id: 2, planId: 1, brand: '삼성전자', category: 'TV/시청각', name: '75형 QLED 4K TV', model: 'KQ75QCE1AFXKR', price: '59800', isVisible: true },
-    { id: 3, planId: 1, brand: '바디프랜드', category: '안마의자', name: '팬텀 로보', model: 'PHANTOM-ROBO', price: '69800', isVisible: true },
-  ]);
+  const allProducts = useQuery(api.products.getAllProducts) || [];
+  const competitors = useQuery(api.competitors.get) || [];
+  
+  const updateProduct = useMutation(api.products.update);
+  const createProduct = useMutation(api.products.create);
+  const deleteProductMutation = useMutation(api.products.remove);
 
   const [selectedPlanId, setSelectedPlanId] = useState<number>(1);
   const [viewMode, setViewMode] = useState<'list' | 'edit_plan' | 'edit_product'>('list');
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [sortConfig, setSortConfig] = useState<{ key: 'brand' | 'category' | null, direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
 
   const thumbInputRef = useRef<HTMLInputElement>(null);
@@ -53,17 +42,34 @@ export default function ProductManagement() {
     return val.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setEditingProduct({ ...editingProduct, image: url });
+    }
+  };
+
+  const handleDetailImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setEditingProduct({ ...editingProduct, detailImage: url });
+    }
+  };
+
   const handleAddProduct = () => {
-    const newId = Date.now();
     setEditingProduct({ 
-      id: newId, 
       planId: selectedPlanId, 
       brand: '삼성전자', 
-      category: '냉장고/김치냉장고', 
+      category: 'TV/시청각', 
       name: '', 
       model: '', 
-      price: '', 
+      price: '0', 
+      discountPrice: '0',
       isVisible: true,
+      tag: '',
+      image: '',
       comparisons: [] 
     });
     setViewMode('edit_product');
@@ -75,72 +81,74 @@ export default function ProductManagement() {
       direction = 'desc';
     }
     setSortConfig({ key, direction });
-    
-    const sorted = [...products].sort((a, b) => {
-      if (direction === 'asc') return a[key].localeCompare(b[key]);
-      return b[key].localeCompare(a[key]);
-    });
-    setProducts(sorted);
   };
 
-  const toggleVisibility = (id: number) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, isVisible: !p.isVisible } : p));
+  const toggleVisibility = async (id: string, current: boolean) => {
+    await updateProduct({ id: id as any, isVisible: !current });
   };
 
-  const deleteProduct = (id: number) => {
+  const deleteProduct = async (id: string) => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
-      setProducts(prev => prev.filter(p => p.id !== id));
+      await deleteProductMutation({ id: id as any });
       setSelectedIds(prev => prev.filter(i => i !== id));
     }
   };
 
-  const copyProduct = (id: number) => {
-    const target = products.find(p => p.id === id);
+  const copyProduct = async (id: string) => {
+    const target = allProducts.find(p => p._id === id);
     if (target) {
-      const copy = { ...target, id: Date.now(), name: `${target.name} (복사본)` };
-      setProducts(prev => [...prev, copy]);
+      const { _id, _creationTime, ...data } = target;
+      await createProduct({ ...data, name: `${data.name} (복사본)` });
     }
   };
 
   // Batch Actions
-  const handleBatchDelete = () => {
+  const handleBatchDelete = async () => {
     if (selectedIds.length === 0) return;
     if (window.confirm(`${selectedIds.length}개의 항목을 삭제하시겠습니까?`)) {
-      setProducts(prev => prev.filter(p => !selectedIds.includes(p.id)));
+      for (const id of selectedIds) {
+        await deleteProductMutation({ id: id as any });
+      }
       setSelectedIds([]);
     }
   };
 
-  const handleBatchToggleVisibility = (visible: boolean) => {
+  const handleBatchToggleVisibility = async (visible: boolean) => {
     if (selectedIds.length === 0) return;
-    setProducts(prev => prev.map(p => selectedIds.includes(p.id) ? { ...p, isVisible: visible } : p));
+    for (const id of selectedIds) {
+      await updateProduct({ id: id as any, isVisible: visible });
+    }
     setSelectedIds([]);
   };
 
-  const handleBatchCopy = () => {
+  const handleBatchCopy = async () => {
     if (selectedIds.length === 0) return;
-    const copies = products
-      .filter(p => selectedIds.includes(p.id))
-      .map((p, idx) => ({ ...p, id: Date.now() + idx, name: `${p.name} (복사본)` }));
-    setProducts(prev => [...prev, ...copies]);
+    for (const id of selectedIds) {
+      const target = allProducts.find(p => p._id === id);
+      if (target) {
+        const { _id, _creationTime, ...data } = target;
+        await createProduct({ ...data, name: `${data.name} (복사본)` });
+      }
+    }
     setSelectedIds([]);
   };
 
   const onDragStart = (index: number) => setDraggedItemIndex(index);
   const onDragOver = (e: React.DragEvent) => e.preventDefault();
   const onDrop = (index: number) => {
-    if (draggedItemIndex === null || draggedItemIndex === index) return;
-    const updatedProducts = [...products];
-    const filteredByPlan = updatedProducts.filter(p => p.planId === selectedPlanId);
-    const otherProducts = updatedProducts.filter(p => p.planId !== selectedPlanId);
-    const itemToMove = filteredByPlan[draggedItemIndex];
-    filteredByPlan.splice(draggedItemIndex, 1);
-    filteredByPlan.splice(index, 0, itemToMove);
-    setProducts([...filteredByPlan, ...otherProducts]);
+    // 순서 변경 로직은 order 필드가 스키마에 추가되면 구현 가능
     setDraggedItemIndex(null);
   };
 
-  const filteredProducts = products.filter(p => p.planId === selectedPlanId);
+  const filteredProducts = allProducts
+    .filter(p => p.planId === selectedPlanId)
+    .sort((a, b) => {
+      if (!sortConfig.key) return 0;
+      const aVal = (a as any)[sortConfig.key] || "";
+      const bVal = (b as any)[sortConfig.key] || "";
+      if (sortConfig.direction === 'asc') return aVal.localeCompare(bVal);
+      return bVal.localeCompare(aVal);
+    });
 
   return (
     <div className="p-8 h-full flex flex-col no-scrollbar overflow-y-auto">
@@ -215,7 +223,7 @@ export default function ProductManagement() {
                   <thead className="sticky top-0 bg-[#F9FAFB] border-b border-[#E5E8EB] z-10">
                     <tr>
                       <th className="px-4 py-4 w-12 text-center">
-                        <button onClick={() => setSelectedIds(selectedIds.length === filteredProducts.length ? [] : filteredProducts.map(p => p.id))}>
+                        <button onClick={() => setSelectedIds(selectedIds.length === filteredProducts.length ? [] : filteredProducts.map(p => p._id))}>
                           {selectedIds.length === filteredProducts.length && filteredProducts.length > 0 ? <CheckSquare className="w-5 h-5 text-[#3182F6]"/> : <Square className="w-5 h-5 text-[#D1D6DB]"/>}
                         </button>
                       </th>
@@ -230,35 +238,38 @@ export default function ProductManagement() {
                   <tbody className="divide-y divide-[#F2F4F6]">
                     {filteredProducts.map((p, index) => (
                       <tr 
-                        key={p.id} 
+                        key={p._id} 
                         draggable
                         onDragStart={() => onDragStart(index)}
                         onDragOver={onDragOver}
                         onDrop={() => onDrop(index)}
-                        className={`hover:bg-[#F9FAFB] transition-colors cursor-move group ${draggedItemIndex === index ? 'opacity-40' : ''} ${selectedIds.includes(p.id) ? 'bg-[#E8F3FF]/30' : ''}`}
+                        className={`hover:bg-[#F9FAFB] transition-colors cursor-move group ${draggedItemIndex === index ? 'opacity-40' : ''} ${selectedIds.includes(p._id) ? 'bg-[#E8F3FF]/30' : ''}`}
                       >
                         <td className="px-4 py-4 text-center">
-                          <button onClick={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(p.id) ? prev.filter(i => i !== p.id) : [...prev, p.id]); }}>
-                            {selectedIds.includes(p.id) ? <CheckSquare className="w-5 h-5 text-[#3182F6]"/> : <Square className="w-5 h-5 text-[#D1D6DB]"/>}
+                          <button onClick={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(p._id) ? prev.filter(i => i !== p._id) : [...prev, p._id]); }}>
+                            {selectedIds.includes(p._id) ? <CheckSquare className="w-5 h-5 text-[#3182F6]"/> : <Square className="w-5 h-5 text-[#D1D6DB]"/>}
                           </button>
                         </td>
                         <td className="px-2 py-4 text-[#D1D6DB] group-hover:text-[#3182F6]"><MoveVertical className="w-5 h-5" /></td>
                         <td className="px-4 py-4 text-[14px] text-[#4E5968] font-bold">{p.brand}</td>
                         <td className="px-4 py-4">
-                          <div className="text-[14px] font-bold text-[#191F28]">{p.name}</div>
+                          <div className="flex items-center gap-2 mb-1">
+                            {p.tag && <span className="text-[10px] font-bold bg-[#3182F6] text-white px-1.5 py-0.5 rounded">{p.tag}</span>}
+                            <div className="text-[14px] font-bold text-[#191F28]">{p.name}</div>
+                          </div>
                           <div className="text-[12px] text-[#A3B1C6]">{p.model}</div>
                         </td>
                         <td className="px-4 py-4 text-[14px] font-bold text-right text-[#3182F6]">{formatNumber(p.price)}원</td>
                         <td className="px-4 py-4 text-center">
-                          <button onClick={(e) => { e.stopPropagation(); toggleVisibility(p.id); }} className={`p-1.5 rounded-full transition-colors ${p.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-400'}`}>
+                          <button onClick={(e) => { e.stopPropagation(); toggleVisibility(p._id, p.isVisible); }} className={`p-1.5 rounded-full transition-colors ${p.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-400'}`}>
                             {p.isVisible ? <Eye className="w-4 h-4"/> : <EyeOff className="w-4 h-4"/>}
                           </button>
                         </td>
                         <td className="px-4 py-4 text-right">
                           <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={(e) => { e.stopPropagation(); copyProduct(p.id); }} className="p-1.5 hover:bg-white rounded-md text-[#3182F6]" title="복사"><Copy className="w-4 h-4"/></button>
+                            <button onClick={(e) => { e.stopPropagation(); copyProduct(p._id); }} className="p-1.5 hover:bg-white rounded-md text-[#3182F6]" title="복사"><Copy className="w-4 h-4"/></button>
                             <button onClick={(e) => { e.stopPropagation(); setEditingProduct(p); setViewMode('edit_product'); }} className="p-1.5 hover:bg-white rounded-md text-[#4E5968]" title="수정"><Edit className="w-4 h-4"/></button>
-                            <button onClick={(e) => { e.stopPropagation(); deleteProduct(p.id); }} className="p-1.5 hover:bg-white rounded-md text-red-500" title="삭제"><Trash2 className="w-4 h-4"/></button>
+                            <button onClick={(e) => { e.stopPropagation(); deleteProduct(p._id); }} className="p-1.5 hover:bg-white rounded-md text-red-500" title="삭제"><Trash2 className="w-4 h-4"/></button>
                           </div>
                         </td>
                       </tr>
@@ -276,13 +287,13 @@ export default function ProductManagement() {
                 </div>
                 <div className="flex gap-2">
                    <button 
-                    onClick={() => { toggleVisibility(editingProduct.id); setEditingProduct({...editingProduct, isVisible: !editingProduct.isVisible}); }}
+                    onClick={() => { toggleVisibility(editingProduct._id, editingProduct.isVisible); setEditingProduct({...editingProduct, isVisible: !editingProduct.isVisible}); }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-[10px] text-[13px] font-bold transition-all ${editingProduct.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-500'}`}
                    >
                      {editingProduct.isVisible ? <><Eye className="w-4 h-4"/> 현재 노출중</> : <><EyeOff className="w-4 h-4"/> 현재 숨김상태</>}
                    </button>
                    <button 
-                    onClick={() => { deleteProduct(editingProduct.id); setViewMode('list'); }}
+                    onClick={() => { deleteProduct(editingProduct._id); setViewMode('list'); }}
                     className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-500 rounded-[10px] text-[13px] font-bold"
                    >
                      <Trash2 className="w-4 h-4"/> 삭제하기
@@ -296,19 +307,19 @@ export default function ProductManagement() {
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">브랜드</label>
-                      <select value={editingProduct.brand} onChange={(e) => setEditingProduct({...editingProduct, brand: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none">
-                        <option>삼성전자</option><option>LG전자</option><option>바디프랜드</option>
+                      <select value={editingProduct.brand} onChange={(e) => setEditingProduct({...editingProduct, brand: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold">
+                        <option>삼성전자</option><option>LG전자</option><option>바디프랜드</option><option>코웨이</option><option>캐리어</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">카테고리</label>
-                      <select value={editingProduct.category} onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none">
-                        <option>TV/시청각</option><option>냉장고/김치냉장고</option><option>안마의자</option>
+                      <select value={editingProduct.category} onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold">
+                        <option>TV/시청각</option><option>냉장고/김치냉장고</option><option>세탁기/건조기</option><option>안마의자/건강</option><option>기타</option>
                       </select>
                     </div>
                     <div className="col-span-2">
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">제품명</label>
-                      <input type="text" value={editingProduct.name} onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none" />
+                      <input type="text" value={editingProduct.name} onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold" />
                     </div>
                     <div>
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">모델명</label>
@@ -318,13 +329,111 @@ export default function ProductManagement() {
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">월 납입금</label>
                       <input type="text" value={formatNumber(editingProduct.price)} onChange={(e) => setEditingProduct({...editingProduct, price: e.target.value.replace(/\D/g, '')})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#3182F6] text-right" />
                     </div>
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">제휴카드 혜택가</label>
+                      <input type="text" value={formatNumber(editingProduct.discountPrice)} onChange={(e) => setEditingProduct({...editingProduct, discountPrice: e.target.value.replace(/\D/g, '')})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#F04452] text-right" />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">라벨 (태그)</label>
+                      <input type="text" value={editingProduct.tag || ''} onChange={(e) => setEditingProduct({...editingProduct, tag: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none" placeholder="예: BEST, HOT, 특가" />
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-8">
+                  {/* 타사 비교 정보 편집 */}
+                  <div className="pt-8 border-t border-[#F2F4F6]">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="font-bold text-[18px]">타사 비교 정보 설정</h3>
+                      <button 
+                        onClick={() => {
+                          const defaultPartner = competitors[0] || { name: '효원상조', months: 60, type: '자사' };
+                          const newComp = {
+                            company: defaultPartner.name,
+                            target: defaultPartner.name + ' 설계',
+                            price: '0',
+                            period: defaultPartner.months + '개월',
+                            isOurs: defaultPartner.type === '자사',
+                            benefit: ''
+                          };
+                          setEditingProduct({
+                            ...editingProduct,
+                            comparisons: [...(editingProduct.comparisons || []), newComp]
+                          });
+                        }}
+                        className="bg-[#3182F6] text-white px-4 py-2 rounded-[10px] text-[13px] font-bold flex items-center gap-1 shadow-sm"
+                      >
+                        <Plus className="w-4 h-4"/> 비교 대상 추가
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {editingProduct.comparisons?.map((comp: any, idx: number) => (
+                        <div key={idx} className="flex items-center gap-4 bg-[#F9FAFB] p-5 rounded-[20px] border border-[#E5E8EB]">
+                          <div className="w-[180px]">
+                            <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">비교 업체</label>
+                            <select 
+                              value={comp.company} 
+                              onChange={(e) => {
+                                const partner = competitors.find(c => c.name === e.target.value);
+                                const updated = [...editingProduct.comparisons];
+                                updated[idx] = { 
+                                  ...updated[idx], 
+                                  company: e.target.value,
+                                  isOurs: partner?.type === '자사',
+                                  period: (partner?.months || 60) + '개월'
+                                };
+                                setEditingProduct({ ...editingProduct, comparisons: updated });
+                              }}
+                              className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none"
+                            >
+                              {competitors.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
+                            </select>
+                          </div>
+                          <div className="flex-1">
+                            <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">비교 내용 (예: 설계 상품명)</label>
+                            <input 
+                              type="text" 
+                              value={comp.target} 
+                              onChange={(e) => {
+                                const updated = [...editingProduct.comparisons];
+                                updated[idx] = { ...updated[idx], target: e.target.value };
+                                setEditingProduct({ ...editingProduct, comparisons: updated });
+                              }}
+                              className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" 
+                            />
+                          </div>
+                          <div className="w-[140px]">
+                            <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">월 납입금</label>
+                            <input 
+                              type="text" 
+                              value={formatNumber(comp.price)} 
+                              onChange={(e) => {
+                                const updated = [...editingProduct.comparisons];
+                                updated[idx] = { ...updated[idx], price: e.target.value.replace(/\D/g, '') };
+                                setEditingProduct({ ...editingProduct, comparisons: updated });
+                              }}
+                              className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none text-right" 
+                            />
+                          </div>
+                          <button 
+                            onClick={() => {
+                              const updated = [...editingProduct.comparisons];
+                              updated.splice(idx, 1);
+                              setEditingProduct({ ...editingProduct, comparisons: updated });
+                            }}
+                            className="text-red-500 hover:bg-red-50 p-2.5 rounded-[10px] mt-4"
+                          >
+                            <Trash2 className="w-5 h-5"/>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-8 pt-8">
                     <div className="space-y-4">
                       <label className="block text-[13px] font-bold text-[#4E5968] px-1">썸네일</label>
                       <div onClick={() => thumbInputRef.current?.click()} className="aspect-square bg-[#F9FAFB] border-2 border-dashed border-[#E5E8EB] rounded-[24px] flex items-center justify-center cursor-pointer overflow-hidden relative group transition-all hover:border-[#3182F6]">
-                        {editingProduct.thumbnail ? <img src={editingProduct.thumbnail} className="w-full h-full object-cover" /> : <Plus className="w-10 h-10 text-[#D1D6DB] group-hover:text-[#3182F6]" />}
+                        {editingProduct.image ? <img src={editingProduct.image} className="w-full h-full object-cover" /> : <Plus className="w-10 h-10 text-[#D1D6DB] group-hover:text-[#3182F6]" />}
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[14px] font-bold">이미지 변경</div>
                       </div>
                     </div>
@@ -338,13 +447,42 @@ export default function ProductManagement() {
                   </div>
 
                   <div className="pt-8 flex gap-4">
-                    <button onClick={() => setViewMode('list')} className="flex-1 bg-[#F2F4F6] text-[#4E5968] font-bold py-4 rounded-[20px] transition-all hover:bg-[#E5E8EB]">취소하기</button>
-                    <button onClick={() => setViewMode('list')} className="flex-[2] bg-[#3182F6] text-white font-bold py-4 rounded-[20px] shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95">정보 저장하기</button>
+                    <button onClick={() => { setViewMode('list'); setEditingProduct(null); }} className="flex-1 bg-[#F2F4F6] text-[#4E5968] font-bold py-4 rounded-[20px] transition-all hover:bg-[#E5E8EB]">취소하기</button>
+                    <button 
+                      onClick={async () => {
+                        if (editingProduct._id) {
+                          const { _id, _creationTime, ...data } = editingProduct;
+                          await updateProduct({ id: _id, ...data });
+                        } else {
+                          await createProduct(editingProduct);
+                        }
+                        setViewMode('list');
+                        setEditingProduct(null);
+                      }}
+                      className="flex-[2] bg-[#3182F6] text-white font-bold py-4 rounded-[20px] shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95"
+                    >
+                      정보 저장하기
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           ) : null}
+
+          <input 
+            type="file" 
+            ref={thumbInputRef} 
+            className="hidden" 
+            accept="image/*" 
+            onChange={handleImageUpload} 
+          />
+          <input 
+            type="file" 
+            ref={detailInputRef} 
+            className="hidden" 
+            accept="image/*" 
+            onChange={handleDetailImageUpload} 
+          />
         </div>
       </div>
     </div>

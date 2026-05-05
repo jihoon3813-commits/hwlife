@@ -1,43 +1,39 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Plus, Trash2, MoveVertical, Upload as UploadIcon, ImageIcon } from 'lucide-react';
-
-interface Competitor {
-  id: number;
-  name: string;
-  months: number;
-  type: string;
-  logo?: string;
-}
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import VideoManagement from '../components/VideoManagement';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('status'); // status, competitor, category, admin, footer
   
-  const [competitors, setCompetitors] = useState<Competitor[]>([
-    { id: 1, name: '효원상조', months: 60, type: '자사' },
-    { id: 2, name: 'BS ON', months: 60, type: '타사' },
-    { id: 3, name: 'KG 이니렌탈', months: 60, type: '타사' }
-  ]);
+  const competitors = useQuery(api.competitors.get) || [];
+  const createCompetitor = useMutation(api.competitors.create);
+  const updateCompetitor = useMutation(api.competitors.update);
+  const removeCompetitor = useMutation(api.competitors.remove);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [currentUploadingId, setCurrentUploadingId] = useState<number | null>(null);
+  const [currentUploadingId, setCurrentUploadingId] = useState<string | null>(null);
 
   const tabs = [
     { id: 'status', label: '진행상태 설정' },
     { id: 'competitor', label: '타사(렌탈/상조) 설정' },
     { id: 'category', label: '브랜드/카테고리 설정' },
+    { id: 'video', label: '랜딩 영상 관리' },
     { id: 'footer', label: '푸터 정보 설정' },
     { id: 'admin', label: '관리자 계정 설정' },
   ];
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && currentUploadingId !== null) {
+      // In a real app, upload to storage and get URL
       const url = URL.createObjectURL(file);
-      setCompetitors(prev => prev.map(c => c.id === currentUploadingId ? { ...c, logo: url } : c));
+      await updateCompetitor({ id: currentUploadingId as any, logo: url });
     }
   };
 
-  const triggerUpload = (id: number) => {
+  const triggerUpload = (id: string) => {
     setCurrentUploadingId(id);
     fileInputRef.current?.click();
   };
@@ -94,27 +90,48 @@ export default function Settings() {
           <div>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-[18px] font-bold">타사(렌탈/상조) 정보 설정</h3>
-              <button className="bg-[#3182F6] text-white px-4 py-2 rounded-[10px] text-[14px] font-bold flex items-center gap-1 shadow-sm">
+              <button 
+                onClick={() => createCompetitor({ name: '신규 업체', months: 60, type: '타사' })}
+                className="bg-[#3182F6] text-white px-4 py-2 rounded-[10px] text-[14px] font-bold flex items-center gap-1 shadow-sm"
+              >
                 <Plus className="w-4 h-4"/> 타사 추가
               </button>
             </div>
             
             <div className="space-y-4">
               {competitors.map((comp) => (
-                <div key={comp.id} className="flex items-center gap-4 bg-[#F9FAFB] p-5 rounded-[20px] border border-[#E5E8EB]">
+                <div key={comp._id} className="flex items-center gap-4 bg-[#F9FAFB] p-5 rounded-[20px] border border-[#E5E8EB]">
                   <div className="w-[80px] shrink-0">
-                    <span className={`text-[12px] font-bold px-2.5 py-1 rounded-full ${comp.type === '자사' ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-200 text-[#4E5968]'}`}>{comp.type}</span>
+                    <select 
+                      value={comp.type} 
+                      onChange={(e) => updateCompetitor({ id: comp._id, type: e.target.value })}
+                      className={`text-[12px] font-bold px-2.5 py-1 rounded-full focus:outline-none appearance-none cursor-pointer text-center ${comp.type === '자사' ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-200 text-[#4E5968]'}`}
+                    >
+                      <option value="자사">자사</option>
+                      <option value="타사">타사</option>
+                    </select>
                   </div>
                   <div className="w-[180px]">
-                    <input type="text" placeholder="회사명" defaultValue={comp.name} className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" />
+                    <input 
+                      type="text" 
+                      placeholder="회사명" 
+                      defaultValue={comp.name} 
+                      onBlur={(e) => updateCompetitor({ id: comp._id, name: e.target.value })}
+                      className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" 
+                    />
                   </div>
                   <div className="w-[120px] flex items-center gap-2 bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] shrink-0">
-                    <input type="number" defaultValue={comp.months} className="w-full text-[14px] font-bold focus:outline-none text-right" />
+                    <input 
+                      type="number" 
+                      defaultValue={comp.months} 
+                      onBlur={(e) => updateCompetitor({ id: comp._id, months: parseInt(e.target.value) })}
+                      className="w-full text-[14px] font-bold focus:outline-none text-right" 
+                    />
                     <span className="text-[13px] text-[#8B95A1] whitespace-nowrap">개월</span>
                   </div>
                   <div className="flex-1 flex gap-3 items-center">
                     <div 
-                      onClick={() => triggerUpload(comp.id)}
+                      onClick={() => triggerUpload(comp._id)}
                       className="w-12 h-12 bg-white border border-[#D1D6DB] rounded-[10px] flex items-center justify-center cursor-pointer hover:border-[#3182F6] transition-colors overflow-hidden shrink-0"
                     >
                       {comp.logo ? (
@@ -131,18 +148,23 @@ export default function Settings() {
                       className="flex-1 bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[13px] text-[#8B95A1] focus:outline-none truncate" 
                     />
                     <button 
-                      onClick={() => triggerUpload(comp.id)}
+                      onClick={() => triggerUpload(comp._id)}
                       className="bg-[#333D4B] text-white px-4 py-2.5 rounded-[10px] text-[12px] font-bold whitespace-nowrap active:bg-[#191F28]"
                     >
                       업로드
                     </button>
                   </div>
-                  <button className="text-red-500 hover:bg-red-50 p-2.5 rounded-[10px]"><Trash2 className="w-5 h-5"/></button>
+                  <button 
+                    onClick={() => removeCompetitor({ id: comp._id })}
+                    className="text-red-500 hover:bg-red-50 p-2.5 rounded-[10px]"
+                  >
+                    <Trash2 className="w-5 h-5"/>
+                  </button>
                 </div>
               ))}
             </div>
-            <div className="mt-8 flex justify-center">
-              <button className="bg-[#191F28] text-white px-10 py-3.5 rounded-[16px] font-bold shadow-lg transition-transform active:scale-95">설정 저장하기</button>
+            <div className="mt-8 p-4 bg-[#F2F4F6] rounded-[16px] text-center">
+              <p className="text-[12px] text-[#8B95A1]">변경사항은 입력 즉시 자동으로 저장됩니다.</p>
             </div>
           </div>
         )}
@@ -188,6 +210,8 @@ export default function Settings() {
             </div>
           </div>
         )}
+
+        {activeTab === 'video' && <VideoManagement />}
 
         {activeTab === 'footer' && (
           <div>

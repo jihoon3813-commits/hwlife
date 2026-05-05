@@ -4,6 +4,7 @@ import { v } from "convex/values";
 export default defineSchema({
   products: defineTable({
     category: v.string(),
+    planId: v.number(),
     brand: v.string(),
     model: v.string(),
     name: v.string(),
@@ -36,11 +37,16 @@ export default defineSchema({
   }),
   shorts: defineTable({
     title: v.string(),
-    youtubeId: v.string(),
     length: v.string(),
     tag: v.string(),
-    views: v.string(),
+    thumbnail: v.optional(v.string()),
+    videoUrl: v.string(),
     order: v.number(),
-    isVisible: v.boolean(),
+  }),
+  competitors: defineTable({
+    name: v.string(),
+    logo: v.optional(v.string()),
+    type: v.string(), // "자사", "타사"
+    months: v.number(),
   }),
 });
