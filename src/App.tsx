@@ -298,8 +298,8 @@ export default function App() {
           alt="효원상조 로고" 
           className="h-[24px] w-auto object-contain"
         />
-        <a href="tel:1588-0000" className="text-[13px] font-semibold text-[#4E5968] bg-[#F2F4F6] px-3 py-1.5 rounded-full hover:bg-[#E5E8EB] transition-colors">
-          상담 1588-0000
+        <a href="tel:1588-0883" className="text-[13px] font-semibold text-[#4E5968] bg-[#F2F4F6] px-3 py-1.5 rounded-full hover:bg-[#E5E8EB] transition-colors">
+          상담 1588-0883
         </a>
       </header>
 
@@ -1274,29 +1274,61 @@ export default function App() {
             </button>
           </form>
 
+        </div>
+      </section>
+
+      {/* 12. Footer */}
+      <footer className="bg-[#111111] pt-16 pb-32 px-6 text-white border-t border-white/5">
+        <div className="max-w-[400px] mx-auto">
           {/* Footer Disclaimers */}
-          <div className="mt-16 pt-8 border-t border-white/10">
-            <div className="flex items-center gap-2 mb-3">
-              <Info className="w-4 h-4 text-[#8B95A1]" />
-              <h4 className="font-bold text-[#8B95A1] text-[13px]">가입 전 꼭 확인하세요</h4>
+          <div className="mb-12">
+            <div className="flex items-center gap-2 mb-4">
+              <Info className="w-4 h-4 text-[#3182F6]" />
+              <h4 className="font-bold text-white text-[14px]">가입 전 꼭 확인하세요</h4>
             </div>
-            <ul className="space-y-2 text-[12px] text-[#8B95A1] leading-[1.6] mb-8 break-keep px-1">
+            <ul className="space-y-3 text-[12px] text-[#8B95A1] leading-[1.6] break-keep px-1">
               <li>• 가전 계약(렌탈/할부)과 상조 계약은 별도의 독립된 계약입니다.</li>
               <li>• 해약환급금은 납입 기간 및 회차에 따라 상이하며, 중도 해지 시 납입한 금액보다 적거나 없을 수 있습니다.</li>
               <li>• 가전 대금 납입 중 해지 시, 가전 잔여 할부금 및 위약금이 일시 청구될 수 있습니다.</li>
               <li>• 반드시 상품 설명서 및 계약 약관을 확인하시기 바랍니다.</li>
             </ul>
-            <p className="text-[12px] text-[#8B95A1] font-medium px-1">
-              주식회사 효원상조 | 대표자 OOO<br/>사업자등록번호 000-00-00000 | 고객센터 1588-0000
+          </div>
+
+          <div className="border-t border-white/5 pt-8">
+            <p className="text-[12px] text-[#8B95A1] font-medium leading-relaxed mb-8 px-1">
+              주식회사 효원상조 | 대표자 OOO<br/>
+              사업자등록번호 000-00-00000 | 고객센터 <span className="text-white font-bold text-[13px]">1588-0883</span><br/>
+              서울특별시 OOO구 OOO로 OOO 효원빌딩
             </p>
-            <a href="admin" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/5 hover:text-white/20 mt-8 block text-center transition-colors">Admin</a>
+            
+            <div className="mb-8 px-1">
+              <a 
+                href="admin" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex items-center gap-2 px-5 py-3 bg-white/5 hover:bg-[#3182F6] hover:text-white text-[#A3B1C6] text-[13px] font-bold rounded-xl border border-white/10 transition-all group"
+              >
+                <LayoutGrid className="w-4 h-4" />
+                관리자 전용 페이지
+                <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+              </a>
+            </div>
+
+            <div className="flex items-center justify-between px-1">
+              <p className="text-[11px] text-white/20 font-medium tracking-tight">© HYOWON. All rights reserved.</p>
+              <div className="flex gap-4">
+                 {/* Dummy icons/links */}
+                 <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10"></div>
+                 <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10"></div>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      </footer>
 
       {/* Sticky Bottom CTA */}
       <div className="fixed bottom-0 w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] bg-white border-t border-[#F2F4F6] px-5 py-4 pb-6 flex gap-3 z-40 sm:border-x sm:border-[#E5E8EB]">
-        <a href="tel:1588-0000" className="flex-1 bg-[#F2F4F6] text-[#333D4B] text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#D1D6DB] transition-colors">
+        <a href="tel:1588-0883" className="flex-1 bg-[#F2F4F6] text-[#333D4B] text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#D1D6DB] transition-colors">
           전화하기
         </a>
         <button 
