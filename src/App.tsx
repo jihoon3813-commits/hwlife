@@ -805,6 +805,105 @@ export default function App() {
         </div>
       </section>
 
+      {/* 5. Price & Benefit Section */}
+      <section className="bg-white py-14 px-6 rounded-[32px] my-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)] border border-[#F2F4F6]">
+        <div className="mb-8">
+          <span className="inline-block px-2.5 py-1 bg-[#3182F6]/10 text-[#3182F6] text-[11px] font-bold rounded-md mb-2 uppercase tracking-wider">Pricing Plan</span>
+          <h2 className="text-[22px] font-bold text-[#191F28] leading-tight">
+            합리적인 가격 구성으로<br />두 배의 가치를 누리세요
+          </h2>
+        </div>
+
+        {/* Product Card */}
+        <div className="bg-[#F8FAFB] rounded-[32px] border border-[#F2F4F6] overflow-hidden shadow-sm">
+          {/* Product Header */}
+          <div className="bg-[#191F28] px-7 py-6 text-white">
+            <div className="flex justify-between items-center mb-1">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-[#3182F6] rounded-full animate-pulse"></span>
+                <span className="text-[12px] text-[#3182F6] font-bold">BEST SELLER</span>
+              </div>
+              <span className="text-[12px] text-white/40 font-medium">Double Account (2구좌)</span>
+            </div>
+            <h3 className="text-[21px] font-bold">스페셜 299 더블</h3>
+          </div>
+
+          {/* Pricing Info */}
+          <div className="p-7 space-y-6">
+            {/* Main Price Display */}
+            <div className="bg-white p-5 rounded-[24px] border border-[#E5E8EB]">
+              <div className="flex justify-between items-end">
+                <div>
+                  <div className="text-[13px] text-[#8B95A1] mb-1">월 납입금 (1회~200회)</div>
+                  <div className="text-[26px] font-black text-[#191F28]">59,800원</div>
+                </div>
+                <div className="text-right pb-1">
+                  <div className="text-[12px] text-[#3182F6] font-bold flex items-center justify-end gap-1">
+                    <Coins className="w-3.5 h-3.5" />
+                    제휴카드 최대 할인 시
+                  </div>
+                  <div className="text-[16px] font-bold text-[#3182F6]">월 34,800원</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Important Breakdown: 1-60 Months */}
+            <div className="bg-[#F2F8FF] rounded-[24px] p-5 border border-[#3182F6]/10 relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-3 opacity-10">
+                 <Info className="w-12 h-12 text-[#3182F6]" />
+               </div>
+               <div className="relative z-10">
+                 <div className="text-[14px] font-bold text-[#191F28] mb-4 flex items-center gap-2">
+                   <div className="w-5 h-5 bg-[#3182F6] text-white rounded-full flex items-center justify-center text-[10px]">!</div>
+                   초기 60회 납입 상세 구성 안내
+                 </div>
+                 <div className="space-y-3">
+                   <div className="flex justify-between items-center">
+                     <span className="text-[14px] text-[#4E5968]">상조부금 (월 납입금의 10%)</span>
+                     <span className="font-bold text-[#191F28]">5,980원</span>
+                   </div>
+                   <div className="flex justify-between items-center">
+                     <span className="text-[14px] text-[#4E5968]">가전 렌탈 대금 (기타 90%)</span>
+                     <span className="font-bold text-[#3182F6]">53,820원</span>
+                   </div>
+                   <div className="pt-3 mt-1 border-t border-[#3182F6]/10 text-[12px] text-[#4E5968]/70 leading-relaxed break-keep">
+                     * 1회부터 60회까지는 상조부금과 가전 렌탈 대금이 구분되어 청구됩니다. 61회부터는 상조부금으로 전액 전환됩니다.
+                   </div>
+                 </div>
+               </div>
+            </div>
+
+            {/* Summary Metrics */}
+            <div className="grid grid-cols-2 gap-3">
+               <div className="bg-white p-5 rounded-[24px] border border-[#E5E8EB]">
+                 <div className="text-[12px] text-[#8B95A1] mb-1">총 상품 금액</div>
+                 <div className="text-[16px] font-bold text-[#191F28]">1,196만 원</div>
+               </div>
+               <div className="bg-[#3182F6] p-5 rounded-[24px] shadow-md shadow-[#3182F6]/20">
+                 <div className="text-[12px] text-white/70 mb-1">만기 환급금</div>
+                 <div className="text-[16px] font-bold text-white">1,196만 원 (100%)</div>
+               </div>
+            </div>
+
+            {/* Service Benefit */}
+            <div className="bg-[#191F28] p-5 rounded-[24px] text-center border border-white/5">
+              <div className="text-[12px] text-white/50 mb-1">더블 상품만의 강력한 서비스</div>
+              <div className="text-[16px] font-bold text-white">
+                상조 또는 크루즈 <span className="text-[#3182F6]">2회 이용 가능</span>
+              </div>
+            </div>
+
+            {/* Extra Disclaimer */}
+            <div className="pt-2 px-1">
+              <p className="text-[11px] text-[#8B95A1] leading-relaxed break-keep text-center">
+                본 상품은 2구좌(더블) 결합 상품으로 한 구좌당 금액은 598만 원입니다.<br />
+                제휴카드 월 25,000원 할인은 전월 실적 충족 시 1회~60회까지 적용됩니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 6. Warning / Honesty */}
       <section className="bg-[#191F28] py-12 px-6 rounded-[32px] text-white my-2">
         <h2 className="text-[22px] font-bold mb-3 break-keep">무조건 다 좋은<br/>상품은 없습니다.</h2>
@@ -851,7 +950,7 @@ export default function App() {
         </motion.div>
       </section>
 
-      {/* 6. Step-by-Step Process - Infographic Version */}
+      {/* 7. Step-by-Step Process - Infographic Version */}
       <section className="bg-[#F8FAFB] py-16 px-6 rounded-[40px] my-4 shadow-sm border border-[#F2F4F6]">
         <div className="text-center mb-12">
           <h2 className="text-[24px] font-bold mb-3 leading-tight text-[#191F28] break-keep">
