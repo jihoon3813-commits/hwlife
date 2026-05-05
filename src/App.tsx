@@ -519,75 +519,194 @@ export default function App() {
           <p className="text-[#4E5968] text-[15px]">{planInfo.desc}</p>
         </div>
 
-        {/* Categories */}
-        <div className="flex flex-wrap justify-center gap-2 px-6 mb-3">
+        {/* Categories & Product Focus View Trigger */}
+        <div className="px-6 flex justify-between items-end mb-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <span className="inline-block px-2.5 py-1 bg-[#3182F6]/10 text-[#3182F6] text-[11px] font-bold rounded-md mb-2">PRODUCT LIST</span>
+            <h2 className="text-[22px] font-bold text-[#191F28] leading-tight">
+              나에게 딱 맞는<br />결합 상품 찾기
+            </h2>
+          </motion.div>
+          {!isProductFullView && (
+            <button 
+              onClick={() => setIsProductFullView(true)}
+              className="text-[#3182F6] text-[13px] font-bold flex items-center gap-1 mb-1 px-3 py-1.5 bg-[#F2F8FF] rounded-full"
+            >
+              전체보기 <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Category Tabs (Horizontal Scroll) */}
+        <div className="px-6 mb-6 overflow-x-auto hide-scrollbar flex gap-2">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-[14px] font-bold transition-all ${activeCategory === cat ? 'bg-[#333D4B] text-white shadow-md' : 'bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]'}`}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-bold transition-all ${
+                activeCategory === cat
+                  ? 'bg-[#191F28] text-white shadow-md'
+                  : 'bg-[#F2F4F6] text-[#4E5968]'
+              }`}
             >
               {cat}
             </button>
           ))}
         </div>
 
-        {/* Product List */}
-        <div className={`${isGridView ? 'px-6 space-y-4' : 'grid grid-rows-2 grid-flow-col auto-cols-max gap-3 px-6 pb-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-px-6'}`}>
-          <AnimatePresence mode="popLayout">
-            {filteredProducts.map((item) => (
-              <motion.div 
-                key={item.id}
-                layout
-                onClick={() => setSelectedProduct(item)}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className={`cursor-pointer ${isGridView ? 'w-full' : 'w-[200px] snap-start'} bg-white rounded-[20px] overflow-hidden flex ${isGridView ? 'flex-row gap-4 border border-[#F2F4F6] p-3 shadow-sm' : 'flex-col border border-[#F2F4F6] shadow-sm'}`}
-              >
-                <div className={`relative ${isGridView ? 'w-[100px] h-[100px] shrink-0 rounded-[12px] overflow-hidden bg-[#F2F4F6]' : 'w-full h-[125px] bg-[#F2F4F6]'}`}>
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                  <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
-                    {item.tag && (
-                      <div className="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[4px] leading-tight">
-                        {item.tag}
-                      </div>
-                    )}
-                    <div className={`${item.priceLabel.includes('최저가') ? 'bg-[#3182F6]' : 'bg-[#191F28]'} text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] shadow-sm leading-tight inline-block`}>
-                      {item.priceLabel}
-                    </div>
+        {/* Product Card List (Horizontal Scroll in Section) */}
+        <div 
+          className="grid grid-rows-2 grid-flow-col auto-cols-max gap-3 px-6 pb-2 overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-px-6"
+          onClick={() => {
+            if (window.innerWidth < 640) setIsProductFullView(true);
+          }}
+        >
+          {filteredProducts.map((item) => (
+            <motion.div
+              key={item.id}
+              layoutId={`product-${item.id}`}
+              className="w-[200px] bg-white rounded-[24px] border border-[#F2F4F6] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-transform"
+            >
+              <div className="relative h-[125px]">
+                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                {item.tag && (
+                  <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">
+                    {item.tag}
+                  </div>
+                )}
+              </div>
+              <div className="p-4">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[11px] font-bold text-[#3182F6]">{item.brand}</span>
+                  <div className="w-[1px] h-2 bg-[#E5E8EB]" />
+                  <span className="text-[11px] font-medium text-[#8B95A1] truncate">{item.model}</span>
+                </div>
+                <h3 className="text-[14px] font-bold text-[#191F28] mb-3 line-clamp-2 h-10 leading-tight">
+                  {item.name}
+                </h3>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[11px] text-[#8B95A1] line-through decoration-[#8B95A1]/40">월 {item.price}</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[16px] font-bold text-[#191F28]">월 {item.discountPrice}</span>
+                    <span className="text-[11px] font-bold text-[#F04452]">0원</span>
                   </div>
                 </div>
-                
-                <div className={`flex flex-col justify-between ${isGridView ? 'py-1 pr-1' : 'p-4'}`}>
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-[10px] font-bold text-[#8B95A1]">{item.brand}</span>
-                      <span className="text-[10px] text-[#A3B1C6]">|</span>
-                      <span className="text-[10px] font-medium text-[#8B95A1]">{item.model}</span>
-                    </div>
-                    <h3 className={`font-bold text-[#191F28] mb-2 leading-snug line-clamp-2 ${isGridView ? 'text-[15px]' : 'text-[14px]'}`}>{item.name}</h3>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <div className="flex justify-between items-center bg-[#333D4B] px-2 py-1 rounded-[6px] mb-0.5">
-                      <span className="text-[11px] text-white/80 font-medium">월 납입금</span>
-                      <span className="text-[12px] text-white font-bold">{item.price}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-[#BE123C] px-2 py-1 rounded-[6px]">
-                      <span className="text-[11px] text-white/90 font-medium">제휴카드</span>
-                      <span className="text-[12px] text-white font-bold">{item.discountPrice}</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+              </div>
+            </motion.div>
+          ))}
         </div>
-        <p className="text-[13px] text-[#8B95A1] mt-2 text-center px-4 break-keep">
-          * 실제 렌탈료는 모델 및 제휴카드 사용 실적에 따라 달라질 수 있습니다.
-        </p>
+
+        <div className="px-6 mt-4">
+          <div className="bg-[#F9FAFB] p-4 rounded-[20px] flex items-center justify-between">
+            <p className="text-[12px] text-[#4E5968] font-medium">원하는 상품이 없으신가요?</p>
+            <button 
+              onClick={() => setIsContactModalOpen(true)}
+              className="text-[12px] text-[#3182F6] font-bold flex items-center gap-1"
+            >
+              상담원에게 물어보기 <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* --- Full Screen Immersive Product Viewer --- */}
+      <AnimatePresence mode="wait">
+        {isProductFullView && (
+          <motion.div
+            initial={{ opacity: 0, y: '100%' }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-[100] bg-white flex flex-col sm:hidden"
+          >
+            {/* Full Screen Header */}
+            <div className="sticky top-0 bg-white/90 backdrop-blur-md z-10 px-6 py-4 flex justify-between items-center border-b border-[#F2F4F6]">
+              <div>
+                <h2 className="text-[18px] font-bold text-[#191F28]">결합 상품 찾기</h2>
+                <p className="text-[12px] text-[#8B95A1]">{filteredProducts.length}개의 상품</p>
+              </div>
+              <button 
+                onClick={() => setIsProductFullView(false)}
+                className="p-2 bg-[#F2F4F6] rounded-full"
+              >
+                <X className="w-5 h-5 text-[#4E5968]" />
+              </button>
+            </div>
+
+            {/* Immersive Category Filter */}
+            <div className="bg-white px-6 py-3 overflow-x-auto hide-scrollbar flex gap-2 border-b border-[#F2F4F6]">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-bold transition-all ${
+                    activeCategory === cat
+                      ? 'bg-[#3182F6] text-white shadow-lg shadow-[#3182F6]/20'
+                      : 'bg-[#F2F4F6] text-[#4E5968]'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Immersive Grid View */}
+            <div className="flex-1 overflow-y-auto px-6 py-6 bg-[#F9FAFB]">
+              <div className="grid grid-cols-2 gap-4">
+                {filteredProducts.map((item) => (
+                  <motion.div
+                    key={`full-${item.id}`}
+                    layoutId={`product-${item.id}`}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-white rounded-[24px] border border-[#E5E8EB] overflow-hidden shadow-sm flex flex-col h-full"
+                    onClick={() => {
+                      setSelectedProduct(item);
+                      setIsProductFullView(false); // Close viewer when selecting a product to show detail
+                    }}
+                  >
+                    <div className="relative aspect-square">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      {item.tag && (
+                        <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold rounded-md">
+                          {item.tag}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 flex-1 flex flex-col">
+                      <span className="text-[10px] font-bold text-[#3182F6] mb-1">{item.brand}</span>
+                      <h3 className="text-[13px] font-bold text-[#191F28] mb-2 line-clamp-2 leading-snug flex-1">
+                        {item.name}
+                      </h3>
+                      <div className="mt-auto">
+                        <span className="text-[10px] text-[#8B95A1] line-through">월 {item.price}</span>
+                        <div className="flex items-baseline justify-between">
+                          <span className="text-[15px] font-bold text-[#191F28]">월 {item.discountPrice}</span>
+                          <span className="text-[10px] font-bold text-[#F04452]">0원</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              
+              <div className="mt-8 text-center pb-12">
+                <p className="text-[13px] text-[#8B95A1] mb-4">원하시는 상품을 선택해 무료 상담을 받아보세요</p>
+                <button 
+                  onClick={() => setIsProductFullView(false)}
+                  className="px-6 py-3 bg-[#E5E8EB] text-[#4E5968] font-bold rounded-full text-[14px]"
+                >
+                  메인으로 돌아가기
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       </section>
 
       {/* 5. What makes us different */}
