@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Check, X, ChevronDown, ArrowRight, Play, Info, LayoutGrid, List,
+  Check, X, ChevronDown, ChevronRight, ArrowRight, Play, Info, LayoutGrid, List,
   ShieldAlert, Coins, LockKeyhole, Megaphone,
   Search, FileText, Smartphone, Gift
 } from 'lucide-react';
