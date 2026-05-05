@@ -1030,55 +1030,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* 7. Temporal Simulation */}
-      <section className="bg-white py-12 px-6 rounded-[32px] my-2">
-        <h2 className="text-[22px] font-bold mb-6">시점별 상황 알아보기</h2>
-
-        <div className="bg-[#F2F4F6] p-1.5 flex rounded-[16px] mb-6 relative">
-          {Object.keys(simulationData).map((tab) => (
-            <button 
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`relative flex-1 py-3 text-[14px] font-bold rounded-[12px] transition-colors z-10 ${activeTab === tab ? 'text-[#191F28]' : 'text-[#8B95A1]'}`}
-            >
-              {activeTab === tab && (
-                <motion.div 
-                  layoutId="simTabBg" 
-                  className="absolute inset-0 bg-white rounded-[12px] shadow-[0_2px_8px_rgb(0,0,0,0.06)]" 
-                  style={{ zIndex: -1 }}
-                />
-              )}
-              {tab === '만기' ? tab : `${tab}개월`}
-            </button>
-          ))}
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div 
-            key={activeTab}
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            className="bg-[#1B64DA] rounded-[24px] p-6 shadow-lg"
-          >
-            <div className="text-white/80 font-bold text-[13px] mb-2">{simulationData[activeTab].subtitle}</div>
-            <h3 className="font-bold text-[20px] text-white mb-3">{simulationData[activeTab].title}</h3>
-            <p className="text-white/90 text-[15px] mb-6 leading-[1.6] break-keep">{simulationData[activeTab].desc}</p>
-            
-            <div className="bg-white rounded-[16px] p-5 space-y-3 shadow-sm">
-              <div className="flex items-start gap-2.5 text-[14px] text-[#333D4B] font-medium leading-[1.5]">
-                <span className="text-[#3182F6] text-[18px] leading-none mt-0.5">•</span>
-                <span>{simulationData[activeTab].point1}</span>
-              </div>
-              <div className="flex items-start gap-2.5 text-[14px] text-[#333D4B] font-medium leading-[1.5]">
-                <span className="text-[#3182F6] text-[18px] leading-none mt-0.5">•</span>
-                <span>{simulationData[activeTab].point2}</span>
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </section>
 
       {/* 8. Target Audience / Fit */}
       <section className="bg-white py-12 px-6 rounded-[32px] my-2">
