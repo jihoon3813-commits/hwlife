@@ -1280,6 +1280,22 @@ export default function App() {
       {/* 12. Footer */}
       <footer className="bg-[#111111] pt-16 pb-32 px-6 text-white border-t border-white/5">
         <div className="max-w-[400px] mx-auto">
+          {/* Logo in Footer */}
+          <div className="mb-10 opacity-60">
+            <img 
+              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
+              alt="효원상조 로고" 
+              className="h-[22px] w-auto object-contain brightness-0 invert"
+            />
+          </div>
+
+          {/* Legal Links */}
+          <div className="flex flex-wrap gap-x-5 gap-y-2 mb-10 px-1">
+            <a href="#" className="text-[13px] font-bold text-[#D1D6DB] hover:text-white transition-colors">이용약관</a>
+            <a href="#" className="text-[13px] font-bold text-white hover:text-white transition-colors underline underline-offset-4 decoration-white/30">개인정보처리방침</a>
+            <a href="#" className="text-[13px] font-bold text-[#D1D6DB] hover:text-white transition-colors">중요정보고시사항</a>
+          </div>
+
           {/* Footer Disclaimers */}
           <div className="mb-12">
             <div className="flex items-center gap-2 mb-4">
