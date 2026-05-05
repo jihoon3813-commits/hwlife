@@ -831,19 +831,19 @@ export default function App() {
           {/* Pricing Info */}
           <div className="p-7 space-y-6">
             {/* Main Price Display */}
-            <div className="bg-white p-5 rounded-[24px] border border-[#E5E8EB]">
-              <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-[13px] text-[#8B95A1]">월 납입금 (1회~200회)</span>
-                  <div className="text-[24px] font-black text-[#191F28] whitespace-nowrap">59,800원</div>
+            <div className="bg-white p-6 rounded-[24px] border border-[#E5E8EB]">
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 sm:gap-0">
+                  <span className="text-[13px] text-[#8B95A1] font-medium">월 납입금 (1회~200회)</span>
+                  <div className="text-[28px] sm:text-[24px] font-black text-[#191F28] whitespace-nowrap">59,800원</div>
                 </div>
                 <div className="w-full h-[1px] bg-[#F2F4F6]"></div>
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
                   <div className="text-[12px] text-[#3182F6] font-bold flex items-center gap-1">
                     <Coins className="w-3.5 h-3.5" />
                     제휴카드 최대 할인 시
                   </div>
-                  <div className="text-[18px] font-black text-[#3182F6] whitespace-nowrap">월 34,800원</div>
+                  <div className="text-[20px] sm:text-[18px] font-black text-[#3182F6] whitespace-nowrap">월 34,800원</div>
                 </div>
               </div>
             </div>
@@ -858,16 +858,16 @@ export default function App() {
                    <div className="w-5 h-5 bg-[#3182F6] text-white rounded-full flex items-center justify-center text-[10px]">!</div>
                    초기 60회 납입 상세 구성 안내
                  </div>
-                 <div className="space-y-4">
-                   <div className="flex justify-between items-center">
+                 <div className="space-y-5">
+                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                      <span className="text-[13px] text-[#4E5968] break-keep">상조부금 (월 납입금의 10%)</span>
-                     <span className="font-bold text-[#191F28] whitespace-nowrap ml-2 text-[15px]">5,980원</span>
+                     <span className="font-bold text-[#191F28] whitespace-nowrap text-[18px] sm:text-[15px]">5,980원</span>
                    </div>
-                   <div className="flex justify-between items-center">
+                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                      <span className="text-[13px] text-[#4E5968] break-keep">가전 렌탈 대금 (기타 90%)</span>
-                     <span className="font-bold text-[#3182F6] whitespace-nowrap ml-2 text-[15px]">53,820원</span>
+                     <span className="font-bold text-[#3182F6] whitespace-nowrap text-[18px] sm:text-[15px]">53,820원</span>
                    </div>
-                   <div className="pt-3 mt-1 border-t border-[#3182F6]/10 text-[11px] text-[#4E5968]/70 leading-relaxed break-keep">
+                   <div className="pt-4 mt-1 border-t border-[#3182F6]/10 text-[11px] text-[#4E5968]/70 leading-relaxed break-keep">
                      * 1회부터 60회까지는 상조부금과 가전 렌탈 대금이 구분되어 청구됩니다. 61회부터는 상조부금으로 전액 전환됩니다.
                    </div>
                  </div>
