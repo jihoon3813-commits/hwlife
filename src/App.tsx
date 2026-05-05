@@ -1277,6 +1277,34 @@ export default function App() {
         </div>
       </section>
 
+      {/* 11-1. Important Notice */}
+      <section className="px-6 mb-2">
+        <div className="bg-white border border-[#E5E8EB] rounded-[32px] p-8 shadow-sm">
+          <div className="flex items-center gap-2 mb-5">
+            <Info className="w-5 h-5 text-[#3182F6]" />
+            <h4 className="font-bold text-[#191F28] text-[16px]">가입 전 꼭 확인하세요</h4>
+          </div>
+          <ul className="space-y-4 text-[13px] text-[#4E5968] leading-[1.6] break-keep">
+            <li className="flex gap-2">
+              <span className="text-[#3182F6] font-bold">•</span>
+              <span>가전 계약(렌탈/할부)과 상조 계약은 별도의 독립된 계약입니다.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[#3182F6] font-bold">•</span>
+              <span>해약환급금은 납입 기간 및 회차에 따라 상이하며, 중도 해지 시 납입한 금액보다 적거나 없을 수 있습니다.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[#3182F6] font-bold">•</span>
+              <span>가전 대금 납입 중 해지 시, 가전 잔여 할부금 및 위약금이 일시 청구될 수 있습니다.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[#3182F6] font-bold">•</span>
+              <span>반드시 상품 설명서 및 계약 약관을 확인하시기 바랍니다.</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
       {/* 12. Footer */}
       <footer className="bg-[#111111] pt-16 pb-32 px-6 text-white border-t border-white/5">
         <div className="max-w-[400px] mx-auto">
@@ -1294,20 +1322,6 @@ export default function App() {
             <a href="#" className="text-[13px] font-bold text-[#D1D6DB] hover:text-white transition-colors">이용약관</a>
             <a href="#" className="text-[13px] font-bold text-white hover:text-white transition-colors underline underline-offset-4 decoration-white/30">개인정보처리방침</a>
             <a href="#" className="text-[13px] font-bold text-[#D1D6DB] hover:text-white transition-colors">중요정보고시사항</a>
-          </div>
-
-          {/* Footer Disclaimers */}
-          <div className="mb-12">
-            <div className="flex items-center gap-2 mb-4">
-              <Info className="w-4 h-4 text-[#3182F6]" />
-              <h4 className="font-bold text-white text-[14px]">가입 전 꼭 확인하세요</h4>
-            </div>
-            <ul className="space-y-3 text-[12px] text-[#8B95A1] leading-[1.6] break-keep px-1">
-              <li>• 가전 계약(렌탈/할부)과 상조 계약은 별도의 독립된 계약입니다.</li>
-              <li>• 해약환급금은 납입 기간 및 회차에 따라 상이하며, 중도 해지 시 납입한 금액보다 적거나 없을 수 있습니다.</li>
-              <li>• 가전 대금 납입 중 해지 시, 가전 잔여 할부금 및 위약금이 일시 청구될 수 있습니다.</li>
-              <li>• 반드시 상품 설명서 및 계약 약관을 확인하시기 바랍니다.</li>
-            </ul>
           </div>
 
           <div className="border-t border-white/5 pt-10">
