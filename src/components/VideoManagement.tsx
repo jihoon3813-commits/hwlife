@@ -336,9 +336,21 @@ export default function VideoManagement() {
               ) : (
                 <>
                   <div className="w-[80px] h-[142px] bg-[#191F28] rounded-[12px] flex items-center justify-center shrink-0 overflow-hidden relative border border-[#E5E8EB]">
-                    {short.thumbnail ? (
-                      <img src={short.thumbnail} alt="thumbnail" className="absolute inset-0 w-full h-full object-cover opacity-80" />
-                    ) : null}
+                    {(() => {
+                      const videoId = extractYoutubeId(short.videoUrl);
+                      const thumbUrl = short.thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null);
+                      
+                      return thumbUrl ? (
+                        <img 
+                          src={thumbUrl} 
+                          alt="thumbnail" 
+                          className="absolute inset-0 w-full h-full object-cover opacity-80"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      ) : null;
+                    })()}
                     <div className="absolute inset-0 bg-black/20"></div>
                     <Play className="w-6 h-6 text-white drop-shadow-md relative z-10" fill="currentColor"/>
                   </div>
