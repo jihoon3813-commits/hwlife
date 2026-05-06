@@ -335,7 +335,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="absolute top-3 left-3 bg-[#3182F6] text-white text-[11px] font-bold px-2 py-1 rounded-[6px]">
+              <div className="absolute top-3 right-3 bg-[#3182F6] text-white text-[11px] font-bold px-2 py-1 rounded-[6px] z-10">
                 {short.tag}
               </div>
               
