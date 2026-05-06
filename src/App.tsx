@@ -310,11 +310,23 @@ export default function App() {
               onClick={() => setActiveVideoItem(short)}
               className="relative shrink-0 w-[150px] aspect-[9/16] snap-center cursor-pointer rounded-2xl overflow-hidden shadow-[0_4px_16px_rgb(0,0,0,0.06)] bg-[#191F28]"
             >
-              <img 
-                src={short.thumbnail || `https://images.unsplash.com/photo-${1500000000000 + idx}?w=300&q=80&auto=format&fit=crop`} 
-                alt="영상 썸네일" 
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+              {(() => {
+                const videoId = short.videoUrl?.includes('youtube.com') || short.videoUrl?.includes('youtu.be')
+                  ? short.videoUrl.split('/').pop()?.split('v=')[1]?.split('&')[0] || short.videoUrl.split('/').pop()?.split('?')[0]
+                  : null;
+                const thumbUrl = short.thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null);
+                
+                return (
+                  <img 
+                    src={thumbUrl || `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=300&q=80&auto=format&fit=crop`} 
+                    alt="영상 썸네일" 
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=300&q=80&auto=format&fit=crop`;
+                    }}
+                  />
+                );
+              })()}
               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80"></div>
               
               <div className="absolute inset-0 flex items-center justify-center">

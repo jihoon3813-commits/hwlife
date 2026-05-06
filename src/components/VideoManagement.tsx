@@ -27,12 +27,26 @@ export default function VideoManagement() {
   const extractYoutubeId = (url: string) => {
     if (!url) return null;
     const trimmed = url.trim();
-    if (trimmed.length === 11 && !trimmed.includes('/') && !trimmed.includes('.')) return trimmed;
     
-    // Improved regex to handle various youtube URL formats including shorts, mobile, etc.
-    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?v=)|(\&v=)|(shorts\/))([^#\&\?]*).*/;
-    const match = trimmed.match(regExp);
-    return (match && match[9].length === 11) ? match[9] : null;
+    // If it's already an 11-char ID
+    if (trimmed.length === 11 && !trimmed.includes('/') && !trimmed.includes('.') && !trimmed.includes('?')) {
+      return trimmed;
+    }
+    
+    // Pattern for various YouTube URL formats
+    const patterns = [
+      /(?:v=|\/)([0-9A-Za-z_-]{11}).*/,  // watch?v=ID or /ID
+      /shorts\/([0-9A-Za-z_-]{11})/,    // shorts/ID
+      /embed\/([0-9A-Za-z_-]{11})/,     // embed/ID
+      /youtu.be\/([0-9A-Za-z_-]{11})/   // youtu.be/ID
+    ];
+
+    for (const pattern of patterns) {
+      const match = trimmed.match(pattern);
+      if (match && match[1]) return match[1];
+    }
+    
+    return null;
   };
 
   const handleUrlFetch = async (url: string) => {
