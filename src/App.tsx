@@ -152,8 +152,8 @@ export default function App() {
           alt="효원상조 로고" 
           className="h-[24px] w-auto object-contain"
         />
-        <a href="tel:1588-8873" className="text-[13px] font-semibold text-[#4E5968] bg-[#F2F4F6] px-3 py-1.5 rounded-full hover:bg-[#E5E8EB] transition-colors">
-          상담 1588-8873
+        <a href="tel:1588-0883" className="text-[13px] font-semibold text-[#4E5968] bg-[#F2F4F6] px-3 py-1.5 rounded-full hover:bg-[#E5E8EB] transition-colors">
+          상담 1588-0883
         </a>
       </header>
 
@@ -163,7 +163,25 @@ export default function App() {
           <h2 className="text-[30px] font-bold leading-[1.2] mb-5 tracking-tight break-keep text-[#191F28]">
             가전결합상조는 비싸다?<br/>
             그 인식을 바꾸기 위해<br/>
-            <span className="text-[#3182F6] text-[38px] mt-1 block">다시 설계했습니다.</span>
+            <div className="flex">
+              {"다시 설계했습니다.".split("").map((char, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ y: 0 }}
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    delay: index * 0.1,
+                    ease: "easeInOut"
+                  }}
+                  className="text-[#3182F6] text-[38px] mt-1 font-black tracking-tight inline-block"
+                  style={{ marginRight: char === " " ? "12px" : "0" }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </div>
           </h2>
 
           <p className="text-[#4E5968] text-[16px] leading-[1.6] mb-8 break-keep">
@@ -1290,7 +1308,7 @@ export default function App() {
 
       {/* Sticky Bottom CTA */}
       <div className="fixed bottom-0 w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] bg-white border-t border-[#F2F4F6] px-5 py-4 pb-6 flex gap-3 z-40 sm:border-x sm:border-[#E5E8EB]">
-        <a href="tel:1588-8873" className="flex-1 bg-[#F2F4F6] text-[#333D4B] text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#D1D6DB] transition-colors">
+        <a href="tel:1588-0883" className="flex-1 bg-[#F2F4F6] text-[#333D4B] text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#D1D6DB] transition-colors">
           전화하기
         </a>
         <button 
