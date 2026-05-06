@@ -25,12 +25,14 @@ export default function VideoManagement() {
   });
 
   const extractYoutubeId = (url: string) => {
+    if (!url) return null;
     const trimmed = url.trim();
     if (trimmed.length === 11 && !trimmed.includes('/') && !trimmed.includes('.')) return trimmed;
     
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+    // Improved regex to handle various youtube URL formats including shorts, mobile, etc.
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?v=)|(\&v=)|(shorts\/))([^#\&\?]*).*/;
     const match = trimmed.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
+    return (match && match[9].length === 11) ? match[9] : null;
   };
 
   const handleUrlFetch = async (url: string) => {
@@ -135,7 +137,8 @@ export default function VideoManagement() {
 
   const getYoutubeEmbedUrl = (url: string) => {
     const videoId = extractYoutubeId(url);
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+    // Added modestbranding and other params for a cleaner preview
+    return videoId ? `https://www.youtube.com/embed/${videoId}?modestbranding=1&rel=0&iv_load_policy=3` : null;
   };
 
   return (
@@ -259,42 +262,59 @@ export default function VideoManagement() {
               <div className="pt-2"><MoveVertical className="w-5 h-5 text-[#D1D6DB] shrink-0 cursor-grab"/></div>
               
               {editingId === short._id ? (
-                <div className="flex-1 space-y-3">
-                  <div className="flex gap-2">
-                    <input 
-                      type="text" 
-                      value={formData.videoUrl}
-                      onChange={e => setFormData({...formData, videoUrl: e.target.value})}
-                      className="flex-1 bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] focus:ring-1 focus:ring-[#3182F6] outline-none"
-                      placeholder="유튜브 URL"
-                    />
-                    <button onClick={() => handleUrlFetch(formData.videoUrl)} className="bg-[#191F28] text-white px-3 rounded-[8px] text-[12px] font-bold">
-                      정보 갱신
-                    </button>
+                <div className="flex-1 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          value={formData.videoUrl}
+                          onChange={e => setFormData({...formData, videoUrl: e.target.value})}
+                          className="flex-1 bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] focus:ring-1 focus:ring-[#3182F6] outline-none"
+                          placeholder="유튜브 URL"
+                        />
+                        <button onClick={() => handleUrlFetch(formData.videoUrl)} className="bg-[#191F28] text-white px-3 rounded-[8px] text-[12px] font-bold">
+                          정보 갱신
+                        </button>
+                      </div>
+                      <textarea 
+                        value={formData.title}
+                        onChange={e => setFormData({...formData, title: e.target.value})}
+                        className="w-full bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] font-bold focus:ring-1 focus:ring-[#3182F6] outline-none min-h-[60px]"
+                        placeholder="제목"
+                      />
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          value={formData.tag}
+                          onChange={e => setFormData({...formData, tag: e.target.value})}
+                          className="flex-1 bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] outline-none focus:ring-1 focus:ring-[#3182F6]"
+                          placeholder="라벨 (태그)"
+                        />
+                        <input 
+                          type="text" 
+                          value={formData.length}
+                          onChange={e => setFormData({...formData, length: e.target.value})}
+                          className="w-[100px] bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] outline-none focus:ring-1 focus:ring-[#3182F6]"
+                          placeholder="길이 (예: 1:23)"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="w-full aspect-video bg-black rounded-[12px] overflow-hidden border border-[#E5E8EB]">
+                      {getYoutubeEmbedUrl(formData.videoUrl) ? (
+                        <iframe 
+                          src={getYoutubeEmbedUrl(formData.videoUrl)!}
+                          className="w-full h-full"
+                          allowFullScreen
+                        ></iframe>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-[#8B95A1] text-[11px]">미리보기 없음</div>
+                      )}
+                    </div>
                   </div>
-                  <textarea 
-                    value={formData.title}
-                    onChange={e => setFormData({...formData, title: e.target.value})}
-                    className="w-full bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] font-bold focus:ring-1 focus:ring-[#3182F6] outline-none min-h-[60px]"
-                    placeholder="제목"
-                  />
-                  <div className="flex gap-2">
-                    <input 
-                      type="text" 
-                      value={formData.tag}
-                      onChange={e => setFormData({...formData, tag: e.target.value})}
-                      className="flex-1 bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] outline-none focus:ring-1 focus:ring-[#3182F6]"
-                      placeholder="라벨 (태그)"
-                    />
-                    <input 
-                      type="text" 
-                      value={formData.length}
-                      onChange={e => setFormData({...formData, length: e.target.value})}
-                      className="w-[100px] bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] outline-none focus:ring-1 focus:ring-[#3182F6]"
-                      placeholder="길이 (예: 1:23)"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 pt-2">
+                  
+                  <div className="flex justify-end gap-2 pt-2 border-t border-[#E5E8EB]">
                     <button onClick={() => setEditingId(null)} className="px-3 py-1.5 text-[#4E5968] text-[13px] font-bold bg-[#E5E8EB] rounded-[8px]">취소</button>
                     <button onClick={() => handleUpdate(short._id)} className="px-4 py-1.5 bg-[#3182F6] text-white font-bold text-[13px] rounded-[8px]">완료</button>
                   </div>

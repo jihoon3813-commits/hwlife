@@ -1336,15 +1336,15 @@ export default function App() {
               initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }}
               className="w-full max-w-[430px] aspect-[9/16] bg-black rounded-[24px] overflow-hidden flex items-center justify-center flex-col relative"
             >
-               {activeVideoItem.videoUrl ? (
-                 <iframe 
-                   src={activeVideoItem.videoUrl.includes('youtube.com') || activeVideoItem.videoUrl.includes('youtu.be') 
-                     ? `https://www.youtube.com/embed/${activeVideoItem.videoUrl.split('/').pop()?.split('v=')[1] || activeVideoItem.videoUrl.split('/').pop()}?autoplay=1`
-                     : activeVideoItem.videoUrl}
-                   className="w-full h-full"
-                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                   allowFullScreen
-                 ></iframe>
+                {activeVideoItem.videoUrl ? (
+                  <iframe 
+                    src={activeVideoItem.videoUrl.includes('youtube.com') || activeVideoItem.videoUrl.includes('youtu.be') 
+                      ? `https://www.youtube.com/embed/${activeVideoItem.videoUrl.split('/').pop()?.split('v=')[1] || activeVideoItem.videoUrl.split('/').pop()}?autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1`
+                      : activeVideoItem.videoUrl}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
                ) : (
                  <div className="text-center p-6">
                     <div className="w-16 h-16 bg-[#3182F6]/20 rounded-full flex items-center justify-center mb-6 mx-auto">
