@@ -45,7 +45,7 @@ export default function AdminLayout({ children, activeMenu, setActiveMenu }: Adm
         <div className="p-4 border-t border-[#E5E8EB]">
           <button 
             className="w-full flex items-center gap-3 px-4 py-3 text-[#8B95A1] hover:text-[#191F28] hover:bg-[#F2F4F6] rounded-[12px] font-medium transition-colors"
-            onClick={() => window.location.href = '/'}
+            onClick={() => window.location.href = './'}
           >
             <LogOut className="w-5 h-5" />
             사이트로 돌아가기

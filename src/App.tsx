@@ -1292,7 +1292,7 @@ export default function App() {
             
             <div className="mb-10 px-1">
               <a 
-                href="admin" 
+                href="?admin=true" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="inline-flex items-center gap-2 px-5 py-3 bg-white/5 hover:bg-[#3182F6] hover:text-white text-[#A3B1C6] text-[13px] font-bold rounded-xl border border-white/10 transition-all group"
