@@ -516,7 +516,10 @@ export default function App() {
               </div>
               <div className="p-4">
                 <div className="mb-2">
-                  <span className="text-[10px] font-bold text-[#3182F6] block mb-0.5">{item.brand}</span>
+                  <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                    <span className="text-[9px] font-bold text-[#4E5968] bg-[#F2F4F6] px-1.5 py-0.5 rounded-[4px]">{item.category}</span>
+                    <span className="text-[10px] font-bold text-[#3182F6]">{item.brand}</span>
+                  </div>
                   <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
                 </div>
                 <h3 className="text-[14px] font-bold text-[#191F28] mb-3 leading-tight">
@@ -721,7 +724,10 @@ export default function App() {
                     </div>
                     <div className="p-3 flex-1 flex flex-col">
                       <div className="mb-2">
-                        <span className="text-[10px] font-bold text-[#3182F6] block mb-0.5">{item.brand}</span>
+                        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                          <span className="text-[9px] font-bold text-[#4E5968] bg-[#F2F4F6] px-1.5 py-0.5 rounded-[4px]">{item.category}</span>
+                          <span className="text-[10px] font-bold text-[#3182F6]">{item.brand}</span>
+                        </div>
                         <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
                       </div>
                       <h3 className="text-[13px] font-bold text-[#191F28] mb-2 leading-snug">
@@ -1413,10 +1419,15 @@ export default function App() {
               </div>
 
               <div className="px-6 py-6 bg-white shrink-0 shadow-sm relative z-10">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <span className="text-[13px] font-bold text-[#8B95A1]">{selectedProduct.brand}</span>
-                  <span className="text-[13px] text-[#A3B1C6]">|</span>
-                  <span className="text-[13px] font-medium text-[#8B95A1]">{selectedProduct.model}</span>
+                <div className="flex flex-col gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-bold text-[#3182F6] bg-[#E8F3FF] px-2 py-0.5 rounded-[6px]">{selectedProduct.category}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[13px] font-bold text-[#8B95A1]">{selectedProduct.brand}</span>
+                    <span className="text-[13px] text-[#A3B1C6]">|</span>
+                    <span className="text-[13px] font-medium text-[#8B95A1]">{selectedProduct.model}</span>
+                  </div>
                 </div>
                 <h2 className="font-bold text-[22px] text-[#191F28] leading-[1.3] mb-5 break-keep">
                   {selectedProduct.name}
