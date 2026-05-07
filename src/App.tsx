@@ -449,15 +449,19 @@ export default function App() {
       </section>
 
       {/* 4. Products & Accounts Section */}
-      <section className="bg-[#F2F4F6] pt-10 pb-6 px-0 rounded-[32px] mb-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)]">
+      <section className="bg-[#111111] pt-12 pb-10 px-0 rounded-[32px] mb-2 shadow-2xl relative overflow-hidden">
+        {/* Subtle Gradient Glow */}
+        <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#3182F6]/10 blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-[#3182F6]/5 blur-[100px] pointer-events-none"></div>
+        
         <div className="px-6 mb-6">
           <div className="inline-block bg-[#1B64DA] text-white text-[11px] font-bold px-2.5 py-1 rounded-full mb-3 shadow-sm">
             {planInfo.name}
           </div>
           <div className="flex justify-between items-end mb-2">
-            <h2 className="text-[22px] font-bold leading-snug">일반 렌탈가전과<br/>가격비교 해보세요! 자신있습니다.</h2>
+            <h2 className="text-[22px] font-bold leading-snug text-white">일반 렌탈가전과<br/>가격비교 해보세요! 자신있습니다.</h2>
           </div>
-          <p className="text-[#4E5968] text-[15px]">{planInfo.desc}</p>
+          <p className="text-[#A3B1C6] text-[15px]">{planInfo.desc}</p>
           <div className="mt-6 rounded-[24px] overflow-hidden shadow-sm border border-[#F2F4F6]">
             <img 
               src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777964857/Generated_Image_May_05_2026_-_4_01PM_cwwwlq.jpg" 
@@ -474,8 +478,8 @@ export default function App() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-block px-2.5 py-1 bg-[#3182F6]/10 text-[#3182F6] text-[11px] font-bold rounded-md mb-2">PRODUCT LIST</span>
-            <h2 className="text-[22px] font-bold text-[#191F28] leading-tight">
+            <span className="inline-block px-2.5 py-1 bg-[#3182F6]/20 text-[#3182F6] text-[11px] font-bold rounded-md mb-2">PRODUCT LIST</span>
+            <h2 className="text-[22px] font-bold text-white leading-tight">
               나에게 딱 맞는<br />결합 상품 찾기
             </h2>
           </motion.div>
@@ -502,7 +506,7 @@ export default function App() {
                 key={(item as any)._id || (item as any).id}
                 onClick={() => openProductDetail(item)}
                 layoutId={`product-${(item as any)._id || (item as any).id}`}
-                className="bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-col h-full"
+                className="bg-[#1C1C1C] rounded-[28px] border border-white/5 overflow-hidden active:scale-95 transition-all cursor-pointer shadow-lg hover:shadow-[#3182F6]/10 hover:-translate-y-1 flex flex-col h-full"
               >
                 <div className="relative h-[125px] bg-white shrink-0">
                   <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-2" />
@@ -520,7 +524,7 @@ export default function App() {
                     </div>
                     <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
                   </div>
-                  <h3 className="text-[13px] font-bold text-[#191F28] mb-3 leading-tight line-clamp-2 min-h-[32px]">
+                  <h3 className="text-[13px] font-bold text-white mb-3 leading-tight line-clamp-2 min-h-[32px]">
                     {item.name}
                   </h3>
                   <div className="mt-auto">
@@ -528,7 +532,7 @@ export default function App() {
                       <span className="text-[10px] text-[#8B95A1] line-through decoration-[#8B95A1]/40 leading-none">월납입금 {formatNumber(item.price)}</span>
                       <div className="flex flex-col gap-0.5">
                         <div className="flex flex-col gap-0.5">
-                          <span className="text-[16px] font-black text-[#191F28]">월 {formatNumber(item.discountPrice)}</span>
+                          <span className="text-[16px] font-black text-white">월 {formatNumber(item.discountPrice)}</span>
                           <span className="text-[9px] font-bold text-[#3182F6] bg-[#3182F6]/5 px-1 py-0.5 rounded-md w-fit">제휴카드 혜택가</span>
                         </div>
                         <span className="text-[10px] font-bold text-[#F04452] mt-1">상조 만기 시 전액지원</span>
@@ -543,16 +547,16 @@ export default function App() {
           {!isProductFullView && (
             <button 
               onClick={openFullView}
-              className="w-full mt-6 flex items-center justify-center gap-2 bg-white border border-[#E5E8EB] py-4 rounded-[20px] text-[15px] font-bold text-[#191F28] hover:bg-[#F9FAFB] active:scale-95 transition-all shadow-sm"
+              className="w-full mt-6 flex items-center justify-center gap-2 bg-[#1C1C1C] border border-white/10 py-4 rounded-[20px] text-[15px] font-bold text-white hover:bg-[#252525] active:scale-95 transition-all shadow-xl"
             >
-              전체 상품 보기 <ArrowRight className="w-4 h-4" />
+              전체 상품 보기 <ArrowRight className="w-4 h-4 text-[#3182F6]" />
             </button>
           )}
         </div>
 
         <div className="px-6 mt-4">
-          <div className="bg-white p-4 rounded-[20px] flex items-center justify-between shadow-sm">
-            <p className="text-[12px] text-[#4E5968] font-medium">원하는 상품이 없으신가요?</p>
+          <div className="bg-[#1C1C1C] p-4 rounded-[20px] flex items-center justify-between shadow-xl border border-white/5">
+            <p className="text-[12px] text-[#A3B1C6] font-medium">원하는 상품이 없으신가요?</p>
             <button 
               onClick={() => setIsContactModalOpen(true)}
               className="text-[12px] text-[#3182F6] font-bold flex items-center gap-1"
