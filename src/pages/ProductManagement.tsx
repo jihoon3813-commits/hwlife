@@ -449,6 +449,7 @@ export default function ProductManagement() {
                       </th>
                       <th className="px-4 py-4 w-10"></th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968]">브랜드</th>
+                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968]">카테고리</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968]">제품명 / 모델명</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] text-right">월납입금</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] text-center">노출</th>
@@ -472,6 +473,7 @@ export default function ProductManagement() {
                         </td>
                         <td className="px-2 py-4 text-[#D1D6DB] group-hover:text-[#3182F6]"><MoveVertical className="w-5 h-5" /></td>
                         <td className="px-4 py-4 text-[14px] text-[#4E5968] font-bold">{p.brand}</td>
+                        <td className="px-4 py-4 text-[13px] text-[#8B95A1] font-medium">{p.category}</td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2 mb-1">
                             {p.tag && <span className="text-[10px] font-bold bg-[#3182F6] text-white px-1.5 py-0.5 rounded">{p.tag}</span>}
