@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Check, X, ChevronDown, ArrowRight, Play, Info, LayoutGrid, List,
+  Check, X, ChevronDown, ChevronLeft, ChevronRight, ArrowRight, Play, Info, LayoutGrid, List,
   ShieldAlert, Coins, LockKeyhole, Megaphone,
   Search, FileText, Smartphone, Gift
 } from 'lucide-react';
@@ -21,6 +21,15 @@ export default function App() {
   const [message, setMessage] = useState('');
   const [isProductFullView, setIsProductFullView] = useState(false);
   const [lastViewedSection, setLastViewedSection] = useState<string | null>(null);
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const productScrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (ref: React.RefObject<HTMLDivElement>, direction: 'left' | 'right') => {
+    if (ref.current) {
+      const scrollAmount = direction === 'left' ? -250 : 250;
+      ref.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   // --- Browser Back Button Support ---
   useEffect(() => {
@@ -480,65 +489,105 @@ export default function App() {
         </div>
 
         {/* Category Tabs (Horizontal Scroll) */}
-        <div className="px-6 mb-6 overflow-x-auto hide-scrollbar flex gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-bold transition-all ${
-                activeCategory === cat
-                  ? 'bg-[#191F28] text-white shadow-md'
-                  : 'bg-[#F2F4F6] text-[#4E5968]'
-              }`}
+        <div className="relative group/cat mb-6">
+          <div 
+            ref={categoryScrollRef}
+            className="px-6 overflow-x-auto hide-scrollbar flex gap-2 scroll-smooth"
+          >
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-bold transition-all ${
+                  activeCategory === cat
+                    ? 'bg-[#191F28] text-white shadow-md'
+                    : 'bg-[#F2F4F6] text-[#4E5968]'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          
+          {/* PC Navigation Buttons */}
+          <div className="hidden sm:block">
+            <button 
+              onClick={() => scroll(categoryScrollRef, 'left')}
+              className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 border border-[#E5E8EB] rounded-full flex items-center justify-center shadow-md opacity-0 group-hover/cat:opacity-100 transition-opacity z-10"
             >
-              {cat}
+              <ChevronLeft className="w-4 h-4 text-[#4E5968]" />
             </button>
-          ))}
+            <button 
+              onClick={() => scroll(categoryScrollRef, 'right')}
+              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 border border-[#E5E8EB] rounded-full flex items-center justify-center shadow-md opacity-0 group-hover/cat:opacity-100 transition-opacity z-10"
+            >
+              <ChevronRight className="w-4 h-4 text-[#4E5968]" />
+            </button>
+          </div>
         </div>
 
         {/* Product Card List (Horizontal Scroll in Section) */}
-        <div 
-          className="grid grid-rows-2 grid-flow-col auto-cols-max gap-3 px-6 pb-2 overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-px-6"
-        >
-          {filteredProducts.map((item) => (
-            <motion.div
-              key={(item as any)._id || (item as any).id}
-              onClick={() => openProductDetail(item)}
-              layoutId={`product-${(item as any)._id || (item as any).id}`}
-              className="w-[200px] bg-[#F9FAFB] rounded-[28px] border border-[#E5E8EB] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1"
-            >
-              <div className="relative h-[125px] bg-white">
-                <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-2" />
-                {item.tag && (
-                  <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">
-                    {item.tag}
-                  </div>
-                )}
-              </div>
-              <div className="p-4">
-                <div className="mb-2">
-                  <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                    <span className="text-[9px] font-bold text-[#4E5968] bg-[#F2F4F6] px-1.5 py-0.5 rounded-[4px]">{item.category}</span>
-                    <span className="text-[10px] font-bold text-[#3182F6]">{item.brand}</span>
-                  </div>
-                  <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
-                </div>
-                <h3 className="text-[14px] font-bold text-[#191F28] mb-3 leading-tight">
-                  {item.name}
-                </h3>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] text-[#8B95A1] line-through decoration-[#8B95A1]/40 leading-none">월납입금 {item.price}</span>
-                  <div className="flex flex-col gap-0.5">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[17px] font-black text-[#191F28]">월 {item.discountPrice}</span>
-                      <span className="text-[9px] font-bold text-[#3182F6] bg-[#3182F6]/5 px-1 py-0.5 rounded-md">제휴카드 혜택가</span>
+        <div className="relative group/prod">
+          <div 
+            ref={productScrollRef}
+            className="grid grid-rows-2 grid-flow-col auto-cols-max gap-3 px-6 pb-2 overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-px-6 scroll-smooth"
+          >
+            {filteredProducts.map((item) => (
+              <motion.div
+                key={(item as any)._id || (item as any).id}
+                onClick={() => openProductDetail(item)}
+                layoutId={`product-${(item as any)._id || (item as any).id}`}
+                className="w-[200px] bg-[#F9FAFB] rounded-[28px] border border-[#E5E8EB] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1"
+              >
+                <div className="relative h-[125px] bg-white">
+                  <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-2" />
+                  {item.tag && (
+                    <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">
+                      {item.tag}
                     </div>
-                    <span className="text-[11px] font-bold text-[#F04452]">상조 만기 시 전액지원</span>
+                  )}
+                </div>
+                <div className="p-4">
+                  <div className="mb-2">
+                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                      <span className="text-[9px] font-bold text-[#4E5968] bg-[#F2F4F6] px-1.5 py-0.5 rounded-[4px]">{item.category}</span>
+                      <span className="text-[10px] font-bold text-[#3182F6]">{item.brand}</span>
+                    </div>
+                    <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
+                  </div>
+                  <h3 className="text-[14px] font-bold text-[#191F28] mb-3 leading-tight">
+                    {item.name}
+                  </h3>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] text-[#8B95A1] line-through decoration-[#8B95A1]/40 leading-none">월납입금 {item.price}</span>
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[17px] font-black text-[#191F28]">월 {item.discountPrice}</span>
+                        <span className="text-[9px] font-bold text-[#3182F6] bg-[#3182F6]/5 px-1 py-0.5 rounded-md">제휴카드 혜택가</span>
+                      </div>
+                      <span className="text-[11px] font-bold text-[#F04452]">상조 만기 시 전액지원</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
+
+          {/* PC Navigation Buttons */}
+          <div className="hidden sm:block">
+            <button 
+              onClick={() => scroll(productScrollRef, 'left')}
+              className="absolute left-1 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 border border-[#E5E8EB] rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover/prod:opacity-100 transition-opacity z-10"
+            >
+              <ChevronLeft className="w-5 h-5 text-[#191F28]" />
+            </button>
+            <button 
+              onClick={() => scroll(productScrollRef, 'right')}
+              className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 border border-[#E5E8EB] rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover/prod:opacity-100 transition-opacity z-10"
+            >
+              <ChevronRight className="w-5 h-5 text-[#191F28]" />
+            </button>
+          </div>
         </div>
 
         <div className="px-6 mt-4">
