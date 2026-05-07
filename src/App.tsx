@@ -515,10 +515,9 @@ export default function App() {
                 )}
               </div>
               <div className="p-4">
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <span className="text-[11px] font-bold text-[#3182F6]">{item.brand}</span>
-                  <div className="w-[1px] h-2 bg-[#E5E8EB]" />
-                  <span className="text-[11px] font-medium text-[#8B95A1] truncate">{item.model}</span>
+                <div className="mb-2">
+                  <span className="text-[10px] font-bold text-[#3182F6] block mb-0.5">{item.brand}</span>
+                  <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
                 </div>
                 <h3 className="text-[14px] font-bold text-[#191F28] mb-3 line-clamp-2 h-10 leading-tight">
                   {item.name}
@@ -721,7 +720,10 @@ export default function App() {
                       )}
                     </div>
                     <div className="p-3 flex-1 flex flex-col">
-                      <span className="text-[10px] font-bold text-[#3182F6] mb-1">{item.brand}</span>
+                      <div className="mb-2">
+                        <span className="text-[10px] font-bold text-[#3182F6] block mb-0.5">{item.brand}</span>
+                        <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
+                      </div>
                       <h3 className="text-[13px] font-bold text-[#191F28] mb-2 line-clamp-2 leading-snug flex-1">
                         {item.name}
                       </h3>
