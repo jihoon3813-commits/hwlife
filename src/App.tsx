@@ -507,7 +507,7 @@ export default function App() {
               layoutId={`product-${(item as any)._id || (item as any).id}`}
               className="w-[200px] bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1"
             >
-              <div className="relative h-[125px] bg-[#F9FAFB]">
+              <div className="relative h-[125px] bg-white">
                 <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-2" />
                 {item.tag && (
                   <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">
@@ -515,7 +515,7 @@ export default function App() {
                   </div>
                 )}
               </div>
-              <div className="p-4">
+              <div className="p-4 bg-[#F9FAFB]">
                 <div className="mb-2">
                   <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                     <span className="text-[9px] font-bold text-[#4E5968] bg-[#F2F4F6] px-1.5 py-0.5 rounded-[4px]">{item.category}</span>
@@ -715,7 +715,7 @@ export default function App() {
                       openProductDetail(item);
                     }}
                   >
-                    <div className="relative aspect-square bg-[#F9FAFB]">
+                    <div className="relative aspect-square bg-white">
                       <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-4" />
                       {item.tag && (
                         <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold rounded-md">
@@ -723,7 +723,7 @@ export default function App() {
                         </div>
                       )}
                     </div>
-                    <div className="p-3 flex-1 flex flex-col">
+                    <div className="p-3 flex-1 flex flex-col bg-[#F9FAFB]">
                       <div className="mb-2">
                         <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                           <span className="text-[9px] font-bold text-[#4E5968] bg-[#F2F4F6] px-1.5 py-0.5 rounded-[4px]">{item.category}</span>
