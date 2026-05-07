@@ -179,8 +179,12 @@ export default function ProductManagement() {
     });
 
   const downloadTemplate = () => {
+    const compHeaders = [];
+    for (let i = 1; i <= 10; i++) {
+      compHeaders.push(`타사${i}명`, `타사${i}금액`);
+    }
     const headers = [
-      ['구좌', '브랜드', '카테고리', '제품명', '모델명', '월납입금', '제휴카드혜택가', '라벨', '타사1명', '타사1금액', '타사2명', '타사2금액', '타사3명', '타사3금액', '썸네일url', '상세이미지 url(쉼표 구분)']
+      ['구좌', '브랜드', '카테고리', '제품명', '모델명', '월납입금', '제휴카드혜택가', '라벨', ...compHeaders, '썸네일url', '상세이미지 url(쉼표 구분)']
     ];
     const ws = XLSX.utils.aoa_to_sheet(headers);
     const wb = XLSX.utils.book_new();
@@ -224,9 +228,9 @@ export default function ProductManagement() {
           const discountPrice = String(row[6] || '0').replace(/\D/g, '');
           const tag = row[7] || '';
           
-          // Multiple Comparisons (Columns 8,9 / 10,11 / 12,13)
+          // Multiple Comparisons (10 pairs starting from index 8)
           const comparisons = [];
-          for (let i = 0; i < 3; i++) {
+          for (let i = 0; i < 10; i++) {
             const baseIdx = 8 + (i * 2);
             const compName = row[baseIdx] || '';
             const compPrice = String(row[baseIdx + 1] || '0').replace(/\D/g, '');
@@ -243,9 +247,10 @@ export default function ProductManagement() {
             }
           }
 
-          // Images (Updated Indices)
-          const thumbnailUrl = row[14] || '';
-          const detailUrls = row[15] ? String(row[15]).split(',').map(s => s.trim()) : [];
+          // Images (Updated Indices for 10 competitors)
+          // 8 + 20 = 28
+          const thumbnailUrl = row[28] || '';
+          const detailUrls = row[29] ? String(row[29]).split(',').map(s => s.trim()) : [];
 
           await createProduct({
             planId,
