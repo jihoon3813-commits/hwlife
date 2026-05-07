@@ -149,15 +149,16 @@ export default function ProductManagement() {
     await updateProduct({ id: id as any, isVisible: !current });
   };
 
-  const toggleMainExposure = async (id: string, current: boolean) => {
-    if (!current) {
-      const mainCount = allProducts.filter(p => p.showOnMain).length;
+  const toggleMainExposure = async (id: string, current: boolean | undefined) => {
+    const isCurrentlyMain = !!current;
+    if (!isCurrentlyMain) {
+      const mainCount = allProducts.filter(p => !!p.showOnMain).length;
       if (mainCount >= 8) {
         alert('메인 노출은 최대 8개까지만 가능합니다.');
         return;
       }
     }
-    await updateProduct({ id: id as any, showOnMain: !current });
+    await updateProduct({ id: id as any, showOnMain: !isCurrentlyMain });
   };
 
   const deleteProduct = async (id: string) => {
@@ -544,7 +545,18 @@ export default function ProductManagement() {
                      {editingProduct.isVisible ? <><Eye className="w-4 h-4"/> 노출중</> : <><EyeOff className="w-4 h-4"/> 숨김상태</>}
                    </button>
                    <button 
-                    onClick={() => { toggleMainExposure(editingProduct._id, editingProduct.showOnMain); setEditingProduct({...editingProduct, showOnMain: !editingProduct.showOnMain}); }}
+                    onClick={() => { 
+                      const nextState = !editingProduct.showOnMain;
+                      if (nextState) {
+                        const mainCount = allProducts.filter(p => !!p.showOnMain).length;
+                        if (mainCount >= 8) {
+                          alert('메인 노출은 최대 8개까지만 가능합니다.');
+                          return;
+                        }
+                      }
+                      toggleMainExposure(editingProduct._id, editingProduct.showOnMain); 
+                      setEditingProduct({...editingProduct, showOnMain: nextState}); 
+                    }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-[10px] text-[13px] font-bold transition-all ${editingProduct.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-500'}`}
                    >
                      {editingProduct.showOnMain ? <><Star className="w-4 h-4 fill-current"/> 메인 노출중</> : <><Star className="w-4 h-4"/> 메인 미노출</>}
