@@ -519,7 +519,7 @@ export default function App() {
                   <span className="text-[10px] font-bold text-[#3182F6] block mb-0.5">{item.brand}</span>
                   <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
                 </div>
-                <h3 className="text-[14px] font-bold text-[#191F28] mb-3 line-clamp-2 h-10 leading-tight">
+                <h3 className="text-[14px] font-bold text-[#191F28] mb-3 leading-tight">
                   {item.name}
                 </h3>
                 <div className="flex flex-col gap-1">
@@ -724,7 +724,7 @@ export default function App() {
                         <span className="text-[10px] font-bold text-[#3182F6] block mb-0.5">{item.brand}</span>
                         <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
                       </div>
-                      <h3 className="text-[13px] font-bold text-[#191F28] mb-2 line-clamp-2 leading-snug flex-1">
+                      <h3 className="text-[13px] font-bold text-[#191F28] mb-2 leading-snug">
                         {item.name}
                       </h3>
                       <div className="mt-auto space-y-0.5">
