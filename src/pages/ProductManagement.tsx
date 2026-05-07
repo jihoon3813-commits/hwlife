@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square, Link, X } from 'lucide-react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import * as XLSX from 'xlsx';
 
 interface Plan {
   id: number;
@@ -30,6 +31,7 @@ export default function ProductManagement() {
   const [viewMode, setViewMode] = useState<'list' | 'edit_plan' | 'edit_product'>('list');
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const excelInputRef = useRef<HTMLInputElement>(null);
   const [sortConfig, setSortConfig] = useState<{ key: 'brand' | 'category' | null, direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
 
   const thumbInputRef = useRef<HTMLInputElement>(null);
@@ -176,6 +178,96 @@ export default function ProductManagement() {
       return bVal.localeCompare(aVal);
     });
 
+  const downloadTemplate = () => {
+    const headers = [
+      ['구좌', '브랜드', '카테고리', '제품명', '모델명', '월납입금', '제휴카드혜택가', '라벨', '타사명', '타사금액', '썸네일url', '상세이미지 url(쉼표 구분)']
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(headers);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "제품등록양식");
+    XLSX.writeFile(wb, "제품등록양식.xlsx");
+  };
+
+  const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws, { header: 1 }) as any[][];
+
+        // Skip header
+        const rows = data.slice(1);
+        
+        for (const row of rows) {
+          if (!row[3]) continue; // Skip if product name is empty
+
+          let planId = 1;
+          const planVal = String(row[0] || '');
+          if (/^\d+$/.test(planVal)) {
+            planId = parseInt(planVal);
+          } else {
+            const matchedPlan = plans.find(p => p.name.includes(planVal));
+            if (matchedPlan) planId = matchedPlan.id;
+          }
+
+          const brand = row[1] || '';
+          const category = row[2] || '';
+          const name = row[3] || '';
+          const model = row[4] || '';
+          const price = String(row[5] || '0').replace(/\D/g, '');
+          const discountPrice = String(row[6] || '0').replace(/\D/g, '');
+          const tag = row[7] || '';
+          
+          // Comparisons
+          const compName = row[8] || '';
+          const compPrice = String(row[9] || '0').replace(/\D/g, '');
+          const comparisons = [];
+          if (compName) {
+            const partner = competitors.find(c => c.name === compName);
+            comparisons.push({
+              company: compName,
+              target: '', 
+              price: compPrice,
+              period: (partner?.months || 60) + '개월',
+              isOurs: partner?.type === '자사'
+            });
+          }
+
+          // Images
+          const thumbnailUrl = row[10] || '';
+          const detailUrls = row[11] ? String(row[11]).split(',').map(s => s.trim()) : [];
+
+          await createProduct({
+            planId,
+            brand,
+            category,
+            name,
+            model,
+            price,
+            discountPrice,
+            tag,
+            isVisible: true,
+            comparisons,
+            images: thumbnailUrl ? [thumbnailUrl] : [],
+            detailImages: detailUrls
+          });
+        }
+        alert('일괄 등록이 완료되었습니다.');
+        if (excelInputRef.current) excelInputRef.current.value = '';
+      } catch (err) {
+        console.error(err);
+        alert('엑셀 처리 중 오류가 발생했습니다.');
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
   return (
     <div className="p-8 h-full flex flex-col no-scrollbar overflow-y-auto">
       <div className="flex justify-between items-center mb-6">
@@ -222,9 +314,30 @@ export default function ProductManagement() {
                     </button>
                   </div>
                 </div>
-                <button onClick={handleAddProduct} className="bg-[#3182F6] text-white px-5 py-3 rounded-[12px] font-bold text-[14px] flex items-center gap-2 shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95">
-                  <Plus className="w-4 h-4" /> 신규 제품 등록
-                </button>
+                <div className="flex gap-2">
+                  <input 
+                    type="file" 
+                    ref={excelInputRef} 
+                    className="hidden" 
+                    accept=".xlsx, .xls" 
+                    onChange={handleExcelUpload} 
+                  />
+                  <button 
+                    onClick={downloadTemplate}
+                    className="bg-white border border-[#E5E8EB] text-[#4E5968] px-4 py-2.5 rounded-[12px] text-[14px] font-bold flex items-center gap-2 hover:bg-[#F9FAFB] transition-colors"
+                  >
+                    <Download className="w-4 h-4" /> 양식 다운로드
+                  </button>
+                  <button 
+                    onClick={() => excelInputRef.current?.click()}
+                    className="bg-white border border-[#E5E8EB] text-[#3182F6] px-4 py-2.5 rounded-[12px] text-[14px] font-bold flex items-center gap-2 hover:bg-[#F9FAFB] transition-colors"
+                  >
+                    <Upload className="w-4 h-4" /> 엑셀 일괄등록
+                  </button>
+                  <button onClick={handleAddProduct} className="bg-[#3182F6] text-white px-5 py-3 rounded-[12px] font-bold text-[14px] flex items-center gap-2 shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95">
+                    <Plus className="w-4 h-4" /> 신규 제품 등록
+                  </button>
+                </div>
               </div>
 
               {/* Batch Actions Bar */}
@@ -371,12 +484,12 @@ export default function ProductManagement() {
                       <h3 className="font-bold text-[18px]">타사 비교 정보 설정</h3>
                       <button 
                         onClick={() => {
-                          const defaultPartner = competitors[0] || { name: '효원상조', months: 60, type: '자사' };
+                          const defaultPartner = competitors[0] || { name: '타사', months: 60, type: '타사' };
                           const newComp = {
                             company: defaultPartner.name,
-                            target: defaultPartner.name + ' 설계',
+                            target: '',
                             price: '0',
-                            period: defaultPartner.months + '개월',
+                            period: (defaultPartner.months || 60) + '개월',
                             isOurs: defaultPartner.type === '자사',
                             benefit: ''
                           };
@@ -413,19 +526,6 @@ export default function ProductManagement() {
                             >
                               {competitors.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
                             </select>
-                          </div>
-                          <div className="flex-1">
-                            <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">비교 내용 (예: 설계 상품명)</label>
-                            <input 
-                              type="text" 
-                              value={comp.target} 
-                              onChange={(e) => {
-                                const updated = [...editingProduct.comparisons];
-                                updated[idx] = { ...updated[idx], target: e.target.value };
-                                setEditingProduct({ ...editingProduct, comparisons: updated });
-                              }}
-                              className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" 
-                            />
                           </div>
                           <div className="w-[140px]">
                             <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">월 납입금</label>
