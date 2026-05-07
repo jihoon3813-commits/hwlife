@@ -37,21 +37,19 @@ export default function App() {
     const handlePopState = (event: PopStateEvent) => {
       const state = event.state;
       
-      if (!state) {
-        // Back to landing
-        setSelectedProduct(null);
+      // Handle modal states based on history
+      if (!state || state.view !== 'video') setActiveVideoItem(null);
+      if (!state || state.view !== 'detail') setSelectedProduct(null);
+      
+      if (state?.view === 'full') {
+        setIsProductFullView(true);
+      } else if (!state) {
         setIsProductFullView(false);
         // Scroll to product list section on landing page
         setTimeout(() => {
           const productSection = document.getElementById('product-list');
           if (productSection) productSection.scrollIntoView({ behavior: 'smooth' });
         }, 100);
-        return;
-      }
-
-      if (state.view === 'full') {
-        setSelectedProduct(null);
-        setIsProductFullView(true);
       }
     };
 
@@ -75,6 +73,15 @@ export default function App() {
   };
 
   const closeProductDetail = () => {
+    window.history.back();
+  };
+
+  const openVideo = (item: any) => {
+    setActiveVideoItem(item);
+    window.history.pushState({ view: 'video' }, '');
+  };
+
+  const closeVideo = () => {
     window.history.back();
   };
 
@@ -322,7 +329,7 @@ export default function App() {
             <motion.div 
               whileTap={{ scale: 0.96 }}
               key={short._id} 
-              onClick={() => setActiveVideoItem(short)}
+              onClick={() => openVideo(short)}
               className="relative shrink-0 w-[150px] aspect-[9/16] snap-center cursor-pointer rounded-2xl overflow-hidden shadow-[0_4px_16px_rgb(0,0,0,0.06)] bg-[#191F28]"
             >
               {(() => {
@@ -477,8 +484,11 @@ export default function App() {
           >
             <span className="inline-block px-2.5 py-1 bg-[#3182F6]/10 text-[#3182F6] text-[11px] font-bold rounded-md mb-2">PRODUCT LIST</span>
             <h2 className="text-[22px] font-bold text-[#191F28] leading-tight">
-              나에게 딱 맞는<br />결합 상품 찾기
+              가전 렌탈료<br />비교하기
             </h2>
+            <p className="text-[12px] text-[#8B95A1] mt-2 break-keep">
+              제품을 클릭하면 타렌탈사(상조사)와 가격 비교표를 확인 할 수 있습니다.
+            </p>
           </motion.div>
           {!isProductFullView && (
             <button 
@@ -1365,7 +1375,7 @@ export default function App() {
             className="fixed inset-0 bg-black/95 z-[150] flex flex-col justify-center items-center"
           >
             <button 
-              onClick={() => setActiveVideoItem(null)}
+              onClick={closeVideo}
               className="absolute top-5 right-5 text-white/50 hover:text-white p-2 z-[160]"
             >
                <X className="w-8 h-8" />
