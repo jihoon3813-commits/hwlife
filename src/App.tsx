@@ -459,9 +459,7 @@ export default function App() {
       {/* 4. Products & Accounts Section */}
       <section className="bg-[#F2F4F6] pt-10 pb-6 px-0 rounded-[32px] mb-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)]">
         <div className="px-6 mb-6">
-          <div className="inline-block bg-[#1B64DA] text-white text-[11px] font-bold px-2.5 py-1 rounded-full mb-3 shadow-sm">
-            {planInfo.name}
-          </div>
+
           <div className="flex justify-between items-end mb-2">
             <h2 className="text-[22px] font-bold leading-snug">일반 렌탈가전과<br/>가격비교 해보세요! 자신있습니다.</h2>
           </div>
@@ -484,9 +482,14 @@ export default function App() {
           >
             <span className="inline-block px-2.5 py-1 bg-[#3182F6]/10 text-[#3182F6] text-[11px] font-bold rounded-md mb-2">PRODUCT LIST</span>
             <h2 className="text-[22px] font-bold text-[#191F28] leading-tight">
-              가전 렌탈료<br />비교하기
+              가전 렌탈료 비교하기
             </h2>
-            <p className="text-[12px] text-[#8B95A1] mt-2 break-keep">
+            <div className="mt-2 mb-2.5">
+              <span className="inline-block bg-[#1B64DA] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
+                {planInfo.name}
+              </span>
+            </div>
+            <p className="text-[12px] text-[#8B95A1] break-keep">
               제품을 클릭하면 타렌탈사(상조사)와 가격 비교표를 확인 할 수 있습니다.
             </p>
           </motion.div>
