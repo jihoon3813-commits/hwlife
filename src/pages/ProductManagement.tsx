@@ -150,6 +150,13 @@ export default function ProductManagement() {
   };
 
   const toggleMainExposure = async (id: string, current: boolean) => {
+    if (!current) {
+      const mainCount = allProducts.filter(p => p.showOnMain).length;
+      if (mainCount >= 8) {
+        alert('메인 노출은 최대 8개까지만 가능합니다.');
+        return;
+      }
+    }
     await updateProduct({ id: id as any, showOnMain: !current });
   };
 
@@ -452,14 +459,14 @@ export default function ProductManagement() {
                         </button>
                       </th>
                       <th className="px-4 py-4 w-10"></th>
-                      <th className="px-4 py-4 w-16 text-[13px] font-bold text-[#4E5968]">이미지</th>
-                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968]">브랜드</th>
-                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968]">카테고리</th>
-                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968]">제품명 / 모델명</th>
-                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] text-right">월납입금</th>
-                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] text-center">노출</th>
-                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] text-center">메인</th>
-                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] text-right">개별관리</th>
+                      <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">이미지</th>
+                      <th className="px-4 py-4 w-24 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">브랜드</th>
+                      <th className="px-4 py-4 w-32 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">카테고리</th>
+                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">제품명 / 모델명</th>
+                      <th className="px-4 py-4 w-32 text-[13px] font-bold text-[#4E5968] text-right whitespace-nowrap">월납입금</th>
+                      <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">노출</th>
+                      <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">메인</th>
+                      <th className="px-4 py-4 w-28 text-[13px] font-bold text-[#4E5968] text-right whitespace-nowrap">개별관리</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#F2F4F6]">
