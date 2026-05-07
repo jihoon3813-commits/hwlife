@@ -559,10 +559,10 @@ export default function App() {
                     {item.name}
                   </h3>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] text-[#8B95A1] line-through decoration-[#8B95A1]/40 leading-none">월납입금 {item.price}</span>
+                    <span className="text-[10px] text-[#8B95A1] line-through decoration-[#8B95A1]/40 leading-none">월납입금 {formatNumber(item.price)}</span>
                     <div className="flex flex-col gap-0.5">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[17px] font-black text-[#191F28]">월 {item.discountPrice}</span>
+                        <span className="text-[17px] font-black text-[#191F28]">월 {formatNumber(item.discountPrice)}</span>
                         <span className="text-[9px] font-bold text-[#3182F6] bg-[#3182F6]/5 px-1 py-0.5 rounded-md">제휴카드 혜택가</span>
                       </div>
                       <span className="text-[11px] font-bold text-[#F04452]">상조 만기 시 전액지원</span>
