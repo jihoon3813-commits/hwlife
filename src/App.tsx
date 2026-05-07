@@ -449,7 +449,7 @@ export default function App() {
       </section>
 
       {/* 4. Products & Accounts Section */}
-      <section className="bg-white pt-10 pb-6 px-0 rounded-[32px] mb-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)]">
+      <section className="bg-[#F2F4F6] pt-10 pb-6 px-0 rounded-[32px] mb-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)]">
         <div className="px-6 mb-6">
           <div className="inline-block bg-[#1B64DA] text-white text-[11px] font-bold px-2.5 py-1 rounded-full mb-3 shadow-sm">
             {planInfo.name}
@@ -502,7 +502,7 @@ export default function App() {
                 key={(item as any)._id || (item as any).id}
                 onClick={() => openProductDetail(item)}
                 layoutId={`product-${(item as any)._id || (item as any).id}`}
-                className="bg-[#F9FAFB] rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-col h-full"
+                className="bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-col h-full"
               >
                 <div className="relative h-[125px] bg-white shrink-0">
                   <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-2" />
@@ -551,7 +551,7 @@ export default function App() {
         </div>
 
         <div className="px-6 mt-4">
-          <div className="bg-[#F9FAFB] p-4 rounded-[20px] flex items-center justify-between">
+          <div className="bg-white p-4 rounded-[20px] flex items-center justify-between shadow-sm">
             <p className="text-[12px] text-[#4E5968] font-medium">원하는 상품이 없으신가요?</p>
             <button 
               onClick={() => setIsContactModalOpen(true)}
