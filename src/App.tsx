@@ -125,10 +125,11 @@ export default function App() {
     price: "월 59,800원 ~"
   };
 
-  const categories = ["전체", "TV/시청각", "냉장고/김치냉장고", "세탁기/건조기", "안마의자/건강", "기타"];
-
   const products = useQuery(api.products.getVisibleProducts) || [];
   const competitors = useQuery(api.competitors.get) || [];
+  const settings = useQuery(api.settings.get);
+  const categories = ["전체", ...(settings?.categories || [])];
+  
   const filteredProducts = activeCategory === "전체" 
     ? products 
     : products.filter(p => p.category === activeCategory);
@@ -507,7 +508,7 @@ export default function App() {
               className="w-[200px] bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1"
             >
               <div className="relative h-[125px] bg-[#F9FAFB]">
-                <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-cover" />
+                <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-2" />
                 {item.tag && (
                   <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">
                     {item.tag}
@@ -714,8 +715,8 @@ export default function App() {
                       openProductDetail(item);
                     }}
                   >
-                    <div className="relative aspect-square">
-                      <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <div className="relative aspect-square bg-[#F9FAFB]">
+                      <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-4" />
                       {item.tag && (
                         <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold rounded-md">
                           {item.tag}
@@ -1404,9 +1405,9 @@ export default function App() {
               
               {/* Product Info Block */}
               <div className="bg-[#F2F4F6] w-full aspect-square relative">
-                <div className="w-full h-full overflow-x-auto flex snap-x snap-mandatory hide-scrollbar">
+                <div className="w-full h-full overflow-x-auto flex snap-x snap-mandatory hide-scrollbar bg-white">
                   {((selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images : [selectedProduct.image]).map((img: string, idx: number) => (
-                    <img key={idx} src={img} alt={`${selectedProduct.name}-${idx}`} className="w-full h-full object-cover shrink-0 snap-center" />
+                    <img key={idx} src={img} alt={`${selectedProduct.name}-${idx}`} className="w-full h-full object-contain p-6 shrink-0 snap-center" />
                   ))}
                 </div>
                 <div className="absolute top-4 left-4">
