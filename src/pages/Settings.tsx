@@ -136,12 +136,12 @@ export default function Settings() {
   if (!settings) return <div className="p-8">로딩 중...</div>;
 
   return (
-    <div className="p-8 h-full flex flex-col no-scrollbar overflow-y-auto">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-8 h-full flex flex-col overflow-hidden">
+      <div className="flex justify-between items-center mb-6 shrink-0">
         <h2 className="text-[24px] font-bold text-[#191F28]">환경설정</h2>
       </div>
 
-      <div className="flex gap-2 border-b border-[#E5E8EB] mb-6 overflow-x-auto no-scrollbar pb-1">
+      <div className="flex gap-2 border-b border-[#E5E8EB] mb-6 overflow-x-auto no-scrollbar pb-1 shrink-0">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -155,7 +155,7 @@ export default function Settings() {
         ))}
       </div>
 
-      <div className="bg-white rounded-[24px] border border-[#E5E8EB] p-8 max-w-5xl shadow-sm">
+      <div className="bg-white rounded-[24px] border border-[#E5E8EB] p-8 max-w-5xl shadow-sm overflow-y-auto no-scrollbar flex-1">
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleLogoUpload} />
 
         {activeTab === 'status' && (
