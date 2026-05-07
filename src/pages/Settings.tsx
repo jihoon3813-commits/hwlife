@@ -23,6 +23,9 @@ export default function Settings() {
   const [localCategories, setLocalCategories] = useState<string[]>([]);
   const [localFooter, setLocalFooter] = useState<any>(null);
 
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragType, setDragType] = useState<'status' | 'brand' | 'category' | null>(null);
+
   useEffect(() => {
     if (settings) {
       setLocalStatuses(settings.statuses || []);
@@ -60,6 +63,43 @@ export default function Settings() {
     } catch (err) {
       alert('설정 저장 중 오류가 발생했습니다.');
     }
+  };
+
+  const handleDragStart = (idx: number, type: 'status' | 'brand' | 'category') => {
+    setDraggedIndex(idx);
+    setDragType(type);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (idx: number) => {
+    if (draggedIndex === null || dragType === null) return;
+    if (draggedIndex === idx) return;
+
+    if (dragType === 'status') {
+      const newList = [...localStatuses];
+      const [movedItem] = newList.splice(draggedIndex, 1);
+      newList.splice(idx, 0, movedItem);
+      setLocalStatuses(newList);
+      saveSettings({ statuses: newList });
+    } else if (dragType === 'brand') {
+      const newList = [...localBrands];
+      const [movedItem] = newList.splice(draggedIndex, 1);
+      newList.splice(idx, 0, movedItem);
+      setLocalBrands(newList);
+      saveSettings({ brands: newList });
+    } else if (dragType === 'category') {
+      const newList = [...localCategories];
+      const [movedItem] = newList.splice(draggedIndex, 1);
+      newList.splice(idx, 0, movedItem);
+      setLocalCategories(newList);
+      saveSettings({ categories: newList });
+    }
+
+    setDraggedIndex(null);
+    setDragType(null);
   };
 
   if (!settings) return <div className="p-8">로딩 중...</div>;
@@ -105,8 +145,15 @@ export default function Settings() {
             
             <div className="space-y-3">
               {localStatuses.map((status, idx) => (
-                <div key={idx} className="flex items-center gap-4 bg-[#F9FAFB] p-4 rounded-[16px] border border-[#E5E8EB]">
-                  <MoveVertical className="w-5 h-5 text-[#D1D6DB] cursor-grab"/>
+                <div 
+                  key={idx} 
+                  draggable
+                  onDragStart={() => handleDragStart(idx, 'status')}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop(idx)}
+                  className={`flex items-center gap-4 bg-[#F9FAFB] p-4 rounded-[16px] border border-[#E5E8EB] transition-all ${draggedIndex === idx && dragType === 'status' ? 'opacity-40 scale-95 border-[#3182F6]' : 'hover:border-[#3182F6]/30'}`}
+                >
+                  <MoveVertical className="w-5 h-5 text-[#D1D6DB] cursor-grab active:cursor-grabbing shrink-0"/>
                   <input 
                     type="text" 
                     value={status.name} 
@@ -251,8 +298,15 @@ export default function Settings() {
               </div>
               <div className="space-y-2">
                 {localBrands.map((brand, idx) => (
-                  <div key={idx} className="flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border border-[#E5E8EB]">
-                    <MoveVertical className="w-4 h-4 text-[#D1D6DB] cursor-grab"/>
+                  <div 
+                    key={idx} 
+                    draggable
+                    onDragStart={() => handleDragStart(idx, 'brand')}
+                    onDragOver={handleDragOver}
+                    onDrop={() => handleDrop(idx)}
+                    className={`flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border border-[#E5E8EB] transition-all ${draggedIndex === idx && dragType === 'brand' ? 'opacity-40 scale-95 border-[#3182F6]' : 'hover:border-[#3182F6]/30'}`}
+                  >
+                    <MoveVertical className="w-4 h-4 text-[#D1D6DB] cursor-grab shrink-0"/>
                     <input 
                       type="text" 
                       value={brand} 
@@ -298,8 +352,15 @@ export default function Settings() {
               </div>
               <div className="space-y-2">
                 {localCategories.map((cat, idx) => (
-                  <div key={idx} className="flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border border-[#E5E8EB]">
-                    <MoveVertical className="w-4 h-4 text-[#D1D6DB] cursor-grab"/>
+                  <div 
+                    key={idx} 
+                    draggable
+                    onDragStart={() => handleDragStart(idx, 'category')}
+                    onDragOver={handleDragOver}
+                    onDrop={() => handleDrop(idx)}
+                    className={`flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border border-[#E5E8EB] transition-all ${draggedIndex === idx && dragType === 'category' ? 'opacity-40 scale-95 border-[#3182F6]' : 'hover:border-[#3182F6]/30'}`}
+                  >
+                    <MoveVertical className="w-4 h-4 text-[#D1D6DB] cursor-grab shrink-0"/>
                     <input 
                       type="text" 
                       value={cat} 
