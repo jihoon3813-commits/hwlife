@@ -484,14 +484,14 @@ export default function App() {
             <h2 className="text-[22px] font-bold text-[#191F28] leading-tight">
               가전 렌탈료 비교하기
             </h2>
-            <div className="mt-2 mb-2.5">
-              <span className="inline-block bg-[#1B64DA] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
+            <p className="text-[12px] text-[#8B95A1] mt-2 mb-4 break-keep">
+              제품을 클릭하면 타렌탈사(상조사)와 가격 비교표를 확인 할 수 있습니다.
+            </p>
+            <div className="mb-6">
+              <span className="inline-block bg-[#1B64DA] text-white text-[13px] font-bold px-3.5 py-1.5 rounded-full shadow-md">
                 {planInfo.name}
               </span>
             </div>
-            <p className="text-[12px] text-[#8B95A1] break-keep">
-              제품을 클릭하면 타렌탈사(상조사)와 가격 비교표를 확인 할 수 있습니다.
-            </p>
           </motion.div>
           {!isProductFullView && (
             <button 
