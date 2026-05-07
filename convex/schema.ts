@@ -51,4 +51,18 @@ export default defineSchema({
     type: v.string(), // "자사", "타사"
     months: v.number(),
   }),
+  settings: defineTable({
+    statuses: v.array(v.object({ name: v.string(), isUsed: v.boolean() })),
+    brands: v.array(v.string()),
+    categories: v.array(v.string()),
+    footer: v.object({
+      companyName: v.string(),
+      representative: v.string(),
+      businessNumber: v.string(),
+      phone: v.string(),
+      address: v.string(),
+      email: v.string(),
+      notice: v.string(),
+    }),
+  }),
 });

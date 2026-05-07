@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { X, Search, Filter, History } from 'lucide-react';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 
 interface Customer {
   id: string;
@@ -70,6 +72,7 @@ export default function CustomerManagement() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [memo, setMemo] = useState('');
   const [status, setStatus] = useState('');
+  const settings = useQuery(api.settings.get);
 
   const formatPhoneNumber = (value: string) => {
     if (!value) return value;
@@ -279,12 +282,9 @@ export default function CustomerManagement() {
                         onChange={(e) => setStatus(e.target.value)}
                         className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[8px] text-[14px] font-bold focus:outline-none focus:ring-1 focus:ring-[#3182F6]"
                       >
-                        <option>신규신청</option>
-                        <option>부재중</option>
-                        <option>상담완료</option>
-                        <option>가입완료</option>
-                        <option>보류</option>
-                        <option>취소</option>
+                        {settings?.statuses?.filter((s: any) => s.isUsed).map((s: any) => (
+                          <option key={s.name}>{s.name}</option>
+                        ))}
                       </select>
                     </div>
                     <div>

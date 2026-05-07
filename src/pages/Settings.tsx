@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Plus, Trash2, MoveVertical, Upload as UploadIcon, ImageIcon } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Plus, Trash2, MoveVertical, Upload as UploadIcon, ImageIcon, Save } from 'lucide-react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import VideoManagement from '../components/VideoManagement';
@@ -12,8 +12,25 @@ export default function Settings() {
   const updateCompetitor = useMutation(api.competitors.update);
   const removeCompetitor = useMutation(api.competitors.remove);
 
+  const settings = useQuery(api.settings.get);
+  const updateSettings = useMutation(api.settings.update);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentUploadingId, setCurrentUploadingId] = useState<string | null>(null);
+
+  const [localStatuses, setLocalStatuses] = useState<any[]>([]);
+  const [localBrands, setLocalBrands] = useState<string[]>([]);
+  const [localCategories, setLocalCategories] = useState<string[]>([]);
+  const [localFooter, setLocalFooter] = useState<any>(null);
+
+  useEffect(() => {
+    if (settings) {
+      setLocalStatuses(settings.statuses || []);
+      setLocalBrands(settings.brands || []);
+      setLocalCategories(settings.categories || []);
+      setLocalFooter(settings.footer || null);
+    }
+  }, [settings]);
 
   const tabs = [
     { id: 'status', label: '진행상태 설정' },
@@ -27,7 +44,6 @@ export default function Settings() {
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && currentUploadingId !== null) {
-      // In a real app, upload to storage and get URL
       const url = URL.createObjectURL(file);
       await updateCompetitor({ id: currentUploadingId as any, logo: url });
     }
@@ -38,10 +54,20 @@ export default function Settings() {
     fileInputRef.current?.click();
   };
 
+  const saveSettings = async (updates: any) => {
+    try {
+      await updateSettings(updates);
+    } catch (err) {
+      alert('설정 저장 중 오류가 발생했습니다.');
+    }
+  };
+
+  if (!settings) return <div className="p-8">로딩 중...</div>;
+
   return (
     <div className="p-8 h-full flex flex-col no-scrollbar overflow-y-auto">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-[24px] font-bold">환경설정</h2>
+        <h2 className="text-[24px] font-bold text-[#191F28]">환경설정</h2>
       </div>
 
       <div className="flex gap-2 border-b border-[#E5E8EB] mb-6 overflow-x-auto no-scrollbar pb-1">
@@ -65,21 +91,58 @@ export default function Settings() {
           <div>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-[18px] font-bold">진행상태 값 설정</h3>
-              <button className="bg-[#3182F6] text-white px-4 py-2 rounded-[10px] text-[14px] font-bold flex items-center gap-1 shadow-sm">
+              <button 
+                onClick={() => {
+                  const newStatuses = [...localStatuses, { name: '새 상태', isUsed: true }];
+                  setLocalStatuses(newStatuses);
+                  saveSettings({ statuses: newStatuses });
+                }}
+                className="bg-[#3182F6] text-white px-4 py-2 rounded-[10px] text-[14px] font-bold flex items-center gap-1 shadow-sm transition-transform active:scale-95"
+              >
                 <Plus className="w-4 h-4"/> 상태 추가
               </button>
             </div>
             
             <div className="space-y-3">
-              {['신규신청', '부재중', '상담완료', '가입완료', '보류', '취소'].map((status, idx) => (
+              {localStatuses.map((status, idx) => (
                 <div key={idx} className="flex items-center gap-4 bg-[#F9FAFB] p-4 rounded-[16px] border border-[#E5E8EB]">
                   <MoveVertical className="w-5 h-5 text-[#D1D6DB] cursor-grab"/>
-                  <input type="text" defaultValue={status} className="flex-1 bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" />
-                  <select className="bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[13px] font-bold focus:outline-none">
+                  <input 
+                    type="text" 
+                    value={status.name} 
+                    onChange={(e) => {
+                      const newStatuses = [...localStatuses];
+                      newStatuses[idx] = { ...newStatuses[idx], name: e.target.value };
+                      setLocalStatuses(newStatuses);
+                    }}
+                    onBlur={() => saveSettings({ statuses: localStatuses })}
+                    className="flex-1 bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" 
+                  />
+                  <select 
+                    value={status.isUsed ? 'Y' : 'N'}
+                    onChange={(e) => {
+                      const newStatuses = [...localStatuses];
+                      newStatuses[idx] = { ...newStatuses[idx], isUsed: e.target.value === 'Y' };
+                      setLocalStatuses(newStatuses);
+                      saveSettings({ statuses: newStatuses });
+                    }}
+                    className="bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[13px] font-bold focus:outline-none"
+                  >
                     <option value="Y">사용함</option>
                     <option value="N">사용안함</option>
                   </select>
-                  <button className="text-red-500 hover:bg-red-50 p-2 rounded-[8px]"><Trash2 className="w-5 h-5"/></button>
+                  <button 
+                    onClick={() => {
+                      if (window.confirm('정말 삭제하시겠습니까?')) {
+                        const newStatuses = localStatuses.filter((_, i) => i !== idx);
+                        setLocalStatuses(newStatuses);
+                        saveSettings({ statuses: newStatuses });
+                      }
+                    }}
+                    className="text-red-500 hover:bg-red-50 p-2 rounded-[8px]"
+                  >
+                    <Trash2 className="w-5 h-5"/>
+                  </button>
                 </div>
               ))}
             </div>
@@ -175,14 +238,44 @@ export default function Settings() {
             <div>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-[16px] font-bold">브랜드 설정</h3>
-                <button className="text-[#3182F6] text-[13px] font-bold flex items-center gap-1"><Plus className="w-4 h-4"/> 추가</button>
+                <button 
+                  onClick={() => {
+                    const newBrands = [...localBrands, '새 브랜드'];
+                    setLocalBrands(newBrands);
+                    saveSettings({ brands: newBrands });
+                  }}
+                  className="text-[#3182F6] text-[13px] font-bold flex items-center gap-1 transition-transform active:scale-95"
+                >
+                  <Plus className="w-4 h-4"/> 추가
+                </button>
               </div>
               <div className="space-y-2">
-                {['삼성전자', 'LG전자', '바디프랜드', '코웨이', '캐리어'].map((brand, idx) => (
+                {localBrands.map((brand, idx) => (
                   <div key={idx} className="flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border border-[#E5E8EB]">
                     <MoveVertical className="w-4 h-4 text-[#D1D6DB] cursor-grab"/>
-                    <input type="text" defaultValue={brand} className="flex-1 bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] font-bold focus:outline-none" />
-                    <button className="text-red-500 p-1.5"><Trash2 className="w-4 h-4"/></button>
+                    <input 
+                      type="text" 
+                      value={brand} 
+                      onChange={(e) => {
+                        const newBrands = [...localBrands];
+                        newBrands[idx] = e.target.value;
+                        setLocalBrands(newBrands);
+                      }}
+                      onBlur={() => saveSettings({ brands: localBrands })}
+                      className="flex-1 bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] font-bold focus:outline-none" 
+                    />
+                    <button 
+                      onClick={() => {
+                        if (window.confirm('삭제하시겠습니까?')) {
+                          const newBrands = localBrands.filter((_, i) => i !== idx);
+                          setLocalBrands(newBrands);
+                          saveSettings({ brands: newBrands });
+                        }
+                      }}
+                      className="text-red-500 p-1.5 hover:bg-red-50 rounded-[6px]"
+                    >
+                      <Trash2 className="w-4 h-4"/>
+                    </button>
                   </div>
                 ))}
               </div>
@@ -192,56 +285,129 @@ export default function Settings() {
             <div>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-[16px] font-bold">카테고리 설정</h3>
-                <button className="text-[#3182F6] text-[13px] font-bold flex items-center gap-1"><Plus className="w-4 h-4"/> 추가</button>
+                <button 
+                  onClick={() => {
+                    const newCategories = [...localCategories, '새 카테고리'];
+                    setLocalCategories(newCategories);
+                    saveSettings({ categories: newCategories });
+                  }}
+                  className="text-[#3182F6] text-[13px] font-bold flex items-center gap-1 transition-transform active:scale-95"
+                >
+                  <Plus className="w-4 h-4"/> 추가
+                </button>
               </div>
               <div className="space-y-2">
-                {['TV/시청각', '냉장고/김치냉장고', '세탁기/건조기', '안마의자/건강', '기타'].map((cat, idx) => (
+                {localCategories.map((cat, idx) => (
                   <div key={idx} className="flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border border-[#E5E8EB]">
                     <MoveVertical className="w-4 h-4 text-[#D1D6DB] cursor-grab"/>
-                    <input type="text" defaultValue={cat} className="flex-1 bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] font-bold focus:outline-none" />
-                    <button className="text-red-500 p-1.5"><Trash2 className="w-4 h-4"/></button>
+                    <input 
+                      type="text" 
+                      value={cat} 
+                      onChange={(e) => {
+                        const newCats = [...localCategories];
+                        newCats[idx] = e.target.value;
+                        setLocalCategories(newCats);
+                      }}
+                      onBlur={() => saveSettings({ categories: localCategories })}
+                      className="flex-1 bg-white border border-[#D1D6DB] px-3 py-1.5 rounded-[8px] text-[13px] font-bold focus:outline-none" 
+                    />
+                    <button 
+                      onClick={() => {
+                        if (window.confirm('삭제하시겠습니까?')) {
+                          const newCats = localCategories.filter((_, i) => i !== idx);
+                          setLocalCategories(newCats);
+                          saveSettings({ categories: newCats });
+                        }
+                      }}
+                      className="text-red-500 p-1.5 hover:bg-red-50 rounded-[6px]"
+                    >
+                      <Trash2 className="w-4 h-4"/>
+                    </button>
                   </div>
                 ))}
               </div>
-            </div>
-            
-            <div className="col-span-2 mt-6 flex justify-center pt-6 border-t border-[#F2F4F6]">
-              <button className="bg-[#191F28] text-white px-10 py-3.5 rounded-[16px] font-bold">설정 저장하기</button>
             </div>
           </div>
         )}
 
         {activeTab === 'video' && <VideoManagement />}
 
-        {activeTab === 'footer' && (
+        {activeTab === 'footer' && localFooter && (
           <div>
-            <h3 className="text-[18px] font-bold mb-6">푸터 정보 설정</h3>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-[18px] font-bold">푸터 정보 설정</h3>
+              <button 
+                onClick={() => saveSettings({ footer: localFooter })}
+                className="bg-[#3182F6] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-bold flex items-center gap-2 shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95"
+              >
+                <Save className="w-4 h-4" /> 설정 저장하기
+              </button>
+            </div>
             <div className="space-y-4 max-w-lg">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">회사명</label>
-                  <input type="text" defaultValue="주식회사 효원상조" className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" />
+                  <input 
+                    type="text" 
+                    value={localFooter.companyName} 
+                    onChange={(e) => setLocalFooter({ ...localFooter, companyName: e.target.value })}
+                    className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                  />
                 </div>
                 <div>
                   <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">대표자</label>
-                  <input type="text" defaultValue="OOO" className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" />
+                  <input 
+                    type="text" 
+                    value={localFooter.representative} 
+                    onChange={(e) => setLocalFooter({ ...localFooter, representative: e.target.value })}
+                    className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                  />
                 </div>
               </div>
               <div>
                 <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">사업자등록번호</label>
-                <input type="text" defaultValue="000-00-00000" className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" />
+                <input 
+                  type="text" 
+                  value={localFooter.businessNumber} 
+                  onChange={(e) => setLocalFooter({ ...localFooter, businessNumber: e.target.value })}
+                  className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                />
               </div>
               <div>
                 <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">고객센터 연락처</label>
-                <input type="text" defaultValue="1588-0000" className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" />
+                <input 
+                  type="text" 
+                  value={localFooter.phone} 
+                  onChange={(e) => setLocalFooter({ ...localFooter, phone: e.target.value })}
+                  className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                />
+              </div>
+              <div>
+                <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">주소</label>
+                <input 
+                  type="text" 
+                  value={localFooter.address || ''} 
+                  onChange={(e) => setLocalFooter({ ...localFooter, address: e.target.value })}
+                  className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                />
+              </div>
+              <div>
+                <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">이메일</label>
+                <input 
+                  type="text" 
+                  value={localFooter.email || ''} 
+                  onChange={(e) => setLocalFooter({ ...localFooter, email: e.target.value })}
+                  className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                />
               </div>
               <div>
                 <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">안내 문구</label>
-                <textarea className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none min-h-[120px]" defaultValue="가전 계약(렌탈/할부)과 상조 계약은 별도의 독립된 계약입니다..."></textarea>
+                <textarea 
+                  value={localFooter.notice} 
+                  onChange={(e) => setLocalFooter({ ...localFooter, notice: e.target.value })}
+                  className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none min-h-[120px] border border-transparent focus:border-[#3182F6] focus:bg-white transition-all"
+                ></textarea>
               </div>
-            </div>
-            <div className="mt-8 pt-8 border-t border-[#F2F4F6] flex justify-center">
-              <button className="bg-[#3182F6] text-white px-10 py-3.5 rounded-[16px] font-bold shadow-lg shadow-[#3182F6]/20">푸터 정보 저장</button>
             </div>
           </div>
         )}
@@ -264,7 +430,7 @@ export default function Settings() {
               </div>
             </div>
             <div className="mt-8 pt-8 border-t border-[#F2F4F6] flex justify-center">
-              <button className="bg-[#3182F6] text-white px-10 py-3.5 rounded-[16px] font-bold shadow-lg shadow-[#3182F6]/20">비밀번호 변경</button>
+              <button className="bg-[#3182F6] text-white px-10 py-3.5 rounded-[16px] font-bold shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95">비밀번호 변경</button>
             </div>
           </div>
         )}

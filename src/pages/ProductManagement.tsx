@@ -20,6 +20,7 @@ export default function ProductManagement() {
 
   const allProducts = useQuery(api.products.getAllProducts) || [];
   const competitors = useQuery(api.competitors.get) || [];
+  const settings = useQuery(api.settings.get);
   
   const updateProduct = useMutation(api.products.update);
   const createProduct = useMutation(api.products.create);
@@ -333,13 +334,13 @@ export default function ProductManagement() {
                     <div>
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">브랜드</label>
                       <select value={editingProduct.brand} onChange={(e) => setEditingProduct({...editingProduct, brand: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold">
-                        <option>삼성전자</option><option>LG전자</option><option>바디프랜드</option><option>코웨이</option><option>캐리어</option>
+                        {settings?.brands?.map((brand: string) => <option key={brand}>{brand}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">카테고리</label>
                       <select value={editingProduct.category} onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold">
-                        <option>TV/시청각</option><option>냉장고/김치냉장고</option><option>세탁기/건조기</option><option>안마의자/건강</option><option>기타</option>
+                        {settings?.categories?.map((cat: string) => <option key={cat}>{cat}</option>)}
                       </select>
                     </div>
                     <div className="col-span-2">
