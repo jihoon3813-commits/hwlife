@@ -474,7 +474,7 @@ export default function App() {
         </div>
 
         {/* Categories & Product Focus View Trigger */}
-        <div className="px-6 flex justify-between items-end mb-6" id="product-list">
+        <div className="px-6 flex flex-col items-start mb-4" id="product-list">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -487,23 +487,12 @@ export default function App() {
             <p className="text-[12px] text-[#8B95A1] mt-2 mb-4 break-keep">
               제품을 클릭하면 타렌탈사(상조사)와 가격 비교표를 확인 할 수 있습니다.
             </p>
-            <div className="mb-6">
+            <div className="mb-2">
               <span className="inline-block bg-[#1B64DA] text-white text-[13px] font-bold px-3.5 py-1.5 rounded-full shadow-md">
                 {planInfo.name}
               </span>
             </div>
           </motion.div>
-          {!isProductFullView && (
-            <button 
-              onClick={openFullView}
-              className="relative overflow-visible group"
-            >
-              <div className="absolute inset-0 bg-[#3182F6] blur-md opacity-40 animate-neon rounded-full group-hover:opacity-60 transition-opacity"></div>
-              <div className="relative text-white text-[14px] font-extrabold flex items-center gap-1.5 px-5 py-2.5 bg-[#3182F6] rounded-full shadow-[0_4px_15px_rgba(49,130,246,0.4)] active:scale-95 transition-transform">
-                전체보기 <ArrowRight className="w-4 h-4" />
-              </div>
-            </button>
-          )}
         </div>
 
 
