@@ -1454,7 +1454,7 @@ export default function App() {
                           benefit: "만기 시 전액 지원"
                         },
                         ...(selectedProduct.comparisons || []).filter((c: any) => !c.isOurs)
-                      ].map((comp: any, idx: number) => {
+                      ].sort((a, b) => parseInt(a.price) - parseInt(b.price)).map((comp: any, idx: number) => {
                         const partner = competitors.find(c => c.name === comp.company);
                         return (
                           <div key={idx} className={`flex items-center py-4 ${comp.isOurs ? 'bg-[#1B64DA] text-white -mx-3 px-3 my-1 rounded-lg shadow-md' : ''}`}>

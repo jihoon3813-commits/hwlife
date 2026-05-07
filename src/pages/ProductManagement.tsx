@@ -246,6 +246,9 @@ export default function ProductManagement() {
               });
             }
           }
+          
+          // Sort by price (cheapest first)
+          comparisons.sort((a, b) => parseInt(a.price) - parseInt(b.price));
 
           // Images (Updated Indices for 10 competitors)
           // 8 + 20 = 28
@@ -649,18 +652,26 @@ export default function ProductManagement() {
                     </div>
                   </div>
 
-                  <div className="pt-8 flex gap-4">
+<div className="pt-8 flex gap-4">
                     <button onClick={() => { setViewMode('list'); setEditingProduct(null); }} className="flex-1 bg-[#F2F4F6] text-[#4E5968] font-bold py-4 rounded-[20px] transition-all hover:bg-[#E5E8EB]">취소하기</button>
                     <button 
                       onClick={async () => {
-                        if (editingProduct._id) {
-                          const { _id, _creationTime, ...data } = editingProduct;
-                          await updateProduct({ id: _id, ...data });
-                        } else {
-                          await createProduct(editingProduct);
+                        if (!editingProduct) return;
+                        try {
+                          const sortedComparisons = [...(editingProduct.comparisons || [])].sort((a: any, b: any) => parseInt(a.price) - parseInt(b.price));
+                          const productData = { ...editingProduct, comparisons: sortedComparisons };
+
+                          if (editingProduct._id) {
+                            const { _id, _creationTime, ...data } = productData;
+                            await updateProduct({ id: _id, ...data });
+                          } else {
+                            await createProduct(productData);
+                          }
+                          setViewMode('list');
+                          setEditingProduct(null);
+                        } catch (e) {
+                          console.error(e);
                         }
-                        setViewMode('list');
-                        setEditingProduct(null);
                       }}
                       className="flex-[2] bg-[#3182F6] text-white font-bold py-4 rounded-[20px] shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95"
                     >
