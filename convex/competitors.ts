@@ -6,10 +6,17 @@ export const get = query({
   handler: async (ctx) => {
     const competitors = await ctx.db.query("competitors").collect();
     return await Promise.all(
-      competitors.map(async (c) => ({
-        ...c,
-        logo: c.logo ? (c.logo.startsWith("http") ? c.logo : await ctx.storage.getUrl(c.logo)) : undefined,
-      }))
+      competitors.map(async (c) => {
+        let logoUrl = c.logo;
+        if (logoUrl && !logoUrl.startsWith("http") && !logoUrl.startsWith("blob")) {
+          try {
+            logoUrl = (await ctx.storage.getUrl(logoUrl)) || logoUrl;
+          } catch (e) {
+            // Not a storage ID
+          }
+        }
+        return { ...c, logo: logoUrl };
+      })
     );
   },
 });

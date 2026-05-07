@@ -7,11 +7,25 @@ export const getAllProducts = query({
   handler: async (ctx) => {
     const products = await ctx.db.query("products").collect();
     return await Promise.all(
-      products.map(async (p) => ({
-        ...p,
-        images: p.images ? await Promise.all(p.images.map(img => img.startsWith("http") ? img : ctx.storage.getUrl(img))) : [],
-        detailImages: p.detailImages ? await Promise.all(p.detailImages.map(img => img.startsWith("http") ? img : ctx.storage.getUrl(img))) : [],
-      }))
+      products.map(async (p) => {
+        const resolveUrl = async (url: string | undefined) => {
+          if (!url || url.startsWith("http") || url.startsWith("blob")) return url;
+          try {
+            return (await ctx.storage.getUrl(url)) || url;
+          } catch (e) {
+            return url;
+          }
+        };
+
+        const images = p.images ? await Promise.all(p.images.map(resolveUrl)) : [];
+        const detailImages = p.detailImages ? await Promise.all(p.detailImages.map(resolveUrl)) : [];
+        
+        return {
+          ...p,
+          images: images.filter((url): url is string => !!url),
+          detailImages: detailImages.filter((url): url is string => !!url),
+        };
+      })
     );
   },
 });
@@ -24,12 +38,27 @@ export const getVisibleProducts = query({
       .query("products")
       .filter((q) => q.eq(q.field("isVisible"), true))
       .collect();
+      
     return await Promise.all(
-      products.map(async (p) => ({
-        ...p,
-        images: p.images ? await Promise.all(p.images.map(img => img.startsWith("http") ? img : ctx.storage.getUrl(img))) : [],
-        detailImages: p.detailImages ? await Promise.all(p.detailImages.map(img => img.startsWith("http") ? img : ctx.storage.getUrl(img))) : [],
-      }))
+      products.map(async (p) => {
+        const resolveUrl = async (url: string | undefined) => {
+          if (!url || url.startsWith("http") || url.startsWith("blob")) return url;
+          try {
+            return (await ctx.storage.getUrl(url)) || url;
+          } catch (e) {
+            return url;
+          }
+        };
+
+        const images = p.images ? await Promise.all(p.images.map(resolveUrl)) : [];
+        const detailImages = p.detailImages ? await Promise.all(p.detailImages.map(resolveUrl)) : [];
+        
+        return {
+          ...p,
+          images: images.filter((url): url is string => !!url),
+          detailImages: detailImages.filter((url): url is string => !!url),
+        };
+      })
     );
   },
 });
