@@ -24,6 +24,11 @@ export default function App() {
   const [lastViewedSection, setLastViewedSection] = useState<string | null>(null);
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const productScrollRef = useRef<HTMLDivElement>(null);
+  const isFullViewRef = useRef(isProductFullView);
+
+  useEffect(() => {
+    isFullViewRef.current = isProductFullView;
+  }, [isProductFullView]);
 
   const scroll = (ref: React.RefObject<HTMLDivElement>, direction: 'left' | 'right') => {
     if (ref.current) {
@@ -44,12 +49,14 @@ export default function App() {
       if (state?.view === 'full') {
         setIsProductFullView(true);
       } else if (!state) {
+        // Only scroll to product list if we were in full view
+        if (isFullViewRef.current) {
+          setTimeout(() => {
+            const productSection = document.getElementById('product-list');
+            if (productSection) productSection.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
         setIsProductFullView(false);
-        // Scroll to product list section on landing page
-        setTimeout(() => {
-          const productSection = document.getElementById('product-list');
-          if (productSection) productSection.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
       }
     };
 
