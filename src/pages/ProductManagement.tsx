@@ -180,7 +180,7 @@ export default function ProductManagement() {
 
   const downloadTemplate = () => {
     const headers = [
-      ['구좌', '브랜드', '카테고리', '제품명', '모델명', '월납입금', '제휴카드혜택가', '라벨', '타사명', '타사금액', '썸네일url', '상세이미지 url(쉼표 구분)']
+      ['구좌', '브랜드', '카테고리', '제품명', '모델명', '월납입금', '제휴카드혜택가', '라벨', '타사1명', '타사1금액', '타사2명', '타사2금액', '타사3명', '타사3금액', '썸네일url', '상세이미지 url(쉼표 구분)']
     ];
     const ws = XLSX.utils.aoa_to_sheet(headers);
     const wb = XLSX.utils.book_new();
@@ -224,24 +224,28 @@ export default function ProductManagement() {
           const discountPrice = String(row[6] || '0').replace(/\D/g, '');
           const tag = row[7] || '';
           
-          // Comparisons
-          const compName = row[8] || '';
-          const compPrice = String(row[9] || '0').replace(/\D/g, '');
+          // Multiple Comparisons (Columns 8,9 / 10,11 / 12,13)
           const comparisons = [];
-          if (compName) {
-            const partner = competitors.find(c => c.name === compName);
-            comparisons.push({
-              company: compName,
-              target: '', 
-              price: compPrice,
-              period: (partner?.months || 60) + '개월',
-              isOurs: partner?.type === '자사'
-            });
+          for (let i = 0; i < 3; i++) {
+            const baseIdx = 8 + (i * 2);
+            const compName = row[baseIdx] || '';
+            const compPrice = String(row[baseIdx + 1] || '0').replace(/\D/g, '');
+            
+            if (compName) {
+              const partner = competitors.find(c => c.name === compName);
+              comparisons.push({
+                company: compName,
+                target: '', 
+                price: compPrice,
+                period: (partner?.months || 60) + '개월',
+                isOurs: partner?.type === '자사'
+              });
+            }
           }
 
-          // Images
-          const thumbnailUrl = row[10] || '';
-          const detailUrls = row[11] ? String(row[11]).split(',').map(s => s.trim()) : [];
+          // Images (Updated Indices)
+          const thumbnailUrl = row[14] || '';
+          const detailUrls = row[15] ? String(row[15]).split(',').map(s => s.trim()) : [];
 
           await createProduct({
             planId,
