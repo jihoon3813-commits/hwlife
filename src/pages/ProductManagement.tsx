@@ -32,6 +32,8 @@ export default function ProductManagement() {
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const excelInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
   const [sortConfig, setSortConfig] = useState<{ key: 'brand' | 'category' | null, direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
 
   const thumbInputRef = useRef<HTMLInputElement>(null);
@@ -199,20 +201,29 @@ export default function ProductManagement() {
     const reader = new FileReader();
     reader.onload = async (evt) => {
       try {
-        const bstr = evt.target?.result;
-        const wb = XLSX.read(bstr, { type: 'binary' });
+        const data = evt.target?.result;
+        const wb = XLSX.read(data, { type: 'binary' });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
-        const data = XLSX.utils.sheet_to_json(ws, { header: 1 }) as any[][];
+        const excelData = XLSX.utils.sheet_to_json(ws, { header: 1 }) as any[][];
 
-        const rows = data.slice(1);
+        const rows = excelData.slice(1);
+        if (rows.length === 0) {
+          alert("등록할 데이터가 없습니다.");
+          return;
+        }
+
+        setIsUploading(true);
+        setUploadProgress({ current: 0, total: rows.length });
+
         let successCount = 0;
         let failCount = 0;
         
         for (let i = 0; i < rows.length; i++) {
+          setUploadProgress(prev => ({ ...prev, current: i + 1 }));
           const row = rows[i];
           try {
-            if (!row || !row[3]) continue; // Skip if empty or product name missing
+            if (!row || !row[3]) continue; 
 
             let planId = 1;
             const planVal = String(row[0] || '').trim();
@@ -249,11 +260,7 @@ export default function ProductManagement() {
               }
             }
             
-            comparisons.sort((a, b) => {
-              const pa = parseInt(a.price) || 0;
-              const pb = parseInt(b.price) || 0;
-              return pa - pb;
-            });
+            comparisons.sort((a, b) => (parseInt(a.price) || 0) - (parseInt(b.price) || 0));
 
             const thumbnailUrl = String(row[28] || '').trim();
             const detailUrls = row[29] ? String(row[29]).split(',').map(s => s.trim()).filter(s => s) : [];
@@ -280,15 +287,38 @@ export default function ProductManagement() {
         }
         alert(`일괄 등록 완료\n성공: ${successCount}건\n실패: ${failCount}건`);
       } catch (err) {
-        console.error(err);
-        alert('엑셀 처리 중 오류가 발생했습니다.');
+        console.error("Excel upload general error:", err);
+        alert("엑셀 파일 처리 중 오류가 발생했습니다. 양식을 다시 확인해 주세요.");
+      } finally {
+        setIsUploading(false);
+        if (e.target) e.target.value = '';
       }
     };
     reader.readAsBinaryString(file);
   };
 
   return (
-    <div className="p-8 h-full flex flex-col no-scrollbar overflow-y-auto">
+    <div className="p-8 h-full flex flex-col no-scrollbar overflow-y-auto relative">
+      {/* Upload Loading Overlay */}
+      {isUploading && (
+        <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white p-8 rounded-[32px] shadow-2xl flex flex-col items-center max-w-[300px] w-full mx-4">
+            <div className="w-12 h-12 border-4 border-[#3182F6] border-t-transparent rounded-full animate-spin mb-6"></div>
+            <h3 className="font-bold text-[18px] text-[#191F28] mb-2">제품 등록 중...</h3>
+            <p className="text-[#8B95A1] text-[14px] mb-6">잠시만 기다려 주세요.</p>
+            <div className="w-full bg-[#F2F4F6] h-2.5 rounded-full overflow-hidden">
+              <div 
+                className="bg-[#3182F6] h-full transition-all duration-300"
+                style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
+              ></div>
+            </div>
+            <div className="mt-3 text-[13px] font-bold text-[#4E5968]">
+              {uploadProgress.current} / {uploadProgress.total}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-[24px] font-bold text-[#191F28]">제품관리</h2>
         <div className="text-[14px] text-[#8B95A1]">드래그로 순서 변경, 일괄 복사/삭제가 가능합니다.</div>
