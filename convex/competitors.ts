@@ -4,7 +4,13 @@ import { mutation, query } from "./_generated/server";
 export const get = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("competitors").collect();
+    const competitors = await ctx.db.query("competitors").collect();
+    return await Promise.all(
+      competitors.map(async (c) => ({
+        ...c,
+        logo: c.logo ? (c.logo.startsWith("http") ? c.logo : await ctx.storage.getUrl(c.logo)) : undefined,
+      }))
+    );
   },
 });
 

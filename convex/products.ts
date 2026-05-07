@@ -1,22 +1,36 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-// Get all visible products
-export const getVisibleProducts = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db
-      .query("products")
-      .filter((q) => q.eq(q.field("isVisible"), true))
-      .collect();
-  },
-});
-
 // Admin: Get all products
 export const getAllProducts = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("products").collect();
+    const products = await ctx.db.query("products").collect();
+    return await Promise.all(
+      products.map(async (p) => ({
+        ...p,
+        images: p.images ? await Promise.all(p.images.map(img => img.startsWith("http") ? img : ctx.storage.getUrl(img))) : [],
+        detailImages: p.detailImages ? await Promise.all(p.detailImages.map(img => img.startsWith("http") ? img : ctx.storage.getUrl(img))) : [],
+      }))
+    );
+  },
+});
+
+// For public view
+export const getVisibleProducts = query({
+  args: {},
+  handler: async (ctx) => {
+    const products = await ctx.db
+      .query("products")
+      .filter((q) => q.eq(q.field("isVisible"), true))
+      .collect();
+    return await Promise.all(
+      products.map(async (p) => ({
+        ...p,
+        images: p.images ? await Promise.all(p.images.map(img => img.startsWith("http") ? img : ctx.storage.getUrl(img))) : [],
+        detailImages: p.detailImages ? await Promise.all(p.detailImages.map(img => img.startsWith("http") ? img : ctx.storage.getUrl(img))) : [],
+      }))
+    );
   },
 });
 

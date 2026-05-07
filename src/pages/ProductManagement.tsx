@@ -47,25 +47,57 @@ export default function ProductManagement() {
     return val.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const generateUploadUrl = useMutation(api.images.generateUploadUrl);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
-      const urls = Array.from(files).map(file => URL.createObjectURL(file));
-      setEditingProduct({ 
-        ...editingProduct, 
-        images: [...(editingProduct.images || []), ...urls] 
-      });
+    if (files && editingProduct) {
+      try {
+        const uploadedUrls = [];
+        for (const file of Array.from(files)) {
+          const postUrl = await generateUploadUrl();
+          const result = await fetch(postUrl, {
+            method: "POST",
+            headers: { "Content-Type": file.type },
+            body: file,
+          });
+          const { storageId } = await result.json();
+          uploadedUrls.push(storageId);
+        }
+        setEditingProduct({ 
+          ...editingProduct, 
+          images: [...(editingProduct.images || []), ...uploadedUrls] 
+        });
+      } catch (err) {
+        console.error(err);
+        alert('이미지 업로드 중 오류가 발생했습니다.');
+      }
     }
   };
 
-  const handleDetailImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDetailImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
-      const urls = Array.from(files).map(file => URL.createObjectURL(file));
-      setEditingProduct({ 
-        ...editingProduct, 
-        detailImages: [...(editingProduct.detailImages || []), ...urls] 
-      });
+    if (files && editingProduct) {
+      try {
+        const uploadedUrls = [];
+        for (const file of Array.from(files)) {
+          const postUrl = await generateUploadUrl();
+          const result = await fetch(postUrl, {
+            method: "POST",
+            headers: { "Content-Type": file.type },
+            body: file,
+          });
+          const { storageId } = await result.json();
+          uploadedUrls.push(storageId);
+        }
+        setEditingProduct({ 
+          ...editingProduct, 
+          detailImages: [...(editingProduct.detailImages || []), ...uploadedUrls] 
+        });
+      } catch (err) {
+        console.error(err);
+        alert('상세 이미지 업로드 중 오류가 발생했습니다.');
+      }
     }
   };
 

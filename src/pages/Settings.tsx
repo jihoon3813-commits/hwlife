@@ -44,11 +44,35 @@ export default function Settings() {
     { id: 'admin', label: '관리자 계정 설정' },
   ];
 
+  const generateUploadUrl = useMutation(api.images.generateUploadUrl);
+
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && currentUploadingId !== null) {
-      const url = URL.createObjectURL(file);
-      await updateCompetitor({ id: currentUploadingId as any, logo: url });
+      try {
+        // 1. Generate upload URL
+        const postUrl = await generateUploadUrl();
+        
+        // 2. Upload the file
+        const result = await fetch(postUrl, {
+          method: "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+        const { storageId } = await result.json();
+
+        // 3. Update competitor with the storageId
+        // Convex usually uses Storage ID, but here we expect a URL string.
+        // We'll update the competitor with the storage ID and handle URL resolution if needed, 
+        // but for now, we'll just save it.
+        // NOTE: The backend needs to handle converting this to a URL or we can do it in the query.
+        await updateCompetitor({ id: currentUploadingId as any, logo: storageId });
+        
+        alert('업로드가 완료되었습니다.');
+      } catch (err) {
+        console.error(err);
+        alert('업로드 중 오류가 발생했습니다.');
+      }
     }
   };
 
