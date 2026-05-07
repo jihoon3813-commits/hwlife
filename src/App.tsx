@@ -507,7 +507,7 @@ export default function App() {
               className="w-[200px] bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden snap-start flex-shrink-0 active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1"
             >
               <div className="relative h-[125px] bg-[#F9FAFB]">
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-cover" />
                 {item.tag && (
                   <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">
                     {item.tag}
@@ -713,7 +713,7 @@ export default function App() {
                     }}
                   >
                     <div className="relative aspect-square">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-cover" />
                       {item.tag && (
                         <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold rounded-md">
                           {item.tag}
@@ -1396,7 +1396,11 @@ export default function App() {
               
               {/* Product Info Block */}
               <div className="bg-[#F2F4F6] w-full aspect-square relative">
-                <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
+                <div className="w-full h-full overflow-x-auto flex snap-x snap-mandatory hide-scrollbar">
+                  {((selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images : [selectedProduct.image]).map((img: string, idx: number) => (
+                    <img key={idx} src={img} alt={`${selectedProduct.name}-${idx}`} className="w-full h-full object-cover shrink-0 snap-center" />
+                  ))}
+                </div>
                 <div className="absolute top-4 left-4">
                   {selectedProduct.priceLabel && (
                     <div className={`${selectedProduct.priceLabel?.includes('최저가') ? 'bg-[#3182F6]' : 'bg-[#191F28]'} text-white text-[12px] font-bold px-3 py-1.5 rounded-[8px] shadow-sm inline-block`}>
@@ -1508,9 +1512,9 @@ export default function App() {
                 </div>
                 {/* Fake long product detail string */}
                 <div className="space-y-2 mt-4 px-4 pb-8 relative z-10">
-                  {selectedProduct.detailImage && (
-                    <img src={selectedProduct.detailImage} alt="상세1" className="w-full rounded-[16px] shadow-sm mb-4" />
-                  )}
+                  {((selectedProduct.detailImages && selectedProduct.detailImages.length > 0) ? selectedProduct.detailImages : (selectedProduct.detailImage ? [selectedProduct.detailImage] : [])).map((img: string, idx: number) => (
+                    <img key={idx} src={img} alt={`상세-${idx}`} className="w-full rounded-[16px] shadow-sm mb-4" />
+                  ))}
                   <div className="h-[400px] bg-[#F2F4F6] rounded-[16px] flex flex-col items-center justify-center text-[#8B95A1] font-medium border border-[#E5E8EB] shadow-sm">
                     <ChevronDown className="w-8 h-8 text-[#D1D6DB] mb-2" />
                     상세페이지 연동 영역

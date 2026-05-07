@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square } from 'lucide-react';
+import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square, Link, X } from 'lucide-react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
@@ -43,19 +43,41 @@ export default function ProductManagement() {
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setEditingProduct({ ...editingProduct, image: url });
+    const files = e.target.files;
+    if (files) {
+      const urls = Array.from(files).map(file => URL.createObjectURL(file));
+      setEditingProduct({ 
+        ...editingProduct, 
+        images: [...(editingProduct.images || []), ...urls] 
+      });
     }
   };
 
   const handleDetailImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setEditingProduct({ ...editingProduct, detailImage: url });
+    const files = e.target.files;
+    if (files) {
+      const urls = Array.from(files).map(file => URL.createObjectURL(file));
+      setEditingProduct({ 
+        ...editingProduct, 
+        detailImages: [...(editingProduct.detailImages || []), ...urls] 
+      });
     }
+  };
+
+  const addImageUrl = (type: 'images' | 'detailImages') => {
+    const url = window.prompt('이미지 URL을 입력해주세요.');
+    if (url) {
+      setEditingProduct({
+        ...editingProduct,
+        [type]: [...(editingProduct[type] || []), url]
+      });
+    }
+  };
+
+  const removeImage = (type: 'images' | 'detailImages', index: number) => {
+    const updated = [...(editingProduct[type] || [])];
+    updated.splice(index, 1);
+    setEditingProduct({ ...editingProduct, [type]: updated });
   };
 
   const handleAddProduct = () => {
@@ -70,6 +92,9 @@ export default function ProductManagement() {
       isVisible: true,
       tag: '',
       image: '',
+      images: [],
+      detailImage: '',
+      detailImages: [],
       comparisons: [] 
     });
     setViewMode('edit_product');
@@ -168,7 +193,7 @@ export default function ProductManagement() {
             {plans.map(plan => (
               <div 
                 key={plan.id}
-                onClick={() => setSelectedPlanId(plan.id)}
+                onClick={() => { setSelectedPlanId(plan.id); setViewMode('list'); setSelectedIds([]); }}
                 className={`p-4 rounded-[16px] cursor-pointer border transition-all ${
                   selectedPlanId === plan.id ? 'bg-[#3182F6] text-white shadow-md border-[#3182F6]' : 'bg-white border-transparent hover:bg-[#F2F4F6]'
                 }`}
@@ -429,19 +454,87 @@ export default function ProductManagement() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-8 pt-8">
+                  <div className="grid grid-cols-1 gap-8 pt-8">
+                    {/* Thumbnail Images */}
                     <div className="space-y-4">
-                      <label className="block text-[13px] font-bold text-[#4E5968] px-1">썸네일</label>
-                      <div onClick={() => thumbInputRef.current?.click()} className="aspect-square bg-[#F9FAFB] border-2 border-dashed border-[#E5E8EB] rounded-[24px] flex items-center justify-center cursor-pointer overflow-hidden relative group transition-all hover:border-[#3182F6]">
-                        {editingProduct.image ? <img src={editingProduct.image} className="w-full h-full object-cover" /> : <Plus className="w-10 h-10 text-[#D1D6DB] group-hover:text-[#3182F6]" />}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[14px] font-bold">이미지 변경</div>
+                      <div className="flex justify-between items-center px-1">
+                        <label className="block text-[13px] font-bold text-[#4E5968]">썸네일 리스트 (여러 개 등록 가능)</label>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => addImageUrl('images')}
+                            className="text-[12px] font-bold text-[#3182F6] flex items-center gap-1 hover:underline"
+                          >
+                            <Link className="w-3 h-3"/> URL 추가
+                          </button>
+                          <button 
+                            onClick={() => thumbInputRef.current?.click()}
+                            className="text-[12px] font-bold text-[#3182F6] flex items-center gap-1 hover:underline"
+                          >
+                            <Upload className="w-3 h-3"/> 이미지 업로드
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 gap-4">
+                        {(editingProduct.images || []).map((img: string, idx: number) => (
+                          <div key={idx} className="aspect-square bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] overflow-hidden relative group">
+                            <img src={img} className="w-full h-full object-cover" />
+                            <button 
+                              onClick={() => removeImage('images', idx)}
+                              className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="w-3 h-3"/>
+                            </button>
+                            {idx === 0 && <div className="absolute bottom-0 left-0 right-0 bg-[#3182F6]/80 text-white text-[10px] text-center py-0.5 font-bold">대표</div>}
+                          </div>
+                        ))}
+                        <div 
+                          onClick={() => thumbInputRef.current?.click()}
+                          className="aspect-square bg-[#F9FAFB] border-2 border-dashed border-[#E5E8EB] rounded-[16px] flex flex-col items-center justify-center cursor-pointer hover:border-[#3182F6] hover:bg-[#F2F4F6] transition-all group"
+                        >
+                          <Plus className="w-6 h-6 text-[#D1D6DB] group-hover:text-[#3182F6] mb-1" />
+                          <span className="text-[11px] text-[#8B95A1] group-hover:text-[#3182F6]">추가하기</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="space-y-4">
-                      <label className="block text-[13px] font-bold text-[#4E5968] px-1">상세 이미지</label>
-                      <div onClick={() => detailInputRef.current?.click()} className="aspect-square bg-[#F9FAFB] border-2 border-dashed border-[#E5E8EB] rounded-[24px] flex items-center justify-center cursor-pointer overflow-hidden relative group transition-all hover:border-[#3182F6]">
-                        {editingProduct.detailImage ? <img src={editingProduct.detailImage} className="w-full h-full object-cover" /> : <Plus className="w-10 h-10 text-[#D1D6DB] group-hover:text-[#3182F6]" />}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[14px] font-bold">이미지 변경</div>
+
+                    {/* Detail Images */}
+                    <div className="space-y-4 pt-4 border-t border-[#F2F4F6]">
+                      <div className="flex justify-between items-center px-1">
+                        <label className="block text-[13px] font-bold text-[#4E5968]">상세 이미지 리스트 (여러 개 등록 가능)</label>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => addImageUrl('detailImages')}
+                            className="text-[12px] font-bold text-[#3182F6] flex items-center gap-1 hover:underline"
+                          >
+                            <Link className="w-3 h-3"/> URL 추가
+                          </button>
+                          <button 
+                            onClick={() => detailInputRef.current?.click()}
+                            className="text-[12px] font-bold text-[#3182F6] flex items-center gap-1 hover:underline"
+                          >
+                            <Upload className="w-3 h-3"/> 이미지 업로드
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 gap-4">
+                        {(editingProduct.detailImages || []).map((img: string, idx: number) => (
+                          <div key={idx} className="aspect-square bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] overflow-hidden relative group">
+                            <img src={img} className="w-full h-full object-cover" />
+                            <button 
+                              onClick={() => removeImage('detailImages', idx)}
+                              className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="w-3 h-3"/>
+                            </button>
+                          </div>
+                        ))}
+                        <div 
+                          onClick={() => detailInputRef.current?.click()}
+                          className="aspect-square bg-[#F9FAFB] border-2 border-dashed border-[#E5E8EB] rounded-[16px] flex flex-col items-center justify-center cursor-pointer hover:border-[#3182F6] hover:bg-[#F2F4F6] transition-all group"
+                        >
+                          <Plus className="w-6 h-6 text-[#D1D6DB] group-hover:text-[#3182F6] mb-1" />
+                          <span className="text-[11px] text-[#8B95A1] group-hover:text-[#3182F6]">추가하기</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -474,6 +567,7 @@ export default function ProductManagement() {
             ref={thumbInputRef} 
             className="hidden" 
             accept="image/*" 
+            multiple
             onChange={handleImageUpload} 
           />
           <input 
@@ -481,6 +575,7 @@ export default function ProductManagement() {
             ref={detailInputRef} 
             className="hidden" 
             accept="image/*" 
+            multiple
             onChange={handleDetailImageUpload} 
           />
         </div>

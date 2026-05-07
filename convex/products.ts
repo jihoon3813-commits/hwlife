@@ -29,11 +29,13 @@ export const create = mutation({
     name: v.string(),
     price: v.string(),
     discountPrice: v.optional(v.string()),
-    image: v.string(),
+    image: v.optional(v.string()),
+    images: v.optional(v.array(v.string())),
     tag: v.optional(v.string()),
     priceLabel: v.optional(v.string()),
     shippingFee: v.optional(v.string()),
     detailImage: v.optional(v.string()),
+    detailImages: v.optional(v.array(v.string())),
     isVisible: v.boolean(),
     comparisons: v.array(
       v.object({
@@ -62,10 +64,12 @@ export const update = mutation({
     price: v.optional(v.string()),
     discountPrice: v.optional(v.string()),
     image: v.optional(v.string()),
+    images: v.optional(v.array(v.string())),
     tag: v.optional(v.string()),
     priceLabel: v.optional(v.string()),
     shippingFee: v.optional(v.string()),
     detailImage: v.optional(v.string()),
+    detailImages: v.optional(v.array(v.string())),
     isVisible: v.optional(v.boolean()),
     comparisons: v.optional(
       v.array(
