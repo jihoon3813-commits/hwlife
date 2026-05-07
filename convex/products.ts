@@ -80,6 +80,7 @@ export const create = mutation({
     detailImage: v.optional(v.string()),
     detailImages: v.optional(v.array(v.string())),
     isVisible: v.boolean(),
+    showOnMain: v.optional(v.boolean()),
     comparisons: v.array(
       v.object({
         company: v.string(),
@@ -114,6 +115,7 @@ export const update = mutation({
     detailImage: v.optional(v.string()),
     detailImages: v.optional(v.array(v.string())),
     isVisible: v.optional(v.boolean()),
+    showOnMain: v.optional(v.boolean()),
     comparisons: v.optional(
       v.array(
         v.object({

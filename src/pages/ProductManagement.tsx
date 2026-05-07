@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square, Link, X } from 'lucide-react';
+import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square, Link, X, Star } from 'lucide-react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import * as XLSX from 'xlsx';
@@ -147,6 +147,10 @@ export default function ProductManagement() {
 
   const toggleVisibility = async (id: string, current: boolean) => {
     await updateProduct({ id: id as any, isVisible: !current });
+  };
+
+  const toggleMainExposure = async (id: string, current: boolean) => {
+    await updateProduct({ id: id as any, showOnMain: !current });
   };
 
   const deleteProduct = async (id: string) => {
@@ -453,6 +457,7 @@ export default function ProductManagement() {
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968]">제품명 / 모델명</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] text-right">월납입금</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] text-center">노출</th>
+                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] text-center">메인</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] text-right">개별관리</th>
                     </tr>
                   </thead>
@@ -487,6 +492,11 @@ export default function ProductManagement() {
                             {p.isVisible ? <Eye className="w-4 h-4"/> : <EyeOff className="w-4 h-4"/>}
                           </button>
                         </td>
+                        <td className="px-4 py-4 text-center">
+                          <button onClick={(e) => { e.stopPropagation(); toggleMainExposure(p._id, p.showOnMain); }} className={`p-1.5 rounded-full transition-colors ${p.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-400'}`}>
+                            {p.showOnMain ? <Star className="w-4 h-4 fill-current"/> : <Star className="w-4 h-4"/>}
+                          </button>
+                        </td>
                         <td className="px-4 py-4 text-right">
                           <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onClick={(e) => { e.stopPropagation(); copyProduct(p._id); }} className="p-1.5 hover:bg-white rounded-md text-[#3182F6]" title="복사"><Copy className="w-4 h-4"/></button>
@@ -512,13 +522,19 @@ export default function ProductManagement() {
                     onClick={() => { toggleVisibility(editingProduct._id, editingProduct.isVisible); setEditingProduct({...editingProduct, isVisible: !editingProduct.isVisible}); }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-[10px] text-[13px] font-bold transition-all ${editingProduct.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-500'}`}
                    >
-                     {editingProduct.isVisible ? <><Eye className="w-4 h-4"/> 현재 노출중</> : <><EyeOff className="w-4 h-4"/> 현재 숨김상태</>}
+                     {editingProduct.isVisible ? <><Eye className="w-4 h-4"/> 노출중</> : <><EyeOff className="w-4 h-4"/> 숨김상태</>}
+                   </button>
+                   <button 
+                    onClick={() => { toggleMainExposure(editingProduct._id, editingProduct.showOnMain); setEditingProduct({...editingProduct, showOnMain: !editingProduct.showOnMain}); }}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-[10px] text-[13px] font-bold transition-all ${editingProduct.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-500'}`}
+                   >
+                     {editingProduct.showOnMain ? <><Star className="w-4 h-4 fill-current"/> 메인 노출중</> : <><Star className="w-4 h-4"/> 메인 미노출</>}
                    </button>
                    <button 
                     onClick={() => { deleteProduct(editingProduct._id); setViewMode('list'); }}
                     className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-500 rounded-[10px] text-[13px] font-bold"
                    >
-                     <Trash2 className="w-4 h-4"/> 삭제하기
+                     <Trash2 className="w-4 h-4"/> 삭제
                    </button>
                    <div className="w-4"></div>
                    <button onClick={() => setViewMode('list')} className="text-[#8B95A1] font-bold text-[14px] hover:text-[#191F28]">닫기</button>
