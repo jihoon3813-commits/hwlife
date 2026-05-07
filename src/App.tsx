@@ -15,6 +15,7 @@ export default function App() {
   const [isGridView, setIsGridView] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [inquiryType, setInquiryType] = useState('');
@@ -449,19 +450,15 @@ export default function App() {
       </section>
 
       {/* 4. Products & Accounts Section */}
-      <section className="bg-[#111111] pt-12 pb-10 px-0 rounded-[32px] mb-2 shadow-2xl relative overflow-hidden">
-        {/* Subtle Gradient Glow */}
-        <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#3182F6]/10 blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-[#3182F6]/5 blur-[100px] pointer-events-none"></div>
-        
+      <section className="bg-[#F2F4F6] pt-10 pb-6 px-0 rounded-[32px] mb-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)]">
         <div className="px-6 mb-6">
           <div className="inline-block bg-[#1B64DA] text-white text-[11px] font-bold px-2.5 py-1 rounded-full mb-3 shadow-sm">
             {planInfo.name}
           </div>
           <div className="flex justify-between items-end mb-2">
-            <h2 className="text-[22px] font-bold leading-snug text-white">일반 렌탈가전과<br/>가격비교 해보세요! 자신있습니다.</h2>
+            <h2 className="text-[22px] font-bold leading-snug">일반 렌탈가전과<br/>가격비교 해보세요! 자신있습니다.</h2>
           </div>
-          <p className="text-[#A3B1C6] text-[15px]">{planInfo.desc}</p>
+          <p className="text-[#4E5968] text-[15px]">{planInfo.desc}</p>
           <div className="mt-6 rounded-[24px] overflow-hidden shadow-sm border border-[#F2F4F6]">
             <img 
               src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777964857/Generated_Image_May_05_2026_-_4_01PM_cwwwlq.jpg" 
@@ -478,8 +475,8 @@ export default function App() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-block px-2.5 py-1 bg-[#3182F6]/20 text-[#3182F6] text-[11px] font-bold rounded-md mb-2">PRODUCT LIST</span>
-            <h2 className="text-[22px] font-bold text-white leading-tight">
+            <span className="inline-block px-2.5 py-1 bg-[#3182F6]/10 text-[#3182F6] text-[11px] font-bold rounded-md mb-2">PRODUCT LIST</span>
+            <h2 className="text-[22px] font-bold text-[#191F28] leading-tight">
               나에게 딱 맞는<br />결합 상품 찾기
             </h2>
           </motion.div>
@@ -506,7 +503,7 @@ export default function App() {
                 key={(item as any)._id || (item as any).id}
                 onClick={() => openProductDetail(item)}
                 layoutId={`product-${(item as any)._id || (item as any).id}`}
-                className="bg-[#1C1C1C] rounded-[28px] border border-white/5 overflow-hidden active:scale-95 transition-all cursor-pointer shadow-lg hover:shadow-[#3182F6]/10 hover:-translate-y-1 flex flex-col h-full"
+                className="bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-col h-full"
               >
                 <div className="relative h-[125px] bg-white shrink-0">
                   <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-2" />
@@ -524,7 +521,7 @@ export default function App() {
                     </div>
                     <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
                   </div>
-                  <h3 className="text-[13px] font-bold text-white mb-3 leading-tight line-clamp-2 min-h-[32px]">
+                  <h3 className="text-[13px] font-bold text-[#191F28] mb-3 leading-tight line-clamp-2 min-h-[32px]">
                     {item.name}
                   </h3>
                   <div className="mt-auto">
@@ -532,7 +529,7 @@ export default function App() {
                       <span className="text-[10px] text-[#8B95A1] line-through decoration-[#8B95A1]/40 leading-none">월납입금 {formatNumber(item.price)}</span>
                       <div className="flex flex-col gap-0.5">
                         <div className="flex flex-col gap-0.5">
-                          <span className="text-[16px] font-black text-white">월 {formatNumber(item.discountPrice)}</span>
+                          <span className="text-[16px] font-black text-[#191F28]">월 {formatNumber(item.discountPrice)}</span>
                           <span className="text-[9px] font-bold text-[#3182F6] bg-[#3182F6]/5 px-1 py-0.5 rounded-md w-fit">제휴카드 혜택가</span>
                         </div>
                         <span className="text-[10px] font-bold text-[#F04452] mt-1">상조 만기 시 전액지원</span>
@@ -547,16 +544,16 @@ export default function App() {
           {!isProductFullView && (
             <button 
               onClick={openFullView}
-              className="w-full mt-6 flex items-center justify-center gap-2 bg-[#1C1C1C] border border-white/10 py-4 rounded-[20px] text-[15px] font-bold text-white hover:bg-[#252525] active:scale-95 transition-all shadow-xl"
+              className="w-full mt-6 flex items-center justify-center gap-2 bg-white border border-[#E5E8EB] py-4 rounded-[20px] text-[15px] font-bold text-[#191F28] hover:bg-[#F9FAFB] active:scale-95 transition-all shadow-sm"
             >
-              전체 상품 보기 <ArrowRight className="w-4 h-4 text-[#3182F6]" />
+              전체 상품 보기 <ArrowRight className="w-4 h-4" />
             </button>
           )}
         </div>
 
         <div className="px-6 mt-4">
-          <div className="bg-[#1C1C1C] p-4 rounded-[20px] flex items-center justify-between shadow-xl border border-white/5">
-            <p className="text-[12px] text-[#A3B1C6] font-medium">원하는 상품이 없으신가요?</p>
+          <div className="bg-white p-4 rounded-[20px] flex items-center justify-between shadow-sm">
+            <p className="text-[12px] text-[#4E5968] font-medium">원하는 상품이 없으신가요?</p>
             <button 
               onClick={() => setIsContactModalOpen(true)}
               className="text-[12px] text-[#3182F6] font-bold flex items-center gap-1"
@@ -1206,6 +1203,13 @@ export default function App() {
                 <span className="text-[13px] text-[#8B95A1] leading-[1.6]">
                   [필수] 개인정보 수집·이용 및 제공에 동의합니다.
                 </span>
+                <button 
+                  type="button"
+                  onClick={() => setIsPrivacyModalOpen(true)}
+                  className="ml-auto text-[11px] text-[#3182F6] underline underline-offset-2 shrink-0"
+                >
+                  내용 보기
+                </button>
               </label>
             </div>
             
@@ -1683,6 +1687,13 @@ export default function App() {
                       <span className="text-[12px] text-[#8B95A1] leading-[1.6]">
                         [필수] 개인정보 수집·이용 및 제공에 동의합니다.
                       </span>
+                      <button 
+                        type="button"
+                        onClick={() => setIsPrivacyModalOpen(true)}
+                        className="ml-auto text-[11px] text-[#3182F6] underline underline-offset-2 shrink-0"
+                      >
+                        내용 보기
+                      </button>
                     </label>
                   </div>
                   
@@ -1690,6 +1701,63 @@ export default function App() {
                     신청 완료
                   </button>
                 </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Privacy Policy Modal */}
+      <AnimatePresence>
+        {isPrivacyModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-[24px] w-full max-w-[400px] max-h-[80vh] overflow-hidden shadow-2xl relative flex flex-col"
+            >
+              <div className="p-6 border-b border-[#F2F4F6] flex justify-between items-center shrink-0">
+                <h3 className="font-bold text-[17px]">개인정보 수집 및 이용 동의</h3>
+                <button onClick={() => setIsPrivacyModalOpen(false)} className="p-1 hover:bg-[#F2F4F6] rounded-full transition-colors">
+                  <X className="w-5 h-5 text-[#8B95A1]" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-6 text-[13px] text-[#4E5968] leading-[1.6] break-keep no-scrollbar">
+                <p className="mb-4">(주)효원상조와 (주)라이프앤조이는 귀하의 상담 신청과 관련하여 다음과 같이 개인정보를 수집·이용 및 제공하고자 합니다.</p>
+                
+                <h4 className="font-bold text-[#191F28] mb-2">1. 개인정보의 수집·이용에 관한 사항</h4>
+                <div className="space-y-1 mb-4">
+                  <p><span className="font-semibold">• 수집 항목:</span> 이름, 연락처(휴대폰 번호), 문의 사항</p>
+                  <p><span className="font-semibold">• 수집 및 이용 목적:</span></p>
+                  <ul className="pl-4 space-y-0.5">
+                    <li>- 상담 신청에 따른 본인 확인 및 원활한 의사소통 경로 확보</li>
+                    <li>- 상품 안내(상조 및 가전결합 상품) 및 가입 상담</li>
+                    <li>- 계약 진행 및 서비스 제공을 위한 기초 자료 활용</li>
+                  </ul>
+                  <p><span className="font-semibold">• 보유 및 이용 기간:</span> 상담 완료 및 목적 달성 시까지 (단, 관련 법령에 따라 보존이 필요한 경우 해당 기간까지 보관)</p>
+                </div>
+
+                <h4 className="font-bold text-[#191F28] mb-2">2. 개인정보의 제3자 제공에 관한 사항</h4>
+                <p className="mb-2">본 상담 서비스 제공을 위해 아래와 같이 개인정보를 제공합니다.</p>
+                <div className="space-y-1 mb-4">
+                  <p><span className="font-semibold">• 제공받는 자:</span> (주)효원상조, (주)라이프앤조이</p>
+                  <p><span className="font-semibold">• 제공 목적:</span> 상품 안내, 해피콜, 계약 체결 및 관리</p>
+                  <p><span className="font-semibold">• 제공 항목:</span> 이름, 연락처, 상담 내용</p>
+                  <p><span className="font-semibold">• 보유 및 이용 기간:</span> 제공 목적 달성 시까지</p>
+                </div>
+
+                <p className="font-bold text-[#191F28] mb-1">※ 동의 거부 권리 안내</p>
+                <p>귀하는 개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있습니다. 다만, 동의를 거부하실 경우 상담 신청 및 상품 안내 서비스 이용이 제한될 수 있습니다.</p>
+              </div>
+              <div className="p-4 border-t border-[#F2F4F6] shrink-0">
+                <button 
+                  onClick={() => setIsPrivacyModalOpen(false)}
+                  className="w-full bg-[#191F28] text-white font-bold py-3.5 rounded-[14px] text-[15px]"
+                >
+                  확인
+                </button>
               </div>
             </motion.div>
           </motion.div>
