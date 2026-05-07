@@ -205,73 +205,80 @@ export default function ProductManagement() {
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws, { header: 1 }) as any[][];
 
-        // Skip header
         const rows = data.slice(1);
+        let successCount = 0;
+        let failCount = 0;
         
-        for (const row of rows) {
-          if (!row[3]) continue; // Skip if product name is empty
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          try {
+            if (!row || !row[3]) continue; // Skip if empty or product name missing
 
-          let planId = 1;
-          const planVal = String(row[0] || '');
-          if (/^\d+$/.test(planVal)) {
-            planId = parseInt(planVal);
-          } else {
-            const matchedPlan = plans.find(p => p.name.includes(planVal));
-            if (matchedPlan) planId = matchedPlan.id;
-          }
-
-          const brand = row[1] || '';
-          const category = row[2] || '';
-          const name = row[3] || '';
-          const model = row[4] || '';
-          const price = String(row[5] || '0').replace(/\D/g, '');
-          const discountPrice = String(row[6] || '0').replace(/\D/g, '');
-          const tag = row[7] || '';
-          
-          // Multiple Comparisons (10 pairs starting from index 8)
-          const comparisons = [];
-          for (let i = 0; i < 10; i++) {
-            const baseIdx = 8 + (i * 2);
-            const compName = row[baseIdx] || '';
-            const compPrice = String(row[baseIdx + 1] || '0').replace(/\D/g, '');
-            
-            if (compName) {
-              const partner = competitors.find(c => c.name === compName);
-              comparisons.push({
-                company: compName,
-                target: '', 
-                price: compPrice,
-                period: (partner?.months || 60) + '개월',
-                isOurs: partner?.type === '자사'
-              });
+            let planId = 1;
+            const planVal = String(row[0] || '').trim();
+            if (/^\d+$/.test(planVal)) {
+              planId = parseInt(planVal);
+            } else if (planVal) {
+              const matchedPlan = plans.find(p => p.name.includes(planVal));
+              if (matchedPlan) planId = matchedPlan.id;
             }
+
+            const brand = String(row[1] || '').trim();
+            const category = String(row[2] || '').trim();
+            const name = String(row[3] || '').trim();
+            const model = String(row[4] || '').trim();
+            const price = String(row[5] || '0').replace(/\D/g, '');
+            const discountPrice = String(row[6] || '0').replace(/\D/g, '');
+            const tag = String(row[7] || '').trim();
+            
+            const comparisons = [];
+            for (let j = 0; j < 10; j++) {
+              const baseIdx = 8 + (j * 2);
+              const compName = String(row[baseIdx] || '').trim();
+              const compPrice = String(row[baseIdx + 1] || '0').replace(/\D/g, '');
+              
+              if (compName) {
+                const partner = competitors.find(c => c.name === compName);
+                comparisons.push({
+                  company: compName,
+                  target: '', 
+                  price: compPrice,
+                  period: (partner?.months || 60) + '개월',
+                  isOurs: partner?.type === '자사'
+                });
+              }
+            }
+            
+            comparisons.sort((a, b) => {
+              const pa = parseInt(a.price) || 0;
+              const pb = parseInt(b.price) || 0;
+              return pa - pb;
+            });
+
+            const thumbnailUrl = String(row[28] || '').trim();
+            const detailUrls = row[29] ? String(row[29]).split(',').map(s => s.trim()).filter(s => s) : [];
+
+            await createProduct({
+              planId,
+              brand,
+              category,
+              name,
+              model,
+              price,
+              discountPrice,
+              tag,
+              isVisible: true,
+              comparisons,
+              images: thumbnailUrl ? [thumbnailUrl] : [],
+              detailImages: detailUrls
+            });
+            successCount++;
+          } catch (rowErr) {
+            console.error(`Row ${i + 2} processing error:`, rowErr, row);
+            failCount++;
           }
-          
-          // Sort by price (cheapest first)
-          comparisons.sort((a, b) => parseInt(a.price) - parseInt(b.price));
-
-          // Images (Updated Indices for 10 competitors)
-          // 8 + 20 = 28
-          const thumbnailUrl = row[28] || '';
-          const detailUrls = row[29] ? String(row[29]).split(',').map(s => s.trim()) : [];
-
-          await createProduct({
-            planId,
-            brand,
-            category,
-            name,
-            model,
-            price,
-            discountPrice,
-            tag,
-            isVisible: true,
-            comparisons,
-            images: thumbnailUrl ? [thumbnailUrl] : [],
-            detailImages: detailUrls
-          });
         }
-        alert('일괄 등록이 완료되었습니다.');
-        if (excelInputRef.current) excelInputRef.current.value = '';
+        alert(`일괄 등록 완료\n성공: ${successCount}건\n실패: ${failCount}건`);
       } catch (err) {
         console.error(err);
         alert('엑셀 처리 중 오류가 발생했습니다.');
