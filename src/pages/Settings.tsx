@@ -66,12 +66,20 @@ export default function Settings() {
   };
 
   const handleDragStart = (idx: number, type: 'status' | 'brand' | 'category') => {
-    setDraggedIndex(idx);
-    setDragType(type);
+    // 드래그 고스트 이미지가 흐릿하게 캡처되는 것을 방지하기 위해 스타일 적용을 약간 늦춥니다.
+    setTimeout(() => {
+      setDraggedIndex(idx);
+      setDragType(type);
+    }, 0);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragType(null);
   };
 
   const handleDrop = (idx: number) => {
@@ -98,8 +106,7 @@ export default function Settings() {
       saveSettings({ categories: newList });
     }
 
-    setDraggedIndex(null);
-    setDragType(null);
+    handleDragEnd();
   };
 
   if (!settings) return <div className="p-8">로딩 중...</div>;
@@ -149,9 +156,10 @@ export default function Settings() {
                   key={idx} 
                   draggable
                   onDragStart={() => handleDragStart(idx, 'status')}
+                  onDragEnd={handleDragEnd}
                   onDragOver={handleDragOver}
                   onDrop={() => handleDrop(idx)}
-                  className={`flex items-center gap-4 bg-[#F9FAFB] p-4 rounded-[16px] border border-[#E5E8EB] transition-all ${draggedIndex === idx && dragType === 'status' ? 'opacity-40 scale-95 border-[#3182F6]' : 'hover:border-[#3182F6]/30'}`}
+                  className={`flex items-center gap-4 bg-[#F9FAFB] p-4 rounded-[16px] border transition-all ${draggedIndex === idx && dragType === 'status' ? 'opacity-20 border-[#3182F6] bg-white' : 'border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
                 >
                   <MoveVertical className="w-5 h-5 text-[#D1D6DB] cursor-grab active:cursor-grabbing shrink-0"/>
                   <input 
@@ -302,9 +310,10 @@ export default function Settings() {
                     key={idx} 
                     draggable
                     onDragStart={() => handleDragStart(idx, 'brand')}
+                    onDragEnd={handleDragEnd}
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop(idx)}
-                    className={`flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border border-[#E5E8EB] transition-all ${draggedIndex === idx && dragType === 'brand' ? 'opacity-40 scale-95 border-[#3182F6]' : 'hover:border-[#3182F6]/30'}`}
+                    className={`flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border transition-all ${draggedIndex === idx && dragType === 'brand' ? 'opacity-20 border-[#3182F6] bg-white' : 'border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
                   >
                     <MoveVertical className="w-4 h-4 text-[#D1D6DB] cursor-grab shrink-0"/>
                     <input 
@@ -356,9 +365,10 @@ export default function Settings() {
                     key={idx} 
                     draggable
                     onDragStart={() => handleDragStart(idx, 'category')}
+                    onDragEnd={handleDragEnd}
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop(idx)}
-                    className={`flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border border-[#E5E8EB] transition-all ${draggedIndex === idx && dragType === 'category' ? 'opacity-40 scale-95 border-[#3182F6]' : 'hover:border-[#3182F6]/30'}`}
+                    className={`flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border transition-all ${draggedIndex === idx && dragType === 'category' ? 'opacity-20 border-[#3182F6] bg-white' : 'border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
                   >
                     <MoveVertical className="w-4 h-4 text-[#D1D6DB] cursor-grab shrink-0"/>
                     <input 
