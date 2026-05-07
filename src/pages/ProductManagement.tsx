@@ -452,6 +452,7 @@ export default function ProductManagement() {
                         </button>
                       </th>
                       <th className="px-4 py-4 w-10"></th>
+                      <th className="px-4 py-4 w-16 text-[13px] font-bold text-[#4E5968]">이미지</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968]">브랜드</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968]">카테고리</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968]">제품명 / 모델명</th>
@@ -477,6 +478,17 @@ export default function ProductManagement() {
                           </button>
                         </td>
                         <td className="px-2 py-4 text-[#D1D6DB] group-hover:text-[#3182F6]"><MoveVertical className="w-5 h-5" /></td>
+                        <td className="px-2 py-4">
+                          <div className="w-12 h-12 bg-white border border-[#F2F4F6] rounded-lg overflow-hidden flex items-center justify-center">
+                            {(p.images && p.images.length > 0) ? (
+                              <img src={p.images[0]} className="w-full h-full object-contain" alt="thumb" />
+                            ) : p.image ? (
+                              <img src={p.image} className="w-full h-full object-contain" alt="thumb" />
+                            ) : (
+                              <ImageIcon className="w-5 h-5 text-[#D1D6DB]" />
+                            )}
+                          </div>
+                        </td>
                         <td className="px-4 py-4 text-[14px] text-[#4E5968] font-bold">{p.brand}</td>
                         <td className="px-4 py-4 text-[13px] text-[#8B95A1] font-medium">{p.category}</td>
                         <td className="px-4 py-4">
