@@ -20,10 +20,39 @@ export default function App() {
   const [phone, setPhone] = useState('');
   const [inquiryType, setInquiryType] = useState('');
   const [message, setMessage] = useState('');
+  const [isAgreed, setIsAgreed] = useState(true);
   const [isProductFullView, setIsProductFullView] = useState(false);
   const [lastViewedSection, setLastViewedSection] = useState<string | null>(null);
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const productScrollRef = useRef<HTMLDivElement>(null);
+  const logVisit = useMutation(api.stats.logVisit);
+
+  useEffect(() => {
+    const trackVisit = async () => {
+      try {
+        let ip = "0.0.0.0";
+        try {
+          const response = await fetch("https://api.ipify.org?format=json");
+          const data = await response.json();
+          ip = data.ip;
+        } catch (e) {
+          // Fallback if IP API fails
+        }
+
+        await logVisit({
+          ip,
+          userAgent: navigator.userAgent,
+          referrer: document.referrer || "직접 유입",
+          path: window.location.pathname + window.location.search,
+        });
+      } catch (e) {
+        console.error("Visit tracking failed", e);
+      }
+    };
+
+    trackVisit();
+  }, [logVisit]);
+
   const isFullViewRef = useRef(isProductFullView);
 
   useEffect(() => {
@@ -1144,6 +1173,7 @@ export default function App() {
               setPhone('');
               setInquiryType('');
               setMessage('');
+              setIsAgreed(true);
             } catch (err) {
               alert('상담 신청 중 오류가 발생했습니다.');
             }
@@ -1205,9 +1235,15 @@ export default function App() {
             
             <div className="pt-3 pb-2">
               <label className="flex items-start gap-3 cursor-pointer group px-1">
-                <div className="relative flex items-center justify-center w-[22px] h-[22px] rounded-[6px] bg-white/10 border border-white/10 group-hover:border-[#3182F6] transition-colors shrink-0 mt-0.5">
-                  <input type="checkbox" required className="opacity-0 absolute" defaultChecked />
-                  <Check className="w-3.5 h-3.5 text-[#3182F6]" strokeWidth={4} />
+                <div className={`relative flex items-center justify-center w-[22px] h-[22px] rounded-[6px] transition-colors shrink-0 mt-0.5 ${isAgreed ? 'bg-[#3182F6] border-[#3182F6]' : 'bg-white/10 border-white/10 group-hover:border-[#3182F6]'}`}>
+                  <input 
+                    type="checkbox" 
+                    required 
+                    checked={isAgreed}
+                    onChange={(e) => setIsAgreed(e.target.checked)}
+                    className="opacity-0 absolute" 
+                  />
+                  {isAgreed && <Check className="w-3.5 h-3.5 text-white" strokeWidth={4} />}
                 </div>
                 <span className="text-[13px] text-[#8B95A1] leading-[1.6]">
                   [필수] 개인정보 수집·이용 및 제공에 동의합니다.
@@ -1689,9 +1725,15 @@ export default function App() {
                   
                   <div className="pt-2 pb-1">
                     <label className="flex items-start gap-3 cursor-pointer group px-1">
-                      <div className="relative flex items-center justify-center w-[20px] h-[20px] rounded-[5px] bg-[#F2F4F6] border border-[#D1D6DB] group-hover:border-[#3182F6] transition-colors shrink-0 mt-0.5">
-                        <input type="checkbox" required className="opacity-0 absolute" defaultChecked />
-                        <Check className="w-3 h-3 text-[#3182F6]" strokeWidth={4} />
+                      <div className={`relative flex items-center justify-center w-[20px] h-[20px] rounded-[5px] transition-colors shrink-0 mt-0.5 ${isAgreed ? 'bg-[#3182F6] border-[#3182F6]' : 'bg-[#F2F4F6] border-[#D1D6DB] group-hover:border-[#3182F6]'}`}>
+                        <input 
+                          type="checkbox" 
+                          required 
+                          checked={isAgreed}
+                          onChange={(e) => setIsAgreed(e.target.checked)}
+                          className="opacity-0 absolute" 
+                        />
+                        {isAgreed && <Check className="w-3 h-3 text-white" strokeWidth={4} />}
                       </div>
                       <span className="text-[12px] text-[#8B95A1] leading-[1.6]">
                         [필수] 개인정보 수집·이용 및 제공에 동의합니다.

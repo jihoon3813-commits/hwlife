@@ -66,4 +66,11 @@ export default defineSchema({
       notice: v.string(),
     }),
   }),
+  visits: defineTable({
+    ip: v.string(),
+    userAgent: v.string(),
+    referrer: v.optional(v.string()),
+    path: v.string(),
+    timestamp: v.number(),
+  }).index("by_timestamp", ["timestamp"]),
 });

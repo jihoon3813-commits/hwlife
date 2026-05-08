@@ -207,7 +207,12 @@ export default function ProductManagement() {
     setSelectedIds([]);
   };
 
-  const onDragStart = (index: number) => setDraggedItemIndex(index);
+  const onDragStart = (index: number) => {
+    // 드래그 고스트 이미지가 흐릿하게 캡처되는 것을 방지하기 위해 스타일 적용을 약간 늦춥니다.
+    setTimeout(() => {
+      setDraggedItemIndex(index);
+    }, 0);
+  };
   const onDragOver = (e: React.DragEvent) => e.preventDefault();
   const onDrop = (index: number) => {
     // 순서 변경 로직은 order 필드가 스키마에 추가되면 구현 가능
@@ -478,7 +483,7 @@ export default function ProductManagement() {
                         onDragStart={() => onDragStart(index)}
                         onDragOver={onDragOver}
                         onDrop={() => onDrop(index)}
-                        className={`hover:bg-[#F9FAFB] transition-colors cursor-move group ${draggedItemIndex === index ? 'opacity-40' : ''} ${selectedIds.includes(p._id) ? 'bg-[#E8F3FF]/30' : ''}`}
+                        className={`hover:bg-[#F9FAFB] cursor-move group ${draggedItemIndex === index ? 'opacity-50 border-dashed border-[#3182F6] bg-[#F2F4F6]' : 'transition-colors'} ${selectedIds.includes(p._id) ? 'bg-[#E8F3FF]/30' : ''}`}
                       >
                         <td className="px-4 py-4 text-center">
                           <button onClick={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(p._id) ? prev.filter(i => i !== p._id) : [...prev, p._id]); }}>

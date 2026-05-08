@@ -129,7 +129,12 @@ export default function VideoManagement() {
     });
   };
 
-  const onDragStart = (index: number) => setDraggedItemIndex(index);
+  const onDragStart = (index: number) => {
+    // 드래그 고스트 이미지가 흐릿하게 캡처되는 것을 방지하기 위해 스타일 적용을 약간 늦춥니다.
+    setTimeout(() => {
+      setDraggedItemIndex(index);
+    }, 0);
+  };
   const onDragOver = (e: React.DragEvent) => e.preventDefault();
   const onDrop = async (index: number) => {
     if (draggedItemIndex === null || draggedItemIndex === index || !shorts) return;
@@ -271,7 +276,7 @@ export default function VideoManagement() {
               onDragStart={() => onDragStart(index)}
               onDragOver={onDragOver}
               onDrop={() => onDrop(index)}
-              className={`flex items-start gap-4 p-4 rounded-[20px] border transition-all cursor-move ${editingId === short._id ? 'border-[#3182F6] bg-[#F2F8FF]' : 'border-[#E5E8EB] bg-white hover:bg-[#F9FAFB]'} ${draggedItemIndex === index ? 'opacity-40' : ''}`}
+              className={`flex items-start gap-4 p-4 rounded-[20px] border cursor-move ${editingId === short._id ? 'border-[#3182F6] bg-[#F2F8FF]' : 'border-[#E5E8EB] bg-white hover:bg-[#F9FAFB]'} ${draggedItemIndex === index ? 'opacity-50 border-dashed border-[#3182F6]' : 'transition-all'}`}
             >
               <div className="pt-2"><MoveVertical className="w-5 h-5 text-[#D1D6DB] shrink-0 cursor-grab"/></div>
               

@@ -183,7 +183,7 @@ export default function Settings() {
                   onDragEnd={handleDragEnd}
                   onDragOver={handleDragOver}
                   onDrop={() => handleDrop(idx)}
-                  className={`flex items-center gap-4 bg-[#F9FAFB] p-4 rounded-[16px] border transition-all ${draggedIndex === idx && dragType === 'status' ? 'opacity-20 border-[#3182F6] bg-white' : 'border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
+                  className={`flex items-center gap-4 bg-[#F9FAFB] p-4 rounded-[16px] border ${draggedIndex === idx && dragType === 'status' ? 'opacity-50 border-dashed border-[#3182F6] bg-white' : 'transition-all border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
                 >
                   <MoveVertical className="w-5 h-5 text-[#D1D6DB] cursor-grab active:cursor-grabbing shrink-0"/>
                   <input 
@@ -337,7 +337,7 @@ export default function Settings() {
                     onDragEnd={handleDragEnd}
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop(idx)}
-                    className={`flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border transition-all ${draggedIndex === idx && dragType === 'brand' ? 'opacity-20 border-[#3182F6] bg-white' : 'border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
+                    className={`flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border ${draggedIndex === idx && dragType === 'brand' ? 'opacity-50 border-dashed border-[#3182F6] bg-white' : 'transition-all border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
                   >
                     <MoveVertical className="w-4 h-4 text-[#D1D6DB] cursor-grab shrink-0"/>
                     <input 
@@ -392,7 +392,7 @@ export default function Settings() {
                     onDragEnd={handleDragEnd}
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop(idx)}
-                    className={`flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border transition-all ${draggedIndex === idx && dragType === 'category' ? 'opacity-20 border-[#3182F6] bg-white' : 'border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
+                    className={`flex items-center gap-2 bg-[#F9FAFB] p-3 rounded-[12px] border ${draggedIndex === idx && dragType === 'category' ? 'opacity-50 border-dashed border-[#3182F6] bg-white' : 'transition-all border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
                   >
                     <MoveVertical className="w-4 h-4 text-[#D1D6DB] cursor-grab shrink-0"/>
                     <input 
