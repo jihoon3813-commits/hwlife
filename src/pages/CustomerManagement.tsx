@@ -18,12 +18,41 @@ export default function CustomerManagement() {
   const removeInquiry = useMutation(api.inquiries.remove);
 
   useEffect(() => {
+    const script = document.createElement('script');
+    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  useEffect(() => {
     if (selectedCustomer) {
-      setEditData(selectedCustomer);
+      setEditData({
+        ...selectedCustomer,
+        newRegDate: selectedCustomer.newRegDate || new Date(selectedCustomer.createdAt).toISOString().split('T')[0],
+        account: selectedCustomer.account || selectedCustomer.productName
+      });
       setStatus(selectedCustomer.status);
       setMemo('');
     }
   }, [selectedCustomer]);
+
+  const openPostcode = () => {
+    if (!(window as any).daum || !(window as any).daum.Postcode) {
+      alert('주소 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+    new (window as any).daum.Postcode({
+      oncomplete: function(data: any) {
+        setEditData((prev: any) => ({
+          ...prev,
+          address: data.roadAddress || data.jibunAddress
+        }));
+      }
+    }).open();
+  };
 
   const handleUpdate = async () => {
     if (!selectedCustomer) return;
@@ -207,9 +236,12 @@ export default function CustomerManagement() {
                       <input type="text" value={editData.birth || ''} onChange={e => setEditData({...editData, birth: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="YYMMDD" />
                     </div>
                     <div className="col-span-2">
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">주소</label>
-                      <input type="text" value={editData.address || ''} onChange={e => setEditData({...editData, address: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] mb-2" placeholder="기본 주소" />
-                      <input type="text" value={editData.detailAddress || ''} onChange={e => setEditData({...editData, detailAddress: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="상세 주소" />
+                      <div className="flex justify-between items-end mb-1">
+                        <label className="block text-[12px] font-medium text-[#8B95A1]">주소</label>
+                        <button onClick={openPostcode} className="text-[11px] bg-[#3182F6] text-white px-2.5 py-1 rounded-[4px] font-bold hover:bg-[#1B64DA] transition-colors">주소 검색</button>
+                      </div>
+                      <input type="text" value={editData.address || ''} readOnly onClick={openPostcode} className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] mb-2 cursor-pointer text-[#4E5968]" placeholder="기본 주소 (검색 버튼을 눌러주세요)" />
+                      <input type="text" value={editData.detailAddress || ''} onChange={e => setEditData({...editData, detailAddress: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="상세 주소 입력" />
                     </div>
                   </div>
                 </section>
