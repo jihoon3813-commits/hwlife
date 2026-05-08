@@ -22,6 +22,7 @@ export default function App() {
   const [message, setMessage] = useState('');
   const [isAgreed, setIsAgreed] = useState(true);
   const [isProductFullView, setIsProductFullView] = useState(false);
+  const [inquiryProduct, setInquiryProduct] = useState<any | null>(null);
   const [lastViewedSection, setLastViewedSection] = useState<string | null>(null);
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const productScrollRef = useRef<HTMLDivElement>(null);
@@ -1604,6 +1605,7 @@ export default function App() {
             <div className="absolute bottom-0 w-full bg-white/90 backdrop-blur-md border-t border-[#F2F4F6] px-5 py-4 pb-6 flex gap-3 shadow-[0_-10px_30px_rgb(0,0,0,0.05)] shrink-0 z-20">
               <button 
                 onClick={() => {
+                  setInquiryProduct(selectedProduct);
                   closeProductDetail();
                   setTimeout(() => {
                     setIsContactModalOpen(true);
@@ -1646,6 +1648,17 @@ export default function App() {
                   <p className="text-[#4E5968] text-[14px] leading-relaxed break-keep">
                     담당자가 구조를 투명하게 설명해 드립니다.<br/>부담 없이 신청해 보세요.
                   </p>
+                  {inquiryProduct && (
+                    <div className="mt-4 bg-[#F9FAFB] border border-[#E5E8EB] rounded-[12px] p-3 flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white rounded-[8px] flex items-center justify-center p-1 shrink-0 border border-[#E5E8EB]">
+                        <img src={inquiryProduct.image} alt="제품" className="w-full h-full object-contain" />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[11px] font-bold text-[#3182F6] mb-0.5">상담 신청 상품</span>
+                        <span className="text-[13px] font-bold text-[#191F28] truncate">{inquiryProduct.name}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <form className="space-y-4" onSubmit={async (e) => {
@@ -1655,7 +1668,7 @@ export default function App() {
                     await createInquiry({
                       name,
                       phone,
-                      productName: selectedProduct?.name || "전체 상담",
+                      productName: inquiryProduct ? inquiryProduct.name : "전체 상담",
                       message: finalMessage || undefined
                     });
                     alert('상담 신청이 접수되었습니다.');
@@ -1664,6 +1677,7 @@ export default function App() {
                     setInquiryType('');
                     setMessage('');
                     setIsContactModalOpen(false);
+                    setInquiryProduct(null);
                   } catch (err) {
                     alert('상담 신청 중 오류가 발생했습니다.');
                   }
