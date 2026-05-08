@@ -1651,7 +1651,7 @@ export default function App() {
                   {inquiryProduct && (
                     <div className="mt-4 bg-[#F9FAFB] border border-[#E5E8EB] rounded-[12px] p-3 flex items-center gap-3">
                       <div className="w-10 h-10 bg-white rounded-[8px] flex items-center justify-center p-1 shrink-0 border border-[#E5E8EB]">
-                        <img src={inquiryProduct.image} alt="제품" className="w-full h-full object-contain" />
+                        <img src={(inquiryProduct.images && inquiryProduct.images.length > 0) ? inquiryProduct.images[0] : inquiryProduct.image} alt="제품" className="w-full h-full object-contain" />
                       </div>
                       <div className="flex flex-col min-w-0">
                         <span className="text-[11px] font-bold text-[#3182F6] mb-0.5">상담 신청 상품</span>
