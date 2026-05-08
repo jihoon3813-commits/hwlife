@@ -133,6 +133,20 @@ export default function Settings() {
     handleDragEnd();
   };
 
+  const getContrastColor = (hex: string) => {
+    if (!hex) return '#4E5968';
+    try {
+      const color = hex.replace('#', '');
+      const r = parseInt(color.substring(0, 2), 16);
+      const g = parseInt(color.substring(2, 4), 16);
+      const b = parseInt(color.substring(4, 6), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 155 ? '#4E5968' : '#FFFFFF';
+    } catch (e) {
+      return '#4E5968';
+    }
+  };
+
   if (!settings) return <div className="p-8">로딩 중...</div>;
 
   return (
@@ -206,41 +220,39 @@ export default function Settings() {
                         className="inline-block text-[11px] font-bold px-3 py-1 rounded-full border border-black/5"
                         style={{ 
                           backgroundColor: status.color || '#F2F4F6',
-                          color: (status.color === '#F2F4F6' ? '#4E5968' : 
-                                  status.color === '#E8F3FF' ? '#1B64DA' :
-                                  status.color === '#E7F9F3' ? '#059669' :
-                                  status.color === '#FFF8E1' ? '#B78103' :
-                                  status.color === '#FFF0F0' ? '#E54949' :
-                                  status.color === '#F5F0FF' ? '#8247E5' : '#191F28')
+                          color: getContrastColor(status.color || '#F2F4F6')
                         }}
                       >
                         {status.name || '상태명'}
                       </span>
                     </div>
 
-                    {/* 색상표 */}
-                    <div className="flex gap-2 p-1.5 bg-white border border-[#E5E8EB] rounded-full shadow-sm">
-                      {[
-                        { val: '#F2F4F6', lbl: '회색' },
-                        { val: '#E8F3FF', lbl: '파랑' },
-                        { val: '#E7F9F3', lbl: '초록' },
-                        { val: '#FFF8E1', lbl: '노랑' },
-                        { val: '#FFF0F0', lbl: '빨강' },
-                        { val: '#F5F0FF', lbl: '보라' }
-                      ].map(c => (
-                        <button
-                          key={c.val}
-                          onClick={() => {
+                    {/* 색상 선택기 */}
+                    <div className="flex items-center gap-2 p-1.5 bg-white border border-[#E5E8EB] rounded-[12px] shadow-sm">
+                      <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-[#E5E8EB]">
+                        <input 
+                          type="color" 
+                          value={status.color || '#F2F4F6'}
+                          onChange={(e) => {
                             const newStatuses = [...localStatuses];
-                            newStatuses[idx] = { ...newStatuses[idx], color: c.val };
+                            newStatuses[idx] = { ...newStatuses[idx], color: e.target.value };
                             setLocalStatuses(newStatuses);
-                            saveSettings({ statuses: newStatuses });
                           }}
-                          className={`w-6 h-6 rounded-full border-2 transition-all ${status.color === c.val ? 'border-[#3182F6] scale-110' : 'border-transparent hover:scale-105'}`}
-                          style={{ backgroundColor: c.val }}
-                          title={c.lbl}
+                          onBlur={() => saveSettings({ statuses: localStatuses })}
+                          className="absolute -inset-2 w-[200%] h-[200%] cursor-pointer border-none p-0"
                         />
-                      ))}
+                      </div>
+                      <input 
+                        type="text"
+                        value={status.color || '#F2F4F6'}
+                        onChange={(e) => {
+                          const newStatuses = [...localStatuses];
+                          newStatuses[idx] = { ...newStatuses[idx], color: e.target.value };
+                          setLocalStatuses(newStatuses);
+                        }}
+                        onBlur={() => saveSettings({ statuses: localStatuses })}
+                        className="w-20 text-[12px] font-bold text-[#4E5968] focus:outline-none uppercase font-mono"
+                      />
                     </div>
                   </div>
 

@@ -145,15 +145,19 @@ export default function CustomerManagement() {
   const getStatusStyle = (statusName: string) => {
     const statusSetting = settings?.statuses?.find((s: any) => s.name === statusName);
     if (statusSetting && statusSetting.color) {
-      const colors: any = {
-        '#F2F4F6': { bg: '#F2F4F6', text: '#4E5968' },
-        '#E8F3FF': { bg: '#E8F3FF', text: '#1B64DA' },
-        '#E7F9F3': { bg: '#E7F9F3', text: '#059669' },
-        '#FFF8E1': { bg: '#FFF8E1', text: '#B78103' },
-        '#FFF0F0': { bg: '#FFF0F0', text: '#E54949' },
-        '#F5F0FF': { bg: '#F5F0FF', text: '#8247E5' },
-      };
-      return colors[statusSetting.color] || { bg: statusSetting.color, text: '#191F28' };
+      const hex = statusSetting.color;
+      let textColor = '#4E5968';
+      try {
+        const color = hex.replace('#', '');
+        const r = parseInt(color.substring(0, 2), 16);
+        const g = parseInt(color.substring(2, 4), 16);
+        const b = parseInt(color.substring(4, 6), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        textColor = brightness > 155 ? '#4E5968' : '#FFFFFF';
+      } catch (e) {
+        textColor = '#4E5968';
+      }
+      return { bg: hex, text: textColor };
     }
     return { bg: '#F2F4F6', text: '#4E5968' };
   };
