@@ -81,7 +81,7 @@ export default defineSchema({
     months: v.number(),
   }),
   settings: defineTable({
-    statuses: v.array(v.object({ name: v.string(), isUsed: v.boolean() })),
+    statuses: v.array(v.object({ name: v.string(), isUsed: v.boolean(), color: v.optional(v.string()) })),
     brands: v.array(v.string()),
     categories: v.array(v.string()),
     footer: v.object({

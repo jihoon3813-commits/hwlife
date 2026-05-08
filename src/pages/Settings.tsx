@@ -164,7 +164,7 @@ export default function Settings() {
               <h3 className="text-[18px] font-bold">진행상태 값 설정</h3>
               <button 
                 onClick={() => {
-                  const newStatuses = [...localStatuses, { name: '새 상태', isUsed: true }];
+                  const newStatuses = [...localStatuses, { name: '새 상태', isUsed: true, color: '#F2F4F6' }];
                   setLocalStatuses(newStatuses);
                   saveSettings({ statuses: newStatuses });
                 }}
@@ -172,6 +172,25 @@ export default function Settings() {
               >
                 <Plus className="w-4 h-4"/> 상태 추가
               </button>
+            </div>
+            
+            <div className="mb-4 p-4 bg-[#F9FAFB] rounded-[16px] border border-[#E5E8EB]">
+              <p className="text-[12px] text-[#8B95A1] font-medium mb-2">상태별 색상 가이드:</p>
+              <div className="flex gap-2">
+                {[
+                  { bg: '#F2F4F6', text: '#4E5968', label: '기본/대기' },
+                  { bg: '#E8F3FF', text: '#1B64DA', label: '진행중' },
+                  { bg: '#E7F9F3', text: '#059669', label: '완료' },
+                  { bg: '#FFF8E1', text: '#B78103', label: '주의' },
+                  { bg: '#FFF0F0', text: '#E54949', label: '취소/거절' },
+                  { bg: '#F5F0FF', text: '#8247E5', label: '기타' },
+                ].map((c, i) => (
+                  <div key={i} className="flex items-center gap-1 px-2 py-1 rounded-md border border-[#E5E8EB] bg-white">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: c.bg }}></div>
+                    <span className="text-[10px] font-bold text-[#4E5968]">{c.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             
             <div className="space-y-3">
@@ -197,6 +216,24 @@ export default function Settings() {
                     onBlur={() => saveSettings({ statuses: localStatuses })}
                     className="flex-1 bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" 
                   />
+                  <select 
+                    value={status.color || '#F2F4F6'}
+                    onChange={(e) => {
+                      const newStatuses = [...localStatuses];
+                      newStatuses[idx] = { ...newStatuses[idx], color: e.target.value };
+                      setLocalStatuses(newStatuses);
+                      saveSettings({ statuses: newStatuses });
+                    }}
+                    className="bg-white border border-[#D1D6DB] px-3 py-2.5 rounded-[10px] text-[13px] font-bold focus:outline-none w-[100px]"
+                    style={{ backgroundColor: status.color || '#F2F4F6', color: '#191F28' }}
+                  >
+                    <option value="#F2F4F6">회색</option>
+                    <option value="#E8F3FF">파랑</option>
+                    <option value="#E7F9F3">초록</option>
+                    <option value="#FFF8E1">노랑</option>
+                    <option value="#FFF0F0">빨강</option>
+                    <option value="#F5F0FF">보라</option>
+                  </select>
                   <select 
                     value={status.isUsed ? 'Y' : 'N'}
                     onChange={(e) => {

@@ -142,6 +142,22 @@ export default function CustomerManagement() {
     return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`;
   };
 
+  const getStatusStyle = (statusName: string) => {
+    const statusSetting = settings?.statuses?.find((s: any) => s.name === statusName);
+    if (statusSetting && statusSetting.color) {
+      const colors: any = {
+        '#F2F4F6': { bg: '#F2F4F6', text: '#4E5968' },
+        '#E8F3FF': { bg: '#E8F3FF', text: '#1B64DA' },
+        '#E7F9F3': { bg: '#E7F9F3', text: '#059669' },
+        '#FFF8E1': { bg: '#FFF8E1', text: '#B78103' },
+        '#FFF0F0': { bg: '#FFF0F0', text: '#E54949' },
+        '#F5F0FF': { bg: '#F5F0FF', text: '#8247E5' },
+      };
+      return colors[statusSetting.color] || { bg: statusSetting.color, text: '#191F28' };
+    }
+    return { bg: '#F2F4F6', text: '#4E5968' };
+  };
+
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString('ko-KR', {
       year: 'numeric',
@@ -240,9 +256,13 @@ export default function CustomerManagement() {
                   <td className="px-6 py-4 text-[14px] text-[#4E5968]">{customer.phone}</td>
                   <td className="px-6 py-4 text-[14px] text-[#4E5968]">{customer.productName}</td>
                   <td className="px-6 py-4">
-                    <span className={`inline-block text-[12px] font-bold px-2.5 py-1 rounded-full ${
-                      customer.status === '대기' ? 'bg-amber-50 text-amber-600' : 'bg-[#E8F3FF] text-[#1B64DA]'
-                    }`}>
+                    <span 
+                      className="inline-block text-[12px] font-bold px-2.5 py-1 rounded-full"
+                      style={{ 
+                        backgroundColor: getStatusStyle(customer.status).bg, 
+                        color: getStatusStyle(customer.status).text 
+                      }}
+                    >
                       {customer.status}
                     </span>
                   </td>
@@ -259,9 +279,13 @@ export default function CustomerManagement() {
             <div className="px-6 py-5 border-b border-[#E5E8EB] flex justify-between items-center bg-white z-10 shrink-0">
               <div className="flex items-center gap-3">
                 <h3 className="text-[20px] font-bold">상담 고객 상세정보</h3>
-                <span className={`inline-block text-[12px] font-bold px-2.5 py-1 rounded-full ${
-                  status === '대기' ? 'bg-amber-50 text-amber-600' : 'bg-[#E8F3FF] text-[#1B64DA]'
-                }`}>
+                <span 
+                  className="inline-block text-[12px] font-bold px-2.5 py-1 rounded-full"
+                  style={{ 
+                    backgroundColor: getStatusStyle(status).bg, 
+                    color: getStatusStyle(status).text 
+                  }}
+                >
                   {status}
                 </span>
               </div>
@@ -388,9 +412,13 @@ export default function CustomerManagement() {
                     value={status} 
                     onChange={(e) => setStatus(e.target.value)}
                     className="w-[140px] bg-white border border-[#D1D6DB] px-3 py-2 rounded-[8px] text-[13px] font-bold focus:outline-none"
+                    style={{ 
+                      backgroundColor: getStatusStyle(status).bg,
+                      color: getStatusStyle(status).text
+                    }}
                   >
                     {settings?.statuses?.filter((s: any) => s.isUsed).map((s: any) => (
-                      <option key={s.name}>{s.name}</option>
+                      <option key={s.name} value={s.name} style={{ backgroundColor: '#ffffff', color: '#191F28' }}>{s.name}</option>
                     ))}
                   </select>
                   <input 
