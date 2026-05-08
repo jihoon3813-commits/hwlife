@@ -4,10 +4,11 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
 export default function CustomerManagement() {
-  const [selectedCustomer, setSelectedCustomer] = useState<any | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [memo, setMemo] = useState('');
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState('대기');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   
   // Local state for editing details
   const [editData, setEditData] = useState<any>({});
@@ -57,7 +58,10 @@ export default function CustomerManagement() {
   const handleUpdate = async () => {
     if (!selectedCustomer) return;
     try {
-      const updates: any = { ...editData, status };
+      // Exclude _id, _creationTime, and non-schema fields to avoid Convex validation errors
+      const { _id, _creationTime, createdAt, productName, message, ...validUpdates } = editData;
+      
+      const updates: any = { ...validUpdates, status };
       
       if (memo.trim()) {
         const newHistory = {
@@ -72,6 +76,7 @@ export default function CustomerManagement() {
       alert('저장되었습니다.');
       setSelectedCustomer(null);
     } catch (e) {
+      console.error(e);
       alert('오류가 발생했습니다.');
     }
   };
@@ -81,7 +86,33 @@ export default function CustomerManagement() {
     if (confirm('정말로 이 고객 정보를 삭제하시겠습니까?')) {
       await removeInquiry({ id: selectedCustomer._id });
       setSelectedCustomer(null);
+      setSelectedIds(prev => prev.filter(id => id !== selectedCustomer._id));
     }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+    if (confirm(`선택한 ${selectedIds.length}명의 고객 정보를 삭제하시겠습니까?`)) {
+      for (const id of selectedIds) {
+        await removeInquiry({ id: id as any });
+      }
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredInquiries.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredInquiries.map(inq => inq._id));
+    }
+  };
+
+  const toggleSelect = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
   };
 
   const formatPhoneNumber = (value: string) => {
@@ -126,6 +157,14 @@ export default function CustomerManagement() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-[24px] font-bold">고객관리</h2>
         <div className="flex gap-2">
+          {selectedIds.length > 0 && (
+            <button 
+              onClick={handleBulkDelete}
+              className="bg-red-50 text-red-500 border border-red-100 hover:bg-red-100 px-4 py-2 rounded-[8px] flex items-center gap-2 text-[14px] font-bold transition-colors"
+            >
+              <Trash2 className="w-4 h-4" /> 선택 삭제 ({selectedIds.length})
+            </button>
+          )}
           <div className="bg-white border border-[#E5E8EB] rounded-[8px] flex items-center px-3 py-2">
             <Search className="w-4 h-4 text-[#8B95A1] mr-2" />
             <input 
@@ -146,6 +185,14 @@ export default function CustomerManagement() {
         <table className="w-full text-left">
           <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
             <tr>
+              <th className="px-6 py-4 w-12">
+                <input 
+                  type="checkbox" 
+                  checked={filteredInquiries.length > 0 && selectedIds.length === filteredInquiries.length}
+                  onChange={toggleSelectAll}
+                  className="w-4 h-4 rounded border-[#E5E8EB] text-[#3182F6] focus:ring-[#3182F6]"
+                />
+              </th>
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">등록일시</th>
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">고객명</th>
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">연락처</th>
@@ -156,7 +203,7 @@ export default function CustomerManagement() {
           <tbody className="divide-y divide-[#E5E8EB]">
             {filteredInquiries.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-20 text-center text-[#8B95A1] text-[14px]">
+                <td colSpan={6} className="px-6 py-20 text-center text-[#8B95A1] text-[14px]">
                   등록된 고객이 없습니다.
                 </td>
               </tr>
@@ -164,9 +211,17 @@ export default function CustomerManagement() {
               filteredInquiries.map(customer => (
                 <tr 
                   key={customer._id} 
-                  className="hover:bg-[#F9FAFB] cursor-pointer transition-colors"
+                  className={`hover:bg-[#F9FAFB] cursor-pointer transition-colors ${selectedIds.includes(customer._id) ? 'bg-[#F2F8FF]' : ''}`}
                   onClick={() => setSelectedCustomer(customer)}
                 >
+                  <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                    <input 
+                      type="checkbox" 
+                      checked={selectedIds.includes(customer._id)}
+                      onChange={(e) => { e.stopPropagation(); toggleSelect(customer._id, e as any); }}
+                      className="w-4 h-4 rounded border-[#E5E8EB] text-[#3182F6] focus:ring-[#3182F6] cursor-pointer"
+                    />
+                  </td>
                   <td className="px-6 py-4 text-[14px] text-[#4E5968]">{formatDate(customer.createdAt)}</td>
                   <td className="px-6 py-4 text-[14px] font-bold text-[#191F28]">{customer.name}</td>
                   <td className="px-6 py-4 text-[14px] text-[#4E5968]">{customer.phone}</td>
