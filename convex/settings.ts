@@ -8,12 +8,12 @@ export const get = query({
       // Default settings
       return {
         statuses: [
-          { name: '신규신청', isUsed: true },
-          { name: '부재중', isUsed: true },
-          { name: '상담완료', isUsed: true },
-          { name: '가입완료', isUsed: true },
-          { name: '보류', isUsed: true },
-          { name: '취소', isUsed: true },
+          { name: '신규신청', isUsed: true, color: '#F2F4F6' },
+          { name: '부재중', isUsed: true, color: '#FFF8E1' },
+          { name: '상담완료', isUsed: true, color: '#E8F3FF' },
+          { name: '가입완료', isUsed: true, color: '#E7F9F3' },
+          { name: '보류', isUsed: true, color: '#F5F0FF' },
+          { name: '취소', isUsed: true, color: '#FFF0F0' },
         ],
         brands: ['삼성전자', 'LG전자', '바디프랜드', '코웨이', '캐리어'],
         categories: ['TV/시청각', '냉장고/김치냉장고', '세탁기/건조기', '안마의자/건강', '기타'],
@@ -35,7 +35,7 @@ export const get = query({
 export const update = mutation({
   args: {
     id: v.optional(v.id("settings")),
-    statuses: v.optional(v.array(v.object({ name: v.string(), isUsed: v.boolean() }))),
+    statuses: v.optional(v.array(v.object({ name: v.string(), isUsed: v.boolean(), color: v.optional(v.string()) }))),
     brands: v.optional(v.array(v.string())),
     categories: v.optional(v.array(v.string())),
     footer: v.optional(v.object({
@@ -64,12 +64,12 @@ export const update = mutation({
       // If none exist, we need to provide defaults for the ones not provided
       const defaults = {
         statuses: [
-          { name: '신규신청', isUsed: true },
-          { name: '부재중', isUsed: true },
-          { name: '상담완료', isUsed: true },
-          { name: '가입완료', isUsed: true },
-          { name: '보류', isUsed: true },
-          { name: '취소', isUsed: true },
+          { name: '신규신청', isUsed: true, color: '#F2F4F6' },
+          { name: '부재중', isUsed: true, color: '#FFF8E1' },
+          { name: '상담완료', isUsed: true, color: '#E8F3FF' },
+          { name: '가입완료', isUsed: true, color: '#E7F9F3' },
+          { name: '보류', isUsed: true, color: '#F5F0FF' },
+          { name: '취소', isUsed: true, color: '#FFF0F0' },
         ],
         brands: ['삼성전자', 'LG전자', '바디프랜드', '코웨이', '캐리어'],
         categories: ['TV/시청각', '냉장고/김치냉장고', '세탁기/건조기', '안마의자/건강', '기타'],
