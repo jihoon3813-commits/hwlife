@@ -150,9 +150,9 @@ export default function Settings() {
   if (!settings) return <div className="p-8">로딩 중...</div>;
 
   return (
-    <div className="p-8 h-full flex flex-col overflow-hidden">
-      <div className="flex justify-between items-center mb-6 shrink-0">
-        <h2 className="text-[24px] font-bold text-[#191F28]">환경설정</h2>
+    <div className="p-4 lg:p-8 h-full flex flex-col overflow-hidden">
+      <div className="flex justify-between items-center mb-4 lg:mb-6 shrink-0">
+        <h2 className="text-[20px] lg:text-[24px] font-bold text-[#191F28]">환경설정</h2>
       </div>
 
       <div className="flex gap-2 border-b border-[#E5E8EB] mb-6 overflow-x-auto no-scrollbar pb-1 shrink-0">
@@ -169,7 +169,7 @@ export default function Settings() {
         ))}
       </div>
 
-      <div className="bg-white rounded-[24px] border border-[#E5E8EB] p-8 max-w-5xl shadow-sm overflow-y-auto no-scrollbar flex-1">
+      <div className="bg-white rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] p-4 lg:p-8 max-w-5xl shadow-sm overflow-y-auto no-scrollbar flex-1">
         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleLogoUpload} />
 
         {activeTab === 'status' && (
@@ -198,40 +198,59 @@ export default function Settings() {
                   onDragEnd={handleDragEnd}
                   onDragOver={handleDragOver}
                   onDrop={() => handleDrop(idx)}
-                  className={`flex items-center gap-4 bg-[#F9FAFB] p-4 rounded-[16px] border ${draggedIndex === idx && dragType === 'status' ? 'opacity-50 border-dashed border-[#3182F6] bg-white' : 'transition-all border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
+                  className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-[#F9FAFB] p-4 rounded-[16px] border ${draggedIndex === idx && dragType === 'status' ? 'opacity-50 border-dashed border-[#3182F6] bg-white' : 'transition-all border-[#E5E8EB] hover:border-[#3182F6]/30'}`}
                 >
-                  <MoveVertical className="w-5 h-5 text-[#D1D6DB] cursor-grab active:cursor-grabbing shrink-0"/>
-                  <input 
-                    type="text" 
-                    value={status.name} 
-                    onChange={(e) => {
-                      const newStatuses = [...localStatuses];
-                      newStatuses[idx] = { ...newStatuses[idx], name: e.target.value };
-                      setLocalStatuses(newStatuses);
-                    }}
-                    onBlur={() => saveSettings({ statuses: localStatuses })}
-                    className="flex-1 bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" 
-                  />
-                  <div className="flex items-center gap-6">
-                    {/* 미리보기 */}
-                    <div className="w-[80px] flex flex-col items-center gap-1">
-                      <span className="text-[10px] text-[#8B95A1] font-bold">미리보기</span>
-                      <span 
-                        className="inline-block text-[11px] font-bold px-3 py-1 rounded-full border border-black/5"
-                        style={{ 
-                          backgroundColor: status.color || '#F2F4F6',
-                          color: getContrastColor(status.color || '#F2F4F6')
+                  <div className="flex items-center gap-4 w-full sm:flex-1">
+                    <MoveVertical className="w-5 h-5 text-[#D1D6DB] cursor-grab active:cursor-grabbing shrink-0"/>
+                    <div className="flex-1 flex flex-col gap-1">
+                      <label className="text-[10px] text-[#8B95A1] font-bold px-1">상태명</label>
+                      <input 
+                        type="text" 
+                        value={status.name} 
+                        onChange={(e) => {
+                          const newStatuses = [...localStatuses];
+                          newStatuses[idx] = { ...newStatuses[idx], name: e.target.value };
+                          setLocalStatuses(newStatuses);
                         }}
-                      >
-                        {status.name || '상태명'}
-                      </span>
+                        onBlur={() => saveSettings({ statuses: localStatuses })}
+                        className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" 
+                      />
                     </div>
+                  </div>
 
-                    {/* 색상 선택기 */}
-                    <div className="flex items-center gap-2 p-1.5 bg-white border border-[#E5E8EB] rounded-[12px] shadow-sm">
-                      <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-[#E5E8EB]">
+                  <div className="flex items-center justify-between w-full sm:w-auto gap-4 sm:gap-6">
+                    <div className="flex items-center gap-4">
+                      {/* 미리보기 */}
+                      <div className="w-[80px] flex flex-col items-center gap-1">
+                        <span className="text-[10px] text-[#8B95A1] font-bold">미리보기</span>
+                        <span 
+                          className="inline-block text-[11px] font-bold px-3 py-1 rounded-full border border-black/5 whitespace-nowrap"
+                          style={{ 
+                            backgroundColor: status.color || '#F2F4F6',
+                            color: getContrastColor(status.color || '#F2F4F6')
+                          }}
+                        >
+                          {status.name || '상태명'}
+                        </span>
+                      </div>
+
+                      {/* 색상 선택기 */}
+                      <div className="flex items-center gap-2 p-1.5 bg-white border border-[#E5E8EB] rounded-[12px] shadow-sm">
+                        <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-[#E5E8EB]">
+                          <input 
+                            type="color" 
+                            value={status.color || '#F2F4F6'}
+                            onChange={(e) => {
+                              const newStatuses = [...localStatuses];
+                              newStatuses[idx] = { ...newStatuses[idx], color: e.target.value };
+                              setLocalStatuses(newStatuses);
+                            }}
+                            onBlur={() => saveSettings({ statuses: localStatuses })}
+                            className="absolute -inset-2 w-[200%] h-[200%] cursor-pointer border-none p-0"
+                          />
+                        </div>
                         <input 
-                          type="color" 
+                          type="text"
                           value={status.color || '#F2F4F6'}
                           onChange={(e) => {
                             const newStatuses = [...localStatuses];
@@ -239,50 +258,39 @@ export default function Settings() {
                             setLocalStatuses(newStatuses);
                           }}
                           onBlur={() => saveSettings({ statuses: localStatuses })}
-                          className="absolute -inset-2 w-[200%] h-[200%] cursor-pointer border-none p-0"
+                          className="w-20 text-[12px] font-bold text-[#4E5968] focus:outline-none uppercase font-mono"
                         />
                       </div>
-                      <input 
-                        type="text"
-                        value={status.color || '#F2F4F6'}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <select 
+                        value={status.isUsed ? 'Y' : 'N'}
                         onChange={(e) => {
                           const newStatuses = [...localStatuses];
-                          newStatuses[idx] = { ...newStatuses[idx], color: e.target.value };
+                          newStatuses[idx] = { ...newStatuses[idx], isUsed: e.target.value === 'Y' };
                           setLocalStatuses(newStatuses);
+                          saveSettings({ statuses: newStatuses });
                         }}
-                        onBlur={() => saveSettings({ statuses: localStatuses })}
-                        className="w-20 text-[12px] font-bold text-[#4E5968] focus:outline-none uppercase font-mono"
-                      />
+                        className="bg-white border border-[#D1D6DB] px-3 py-2 rounded-[10px] text-[13px] font-bold focus:outline-none"
+                      >
+                        <option value="Y">사용</option>
+                        <option value="N">미사용</option>
+                      </select>
+                      <button 
+                        onClick={() => {
+                          if (window.confirm('정말 삭제하시겠습니까?')) {
+                            const newStatuses = localStatuses.filter((_, i) => i !== idx);
+                            setLocalStatuses(newStatuses);
+                            saveSettings({ statuses: newStatuses });
+                          }
+                        }}
+                        className="text-red-500 hover:bg-red-50 p-2 rounded-[8px]"
+                      >
+                        <Trash2 className="w-5 h-5"/>
+                      </button>
                     </div>
                   </div>
-
-                  <div className="w-[100px]">
-                    <select 
-                      value={status.isUsed ? 'Y' : 'N'}
-                      onChange={(e) => {
-                        const newStatuses = [...localStatuses];
-                        newStatuses[idx] = { ...newStatuses[idx], isUsed: e.target.value === 'Y' };
-                        setLocalStatuses(newStatuses);
-                        saveSettings({ statuses: newStatuses });
-                      }}
-                      className="w-full bg-white border border-[#D1D6DB] px-3 py-2 rounded-[10px] text-[13px] font-bold focus:outline-none"
-                    >
-                      <option value="Y">사용함</option>
-                      <option value="N">사용안함</option>
-                    </select>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      if (window.confirm('정말 삭제하시겠습니까?')) {
-                        const newStatuses = localStatuses.filter((_, i) => i !== idx);
-                        setLocalStatuses(newStatuses);
-                        saveSettings({ statuses: newStatuses });
-                      }
-                    }}
-                    className="text-red-500 hover:bg-red-50 p-2 rounded-[8px]"
-                  >
-                    <Trash2 className="w-5 h-5"/>
-                  </button>
                 </div>
               ))}
             </div>
@@ -303,66 +311,67 @@ export default function Settings() {
             
             <div className="space-y-4">
               {competitors.map((comp) => (
-                <div key={comp._id} className="flex items-center gap-4 bg-[#F9FAFB] p-5 rounded-[20px] border border-[#E5E8EB]">
-                  <div className="w-[80px] shrink-0">
-                    <select 
-                      value={comp.type} 
-                      onChange={(e) => updateCompetitor({ id: comp._id, type: e.target.value })}
-                      className={`text-[12px] font-bold px-2.5 py-1 rounded-full focus:outline-none appearance-none cursor-pointer text-center ${comp.type === '자사' ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-200 text-[#4E5968]'}`}
-                    >
-                      <option value="자사">자사</option>
-                      <option value="타사">타사</option>
-                    </select>
-                  </div>
-                  <div className="w-[180px]">
-                    <input 
-                      type="text" 
-                      placeholder="회사명" 
-                      defaultValue={comp.name} 
-                      onBlur={(e) => updateCompetitor({ id: comp._id, name: e.target.value })}
-                      className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" 
-                    />
-                  </div>
-                  <div className="w-[120px] flex items-center gap-2 bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] shrink-0">
-                    <input 
-                      type="number" 
-                      defaultValue={comp.months} 
-                      onBlur={(e) => updateCompetitor({ id: comp._id, months: parseInt(e.target.value) })}
-                      className="w-full text-[14px] font-bold focus:outline-none text-right" 
-                    />
-                    <span className="text-[13px] text-[#8B95A1] whitespace-nowrap">개월</span>
-                  </div>
-                  <div className="flex-1 flex gap-3 items-center">
-                    <div 
-                      onClick={() => triggerUpload(comp._id)}
-                      className="w-12 h-12 bg-white border border-[#D1D6DB] rounded-[10px] flex items-center justify-center cursor-pointer hover:border-[#3182F6] transition-colors overflow-hidden shrink-0"
-                    >
-                      {comp.logo ? (
-                        <img src={comp.logo} className="w-full h-full object-contain" alt="logo" />
-                      ) : (
-                        <ImageIcon className="w-5 h-5 text-[#D1D6DB]" />
-                      )}
+                <div key={comp._id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-[#F9FAFB] p-5 rounded-[20px] border border-[#E5E8EB]">
+                  <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <div className="w-[60px] shrink-0">
+                      <select 
+                        value={comp.type} 
+                        onChange={(e) => updateCompetitor({ id: comp._id, type: e.target.value })}
+                        className={`w-full text-[12px] font-bold px-2 py-1.5 rounded-full focus:outline-none appearance-none cursor-pointer text-center ${comp.type === '자사' ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-200 text-[#4E5968]'}`}
+                      >
+                        <option value="자사">자사</option>
+                        <option value="타사">타사</option>
+                      </select>
                     </div>
-                    <input 
-                      type="text" 
-                      placeholder="로고 URL" 
-                      value={comp.logo || ''} 
-                      readOnly
-                      className="flex-1 bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[13px] text-[#8B95A1] focus:outline-none truncate" 
-                    />
+                    <div className="flex-1 sm:w-[180px]">
+                      <input 
+                        type="text" 
+                        placeholder="회사명" 
+                        defaultValue={comp.name} 
+                        onBlur={(e) => updateCompetitor({ id: comp._id, name: e.target.value })}
+                        className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none" 
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 w-full sm:flex-1">
+                    <div className="w-[100px] flex items-center gap-2 bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] shrink-0">
+                      <input 
+                        type="number" 
+                        defaultValue={comp.months} 
+                        onBlur={(e) => updateCompetitor({ id: comp._id, months: parseInt(e.target.value) })}
+                        className="w-full text-[14px] font-bold focus:outline-none text-right" 
+                      />
+                      <span className="text-[13px] text-[#8B95A1] whitespace-nowrap">M</span>
+                    </div>
+                    
+                    <div className="flex-1 flex gap-2 items-center min-w-0">
+                      <div 
+                        onClick={() => triggerUpload(comp._id)}
+                        className="w-10 h-10 bg-white border border-[#D1D6DB] rounded-[10px] flex items-center justify-center cursor-pointer hover:border-[#3182F6] transition-colors overflow-hidden shrink-0"
+                      >
+                        {comp.logo ? (
+                          <img src={comp.logo} className="w-full h-full object-contain" alt="logo" />
+                        ) : (
+                          <ImageIcon className="w-4 h-4 text-[#D1D6DB]" />
+                        )}
+                      </div>
+                      <input 
+                        type="text" 
+                        placeholder="로고 URL" 
+                        value={comp.logo || ''} 
+                        readOnly
+                        className="flex-1 bg-white border border-[#D1D6DB] px-3 py-2.5 rounded-[10px] text-[12px] text-[#8B95A1] focus:outline-none truncate" 
+                      />
+                    </div>
+
                     <button 
-                      onClick={() => triggerUpload(comp._id)}
-                      className="bg-[#333D4B] text-white px-4 py-2.5 rounded-[10px] text-[12px] font-bold whitespace-nowrap active:bg-[#191F28]"
+                      onClick={() => removeCompetitor({ id: comp._id })}
+                      className="text-red-500 hover:bg-red-50 p-2.5 rounded-[10px]"
                     >
-                      업로드
+                      <Trash2 className="w-5 h-5"/>
                     </button>
                   </div>
-                  <button 
-                    onClick={() => removeCompetitor({ id: comp._id })}
-                    className="text-red-500 hover:bg-red-50 p-2.5 rounded-[10px]"
-                  >
-                    <Trash2 className="w-5 h-5"/>
-                  </button>
                 </div>
               ))}
             </div>
@@ -373,7 +382,7 @@ export default function Settings() {
         )}
 
         {activeTab === 'category' && (
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* 브랜드 설정 */}
             <div>
               <div className="flex justify-between items-center mb-4">

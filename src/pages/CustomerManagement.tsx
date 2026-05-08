@@ -186,36 +186,40 @@ export default function CustomerManagement() {
   );
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-[24px] font-bold">고객관리</h2>
-        <div className="flex gap-2">
-          {selectedIds.length > 0 && (
-            <button 
-              onClick={handleBulkDelete}
-              className="bg-red-50 text-red-500 border border-red-100 hover:bg-red-100 px-4 py-2 rounded-[8px] flex items-center gap-2 text-[14px] font-bold transition-colors"
-            >
-              <Trash2 className="w-4 h-4" /> 선택 삭제 ({selectedIds.length})
-            </button>
-          )}
-          <div className="bg-white border border-[#E5E8EB] rounded-[8px] flex items-center px-3 py-2">
-            <Search className="w-4 h-4 text-[#8B95A1] mr-2" />
-            <input 
-              type="text" 
-              placeholder="고객명, 연락처 검색" 
-              className="text-[14px] focus:outline-none"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+    <div className="p-4 lg:p-8">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+        <h2 className="text-[20px] lg:text-[24px] font-bold">고객관리</h2>
+        <div className="flex flex-col sm:flex-row w-full lg:w-auto gap-2">
+          <div className="flex gap-2">
+            {selectedIds.length > 0 && (
+              <button 
+                onClick={handleBulkDelete}
+                className="flex-1 lg:flex-none bg-red-50 text-red-500 border border-red-100 hover:bg-red-100 px-4 py-2 rounded-[8px] flex items-center justify-center gap-2 text-[14px] font-bold transition-colors"
+              >
+                <Trash2 className="w-4 h-4" /> 삭제 ({selectedIds.length})
+              </button>
+            )}
           </div>
-          <button className="bg-white border border-[#E5E8EB] px-4 py-2 rounded-[8px] flex items-center gap-2 text-[14px] font-medium">
-            <Filter className="w-4 h-4" /> 필터
-          </button>
+          <div className="flex gap-2 w-full lg:w-auto">
+            <div className="flex-1 lg:w-[240px] bg-white border border-[#E5E8EB] rounded-[8px] flex items-center px-3 py-2 shadow-sm">
+              <Search className="w-4 h-4 text-[#8B95A1] mr-2" />
+              <input 
+                type="text" 
+                placeholder="고객명, 연락처 검색" 
+                className="text-[14px] focus:outline-none w-full"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <button className="bg-white border border-[#E5E8EB] px-4 py-2 rounded-[8px] flex items-center gap-2 text-[14px] font-medium shadow-sm shrink-0">
+              <Filter className="w-4 h-4" /> 필터
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-[16px] shadow-sm border border-[#E5E8EB] overflow-hidden">
-        <table className="w-full text-left">
+      <div className="bg-white rounded-[16px] shadow-sm border border-[#E5E8EB] overflow-x-auto hide-scrollbar">
+        <table className="w-full text-left min-w-[800px]">
           <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
             <tr>
               <th className="px-6 py-4 w-12">
@@ -278,8 +282,8 @@ export default function CustomerManagement() {
       </div>
 
       {selectedCustomer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white rounded-[24px] w-full max-w-[800px] max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 lg:p-4">
+          <div className="bg-white lg:rounded-[24px] w-full max-w-[800px] h-full lg:h-auto lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
             <div className="px-6 py-5 border-b border-[#E5E8EB] flex justify-between items-center bg-white z-10 shrink-0">
               <div className="flex items-center gap-3">
                 <h3 className="text-[20px] font-bold">상담 고객 상세정보</h3>
@@ -303,14 +307,14 @@ export default function CustomerManagement() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 bg-[#F9FAFB]">
-              <div className="grid grid-cols-2 gap-6">
+            <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-6 bg-[#F9FAFB] hide-scrollbar">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* 1. 기본 고객 정보 */}
                 <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
                   <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#3182F6]"></span>기본 고객 정보
                   </h4>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                     <div>
                       <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">고객명</label>
                       <input type="text" value={editData.name || ''} onChange={e => setEditData({...editData, name: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
@@ -347,7 +351,7 @@ export default function CustomerManagement() {
                   <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#BE123C]"></span>상담/계약 일정 정보
                   </h4>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                     <div>
                       <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">신규 접수일</label>
                       <input type="date" value={editData.newRegDate || ''} onChange={e => setEditData({...editData, newRegDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
@@ -385,7 +389,7 @@ export default function CustomerManagement() {
                 <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#059669]"></span>신청 상품 정보
                 </h4>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="bg-[#F2F4F6] p-4 rounded-[12px]">
                     <span className="text-[12px] font-bold text-[#8B95A1] mb-1 block">웹사이트 신청/문의 상품</span>
                     <span className="text-[14px] font-bold text-[#191F28]">{selectedCustomer.productName}</span>
@@ -411,7 +415,7 @@ export default function CustomerManagement() {
                 <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#191F28]"></span>상태 변경 및 메모
                 </h4>
-                <div className="flex gap-3">
+                <div className="flex flex-col lg:flex-row gap-3">
                   <select 
                     value={status} 
                     onChange={(e) => setStatus(e.target.value)}
@@ -432,7 +436,7 @@ export default function CustomerManagement() {
                     placeholder="변경 사유 또는 메모를 입력하세요 (선택)" 
                     className="flex-1 bg-[#F9FAFB] border border-[#E5E8EB] px-4 py-2 rounded-[8px] text-[13px] focus:outline-none"
                   />
-                  <button onClick={handleUpdate} className="bg-[#3182F6] text-white px-6 py-2 rounded-[8px] font-bold text-[13px] flex items-center gap-2 hover:bg-[#1B64DA] transition-colors shadow-sm">
+                  <button onClick={handleUpdate} className="w-full lg:w-auto bg-[#3182F6] text-white px-6 py-3 lg:py-2 rounded-[8px] font-bold text-[14px] lg:text-[13px] flex items-center justify-center gap-2 hover:bg-[#1B64DA] transition-colors shadow-sm">
                     <Save className="w-4 h-4" /> 저장
                   </button>
                 </div>

@@ -368,24 +368,24 @@ export default function ProductManagement() {
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-[24px] font-bold text-[#191F28]">제품관리</h2>
-        <div className="text-[14px] text-[#8B95A1]">드래그로 순서 변경, 일괄 복사/삭제가 가능합니다.</div>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+        <h2 className="text-[20px] lg:text-[24px] font-bold text-[#191F28]">제품관리</h2>
+        <div className="text-[13px] text-[#8B95A1] lg:block hidden">드래그로 순서 변경, 일괄 복사/삭제가 가능합니다.</div>
       </div>
 
-      <div className="flex flex-1 gap-6 overflow-hidden min-h-0">
+      <div className="flex flex-1 flex-col lg:flex-row gap-6 overflow-hidden min-h-0">
         {/* Left: Plan List */}
-        <div className="w-[260px] flex flex-col bg-white rounded-[24px] border border-[#E5E8EB] overflow-hidden shadow-sm">
-          <div className="p-5 border-b border-[#F2F4F6] bg-[#F9FAFB] flex justify-between items-center">
+        <div className="w-full lg:w-[260px] flex flex-col bg-white rounded-[24px] border border-[#E5E8EB] overflow-hidden shadow-sm shrink-0">
+          <div className="p-4 lg:p-5 border-b border-[#F2F4F6] bg-[#F9FAFB] flex justify-between items-center">
             <h3 className="font-bold text-[14px] text-[#4E5968]">구좌 선택</h3>
-            <button className="p-1 bg-[#3182F6] text-white rounded-[6px]"><Plus className="w-4 h-4"/></button>
+            <button className="p-1.5 bg-[#3182F6] text-white rounded-[8px]"><Plus className="w-4 h-4"/></button>
           </div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
+          <div className="flex lg:flex-col overflow-x-auto lg:overflow-y-auto p-3 gap-2 no-scrollbar">
             {plans.map(plan => (
               <div 
                 key={plan.id}
                 onClick={() => { setSelectedPlanId(plan.id); setViewMode('list'); setSelectedIds([]); }}
-                className={`p-4 rounded-[16px] cursor-pointer border transition-all ${
+                className={`flex-none lg:w-full p-4 rounded-[16px] cursor-pointer border transition-all whitespace-nowrap lg:whitespace-normal ${
                   selectedPlanId === plan.id ? 'bg-[#3182F6] text-white shadow-md border-[#3182F6]' : 'bg-white border-transparent hover:bg-[#F2F4F6]'
                 }`}
               >
@@ -400,19 +400,19 @@ export default function ProductManagement() {
         <div className="flex-1 flex flex-col bg-white rounded-[24px] border border-[#E5E8EB] overflow-hidden shadow-sm">
           {viewMode === 'list' && selectedPlan ? (
             <>
-              <div className="p-6 border-b border-[#F2F4F6] bg-[#F9FAFB] flex justify-between items-center">
-                <div>
-                  <h3 className="font-bold text-[18px] mb-2">{selectedPlan.name} 리스트</h3>
+              <div className="p-4 lg:p-6 border-b border-[#F2F4F6] bg-[#F9FAFB] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="w-full sm:w-auto">
+                  <h3 className="font-bold text-[16px] lg:text-[18px] mb-2">{selectedPlan.name} 리스트</h3>
                   <div className="flex gap-2">
-                    <button onClick={() => toggleSort('brand')} className={`px-3 py-1.5 border rounded-[8px] text-[12px] font-bold transition-all ${sortConfig.key === 'brand' ? 'bg-[#3182F6] text-white border-[#3182F6]' : 'bg-white text-[#4E5968] border-[#E5E8EB]'}`}>
+                    <button onClick={() => toggleSort('brand')} className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${sortConfig.key === 'brand' ? 'bg-[#3182F6] text-white border-[#3182F6]' : 'bg-white text-[#4E5968] border-[#E5E8EB]'}`}>
                       브랜드 {sortConfig.key === 'brand' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </button>
-                    <button onClick={() => toggleSort('category')} className={`px-3 py-1.5 border rounded-[8px] text-[12px] font-bold transition-all ${sortConfig.key === 'category' ? 'bg-[#3182F6] text-white border-[#3182F6]' : 'bg-white text-[#4E5968] border-[#E5E8EB]'}`}>
+                    <button onClick={() => toggleSort('category')} className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${sortConfig.key === 'category' ? 'bg-[#3182F6] text-white border-[#3182F6]' : 'bg-white text-[#4E5968] border-[#E5E8EB]'}`}>
                       카테고리 {sortConfig.key === 'category' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </button>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                   <input 
                     type="file" 
                     ref={excelInputRef} 
@@ -422,18 +422,18 @@ export default function ProductManagement() {
                   />
                   <button 
                     onClick={downloadTemplate}
-                    className="bg-white border border-[#E5E8EB] text-[#4E5968] px-4 py-2.5 rounded-[12px] text-[14px] font-bold flex items-center gap-2 hover:bg-[#F9FAFB] transition-colors"
+                    className="flex-1 sm:flex-none bg-white border border-[#E5E8EB] text-[#4E5968] px-3 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-2"
                   >
-                    <Download className="w-4 h-4" /> 양식 다운로드
+                    <Download className="w-4 h-4" /> 양식
                   </button>
                   <button 
                     onClick={() => excelInputRef.current?.click()}
-                    className="bg-white border border-[#E5E8EB] text-[#3182F6] px-4 py-2.5 rounded-[12px] text-[14px] font-bold flex items-center gap-2 hover:bg-[#F9FAFB] transition-colors"
+                    className="flex-1 sm:flex-none bg-white border border-[#E5E8EB] text-[#3182F6] px-3 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-2"
                   >
-                    <Upload className="w-4 h-4" /> 엑셀 일괄등록
+                    <Upload className="w-4 h-4" /> 엑셀
                   </button>
-                  <button onClick={handleAddProduct} className="bg-[#3182F6] text-white px-5 py-3 rounded-[12px] font-bold text-[14px] flex items-center gap-2 shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95">
-                    <Plus className="w-4 h-4" /> 신규 제품 등록
+                  <button onClick={handleAddProduct} className="w-full sm:w-auto bg-[#3182F6] text-white px-5 py-3 rounded-[12px] font-bold text-[14px] flex items-center justify-center gap-2">
+                    <Plus className="w-4 h-4" /> 등록
                   </button>
                 </div>
               </div>
@@ -455,8 +455,8 @@ export default function ProductManagement() {
                 <div className="text-[12px] text-[#8B95A1]">목록에서 개별 관리도 가능합니다.</div>
               </div>
 
-              <div className="flex-1 overflow-auto no-scrollbar">
-                <table className="w-full text-left border-collapse">
+              <div className="flex-1 overflow-auto no-scrollbar hide-scrollbar">
+                <table className="w-full text-left border-collapse min-w-[1000px]">
                   <thead className="sticky top-0 bg-[#F9FAFB] border-b border-[#E5E8EB] z-10">
                     <tr>
                       <th className="px-4 py-4 w-12 text-center">
@@ -537,17 +537,17 @@ export default function ProductManagement() {
             </>
           ) : viewMode === 'edit_product' && editingProduct ? (
             <div className="flex flex-col h-full overflow-hidden">
-              <div className="px-8 py-6 border-b border-[#F2F4F6] flex justify-between items-center shrink-0 bg-[#F9FAFB]">
+              <div className="px-4 lg:px-8 py-6 border-b border-[#F2F4F6] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0 bg-[#F9FAFB]">
                 <div>
-                  <h3 className="font-bold text-[20px] mb-1">제품 세부 정보 관리</h3>
-                  <p className="text-[13px] text-[#8B95A1]">제품의 기본 정보와 노출 상태를 설정합니다.</p>
+                  <h3 className="font-bold text-[18px] lg:text-[20px] mb-1">제품 정보 관리</h3>
+                  <p className="text-[12px] lg:text-[13px] text-[#8B95A1]">제품 정보와 노출 상태를 설정합니다.</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                    <button 
                     onClick={() => { toggleVisibility(editingProduct._id, editingProduct.isVisible); setEditingProduct({...editingProduct, isVisible: !editingProduct.isVisible}); }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-[10px] text-[13px] font-bold transition-all ${editingProduct.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-500'}`}
+                    className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2.5 rounded-[10px] text-[12px] font-bold transition-all ${editingProduct.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-500'}`}
                    >
-                     {editingProduct.isVisible ? <><Eye className="w-4 h-4"/> 노출중</> : <><EyeOff className="w-4 h-4"/> 숨김상태</>}
+                     {editingProduct.isVisible ? <><Eye className="w-4 h-4"/> 노출</> : <><EyeOff className="w-4 h-4"/> 숨김</>}
                    </button>
                    <button 
                     onClick={() => { 
@@ -562,23 +562,22 @@ export default function ProductManagement() {
                       toggleMainExposure(editingProduct._id, editingProduct.showOnMain); 
                       setEditingProduct({...editingProduct, showOnMain: nextState}); 
                     }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-[10px] text-[13px] font-bold transition-all ${editingProduct.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-500'}`}
+                    className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2.5 rounded-[10px] text-[12px] font-bold transition-all ${editingProduct.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-500'}`}
                    >
-                     {editingProduct.showOnMain ? <><Star className="w-4 h-4 fill-current"/> 메인 노출중</> : <><Star className="w-4 h-4"/> 메인 미노출</>}
+                     {editingProduct.showOnMain ? <><Star className="w-4 h-4 fill-current"/> 메인</> : <><Star className="w-4 h-4"/> 메인</>}
                    </button>
                    <button 
                     onClick={() => { deleteProduct(editingProduct._id); setViewMode('list'); }}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-500 rounded-[10px] text-[13px] font-bold"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2.5 bg-red-50 text-red-500 rounded-[10px] text-[12px] font-bold"
                    >
                      <Trash2 className="w-4 h-4"/> 삭제
                    </button>
-                   <div className="w-4"></div>
-                   <button onClick={() => setViewMode('list')} className="text-[#8B95A1] font-bold text-[14px] hover:text-[#191F28]">닫기</button>
+                   <button onClick={() => setViewMode('list')} className="flex-1 sm:flex-none bg-[#F2F4F6] text-[#4E5968] font-bold text-[12px] px-3 py-2.5 rounded-[10px]">닫기</button>
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
                 <div className="max-w-3xl space-y-8 pb-10">
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">브랜드</label>
                       <select value={editingProduct.brand} onChange={(e) => setEditingProduct({...editingProduct, brand: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold">
@@ -710,7 +709,7 @@ export default function ProductManagement() {
                           </button>
                         </div>
                       </div>
-                      <div className="grid grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {(editingProduct.images || []).map((img: string, idx: number) => (
                           <div key={idx} className="aspect-square bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] overflow-hidden relative group">
                             <img src={img} className="w-full h-full object-cover" />
@@ -752,7 +751,7 @@ export default function ProductManagement() {
                           </button>
                         </div>
                       </div>
-                      <div className="grid grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {(editingProduct.detailImages || []).map((img: string, idx: number) => (
                           <div key={idx} className="aspect-square bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] overflow-hidden relative group">
                             <img src={img} className="w-full h-full object-cover" />
