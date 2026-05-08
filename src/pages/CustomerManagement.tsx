@@ -47,9 +47,22 @@ export default function CustomerManagement() {
     }
     new (window as any).daum.Postcode({
       oncomplete: function(data: any) {
+        let fullAddr = data.roadAddress || data.jibunAddress;
+        let extraAddr = '';
+
+        if (data.addressType === 'R') {
+          if (data.bname !== '') {
+            extraAddr += data.bname;
+          }
+          if (data.buildingName !== '') {
+            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+          }
+          fullAddr += (extraAddr !== '' ? ' (' + extraAddr + ')' : '');
+        }
+
         setEditData((prev: any) => ({
           ...prev,
-          address: data.roadAddress || data.jibunAddress
+          address: fullAddr
         }));
       }
     }).open();
