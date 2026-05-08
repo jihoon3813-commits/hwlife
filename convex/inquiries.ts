@@ -67,3 +67,43 @@ export const list = query({
     return await ctx.db.query("inquiries").order("desc").collect();
   },
 });
+
+export const update = mutation({
+  args: {
+    id: v.id("inquiries"),
+    name: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    status: v.optional(v.string()),
+    gender: v.optional(v.string()),
+    birth: v.optional(v.string()),
+    address: v.optional(v.string()),
+    detailAddress: v.optional(v.string()),
+    newRegDate: v.optional(v.string()),
+    sangjoContractDate: v.optional(v.string()),
+    rentalContractDate: v.optional(v.string()),
+    cancelDate: v.optional(v.string()),
+    terminationDate: v.optional(v.string()),
+    deliveryDate: v.optional(v.string()),
+    note: v.optional(v.string()),
+    account: v.optional(v.string()),
+    appliance: v.optional(v.string()),
+    memoHistory: v.optional(v.array(
+      v.object({
+        date: v.string(),
+        status: v.string(),
+        memo: v.string()
+      })
+    )),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    await ctx.db.patch(id, updates);
+  },
+});
+
+export const remove = mutation({
+  args: { id: v.id("inquiries") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+  },
+});

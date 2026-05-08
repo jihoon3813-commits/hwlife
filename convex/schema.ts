@@ -37,6 +37,34 @@ export default defineSchema({
     message: v.optional(v.string()),
     status: v.string(), // "대기", "상담완료", "거절"
     createdAt: v.number(),
+    
+    // Additional Detail Fields
+    gender: v.optional(v.string()),
+    birth: v.optional(v.string()),
+    address: v.optional(v.string()),
+    detailAddress: v.optional(v.string()),
+    
+    // Schedule Fields
+    newRegDate: v.optional(v.string()),
+    sangjoContractDate: v.optional(v.string()),
+    rentalContractDate: v.optional(v.string()),
+    cancelDate: v.optional(v.string()),
+    terminationDate: v.optional(v.string()),
+    deliveryDate: v.optional(v.string()),
+    note: v.optional(v.string()),
+    
+    // Product Details
+    account: v.optional(v.string()),
+    appliance: v.optional(v.string()),
+    
+    // History
+    memoHistory: v.optional(v.array(
+      v.object({
+        date: v.string(),
+        status: v.string(),
+        memo: v.string()
+      })
+    )),
   }),
   shorts: defineTable({
     title: v.string(),
