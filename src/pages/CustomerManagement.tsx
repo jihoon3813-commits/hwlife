@@ -32,7 +32,7 @@ export default function CustomerManagement() {
     if (selectedCustomer) {
       setEditData({
         ...selectedCustomer,
-        newRegDate: selectedCustomer.newRegDate || new Date(selectedCustomer.createdAt).toISOString().split('T')[0],
+        newRegDate: selectedCustomer.newRegDate || new Date(selectedCustomer.createdAt + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
         account: selectedCustomer.account || selectedCustomer.productName
       });
       setStatus(selectedCustomer.status);
@@ -78,7 +78,7 @@ export default function CustomerManagement() {
       
       if (memo.trim()) {
         const newHistory = {
-          date: new Date().toISOString().split('T')[0],
+          date: new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
           status,
           memo: memo.trim()
         };
@@ -164,6 +164,7 @@ export default function CustomerManagement() {
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString('ko-KR', {
+      timeZone: 'Asia/Seoul',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',

@@ -23,9 +23,14 @@ export const getDashboardStats = query({
   handler: async (ctx, args) => {
     const period = args.period || "today";
     const now = Date.now();
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayStartTime = todayStart.getTime();
+    
+    // 대한민국 시간(KST, UTC+9) 기준으로 오늘 시작 시간 계산
+    const KST_OFFSET = 9 * 60 * 60 * 1000;
+    const kstNow = new Date(now + KST_OFFSET);
+    const todayStart = new Date(now + KST_OFFSET);
+    todayStart.setUTCHours(0, 0, 0, 0);
+    const todayStartTime = todayStart.getTime() - KST_OFFSET; // 다시 UTC 타임스탬프로 변환하여 쿼리에 사용
+
 
     let currentStartTime = todayStartTime;
     let previousStartTime = todayStartTime - 24 * 60 * 60 * 1000;
@@ -95,7 +100,7 @@ export const getDashboardStats = query({
         ipLogsMap.set(v.ip, {
           ip: v.ip,
           count: (existing?.count || 0) + 1,
-          lastVisit: new Date(v.timestamp).toLocaleString('ko-KR'),
+          lastVisit: new Date(v.timestamp).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
           timestamp: v.timestamp
         });
       } else {
@@ -120,8 +125,11 @@ export const getDashboardStats = query({
       
       const dayInquiries = allInquiries.filter(inq => inq.createdAt >= start && inq.createdAt < end);
       
+      // KST 날짜 문자열 생성
+      const kstDateStr = new Date(start + KST_OFFSET).toISOString().split('T')[0];
+      
       dailyStats.push({
-        date: d.toISOString().split('T')[0],
+        date: kstDateStr,
         uv: new Set(dayVisits.map(v => v.ip)).size,
         pv: dayVisits.length,
         applies: dayInquiries.length

@@ -47,7 +47,7 @@ export const sendDiscordNotification = internalAction({
           { name: "📦 신청 상품", value: args.productName },
           { name: "💬 문의 내용", value: args.message || "내용 없음" },
         ],
-        footer: { text: "효원결합 상담 관리 시스템" },
+        footer: { text: `효원결합 상담 관리 시스템 | 접수시간: ${new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().replace('T', ' ').slice(0, 19)} (KST)` },
         timestamp: new Date().toISOString(),
       }]
     };
