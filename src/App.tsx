@@ -366,7 +366,7 @@ export default function App() {
       </section>
 
       {/* 2-1. Shorts Trust Section */}
-      <section className="py-12 px-0 bg-[#F2F4F6]">
+      <section id="video-shorts" className="py-12 px-0 bg-[#F2F4F6]">
         <div className="px-6 mb-5">
           <h2 className="text-[22px] font-bold mb-2">무엇이 다른지,<br/>영상으로 먼저 확인하세요</h2>
           <p className="text-[#4E5968] text-[15px]">우측으로 넘겨가며 순서대로 시청해보세요</p>
@@ -940,7 +940,7 @@ export default function App() {
       </section>
 
       {/* 7. Step-by-Step Process - Infographic Version */}
-      <section className="bg-[#F8FAFB] py-16 px-6 rounded-[40px] my-4 shadow-sm border border-[#F2F4F6]">
+      <section id="step-process" className="bg-[#F8FAFB] py-16 px-6 rounded-[40px] my-4 shadow-sm border border-[#F2F4F6]">
         <div className="text-center mb-12">
           <h2 className="text-[24px] font-bold mb-3 leading-tight text-[#191F28] break-keep">
             가입부터 선택까지,<br/>이렇게 진행됩니다
@@ -1115,7 +1115,7 @@ export default function App() {
       </section>
 
       {/* 10. FAQ */}
-      <section className="bg-white py-12 px-6 rounded-[32px] my-2">
+      <section id="faq" className="bg-white py-12 px-6 rounded-[32px] my-2">
          <h2 className="text-[22px] font-bold mb-6">자주 묻는 질문</h2>
          <div className="space-y-4">
            {[{
