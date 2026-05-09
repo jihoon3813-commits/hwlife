@@ -98,10 +98,21 @@ export default function App() {
   const openFullView = () => {
     setIsProductFullView(true);
     window.history.pushState({ view: 'full' }, '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const closeFullView = () => {
+    setIsProductFullView(false);
     window.history.back();
+  };
+
+  // Google Ads Conversion Tracking
+  const trackConversion = () => {
+    if (typeof (window as any).gtag === 'function') {
+      (window as any).gtag('event', 'conversion', {
+        'send_to': 'AW-17813552218/4FFtCl-9i4ocENr4lK5C'
+      });
+    }
   };
 
   const openProductDetail = (item: any) => {
@@ -1169,6 +1180,10 @@ export default function App() {
                 productName: "랜딩 하단 상담",
                 message: finalMessage || undefined
               });
+              
+              // Google Ads Conversion Tracking
+              trackConversion();
+              
               alert('상담 신청이 접수되었습니다.');
               setName('');
               setPhone('');
@@ -1671,6 +1686,10 @@ export default function App() {
                       productName: inquiryProduct ? inquiryProduct.name : "전체 상담",
                       message: finalMessage || undefined
                     });
+                    
+                    // Google Ads Conversion Tracking
+                    trackConversion();
+                    
                     alert('상담 신청이 접수되었습니다.');
                     setName('');
                     setPhone('');
