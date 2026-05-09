@@ -100,7 +100,7 @@ export const getDashboardStats = query({
         ipLogsMap.set(v.ip, {
           ip: v.ip,
           count: (existing?.count || 0) + 1,
-          lastVisit: new Date(v.timestamp).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+          lastVisit: new Date(v.timestamp + 9 * 60 * 60 * 1000).toISOString().replace('T', ' ').split('.')[0].substring(5), // "MM-DD HH:mm:ss"
           timestamp: v.timestamp
         });
       } else {
@@ -109,7 +109,11 @@ export const getDashboardStats = query({
     });
     const ipLogs = Array.from(ipLogsMap.values())
       .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, 20);
+      .slice(0, 20)
+      .map(log => ({
+        ...log,
+        lastVisit: log.lastVisit // It's already formatted
+      }));
 
     // Daily Stats for last 7 days (Always show 7 days)
     const dailyStats = [];

@@ -138,7 +138,7 @@ export default function Statistics() {
                     <td className="px-4 py-3 text-center">
                       <span className="text-[12px] font-bold text-[#3182F6] bg-[#E8F3FF] px-2 py-0.5 rounded-md">{log.count}회</span>
                     </td>
-                    <td className="px-4 py-3 text-[12px] text-[#8B95A1] text-right font-medium">{log.lastVisit.split(' ').slice(1).join(' ')}</td>
+                    <td className="px-4 py-3 text-[12px] text-[#8B95A1] text-right font-medium">{log.lastVisit}</td>
                   </tr>
                 )) : (
                   <tr>
