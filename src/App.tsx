@@ -260,7 +260,7 @@ export default function App() {
           </p>
 
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777896370/Generated_Image_May_04_2026_-_9_04PM_l3o3ph.jpg" 
+            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png" 
             alt="프리미엄 가전 결합 서비스" 
             className="w-full aspect-[4/3] object-cover rounded-2xl mb-8 shadow-lg"
           />
@@ -514,7 +514,7 @@ export default function App() {
           <p className="text-[#4E5968] text-[15px]">{planInfo.desc}</p>
           <div className="mt-6 rounded-[24px] overflow-hidden shadow-sm border border-[#F2F4F6]">
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777964857/Generated_Image_May_05_2026_-_4_01PM_cwwwlq.jpg" 
+              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_medium_shot_of_a_focused_South_Ko-1778416293447_fw1ng1.png" 
               alt="가격비교 혜택" 
               className="w-full h-auto"
             />
@@ -834,7 +834,7 @@ export default function App() {
         </p>
         <div className="mb-10 rounded-[24px] overflow-hidden shadow-sm border border-[#F2F4F6]">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777964960/Generated_Image_May_05_2026_-_4_07PM_op1mfs.jpg" 
+            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_wide-angle_shot_of_a_newly_moved--1778416711833_yxp1ym.png" 
             alt="효원 차별화" 
             className="w-full h-auto"
           />

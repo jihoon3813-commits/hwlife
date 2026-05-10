@@ -97,10 +97,21 @@ export const getDashboardStats = query({
     currentVisits.forEach(v => {
       const existing = ipLogsMap.get(v.ip);
       if (!existing || v.timestamp > existing.timestamp) {
+        const date = new Date(v.timestamp + 9 * 60 * 60 * 1000);
+        const y = date.getUTCFullYear();
+        const m = date.getUTCMonth() + 1;
+        const d = date.getUTCDate();
+        const h = date.getUTCHours();
+        const ampm = h >= 12 ? '오후' : '오전';
+        const h12 = h % 12 || 12;
+        const min = String(date.getUTCMinutes()).padStart(2, '0');
+        const s = String(date.getUTCSeconds()).padStart(2, '0');
+        const kstString = `${y}. ${m}. ${d}. ${ampm} ${h12}:${min}:${s}`;
+
         ipLogsMap.set(v.ip, {
           ip: v.ip,
           count: (existing?.count || 0) + 1,
-          lastVisit: new Date(v.timestamp + 9 * 60 * 60 * 1000).toISOString().replace('T', ' ').split('.')[0].substring(5), // "MM-DD HH:mm:ss"
+          lastVisit: kstString,
           timestamp: v.timestamp
         });
       } else {

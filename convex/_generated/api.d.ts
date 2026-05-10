@@ -15,6 +15,7 @@ import type * as products from "../products.js";
 import type * as settings from "../settings.js";
 import type * as shorts from "../shorts.js";
 import type * as stats from "../stats.js";
+import type * as test from "../test.js";
 
 import type {
   ApiFromModules,
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   settings: typeof settings;
   shorts: typeof shorts;
   stats: typeof stats;
+  test: typeof test;
 }>;
 
 /**
