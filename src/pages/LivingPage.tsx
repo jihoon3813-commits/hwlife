@@ -210,7 +210,7 @@ export default function LivingPage() {
           {/* 카드 2 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-5 flex flex-col items-center text-center">
             <div className="w-24 h-24 rounded-full bg-white mb-4 overflow-hidden shadow-lg">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480378/DSfs_ao0lji.png" alt="포인트 보너스" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480574/%ED%8F%AC%EC%9D%B8%ED%8A%B8_tj8ujg.png" alt="포인트 보너스" className="w-full h-full object-cover" />
             </div>
             <span className="text-[11px] font-bold text-[#FFAB00] mb-1">가입 축하 혜택 2</span>
             <h4 className="text-[14px] font-bold text-white break-keep">프리미엄몰 특별 보너스 증정</h4>
