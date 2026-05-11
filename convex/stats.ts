@@ -21,6 +21,7 @@ export const getDashboardStats = query({
   args: {
     period: v.optional(v.string()), // "today", "week", "month"
     channelId: v.optional(v.string()),
+    channelIds: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const period = args.period || "today";
@@ -48,21 +49,32 @@ export const getDashboardStats = query({
       previousEndTime = currentStartTime;
     }
 
+    const filterByChannels = (q: any) => {
+        if (args.channelIds && args.channelIds.length > 0) {
+            return q.or(...args.channelIds.map(id => q.eq(q.field("channelId"), id)));
+        }
+        if (args.channelId) {
+            return q.eq(q.field("channelId"), args.channelId);
+        }
+        return q;
+    };
+
     // Current period stats
     let currentVisitsQuery = ctx.db
       .query("visits")
       .withIndex("by_timestamp", (q) => q.gte("timestamp", currentStartTime));
     
-    if (args.channelId) {
-        currentVisitsQuery = currentVisitsQuery.filter((q) => q.eq(q.field("channelId"), args.channelId));
+    if (args.channelIds || args.channelId) {
+        currentVisitsQuery = currentVisitsQuery.filter(filterByChannels);
     }
     const currentVisits = await currentVisitsQuery.collect();
 
     let inquiriesQuery = ctx.db.query("inquiries");
-    if (args.channelId) {
-        inquiriesQuery = inquiriesQuery.filter((q) => q.eq(q.field("channelId"), args.channelId));
+    if (args.channelIds || args.channelId) {
+        inquiriesQuery = inquiriesQuery.filter(filterByChannels);
     }
     const allInquiries = await inquiriesQuery.collect();
+
     
     const currentInquiriesFiltered = allInquiries.filter(i => i.createdAt >= currentStartTime);
 
@@ -71,9 +83,10 @@ export const getDashboardStats = query({
       .query("visits")
       .withIndex("by_timestamp", (q) => q.gte("timestamp", previousStartTime).lt("timestamp", previousEndTime));
     
-    if (args.channelId) {
-        previousVisitsQuery = previousVisitsQuery.filter((q) => q.eq(q.field("channelId"), args.channelId));
+    if (args.channelIds || args.channelId) {
+        previousVisitsQuery = previousVisitsQuery.filter(filterByChannels);
     }
+
     const previousVisits = await previousVisitsQuery.collect();
 
     const previousInquiriesFiltered = allInquiries.filter(i => i.createdAt >= previousStartTime && i.createdAt < previousEndTime);
@@ -149,9 +162,10 @@ export const getDashboardStats = query({
         .query("visits")
         .withIndex("by_timestamp", (q) => q.gte("timestamp", start).lt("timestamp", end));
       
-      if (args.channelId) {
-        dayVisitsQuery = dayVisitsQuery.filter((q) => q.eq(q.field("channelId"), args.channelId));
+      if (args.channelIds || args.channelId) {
+        dayVisitsQuery = dayVisitsQuery.filter(filterByChannels);
       }
+
       const dayVisits = await dayVisitsQuery.collect();
       
       const dayInquiries = allInquiries.filter(inq => inq.createdAt >= start && inq.createdAt < end);

@@ -76,18 +76,38 @@ export const sendDiscordNotification = internalAction({
 
 // Admin: Get all inquiries with optional channel filter
 export const list = query({
-  args: { channelId: v.optional(v.string()) },
+  args: { 
+    channelId: v.optional(v.string()),
+    channelIds: v.optional(v.array(v.string())),
+  },
   handler: async (ctx, args) => {
+    let query = ctx.db.query("inquiries").order("desc");
+
+    if (args.channelIds && args.channelIds.length > 0) {
+        // If multiple IDs provided (Parent-Child hierarchy)
+        const allInquiries = await query.collect();
+        return allInquiries.filter(i => args.channelIds!.includes(i.channelId || '본사'));
+    }
+
     if (args.channelId) {
-        return await ctx.db
-            .query("inquiries")
+        if (args.channelId === 'default' || args.channelId === '본사') {
+            return await query
+                .filter((q) => q.or(
+                    q.eq(q.field("channelId"), undefined),
+                    q.eq(q.field("channelId"), "본사"),
+                    q.eq(q.field("channelId"), "default")
+                ))
+                .collect();
+        }
+        return await query
             .filter((q) => q.eq(q.field("channelId"), args.channelId))
-            .order("desc")
             .collect();
     }
-    return await ctx.db.query("inquiries").order("desc").collect();
+    
+    return await query.collect();
   },
 });
+
 
 export const update = mutation({
   args: {
@@ -100,11 +120,16 @@ export const update = mutation({
     address: v.optional(v.string()),
     detailAddress: v.optional(v.string()),
     newRegDate: v.optional(v.string()),
+    cardPaymentDate: v.optional(v.string()),
+    purchaseConsentDate: v.optional(v.string()),
     sangjoContractDate: v.optional(v.string()),
     rentalContractDate: v.optional(v.string()),
     cancelDate: v.optional(v.string()),
     terminationDate: v.optional(v.string()),
     deliveryDate: v.optional(v.string()),
+    consentStatus: v.optional(v.string()),
+    consentFileUrl: v.optional(v.string()),
+    consentSentDate: v.optional(v.string()),
     note: v.optional(v.string()),
     account: v.optional(v.string()),
     appliance: v.optional(v.string()),

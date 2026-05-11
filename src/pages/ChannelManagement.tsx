@@ -8,24 +8,30 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
   const createChannel = useMutation(api.channels.create);
   const updateChannel = useMutation(api.channels.update);
   const removeChannel = useMutation(api.channels.remove);
+  const landings = useQuery(api.landings.get) || [];
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   const initialFormState = {
     _id: '',
     accountId: '',
     password: '',
-    confirmPassword: '',
     subdomain: '',
+
     status: '승인대기',
     channelName: '',
     managerName: '',
     managerContact: '',
+    landingPage: '',
+    landingPages: [] as string[],
+    parentChannelId: '',
   };
+
+
 
   const [formData, setFormData] = useState(initialFormState);
 
@@ -50,36 +56,29 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
     setIsEditing(false);
     setFormData(initialFormState);
     setShowPassword(false);
-    setShowConfirmPassword(false);
     setIsModalOpen(true);
+
   };
 
   const openEditModal = (channel: any) => {
     setIsEditing(true);
     setFormData({
       ...channel,
-      password: '', // editing does not require fetching the old password into the field usually, or we can keep it blank to signify no change
-      confirmPassword: '',
+      password: '',
+
+      landingPages: channel.landingPages || (channel.landingPage ? [channel.landingPage] : []),
     });
+
     setShowPassword(false);
-    setShowConfirmPassword(false);
     setIsModalOpen(true);
+
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isEditing && formData.password !== formData.confirmPassword) {
-      alert('비밀번호가 일치하지 않습니다.');
-      return;
-    }
-
-    if (isEditing && formData.password && formData.password !== formData.confirmPassword) {
-      alert('비밀번호가 일치하지 않습니다.');
-      return;
-    }
-
     try {
+
       if (isEditing) {
         const updates: any = {
           id: formData._id as any,
@@ -88,7 +87,12 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
           channelName: formData.channelName,
           managerName: formData.managerName,
           managerContact: formData.managerContact,
+          landingPage: formData.landingPage,
+          landingPages: formData.landingPages,
+          parentChannelId: formData.parentChannelId || undefined,
         };
+
+
         if (formData.password) {
           updates.password = formData.password;
         }
@@ -102,7 +106,12 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
           channelName: formData.channelName,
           managerName: formData.managerName,
           managerContact: formData.managerContact,
+          landingPage: formData.landingPage,
+          landingPages: formData.landingPages,
+          parentChannelId: formData.parentChannelId || undefined,
         });
+
+
       }
       setIsModalOpen(false);
     } catch (error: any) {
@@ -161,7 +170,9 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">채널명</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">담당자</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">연락처</th>
+                <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">상위 채널</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">상태</th>
+
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1] text-center">관리</th>
               </tr>
             </thead>
@@ -177,7 +188,13 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                     <td className="py-4 px-6 text-[14px] font-bold text-[#191F28]">{channel.channelName}</td>
                     <td className="py-4 px-6 text-[14px] font-medium text-[#191F28]">{channel.managerName}</td>
                     <td className="py-4 px-6 text-[14px] text-[#4E5968]">{channel.managerContact}</td>
+                    <td className="py-4 px-6 text-[13px] text-[#8B95A1]">
+                      {channel.parentChannelId ? (
+                        <span className="font-medium text-[#191F28]">{channels.find(c => c.subdomain === channel.parentChannelId)?.channelName || channel.parentChannelId}</span>
+                      ) : '-'}
+                    </td>
                     <td className="py-4 px-6">
+
                       <span className={`inline-flex px-2.5 py-1 rounded-full text-[12px] font-bold ${
                         channel.status === '정상' ? 'bg-[#E8F3FF] text-[#1B64DA]' :
                         channel.status === '승인대기' ? 'bg-[#FFF3E1] text-[#F9A825]' :
@@ -233,6 +250,7 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                     disabled={isEditing}
                     value={formData.accountId}
                     onChange={(e) => setFormData({...formData, accountId: e.target.value})}
+                    autoComplete="off"
                     className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 disabled:opacity-60 disabled:cursor-not-allowed" 
                     placeholder="채널 아이디 입력" 
                   />
@@ -249,9 +267,11 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                       required={!isEditing}
                       value={formData.password}
                       onChange={(e) => setFormData({...formData, password: e.target.value})}
+                      autoComplete="new-password"
                       className="w-full bg-[#F2F4F6] pl-5 pr-12 py-3.5 rounded-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20" 
                       placeholder="비밀번호 입력" 
                     />
+
                     <button 
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -262,29 +282,7 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                   </div>
                 </div>
 
-                {/* Confirm Password */}
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">
-                    비밀번호 확인 {isEditing && !formData.password ? '' : <span className="text-[#F04452]">*</span>}
-                  </label>
-                  <div className="relative">
-                    <input 
-                      type={showConfirmPassword ? "text" : "password"}
-                      required={!isEditing || !!formData.password}
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                      className="w-full bg-[#F2F4F6] pl-5 pr-12 py-3.5 rounded-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20" 
-                      placeholder="비밀번호 재입력" 
-                    />
-                    <button 
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B95A1] hover:text-[#4E5968]"
-                    >
-                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </div>
+
 
                 {/* Subdomain */}
                 <div>
@@ -345,6 +343,70 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                   </div>
                 </div>
 
+                {/* Landing Page Selection (Multiple) */}
+                <div>
+                  <label className="block text-[13px] font-bold text-[#4E5968] mb-3 px-1">적용 랜딩페이지 (복수 선택)</label>
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto p-4 bg-[#F2F4F6] rounded-[16px]">
+                    <label className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors group">
+                      <input 
+                        type="checkbox"
+                        checked={formData.landingPages.includes('/') || formData.landingPage === '/'}
+                        onChange={(e) => {
+                          const val = '/';
+                          const current = formData.landingPages;
+                          setFormData({
+                            ...formData,
+                            landingPages: e.target.checked ? [...current, val] : current.filter(v => v !== val)
+                          });
+                        }}
+                        className="w-5 h-5 rounded border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6]"
+                      />
+                      <span className="text-[14px] font-medium text-[#191F28]">메인 페이지 (/)</span>
+                    </label>
+                    {landings.filter(l => l.isActive && l.path !== '/').map(landing => (
+                      <label key={landing._id} className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors group">
+                        <input 
+                          type="checkbox"
+                          checked={formData.landingPages.includes(landing.path) || formData.landingPage === landing.path}
+                          onChange={(e) => {
+                            const val = landing.path;
+                            const current = formData.landingPages;
+                            setFormData({
+                              ...formData,
+                              landingPages: e.target.checked ? [...current, val] : current.filter(v => v !== val)
+                            });
+                          }}
+                          className="w-5 h-5 rounded border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6]"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-[14px] font-medium text-[#191F28]">{landing.name}</span>
+                          <span className="text-[11px] text-[#8B95A1]">{landing.path}</span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+
+                {/* Parent Channel Selection */}
+                <div>
+                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">상위 채널 (선택 사항)</label>
+                  <select 
+                    value={formData.parentChannelId}
+                    onChange={(e) => setFormData({...formData, parentChannelId: e.target.value})}
+                    className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 appearance-none cursor-pointer"
+                  >
+                    <option value="">없음 (최상위 채널)</option>
+                    {channels
+                      .filter(c => c.status === '정상' && c._id !== formData._id)
+                      .map(channel => (
+                        <option key={channel._id} value={channel.subdomain}>
+                          {channel.channelName} ({channel.subdomain})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
                 {/* Status */}
                 <div>
                   <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">파트너 상태 <span className="text-[#F04452]">*</span></label>
@@ -368,6 +430,7 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                     ))}
                   </div>
                 </div>
+
               </div>
 
               <div className="mt-8 flex gap-3">

@@ -4,10 +4,11 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import VideoManagement from '../components/VideoManagement';
 
-export default function Settings() {
-  const [activeTab, setActiveTab] = useState('status'); // status, competitor, category, admin, footer
+export default function Settings({ user }: { user?: any }) {
+  const [activeTab, setActiveTab] = useState(user?.type === 'channel' ? 'admin' : 'status'); // status, competitor, category, admin, footer
   
-  const competitors = useQuery(api.competitors.get) || [];
+  const userType = user?.type || 'admin';
+  const updateChannel = useMutation(api.channels.update);
   const createCompetitor = useMutation(api.competitors.create);
   const updateCompetitor = useMutation(api.competitors.update);
   const removeCompetitor = useMutation(api.competitors.remove);
@@ -41,10 +42,16 @@ export default function Settings() {
     { id: 'category', label: '브랜드/카테고리 설정' },
     { id: 'video', label: '랜딩 영상 관리' },
     { id: 'footer', label: '푸터 정보 설정' },
-    { id: 'admin', label: '관리자 계정 설정' },
-  ];
+    { id: 'admin', label: '계정 설정' },
+  ].filter(tab => {
+    if (userType === 'channel') {
+      return tab.id === 'admin';
+    }
+    return true;
+  });
 
   const generateUploadUrl = useMutation(api.images.generateUploadUrl);
+// ... existing code ...
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -578,27 +585,89 @@ export default function Settings() {
         )}
 
         {activeTab === 'admin' && (
-          <div>
-            <h3 className="text-[18px] font-bold mb-6">관리자 계정 비밀번호 변경</h3>
-            <div className="space-y-4 max-w-sm">
-              <div>
-                <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">현재 비밀번호</label>
-                <input type="password" placeholder="현재 비밀번호 입력" className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" />
-              </div>
-              <div>
-                <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">새 비밀번호</label>
-                <input type="password" placeholder="새 비밀번호 입력" className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" />
-              </div>
-              <div>
-                <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">새 비밀번호 확인</label>
-                <input type="password" placeholder="새 비밀번호 다시 입력" className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" />
-              </div>
-            </div>
-            <div className="mt-8 pt-8 border-t border-[#F2F4F6] flex justify-center">
-              <button className="bg-[#3182F6] text-white px-10 py-3.5 rounded-[16px] font-bold shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95">비밀번호 변경</button>
-            </div>
-          </div>
+          <AdminAccountSettings user={user} updateChannel={updateChannel} />
         )}
+      </div>
+    </div>
+  );
+}
+
+function AdminAccountSettings({ user, updateChannel }: { user: any, updateChannel: any }) {
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // For channel users, we need their full info to update
+  const channelData = useQuery(api.channels.getBySubdomain, { subdomain: user?.subdomain || '' });
+
+  const handlePasswordChange = async () => {
+    if (user.type !== 'channel') {
+      alert('마스터 관리자 비밀번호 변경은 현재 코드에서 관리됩니다.');
+      return;
+    }
+    if (!newPassword) {
+      alert('새 비밀번호를 입력해주세요.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    if (!channelData) {
+      alert('채널 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    try {
+      await updateChannel({
+        id: channelData._id,
+        password: newPassword,
+        subdomain: channelData.subdomain,
+        status: channelData.status,
+        channelName: channelData.channelName,
+        managerName: channelData.managerName,
+        managerContact: channelData.managerContact,
+        landingPage: channelData.landingPage,
+      });
+      alert('비밀번호가 성공적으로 변경되었습니다.');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      alert('비밀번호 변경 중 오류가 발생했습니다.');
+    }
+  };
+
+  return (
+    <div>
+      <h3 className="text-[18px] font-bold mb-6">계정 비밀번호 변경</h3>
+      <div className="space-y-4 max-w-sm">
+        <div>
+          <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">새 비밀번호</label>
+          <input 
+            type="password" 
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="새 비밀번호 입력" 
+            className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" 
+          />
+        </div>
+        <div>
+          <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">새 비밀번호 확인</label>
+          <input 
+            type="password" 
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="새 비밀번호 다시 입력" 
+            className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" 
+          />
+        </div>
+      </div>
+      <div className="mt-8 pt-8 border-t border-[#F2F4F6] flex justify-center">
+        <button 
+          onClick={handlePasswordChange}
+          className="bg-[#3182F6] text-white px-10 py-3.5 rounded-[16px] font-bold shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95"
+        >
+          비밀번호 변경
+        </button>
       </div>
     </div>
   );

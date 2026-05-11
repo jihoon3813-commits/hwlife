@@ -12,11 +12,25 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   
   // Local state for editing details
   const [editData, setEditData] = useState<any>({});
+  const [selectedChannelId, setSelectedChannelId] = useState<string>('all');
+
   
   const settings = useQuery(api.settings.get);
-  const inquiries = useQuery(api.inquiries.list, { channelId });
+  const channels = useQuery(api.channels.get);
+  
+  const subChannelIds = useQuery(api.channels.getSubChannelIds, 
+    channelId ? { subdomain: channelId } : 'skip'
+  );
+
+  const inquiries = useQuery(api.inquiries.list, 
+    channelId 
+      ? (subChannelIds ? { channelIds: subChannelIds } : 'skip') 
+      : {}
+  );
+
   const updateInquiry = useMutation(api.inquiries.update);
   const removeInquiry = useMutation(api.inquiries.remove);
+
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -173,6 +187,49 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     });
   };
 
+  const getChannelName = (id?: string) => {
+    if (!id || id === '본사' || id === 'default') return '본사';
+    if (!channels) return '...';
+    return channels?.find(c => c.subdomain === id)?.channelName || id;
+  };
+
+
+
+  const getInquiryCountsByChannel = () => {
+    if (!inquiries || !channels || channelId) return [];
+    
+    // Create a mapping from subdomain and landingPage to channel subdomain
+    const pathMap: { [key: string]: string } = {};
+    channels.forEach(c => {
+      if (c.landingPage) {
+        // Map path (e.g. /living) to subdomain (e.g. bestone)
+        pathMap[c.landingPage.replace('/', '')] = c.subdomain;
+      }
+    });
+
+    const counts: { [key: string]: number } = {};
+    inquiries.forEach(inq => {
+      let cid = inq.channelId || 'default';
+      // If cid is a path (like 'living'), map it to the subdomain
+      if (pathMap[cid]) {
+        cid = pathMap[cid];
+      }
+      counts[cid] = (counts[cid] || 0) + 1;
+    });
+    
+    const result = channels.map(c => ({
+      name: c.channelName,
+      id: c.subdomain,
+      count: counts[c.subdomain] || 0
+    }));
+    
+    result.unshift({ name: '본사', id: 'default', count: counts['default'] || counts['본사'] || 0 });
+    return result;
+  };
+
+
+
+
   if (!inquiries) {
     return (
       <div className="p-8 flex flex-col items-center justify-center h-full">
@@ -182,14 +239,59 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     );
   }
 
-  const filteredInquiries = inquiries.filter(inq => 
-    inq.name.includes(searchQuery) || inq.phone.includes(searchQuery)
-  );
+  const filteredInquiries = inquiries.filter(inq => {
+    // 1. Channel Filter
+    if (selectedChannelId !== 'all') {
+      const targetCid = (selectedChannelId === 'default' || selectedChannelId === '본사') ? undefined : selectedChannelId;
+      const inquiryCid = (!inq.channelId || inq.channelId === '본사' || inq.channelId === 'default') ? undefined : inq.channelId;
+      if (inquiryCid !== targetCid) return false;
+    }
+
+    
+    // 2. Search Query Filter
+    const search = searchQuery.toLowerCase();
+    return (
+      (inq.name || '').toLowerCase().includes(search) || 
+      (inq.phone || '').toLowerCase().includes(search) || 
+      (inq.productName || '').toLowerCase().includes(search)
+    );
+  });
+
 
   return (
     <div className="p-4 lg:p-8">
+      {!channelId && (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
+          <div 
+            onClick={() => setSelectedChannelId('all')}
+            className={`p-4 rounded-[16px] border cursor-pointer transition-all ${selectedChannelId === 'all' ? 'bg-[#3182F6] border-[#3182F6] text-white shadow-lg shadow-blue-500/20' : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:border-[#3182F6]'}`}
+          >
+            <p className="text-[12px] font-bold opacity-80 mb-1">전체 채널</p>
+            <p className="text-[18px] font-black">{inquiries?.length || 0}건</p>
+          </div>
+          {getInquiryCountsByChannel().filter(c => c.count > 0 || c.id === 'default').map(c => (
+            <div 
+              key={c.id}
+              onClick={() => setSelectedChannelId(c.id === 'default' ? 'default' : c.id)}
+              className={`p-4 rounded-[16px] border cursor-pointer transition-all ${((c.id === 'default' && selectedChannelId === 'default') || selectedChannelId === c.id) ? 'bg-[#191F28] border-[#191F28] text-white shadow-lg' : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:border-[#191F28]'}`}
+            >
+              <p className="text-[12px] font-bold opacity-80 mb-1">{c.name}</p>
+              <p className="text-[18px] font-black">{c.count}건</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <h2 className="text-[20px] lg:text-[24px] font-bold">고객관리</h2>
+        <h2 className="text-[20px] lg:text-[24px] font-bold">
+          고객관리 
+          {!channelId && selectedChannelId !== 'all' && (
+            <span className="text-[#3182F6] text-[16px] ml-2">
+              ({getChannelName(selectedChannelId === 'default' ? undefined : selectedChannelId)})
+            </span>
+          )}
+        </h2>
+
         <div className="flex flex-col sm:flex-row w-full lg:w-auto gap-2">
           <div className="flex gap-2">
             {selectedIds.length > 0 && (
@@ -202,19 +304,42 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
             )}
           </div>
           <div className="flex gap-2 w-full lg:w-auto">
+            {!channelId && (
+              <select 
+                value={selectedChannelId} 
+                onChange={(e) => setSelectedChannelId(e.target.value)}
+                className="bg-white border border-[#E5E8EB] px-4 py-2 rounded-[8px] text-[14px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
+              >
+                <option value="all">모든 채널</option>
+                <option value="default">본사</option>
+                {channels?.map(c => (
+                  <option key={c._id} value={c.subdomain}>{c.channelName}</option>
+                ))}
+              </select>
+            )}
+            {channelId && subChannelIds && subChannelIds.length > 1 && (
+               <select 
+                 value={selectedChannelId} 
+                 onChange={(e) => setSelectedChannelId(e.target.value)}
+                 className="bg-white border border-[#E5E8EB] px-4 py-2 rounded-[8px] text-[14px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
+               >
+                 <option value="all">내 하위 채널 전체</option>
+                 {subChannelIds.map(sid => (
+                   <option key={sid} value={sid}>{getChannelName(sid)}</option>
+                 ))}
+               </select>
+            )}
+
             <div className="flex-1 lg:w-[240px] bg-white border border-[#E5E8EB] rounded-[8px] flex items-center px-3 py-2 shadow-sm">
               <Search className="w-4 h-4 text-[#8B95A1] mr-2" />
               <input 
                 type="text" 
-                placeholder="고객명, 연락처 검색" 
+                placeholder="고객명, 연락처, 상품 검색" 
                 className="text-[14px] focus:outline-none w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button className="bg-white border border-[#E5E8EB] px-4 py-2 rounded-[8px] flex items-center gap-2 text-[14px] font-medium shadow-sm shrink-0">
-              <Filter className="w-4 h-4" /> 필터
-            </button>
           </div>
         </div>
       </div>
@@ -232,6 +357,8 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                 />
               </th>
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">등록일시</th>
+              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">채널명</th>
+
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">고객명</th>
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">연락처</th>
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">신청상품</th>
@@ -261,6 +388,12 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                     />
                   </td>
                   <td className="px-6 py-4 text-[14px] text-[#4E5968]">{formatDate(customer.createdAt)}</td>
+                  <td className="px-6 py-4">
+                    <span className={`text-[12px] font-bold px-2 py-1 rounded-md ${(!customer.channelId || customer.channelId === '본사') ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-[#3182F6]'}`}>
+                      {getChannelName(customer.channelId)}
+                    </span>
+                  </td>
+
                   <td className="px-6 py-4 text-[14px] font-bold text-[#191F28]">{customer.name}</td>
                   <td className="px-6 py-4 text-[14px] text-[#4E5968]">{customer.phone}</td>
                   <td className="px-6 py-4 text-[14px] text-[#4E5968]">{customer.productName}</td>
@@ -353,30 +486,66 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                     <span className="w-1.5 h-1.5 rounded-full bg-[#BE123C]"></span>상담/계약 일정 정보
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">신규 접수일</label>
-                      <input type="date" value={editData.newRegDate || ''} onChange={e => setEditData({...editData, newRegDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">상조 계약일</label>
-                      <input type="date" value={editData.sangjoContractDate || ''} onChange={e => setEditData({...editData, sangjoContractDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">렌탈 계약일</label>
-                      <input type="date" value={editData.rentalContractDate || ''} onChange={e => setEditData({...editData, rentalContractDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">청약 철회일</label>
-                      <input type="date" value={editData.cancelDate || ''} onChange={e => setEditData({...editData, cancelDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">계약 해지일</label>
-                      <input type="date" value={editData.terminationDate || ''} onChange={e => setEditData({...editData, terminationDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">가전 배송일</label>
-                      <input type="date" value={editData.deliveryDate || ''} onChange={e => setEditData({...editData, deliveryDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
+                    {/* If product is living (신한카드 144) */}
+                    {(selectedCustomer.productName?.toLowerCase().includes('living') || selectedCustomer.productName?.includes('리빙')) ? (
+                      <>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">신규 접수일</label>
+                          <input type="date" value={editData.newRegDate || ''} onChange={e => setEditData({...editData, newRegDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">카드 결제일</label>
+                          <input type="date" value={editData.cardPaymentDate || ''} onChange={e => setEditData({...editData, cardPaymentDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">구매 동의일 (자동)</label>
+                          <input type="date" value={editData.purchaseConsentDate || ''} readOnly className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] text-[#8B95A1]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">상조 계약일</label>
+                          <input type="date" value={editData.sangjoContractDate || ''} onChange={e => setEditData({...editData, sangjoContractDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">청약 철회일</label>
+                          <input type="date" value={editData.cancelDate || ''} onChange={e => setEditData({...editData, cancelDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">계약 해지일</label>
+                          <input type="date" value={editData.terminationDate || ''} onChange={e => setEditData({...editData, terminationDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">가전 배송일</label>
+                          <input type="date" value={editData.deliveryDate || ''} onChange={e => setEditData({...editData, deliveryDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">신규 접수일</label>
+                          <input type="date" value={editData.newRegDate || ''} onChange={e => setEditData({...editData, newRegDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">상조 계약일</label>
+                          <input type="date" value={editData.sangjoContractDate || ''} onChange={e => setEditData({...editData, sangjoContractDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">렌탈 계약일</label>
+                          <input type="date" value={editData.rentalContractDate || ''} onChange={e => setEditData({...editData, rentalContractDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">청약 철회일</label>
+                          <input type="date" value={editData.cancelDate || ''} onChange={e => setEditData({...editData, cancelDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">계약 해지일</label>
+                          <input type="date" value={editData.terminationDate || ''} onChange={e => setEditData({...editData, terminationDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                        <div>
+                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">가전 배송일</label>
+                          <input type="date" value={editData.deliveryDate || ''} onChange={e => setEditData({...editData, deliveryDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
+                        </div>
+                      </>
+                    )}
                     <div className="col-span-2">
                       <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">특이사항</label>
                       <input type="text" value={editData.note || ''} onChange={e => setEditData({...editData, note: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />

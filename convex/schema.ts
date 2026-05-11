@@ -10,7 +10,21 @@ export default defineSchema({
     channelName: v.string(),
     managerName: v.string(),
     managerContact: v.string(),
-  }).index("by_accountId", ["accountId"]),
+    landingPage: v.optional(v.string()), // Legacy field
+    landingPages: v.optional(v.array(v.string())), // Multiple landing pages
+    parentChannelId: v.optional(v.string()), // Subdomain of the parent channel
+  }).index("by_accountId", ["accountId"])
+    .index("by_subdomain", ["subdomain"])
+    .index("by_parent", ["parentChannelId"]),
+
+
+  landings: defineTable({
+    name: v.string(),
+    path: v.string(), // e.g., "/", "/living"
+    thumbnail: v.optional(v.string()),
+    description: v.optional(v.string()),
+    isActive: v.boolean(),
+  }),
   products: defineTable({
     category: v.string(),
     planId: v.number(),
@@ -55,11 +69,16 @@ export default defineSchema({
     
     // Schedule Fields
     newRegDate: v.optional(v.string()),
+    cardPaymentDate: v.optional(v.string()),
+    purchaseConsentDate: v.optional(v.string()),
     sangjoContractDate: v.optional(v.string()),
     rentalContractDate: v.optional(v.string()),
     cancelDate: v.optional(v.string()),
     terminationDate: v.optional(v.string()),
     deliveryDate: v.optional(v.string()),
+    consentStatus: v.optional(v.string()), // "미발송", "발송완료", "서명완료"
+    consentFileUrl: v.optional(v.string()),
+    consentSentDate: v.optional(v.string()),
     note: v.optional(v.string()),
     
     // Product Details

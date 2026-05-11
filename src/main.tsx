@@ -13,7 +13,8 @@ const convex = new ConvexReactClient(convexUrl);
 const path = window.location.pathname.toLowerCase();
 const search = window.location.search.toLowerCase();
 const hash = window.location.hash.toLowerCase();
-const isAdmin = path.endsWith('/admin') || path.endsWith('/admin/') || path.includes('/admin?') || search.includes('admin=true') || search.includes('proxy=');
+const isAdmin = path.includes('/admin') || search.includes('proxy=') || search.includes('admin=true');
+
 
 window.onerror = function(msg, url, lineNo, columnNo, error) {
   alert('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
@@ -21,10 +22,12 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
 };
 
 console.log('Routing Debug:', { path, search, hash, isAdmin });
+if (isAdmin && search.includes('admin=true')) {
+    window.history.replaceState({}, '', '/admin');
+}
 
 import React from 'react';
-
-import LivingPage from './pages/LivingPage.tsx';
+import LandingRouter from './components/LandingRouter.tsx';
 
 // Error Boundary for Admin debugging
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
@@ -62,10 +65,8 @@ createRoot(document.getElementById('root')!).render(
       <ConvexProvider client={convex}>
         {isAdmin ? (
           <AdminApp />
-        ) : path.includes('/living') ? (
-          <LivingPage />
         ) : (
-          <App />
+          <LandingRouter />
         )}
       </ConvexProvider>
     </ErrorBoundary>

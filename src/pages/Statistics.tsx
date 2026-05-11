@@ -5,7 +5,16 @@ import { api } from '../../convex/_generated/api';
 
 export default function Statistics({ channelId }: { channelId?: string }) {
   const [period, setPeriod] = useState('today');
-  const stats = useQuery(api.stats.getDashboardStats, { period, channelId });
+  const subChannelIds = useQuery(api.channels.getSubChannelIds, 
+    channelId ? { subdomain: channelId } : 'skip'
+  );
+
+  const stats = useQuery(api.stats.getDashboardStats, 
+    channelId 
+      ? (subChannelIds ? { period, channelIds: subChannelIds } : 'skip') 
+      : { period }
+  );
+
 
   if (!stats) {
     return (

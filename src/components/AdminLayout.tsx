@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutGrid, Users, Box, BarChart3, Settings as SettingsIcon, LogOut, Menu, X } from 'lucide-react';
+import { LayoutGrid, Users, Box, BarChart3, Settings as SettingsIcon, LogOut, Menu, X, Globe, ShieldCheck, ExternalLink, Shield } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -9,27 +9,44 @@ interface AdminLayoutProps {
   userName?: string;
   isProxyMode?: boolean;
   onExitProxy?: () => void;
+  onLogout?: () => void;
+  subdomain?: string;
 }
 
-export default function AdminLayout({ children, activeMenu, setActiveMenu, userType = 'admin', userName, isProxyMode, onExitProxy }: AdminLayoutProps) {
+
+export default function AdminLayout({ 
+  children, activeMenu, setActiveMenu, userType = 'admin', 
+  userName, isProxyMode, onExitProxy, onLogout, subdomain 
+}: AdminLayoutProps) {
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const allMenuItems = [
     { id: 'customers', label: '고객관리', icon: Users },
     { id: 'products', label: '제품관리', icon: Box },
+    { id: 'landings', label: '랜딩관리', icon: Globe },
     { id: 'channels', label: '채널관리', icon: LayoutGrid },
     { id: 'statistics', label: '통계분석', icon: BarChart3 },
+    { id: 'consent', label: '구매동의 관리', icon: ShieldCheck },
+    { id: 'shinhan48', label: '신한48 관리', icon: ExternalLink, url: 'https://partner.48mall.co.kr/' },
+    { id: 'sangjo', label: '상조접수 관리', icon: ExternalLink, url: 'https://hwsj.kr/intranet/' },
     { id: 'settings', label: '설정', icon: SettingsIcon },
   ];
 
   const menuItems = allMenuItems.filter(item => {
     if (userType === 'channel') {
-      return ['customers', 'statistics'].includes(item.id);
+      return ['customers', 'landings', 'statistics', 'consent', 'shinhan48', 'sangjo', 'settings'].includes(item.id);
     }
+
     return true;
   });
 
   const handleMenuClick = (id: string) => {
+    const item = allMenuItems.find(m => m.id === id);
+    if (item?.url) {
+      window.open(item.url, '_blank');
+      return;
+    }
     setActiveMenu(id);
     setIsSidebarOpen(false);
   };
@@ -58,7 +75,10 @@ export default function AdminLayout({ children, activeMenu, setActiveMenu, userT
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-6 border-b border-[#E5E8EB] flex items-center justify-between">
-          <h1 className="text-[20px] font-bold tracking-tight">효원상조 관리자</h1>
+          <h1 className="text-[18px] font-bold tracking-tight text-[#191F28] truncate">
+            {userType === 'channel' ? (userName || '채널 관리자') : '효원 관리자'}
+          </h1>
+
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-1 hover:bg-[#F2F4F6] rounded-full">
             <X className="w-6 h-6 text-[#8B95A1]" />
           </button>
@@ -107,15 +127,26 @@ export default function AdminLayout({ children, activeMenu, setActiveMenu, userT
             );
           })}
         </nav>
-        <div className="p-4 border-t border-[#E5E8EB]">
+        <div className="p-4 border-t border-[#E5E8EB] space-y-1">
           <button 
-            className="w-full flex items-center gap-3 px-4 py-3 text-[#8B95A1] hover:text-[#191F28] hover:bg-[#F2F4F6] rounded-[12px] font-medium transition-colors"
-            onClick={() => window.location.href = './'}
+            className="w-full flex items-center gap-3 px-4 py-3 text-[#4E5968] hover:text-[#191F28] hover:bg-[#F2F4F6] rounded-[12px] font-medium transition-colors"
+            onClick={() => {
+              const targetPath = userType === 'channel' && subdomain ? `./${subdomain}` : './';
+              window.open(targetPath, '_blank');
+            }}
+          >
+            <Globe className="w-5 h-5" />
+            사이트로 바로가기
+          </button>
+          <button 
+            className="w-full flex items-center gap-3 px-4 py-3 text-[#F04452] hover:bg-red-50 rounded-[12px] font-medium transition-colors"
+            onClick={onLogout}
           >
             <LogOut className="w-5 h-5" />
-            사이트로 돌아가기
+            로그아웃
           </button>
         </div>
+
       </aside>
 
       {/* Main Content */}

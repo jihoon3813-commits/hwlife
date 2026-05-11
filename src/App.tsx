@@ -9,6 +9,8 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 
 export default function App() {
+  const landingInfo = useQuery(api.landings.getByPath, { path: "/" });
+
   const [activeTab, setActiveTab] = useState('12');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState("전체");
@@ -26,7 +28,9 @@ export default function App() {
   const [lastViewedSection, setLastViewedSection] = useState<string | null>(null);
   
   // Channel Tracking
-  const channelId = window.location.pathname.split('/')[1] || undefined;
+  const segments = window.location.pathname.split('/').filter(Boolean);
+  const channelId = segments.length === 0 ? '본사' : segments[0];
+
   
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const productScrollRef = useRef<HTMLDivElement>(null);
@@ -1491,7 +1495,7 @@ export default function App() {
             
             <div className="mb-10 px-1">
               <a 
-                href="?admin=true" 
+                href="/admin" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="inline-flex items-center gap-2 px-5 py-3 bg-white/5 hover:bg-[#3182F6] hover:text-white text-[#A3B1C6] text-[13px] font-bold rounded-xl border border-white/10 transition-all group"
@@ -1795,7 +1799,7 @@ export default function App() {
                     await createInquiry({
                       name,
                       phone,
-                      productName: inquiryProduct ? inquiryProduct.name : "전체 상담",
+                      productName: inquiryProduct ? inquiryProduct.name : (landingInfo?.name || "전체 상담"),
                       message: finalMessage || undefined,
                       channelId: channelId
                     });

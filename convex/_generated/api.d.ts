@@ -12,6 +12,7 @@ import type * as channels from "../channels.js";
 import type * as competitors from "../competitors.js";
 import type * as images from "../images.js";
 import type * as inquiries from "../inquiries.js";
+import type * as landings from "../landings.js";
 import type * as products from "../products.js";
 import type * as settings from "../settings.js";
 import type * as shorts from "../shorts.js";
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   competitors: typeof competitors;
   images: typeof images;
   inquiries: typeof inquiries;
+  landings: typeof landings;
   products: typeof products;
   settings: typeof settings;
   shorts: typeof shorts;

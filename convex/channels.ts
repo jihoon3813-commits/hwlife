@@ -16,7 +16,12 @@ export const create = mutation({
     channelName: v.string(),
     managerName: v.string(),
     managerContact: v.string(),
+    landingPage: v.optional(v.string()),
+    landingPages: v.optional(v.array(v.string())),
+    parentChannelId: v.optional(v.string()),
   },
+
+
   handler: async (ctx, args) => {
     // Check if accountId already exists
     const existing = await ctx.db
@@ -41,7 +46,12 @@ export const update = mutation({
     channelName: v.string(),
     managerName: v.string(),
     managerContact: v.string(),
+    landingPage: v.optional(v.string()),
+    landingPages: v.optional(v.array(v.string())),
+    parentChannelId: v.optional(v.string()),
   },
+
+
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
     return await ctx.db.patch(id, updates);
@@ -87,3 +97,44 @@ export const getBySubdomain = query({
       .first();
   },
 });
+
+export const getByLandingPage = query({
+  args: { landingPage: v.string() },
+  handler: async (ctx, args) => {
+    // 1. Try exact match on legacy field
+    const legacyMatch = await ctx.db
+      .query("channels")
+      .filter((q) => q.eq(q.field("landingPage"), args.landingPage))
+      .first();
+    
+    if (legacyMatch) return legacyMatch;
+
+    // 2. Try match in landingPages array
+    const allChannels = await ctx.db.query("channels").collect();
+    return allChannels.find(c => c.landingPages?.includes(args.landingPage));
+  },
+});
+
+export const getChildren = query({
+  args: { parentSubdomain: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("channels")
+      .withIndex("by_parent", (q) => q.eq("parentChannelId", args.parentSubdomain))
+      .collect();
+  },
+});
+
+export const getSubChannelIds = query({
+  args: { subdomain: v.string() },
+  handler: async (ctx, args) => {
+    const children = await ctx.db
+      .query("channels")
+      .withIndex("by_parent", (q) => q.eq("parentChannelId", args.subdomain))
+      .collect();
+    
+    return [args.subdomain, ...children.map(c => c.subdomain)];
+  },
+});
+
+

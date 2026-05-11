@@ -2,22 +2,96 @@ import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowRight, Phone, Check, Calendar, Coins, ShieldCheck, 
-  ChevronDown, ChevronUp, FileText, Wallet, Sparkles, CreditCard,
+  ChevronDown, ChevronUp, ChevronRight, FileText, Wallet, Sparkles, CreditCard, X,
   Hotel, HeartPulse, Film
 } from 'lucide-react';
+import { useMutation, useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 
-export default function LivingPage() {
+
+export default function LivingPage({ channelSubdomain }: { channelSubdomain?: string }) {
+  const landingInfo = useQuery(api.landings.getByPath, { path: "/living" });
+
+
   const formRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<'1' | '2'>('1');
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+  const [name, setName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const createInquiry = useMutation(api.inquiries.create);
+
+
+  // Channel Tracking
+  // 1. Prioritize explicitly passed channelSubdomain
+  // 2. If visiting /living directly, it's Master (본사)
+  // 3. If visiting /living/subdomain, use that subdomain
+  const segments = window.location.pathname.split('/').filter(Boolean);
+  const channelId = channelSubdomain || 
+                   (segments.length === 1 && segments[0] === 'living' ? '본사' : 
+                   (segments.length >= 2 ? segments[1] : undefined));
+
+
 
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9]/g, '');
+    let formattedValue = '';
+    
+    if (value.length <= 3) {
+      formattedValue = value;
+    } else if (value.length <= 7) {
+      formattedValue = `${value.slice(0, 3)}-${value.slice(3)}`;
+    } else {
+      formattedValue = `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7, 11)}`;
+    }
+    
+    setPhoneNumber(formattedValue);
+  };
+
   const toggleAccordion = (id: string) => {
     setOpenAccordion(openAccordion === id ? null : id);
   };
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (isSubmitting) return;
+
+    if (!name.trim()) {
+      alert('성함을 입력해주세요.');
+      return;
+    }
+    if (phoneNumber.replace(/[^0-9]/g, '').length < 10) {
+      alert('올바른 연락처를 입력해주세요.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await createInquiry({
+        name: name.trim(),
+        phone: phoneNumber,
+        productName: landingInfo?.name || '신한카드 리빙144',
+        channelId: channelId
+      });
+      alert('상담 신청이 접수되었습니다. 빠르게 연락드리겠습니다.');
+      setName('');
+      setPhoneNumber('');
+      setIsContactModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      alert('상담 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
 
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
@@ -88,7 +162,7 @@ export default function LivingPage() {
           </p>
 
           <button 
-            onClick={scrollToForm}
+            onClick={() => setIsContactModalOpen(true)}
             className="w-full flex items-center justify-center gap-2 bg-[#3182F6] py-4 rounded-[20px] text-[16px] font-bold text-white shadow-[0_8px_20px_rgba(49,130,246,0.4)] hover:bg-[#1B64DA] transition-all active:scale-95"
           >
             단독 혜택받고 무료상담 신청 <ArrowRight className="w-5 h-5" />
@@ -197,41 +271,49 @@ export default function LivingPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* 카드 1 */}
-          <div className="bg-white/5 border border-white/10 rounded-[24px] p-5 flex flex-col items-center text-center">
-            <div className="w-24 h-24 rounded-full bg-white mb-4 overflow-hidden shadow-lg">
+          <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
               <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/3._%ED%94%84%EB%A6%AC%EB%AA%A8_mmmjvf.png" alt="고급 리빙제품" className="w-full h-full object-cover" />
             </div>
-            <span className="text-[11px] font-bold text-[#3182F6] mb-1">가입 축하 혜택 1</span>
-            <h4 className="text-[14px] font-bold text-white break-keep">고급 리빙제품 증정</h4>
+            <div>
+              <span className="text-[11px] font-bold text-[#3182F6] mb-1 block">가입 축하 혜택 1</span>
+              <h4 className="text-[14px] font-bold text-white break-keep">고급 리빙제품 증정</h4>
+            </div>
           </div>
 
           {/* 카드 2 */}
-          <div className="bg-white/5 border border-white/10 rounded-[24px] p-5 flex flex-col items-center text-center">
-            <div className="w-24 h-24 rounded-full bg-white mb-4 overflow-hidden shadow-lg">
+          <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
               <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480574/%ED%8F%AC%EC%9D%B8%ED%8A%B8_tj8ujg.png" alt="포인트 보너스" className="w-full h-full object-cover" />
             </div>
-            <span className="text-[11px] font-bold text-[#FFAB00] mb-1">가입 축하 혜택 2</span>
-            <h4 className="text-[14px] font-bold text-white break-keep">프리미엄몰 특별 보너스 증정</h4>
+            <div>
+              <span className="text-[11px] font-bold text-[#FFAB00] mb-1 block">가입 축하 혜택 2</span>
+              <h4 className="text-[14px] font-bold text-white break-keep">프리미엄몰 특별 보너스 증정</h4>
+            </div>
           </div>
 
           {/* 카드 3 */}
-          <div className="bg-white/5 border border-white/10 rounded-[24px] p-5 flex flex-col items-center text-center">
-            <div className="w-24 h-24 rounded-full bg-white mb-4 overflow-hidden shadow-lg">
+          <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
               <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480399/5%EB%A7%8C%EC%9B%90_2_dnu8n6.png" alt="100% 환급" className="w-full h-full object-cover" />
             </div>
-            <span className="text-[11px] font-bold text-[#00C853] mb-1">스마트 혜택</span>
-            <h4 className="text-[14px] font-bold text-white break-keep">납부한 금액 100% 환급 보장</h4>
+            <div>
+              <span className="text-[11px] font-bold text-[#00C853] mb-1 block">스마트 혜택</span>
+              <h4 className="text-[14px] font-bold text-white break-keep">납부한 금액 100% 환급 보장</h4>
+            </div>
           </div>
 
           {/* 카드 4 */}
-          <div className="bg-white/5 border border-white/10 rounded-[24px] p-5 flex flex-col items-center text-center">
-            <div className="w-24 h-24 rounded-full bg-white mb-4 overflow-hidden shadow-lg">
+          <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
               <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?w=300&q=80&fit=crop" alt="크루즈" className="w-full h-full object-cover" />
             </div>
-            <span className="text-[11px] font-bold text-[#E91E63] mb-1">라이프 케어 혜택</span>
-            <h4 className="text-[14px] font-bold text-white break-keep">장례 대신 크루즈 여행 가능</h4>
+            <div>
+              <span className="text-[11px] font-bold text-[#E91E63] mb-1 block">라이프 케어 혜택</span>
+              <h4 className="text-[14px] font-bold text-white break-keep">장례 대신 크루즈 여행 가능</h4>
+            </div>
           </div>
         </div>
       </section>
@@ -251,7 +333,7 @@ export default function LivingPage() {
           {/* 포인트 1 */}
           <div className="flex flex-col">
             <div className="w-full aspect-[4/3] rounded-2xl bg-[#F2F4F6] overflow-hidden mb-3">
-              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80&fit=crop" alt="악수" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480713/photo01_qowgk1.jpg" alt="안심 케어" className="w-full h-full object-cover" />
             </div>
             <p className="text-[13px] font-medium text-[#4E5968] leading-snug break-keep">
               <span className="font-bold text-[#191F28] block mb-1">안심 케어</span>
@@ -273,7 +355,7 @@ export default function LivingPage() {
           {/* 포인트 3 */}
           <div className="flex flex-col">
             <div className="w-full aspect-[4/3] rounded-2xl bg-[#F2F4F6] overflow-hidden mb-3">
-              <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&q=80&fit=crop" alt="여행 여권" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480897/%EC%BD%94%EC%8A%A4%ED%83%80_nbsz5n.png" alt="유연한 전환" className="w-full h-full object-cover" />
             </div>
             <p className="text-[13px] font-medium text-[#4E5968] leading-snug break-keep">
               <span className="font-bold text-[#191F28] block mb-1">유연한 전환</span>
@@ -355,9 +437,12 @@ export default function LivingPage() {
                 </div>
               </div>
               <div className="w-full h-[1px] bg-[#E5E8EB]"></div>
-              <div className="flex justify-between items-center bg-[#3182F6]/5 p-4 rounded-[16px]">
-                <span className="text-[14px] text-[#3182F6] font-bold">만기 시 환급금</span>
-                <span className="text-[18px] font-black text-[#3182F6]">{activeTab === '1' ? '5,936,000원' : '11,872,000원'} <span className="text-[13px] font-bold">(100%)</span></span>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-[#3182F6]/5 p-4 rounded-[16px] gap-2 sm:gap-0">
+                <span className="text-[14px] text-[#3182F6] font-bold whitespace-nowrap">만기 시 환급금</span>
+                <span className="text-[18px] font-black text-[#3182F6]">
+                  {activeTab === '1' ? '5,936,000원' : '11,872,000원'} 
+                  <span className="text-[13px] font-bold ml-1">(100%)</span>
+                </span>
               </div>
               <div>
                 <span className="text-[13px] font-bold text-[#4E5968] mb-3 block">가입 특전</span>
@@ -486,7 +571,7 @@ export default function LivingPage() {
                   className="bg-white px-6 overflow-hidden"
                 >
                   <div className="pb-6 space-y-4 pt-2">
-                    <div className="flex justify-between items-center text-[14px] p-3 bg-[#F9FAFB] rounded-xl border border-dashed border-[#3182F6]/30">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-[14px] p-3 bg-[#F9FAFB] rounded-xl border border-dashed border-[#3182F6]/30 gap-1 sm:gap-0">
                       <div className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-[#3182F6]" />
                         <span className="font-bold text-[#3182F6]">캐시백(2회차 시점)</span>
@@ -495,37 +580,33 @@ export default function LivingPage() {
                     </div>
                     
                     <div className="space-y-3 px-1">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">1회차</span>
-                        <span className="text-[14px] font-medium text-[#191F28]">원금 35,000원 + 이자 31,142원 = <span className="font-bold">66,142원</span></span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">2회차</span>
-                        <span className="text-[14px] font-medium text-[#191F28]">원금 35,000원 + 이자 26,968원 = <span className="font-bold">61,968원</span></span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">3회차</span>
-                        <span className="text-[14px] font-medium text-[#191F28]">원금 35,000원 + 이자 27,412원 = <span className="font-bold">62,412원</span></span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">4회차</span>
-                        <span className="text-[14px] font-medium text-[#191F28]">원금 35,000원 + 이자 26,948원 = <span className="font-bold">61,948원</span></span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">5회차</span>
-                        <span className="text-[14px] font-medium text-[#191F28]">원금 35,000원 + 이자 25,638원 = <span className="font-bold">60,638원</span></span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">6~48회차</span>
+                      {[
+                        { label: '1회차', value: '원금 35,000원 + 이자 31,142원 = ', total: '66,142원' },
+                        { label: '2회차', value: '원금 35,000원 + 이자 26,968원 = ', total: '61,968원' },
+                        { label: '3회차', value: '원금 35,000원 + 이자 27,412원 = ', total: '62,412원' },
+                        { label: '4회차', value: '원금 35,000원 + 이자 26,948원 = ', total: '61,948원' },
+                        { label: '5회차', value: '원금 35,000원 + 이자 25,638원 = ', total: '60,638원' },
+                      ].map((item, i) => (
+                        <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-50 pb-2 sm:pb-0 sm:border-0">
+                          <span className="text-[13px] text-[#4E5968] font-bold sm:font-normal mb-1 sm:mb-0">{item.label}</span>
+                          <div className="text-[14px] font-medium text-[#191F28] text-left sm:text-right">
+                            <span className="block sm:inline opacity-80 sm:opacity-100">{item.value}</span>
+                            <span className="block sm:inline font-bold text-[#191F28] mt-0.5 sm:mt-0 sm:ml-1">{item.total}</span>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-2 sm:pt-0">
+                        <span className="text-[13px] text-[#4E5968] font-bold sm:font-normal mb-1 sm:mb-0">6~48회차</span>
                         <span className="text-[14px] font-bold text-[#3182F6]">원금만 35,000원 (무이자)</span>
                       </div>
                     </div>
 
-                    <div className="mt-4 p-4 bg-[#191F28] rounded-[16px] flex justify-between items-center text-white">
+                    <div className="mt-4 p-4 bg-[#191F28] rounded-[16px] flex flex-col sm:flex-row sm:justify-between sm:items-center text-white gap-2 sm:gap-0">
                       <span className="text-[13px] font-bold text-white/60">총 예상금액</span>
-                      <span className="text-[16px] font-black tracking-tight text-white">
-                        1,683,708원 <span className="text-[11px] text-[#3182F6] ml-1">(+)3,708원</span>
-                      </span>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-[20px] sm:text-[18px] font-black tracking-tight text-white">1,683,708원</span>
+                        <span className="text-[11px] text-[#3182F6] font-bold">(+)3,708원</span>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -552,7 +633,7 @@ export default function LivingPage() {
                   className="bg-white px-6 overflow-hidden"
                 >
                   <div className="pb-6 space-y-4 pt-2">
-                    <div className="flex justify-between items-center text-[14px] p-3 bg-[#F9FAFB] rounded-xl border border-dashed border-[#3182F6]/30">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-[14px] p-3 bg-[#F9FAFB] rounded-xl border border-dashed border-[#3182F6]/30 gap-1 sm:gap-0">
                       <div className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-[#3182F6]" />
                         <span className="font-bold text-[#3182F6]">캐시백(2회차 시점)</span>
@@ -561,37 +642,33 @@ export default function LivingPage() {
                     </div>
                     
                     <div className="space-y-3 px-1">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">1회차</span>
-                        <span className="text-[14px] font-medium text-[#191F28]">원금 70,000원 + 이자 62,284원 = <span className="font-bold">132,284원</span></span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">2회차</span>
-                        <span className="text-[14px] font-medium text-[#191F28]">원금 70,000원 + 이자 53,936원 = <span className="font-bold">123,936원</span></span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">3회차</span>
-                        <span className="text-[14px] font-medium text-[#191F28]">원금 70,000원 + 이자 54,824원 = <span className="font-bold">124,824원</span></span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">4회차</span>
-                        <span className="text-[14px] font-medium text-[#191F28]">원금 70,000원 + 이자 53,896원 = <span className="font-bold">123,896원</span></span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">5회차</span>
-                        <span className="text-[14px] font-medium text-[#191F28]">원금 70,000원 + 이자 51,276원 = <span className="font-bold">121,276원</span></span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[13px] text-[#4E5968]">6~48회차</span>
+                      {[
+                        { label: '1회차', value: '원금 70,000원 + 이자 62,284원 = ', total: '132,284원' },
+                        { label: '2회차', value: '원금 70,000원 + 이자 53,936원 = ', total: '123,936원' },
+                        { label: '3회차', value: '원금 70,000원 + 이자 54,824원 = ', total: '124,824원' },
+                        { label: '4회차', value: '원금 70,000원 + 이자 53,896원 = ', total: '123,896원' },
+                        { label: '5회차', value: '원금 70,000원 + 이자 51,276원 = ', total: '121,276원' },
+                      ].map((item, i) => (
+                        <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-50 pb-2 sm:pb-0 sm:border-0">
+                          <span className="text-[13px] text-[#4E5968] font-bold sm:font-normal mb-1 sm:mb-0">{item.label}</span>
+                          <div className="text-[14px] font-medium text-[#191F28] text-left sm:text-right">
+                            <span className="block sm:inline opacity-80 sm:opacity-100">{item.value}</span>
+                            <span className="block sm:inline font-bold text-[#191F28] mt-0.5 sm:mt-0 sm:ml-1">{item.total}</span>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-2 sm:pt-0">
+                        <span className="text-[13px] text-[#4E5968] font-bold sm:font-normal mb-1 sm:mb-0">6~48회차</span>
                         <span className="text-[14px] font-bold text-[#3182F6]">원금만 70,000원 (무이자)</span>
                       </div>
                     </div>
 
-                    <div className="mt-4 p-4 bg-[#191F28] rounded-[16px] flex justify-between items-center text-white">
+                    <div className="mt-4 p-4 bg-[#191F28] rounded-[16px] flex flex-col sm:flex-row sm:justify-between sm:items-center text-white gap-2 sm:gap-0">
                       <span className="text-[13px] font-bold text-white/60">총 예상금액</span>
-                      <span className="text-[16px] font-black tracking-tight text-white">
-                        3,367,416원 <span className="text-[11px] text-[#3182F6] ml-1">(+)7,416원</span>
-                      </span>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-[20px] sm:text-[18px] font-black tracking-tight text-white">3,367,416원</span>
+                        <span className="text-[11px] text-[#3182F6] font-bold">(+)7,416원</span>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -623,18 +700,26 @@ export default function LivingPage() {
             </div>
             <div className="space-y-4">
               <div className="bg-[#F9FAFB] rounded-[24px] p-6 border border-[#E5E8EB]">
-                <div className="w-full aspect-video rounded-xl bg-white overflow-hidden mb-4 shadow-sm">
-                  <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600&q=80&fit=crop" alt="발마사지기" className="w-full h-full object-cover" />
+                <div className="w-full aspect-square rounded-xl bg-white overflow-hidden mb-4 shadow-sm relative">
+                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-[#3182F6] text-white text-[10px] font-black rounded-lg shadow-sm">
+                    1구좌
+                  </div>
+                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/1._%EB%B0%94%EB%A1%9C%ED%81%90_qehlsv.png" alt="바로큐" className="w-full h-full object-contain p-2" />
                 </div>
-                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">바로온 저주파 발마사지기</h4>
-                <p className="text-[13px] text-[#8B95A1]">하루의 피로를 풀어주는 스마트 힐링</p>
+                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">바로큐 복부 근육통증 완화 의료기기</h4>
+                <p className="text-[13px] text-[#4E5968] leading-snug mb-1">복부 근육통 완화와 건강 관리를 위한 전문 의료기기</p>
+                <p className="text-[12px] text-[#8B95A1]">HBSAZ-001</p>
               </div>
               <div className="bg-[#F9FAFB] rounded-[24px] p-6 border border-[#E5E8EB]">
-                <div className="w-full aspect-video rounded-xl bg-white overflow-hidden mb-4 shadow-sm">
-                  <img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80&fit=crop" alt="건식족욕기" className="w-full h-full object-cover" />
+                <div className="w-full aspect-square rounded-xl bg-white overflow-hidden mb-4 shadow-sm relative">
+                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-[#3182F6] text-white text-[10px] font-black rounded-lg shadow-sm">
+                    1구좌
+                  </div>
+                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/2._%EB%A7%88%ED%95%98%EB%82%98%EC%9E%84_%EA%B1%B4%EC%8B%9D%EC%A1%B1%EC%9A%95%EA%B8%B0_udjx9h.png" alt="건식족욕기" className="w-full h-full object-contain p-2" />
                 </div>
                 <h4 className="text-[16px] font-bold text-[#191F28] mb-1">미하나임 건식족욕기</h4>
-                <p className="text-[13px] text-[#8B95A1]">언제 어디서나 간편하게 즐기는 따뜻한 휴식</p>
+                <p className="text-[13px] text-[#4E5968] leading-snug mb-1">언제 어디서나 간편하게 즐기는 따뜻한 휴식</p>
+                <p className="text-[12px] text-[#8B95A1]">MH-101</p>
               </div>
             </div>
           </div>
@@ -646,27 +731,44 @@ export default function LivingPage() {
               <span className="text-[13px] font-bold text-[#4E5968]">(택 1)</span>
             </div>
             <div className="space-y-4">
+              {/* 2구좌 1번: LG 퓨리케어 */}
               <div className="bg-[#F9FAFB] rounded-[24px] p-6 border border-[#3182F6]/30 bg-gradient-to-br from-[#F2F8FF] to-white">
-                <div className="w-full aspect-video rounded-xl bg-white overflow-hidden mb-4 shadow-sm">
-                  <img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=600&q=80&fit=crop" alt="매트리스" className="w-full h-full object-cover" />
+                <div className="w-full aspect-square rounded-xl bg-white overflow-hidden mb-4 shadow-sm relative">
+                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-[#191F28] text-white text-[10px] font-black rounded-lg shadow-sm">
+                    2구좌
+                  </div>
+                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/large03_drecnx.jpg" alt="공기청정기" className="w-full h-full object-contain p-2" />
                 </div>
-                <div className="inline-block px-2 py-0.5 bg-[#3182F6] text-white text-[10px] font-bold rounded mb-2">BEST 2종 결합 세트</div>
-                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">프라임 프리미엄 매트리스 (Q/SS)</h4>
-                <p className="text-[13px] text-[#4E5968] leading-snug">매트리스 + 저주파 발마사지기 또는 건식족욕기 중 택 1</p>
+                <div className="inline-block px-2 py-0.5 bg-[#3182F6] text-white text-[10px] font-bold rounded mb-2">BEST</div>
+                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">LG 퓨리케어 360 공기청정기 HIT</h4>
+                <p className="text-[13px] text-[#4E5968] leading-snug mb-1">깨끗한 공기로 완성되는 쾌적한 공간</p>
+                <p className="text-[12px] text-[#8B95A1]">AS156HWWC</p>
               </div>
+
+              {/* 2구좌 2번: 프리모 매트리스 */}
               <div className="bg-[#F9FAFB] rounded-[24px] p-6 border border-[#E5E8EB]">
-                <div className="w-full aspect-video rounded-xl bg-white overflow-hidden mb-4 shadow-sm">
-                  <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80&fit=crop" alt="공기청정기" className="w-full h-full object-cover" />
+                <div className="w-full aspect-square rounded-xl bg-white overflow-hidden mb-4 shadow-sm relative">
+                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-[#191F28] text-white text-[10px] font-black rounded-lg shadow-sm">
+                    2구좌
+                  </div>
+                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/3._%ED%94%84%EB%A6%AC%EB%AA%A8_mmmjvf.png" alt="매트리스" className="w-full h-full object-contain p-2" />
                 </div>
-                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">LG 퓨리케어 360도 공기청정기</h4>
-                <p className="text-[13px] text-[#8B95A1]">깨끗한 공기로 완성되는 쾌적한 공간</p>
+                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">프리모 캐나다 독립 포켓스프링 매트리스(K,Q)</h4>
+                <p className="text-[13px] text-[#4E5968] leading-snug mb-1">독립 포켓스프링의 프리미엄 매트리스(빠른 배송)</p>
+                <p className="text-[12px] text-[#8B95A1]">PR330-1_K/Q</p>
               </div>
-              <div className="bg-[#F2F4F6] rounded-[24px] p-10 border border-dashed border-[#D1D6DB] flex flex-col items-center justify-center text-center">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-4">
-                  <Sparkles className="w-6 h-6 text-[#D1D6DB]" />
+
+              {/* 2구좌 3번: 바로큐+마하나임 세트 */}
+              <div className="bg-[#F9FAFB] rounded-[24px] p-6 border border-[#E5E8EB]">
+                <div className="w-full aspect-square rounded-xl bg-white overflow-hidden mb-4 shadow-sm relative">
+                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-[#191F28] text-white text-[10px] font-black rounded-lg shadow-sm">
+                    2구좌
+                  </div>
+                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482271/4._%EB%B0%94%EB%A1%9C%ED%81%90_%EB%A7%88%ED%95%98%EB%82%98%EC%9E%84_zcp5lo.png" alt="결합세트" className="w-full h-full object-contain p-2" />
                 </div>
-                <h4 className="text-[16px] font-bold text-[#ADB5BD]">Coming Soon</h4>
-                <p className="text-[12px] text-[#ADB5BD]">추가 오픈 예정 라인업</p>
+                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">바로큐 안마기+마하나임 족욕기</h4>
+                <p className="text-[13px] text-[#4E5968] leading-snug mb-1">복부 안마기와 족욕기를 동시에 제공</p>
+                <p className="text-[12px] text-[#8B95A1]">HBSAZ-001+MH101</p>
               </div>
             </div>
           </div>
@@ -686,12 +788,12 @@ export default function LivingPage() {
 
         <div className="grid grid-cols-2 gap-3">
           {[
-            { title: '장례', desc: '품격 있는 의전', img: 'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?w=300&q=80&fit=crop' },
-            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://images.unsplash.com/photo-1548574505-5e239809ee19?w=300&q=80&fit=crop' },
-            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=300&q=80&fit=crop' },
-            { title: '웨딩', desc: '아름다운 시작', img: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=300&q=80&fit=crop' },
-            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=300&q=80&fit=crop' },
-            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=300&q=80&fit=crop' },
+            { title: '장례', desc: '품격 있는 의전', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482388/fileView_peyuol.jpg' },
+            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482393/photo_best02_product09_ratqci.jpg' },
+            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482785/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_w9mkhs.png' },
+            { title: '웨딩', desc: '아름다운 시작', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482894/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_1_eohmjh.png' },
+            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483177/A_modern_Korean_family_celebrating_a_70th_birthday-1778483158578_ka1tmy.png' },
+            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483181/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_2_wrklcr.png' },
           ].map((service, i) => (
             <div key={i} className="relative aspect-square rounded-[20px] overflow-hidden group shadow-sm">
               <img src={service.img} alt={service.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
@@ -718,19 +820,20 @@ export default function LivingPage() {
           </h2>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto px-6 pb-6 no-scrollbar snap-x snap-mandatory">
+        <div className="grid grid-cols-2 gap-3 px-6">
           {[
-            { title: '기차여행', desc: 'KTX, SRT 등\n최대 35% 할인', icon: <CreditCard className="w-6 h-6" /> },
-            { title: '호텔/리조트', desc: '전국 주요 숙박시설\n최대 80% 할인', icon: <Hotel className="w-6 h-6" /> },
-            { title: '건강검진', desc: 'KMI 등 전문기관\n최대 70% 할인', icon: <HeartPulse className="w-6 h-6" /> },
-            { title: '영화·공연', desc: 'CGV, 롯데시네마 등\n최대 40% 할인', icon: <Film className="w-6 h-6" /> },
+            { title: '기차여행', desc: 'KTX, SRT 등\n최대 35% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483384/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._4_mko5lm.png' },
+            { title: '호텔/리조트', desc: '전국 주요 숙박시설\n최대 80% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483539/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._5_ownbho.png' },
+            { title: '건강검진', desc: 'KMI 등 전문기관\n최대 70% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483641/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._6_isio8t.png' },
+            { title: '영화·공연', desc: 'CGV, 롯데시네마 등\n최대 40% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483644/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._7_dqdjc4.png' },
           ].map((item, i) => (
-            <div key={i} className="min-w-[160px] snap-center bg-[#F9FAFB] rounded-[24px] p-6 flex flex-col items-center text-center border border-[#E5E8EB]">
-              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm text-[#3182F6]">
-                {item.icon}
+            <div key={i} className="relative aspect-square rounded-[24px] overflow-hidden group shadow-md">
+              <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10"></div>
+              <div className="absolute inset-0 p-5 flex flex-col justify-end">
+                <h4 className="text-[16px] font-bold text-white mb-1.5">{item.title}</h4>
+                <p className="text-[11px] text-white/70 leading-snug whitespace-pre-line">{item.desc}</p>
               </div>
-              <h4 className="text-[15px] font-bold text-[#191F28] mb-2">{item.title}</h4>
-              <p className="text-[12px] text-[#4E5968] leading-snug whitespace-pre-line">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -857,10 +960,10 @@ export default function LivingPage() {
 
         <div className="grid grid-cols-2 gap-3">
           {[
-            { title: '황금 수의', desc: '품격을 높이는 최고급 수의', img: 'https://images.unsplash.com/photo-1590736910118-2434524c0846?w=400&q=80&fit=crop' },
-            { title: '궁중 염습', desc: '정성을 다하는 궁중 염습', img: 'https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=400&q=80&fit=crop' },
-            { title: '링컨 리무진', desc: '최고급 고인 전용 리무진', img: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&q=80&fit=crop' },
-            { title: '제단 꽃장식', desc: '풍성한 빈소 제단 장식', img: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=400&q=80&fit=crop' },
+            { title: '황금 수의', desc: '품격을 높이는 최고급 수의', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484181/img_mnzkaq.jpg' },
+            { title: '궁중 염습', desc: '정성을 다하는 궁중 염습', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484273/031_nihilist71_rwwsfl.jpg' },
+            { title: '링컨 리무진', desc: '최고급 고인 전용 리무진', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484299/4_mpwp2l.jpg' },
+            { title: '제단 꽃장식', desc: '풍성한 빈소 제단 장식', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484373/8e5d644c-146b-481a-9f57-d71770dd8166_fbug9x.webp' },
           ].map((item, i) => (
             <div key={i} className="flex flex-col">
               <div className="relative aspect-[4/5] rounded-[24px] overflow-hidden mb-3 shadow-2xl">
@@ -878,30 +981,52 @@ export default function LivingPage() {
 
       {/* Section 15: 브랜드 신뢰도 & 모델 영역 (Trust) */}
       <section className="bg-white py-16 px-6 my-2">
-        <div className="bg-[#E9F4EE] rounded-[32px] overflow-hidden relative mb-4">
-          <div className="p-8 pb-0">
-            <h4 className="text-[13px] font-bold text-[#006E4E] mb-3">20년간 오직 한 길만 걸어온 정통 상조회사</h4>
-            <h2 className="text-[28px] font-black text-[#191F28] leading-tight mb-6">효원상조와 함께하세요!</h2>
+        <div className="bg-[#E9F4EE] rounded-[32px] overflow-hidden relative mb-4 shadow-sm">
+          <div className="p-8 pb-4">
+            <h4 className="text-[11px] sm:text-[13px] font-bold text-[#006E4E] mb-3 whitespace-nowrap">20년간 오직 한 길만 걸어온 정통 상조회사</h4>
+            <h2 className="text-[22px] sm:text-[28px] font-black text-[#191F28] leading-tight mb-2 whitespace-nowrap">효원상조와 함께하세요!</h2>
+            <p className="text-[14px] text-[#4E5968] font-medium">정직과 신뢰로 보답하겠습니다.</p>
           </div>
-          <div className="px-6 flex justify-end">
+          <div className="px-4 flex justify-center">
             <img 
-              src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&q=80&fit=crop" 
-              alt="신뢰감 있는 모델" 
-              className="w-[80%] h-auto object-contain [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_80%,rgba(0,0,0,0)_100%)]"
+              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476138/IMG_3660_l4vlag.png" 
+              alt="효원상조 전속모델" 
+              className="w-full h-auto object-contain max-h-[320px]"
             />
           </div>
         </div>
 
-        <div className="bg-white border border-[#E5E8EB] rounded-[32px] p-8 flex items-center gap-5">
-          <div className="w-20 h-20 bg-[#F2F4F6] rounded-full overflow-hidden shrink-0">
-            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80&fit=crop" alt="안내 모델" className="w-full h-full object-cover" />
+        <div className="bg-white border border-[#E5E8EB] rounded-[32px] p-8 flex items-center gap-5 shadow-sm">
+          <div className="w-20 h-20 bg-[#F2F4F6] rounded-full overflow-hidden shrink-0 border-2 border-white shadow-inner">
+            <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476138/IMG_3660_l4vlag.png" alt="안내 모델" className="w-full h-full object-cover object-top" />
           </div>
           <div>
             <span className="text-[12px] font-bold text-[#3182F6] block mb-1">바른 소비의 첫걸음</span>
-            <p className="text-[15px] font-bold text-[#191F28] leading-relaxed break-keep">
-              고객과 함께 발맞춰 걷는<br/>효원상조가 되겠습니다.
+            <p className="text-[13px] sm:text-[15px] font-bold text-[#191F28] leading-relaxed break-keep">
+              고객과 함께 발맞춰 걷는 효원상조가 되겠습니다.
             </p>
           </div>
+        </div>
+
+        {/* 신한카드 이용한도 확인 링크 */}
+        <div className="mt-6">
+          <a 
+            href="https://www.shinhancard.com/pconts/html/bridge/MOBFM052R01.html?crustMenuId=ms560" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center justify-between bg-white border border-[#3182F6] rounded-[24px] p-5 transition-all hover:bg-[#F2F8FF] group shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#F2F8FF] rounded-2xl flex items-center justify-center text-[#3182F6]">
+                <CreditCard className="w-6 h-6" />
+              </div>
+              <div className="text-left">
+                <span className="text-[12px] font-bold text-[#3182F6] block mb-0.5">결제 전 확인해 보세요</span>
+                <p className="text-[14px] sm:text-[15px] font-bold text-[#191F28] whitespace-nowrap">신한카드 이용한도 조회하기</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-[#ADB5BD] group-hover:text-[#3182F6] transition-colors" />
+          </a>
         </div>
       </section>
 
@@ -928,10 +1053,20 @@ export default function LivingPage() {
 
         <div className="bg-[#191F28] rounded-[24px] p-6 border border-white/10 mb-10">
           <div className="flex items-center gap-4 mb-5">
-            <div className="w-12 h-8 bg-gradient-to-br from-[#ADB5BD] to-[#4E5968] rounded shadow-inner"></div>
+            <div className="w-12 h-8 bg-gradient-to-br from-[#0046FF] to-[#00227B] rounded-md shadow-inner relative overflow-hidden">
+              <div className="absolute top-2 left-2 w-3 h-2 bg-[#FFD700]/80 rounded-[2px]"></div>
+              <div className="absolute -right-2 -bottom-2 w-8 h-8 bg-white/5 rounded-full"></div>
+            </div>
             <p className="text-[14px] font-bold leading-snug">신한카드 이용 한도 확인 및<br/>이용 한도 상향 방법 안내</p>
           </div>
-          <button className="w-full py-3 bg-white/10 rounded-xl text-[13px] font-bold border border-white/20">한도 확인 바로가기</button>
+          <a 
+            href="https://www.shinhancard.com/pconts/html/bridge/MOBFM052R01.html?crustMenuId=ms560" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block w-full py-3.5 bg-white/5 rounded-xl text-[14px] font-bold border border-white/10 text-center hover:bg-white/10 transition-colors"
+          >
+            한도 확인 바로가기
+          </a>
         </div>
 
         <div className="space-y-2 px-2">
@@ -947,67 +1082,384 @@ export default function LivingPage() {
       </section>
 
       {/* Section 12: 최종 간편 상담 신청 폼 */}
-      <section ref={formRef} className="bg-[#F2F4F6] py-20 px-6">
-        <div className="mb-10 text-center">
-          <p className="text-[14px] font-bold text-[#3182F6] mb-3">지금 가장 좋은 타이밍에 준비하세요</p>
-          <h2 className="text-[26px] font-black text-[#191F28] leading-snug break-keep">
-            [효원상조 X 신한카드]<br/>간편 상담 신청
+      <section ref={formRef} className="bg-[#F2F4F6] py-16 sm:py-24 px-6">
+        <div className="mb-8 sm:mb-12 text-center">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" alt="효원상조" className="h-4 sm:h-5 object-contain" />
+            <span className="text-[14px] font-medium text-[#ADB5BD]">×</span>
+            <img 
+              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485695/images_k1hjt8.png" 
+              alt="신한카드" 
+              className="h-4 sm:h-5 object-contain mix-blend-multiply" 
+            />
+          </div>
+          <h2 className="text-[28px] font-black text-[#191F28] leading-tight break-keep mb-3">
+            간편 상담 신청
           </h2>
+          <p className="text-[14px] text-[#4E5968] font-medium">지금 바로 혜택 상담을 시작하세요</p>
         </div>
 
-        <div className="bg-white rounded-[32px] p-8 shadow-xl shadow-gray-200 border border-white">
-          <div className="space-y-5 mb-8">
-            <div>
-              <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1">이름</label>
-              <input type="text" placeholder="성함을 입력해주세요" className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] px-5 py-4 text-[16px] focus:ring-2 focus:ring-[#3182F6] focus:border-transparent outline-none transition-all placeholder:text-[#ADB5BD]" />
+        <div className="bg-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white max-w-[500px] mx-auto">
+          <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-10">
+            <div className="group">
+              <label className="block text-[13px] font-bold text-[#4E5968] mb-2 ml-1 transition-colors group-focus-within:text-[#3182F6]">성함</label>
+              <input 
+                type="text" 
+                placeholder="성함을 입력해주세요" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[20px] px-6 py-3.5 sm:py-4.5 text-[16px] focus:ring-2 focus:ring-[#3182F6]/20 focus:border-[#3182F6] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+              />
+
             </div>
-            <div>
-              <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1">연락처</label>
-              <input type="tel" placeholder="010-0000-0000" className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] px-5 py-4 text-[16px] focus:ring-2 focus:ring-[#3182F6] focus:border-transparent outline-none transition-all placeholder:text-[#ADB5BD]" />
-            </div>
-            <div>
-              <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1">생년월일</label>
-              <input type="number" placeholder="주민번호 앞 6자리" className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] px-5 py-4 text-[16px] focus:ring-2 focus:ring-[#3182F6] focus:border-transparent outline-none transition-all placeholder:text-[#ADB5BD]" />
+            <div className="group">
+              <label className="block text-[13px] font-bold text-[#4E5968] mb-2 ml-1 transition-colors group-focus-within:text-[#3182F6]">연락처</label>
+              <input 
+                type="tel" 
+                inputMode="tel"
+                value={phoneNumber}
+                onChange={handlePhoneChange}
+                placeholder="010-0000-0000" 
+                maxLength={13}
+                className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[20px] px-6 py-3.5 sm:py-4.5 text-[16px] focus:ring-2 focus:ring-[#3182F6]/20 focus:border-[#3182F6] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+              />
             </div>
             
             <div className="pt-2">
-              <label className="flex items-center gap-3 p-4 bg-[#F9FAFB] rounded-[20px] cursor-pointer group">
-                <input type="checkbox" className="w-5 h-5 rounded border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6] transition-all" defaultChecked />
+              <label className="flex items-center gap-3 p-4 sm:p-5 bg-[#F9FAFB] rounded-[24px] cursor-pointer group hover:bg-[#F2F8FF] transition-colors border border-transparent hover:border-[#3182F6]/10">
+                <input type="checkbox" className="w-5 h-5 rounded-full border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6] transition-all" defaultChecked />
                 <div className="flex-1 flex justify-between items-center">
-                  <span className="text-[14px] font-bold text-[#191F28]">개인정보 수집 및 이용 동의</span>
-                  <span className="text-[12px] text-[#8B95A1] underline">전문보기</span>
+                  <span className="text-[14px] font-bold text-[#191F28]">개인정보 동의</span>
+                  <span 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsPrivacyModalOpen(true);
+                    }}
+                    className="text-[12px] text-[#8B95A1] underline decoration-[#D1D6DB] underline-offset-4 cursor-pointer hover:text-[#3182F6] transition-colors"
+                  >
+                    전문보기
+                  </span>
                 </div>
               </label>
             </div>
           </div>
 
-          <button className="w-full bg-[#3182F6] text-white font-black text-[18px] py-5 rounded-[20px] hover:bg-[#1B64DA] transition-all shadow-lg shadow-blue-500/30 active:scale-[0.98] flex flex-col items-center gap-1">
-            <span className="text-[12px] opacity-80 font-bold">🎁 사은품 혜택받고</span>
-            무료 상담 신청하기
+          <button 
+            onClick={() => handleSubmit()}
+            disabled={isSubmitting}
+            className={`w-full bg-[#3182F6] text-white font-black text-[18px] py-4.5 sm:py-6 rounded-[24px] hover:bg-[#1B64DA] transition-all shadow-[0_10px_30px_rgba(49,130,246,0.3)] active:scale-[0.97] flex flex-col items-center gap-1 group ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+          >
+            <span className="text-[12px] opacity-80 font-bold tracking-wider group-hover:scale-110 transition-transform">
+              {isSubmitting ? '접수 중...' : '🎁 특별 혜택 신청하기'}
+            </span>
+            <div className="flex items-center gap-2">
+              {isSubmitting ? '잠시만 기다려주세요' : '무료 상담 예약'}
+              {!isSubmitting && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+            </div>
           </button>
+
           
-          <p className="mt-6 text-[12px] text-[#8B95A1] text-center leading-relaxed">
-            신청 즉시 전문 상담원이 순차적으로<br/>연락을 드려 친절히 안내해 드립니다.
-          </p>
+          <div className="mt-8 flex flex-col items-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#F9FAFB] rounded-full border border-[#F2F4F6]">
+              <div className="w-1.5 h-1.5 bg-[#00D084] rounded-full animate-pulse"></div>
+              <span className="text-[11px] font-bold text-[#4E5968]">현재 상담 대기 중</span>
+            </div>
+            <p className="text-[12px] text-[#8B95A1] text-center leading-relaxed">
+              신청 즉시 전문 상담원이 순차적으로<br/>연락을 드려 친절히 안내해 드립니다.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* 푸터 영역 (App.tsx의 디자인 차용) */}
+      {/* 푸터 영역 */}
+      <footer className="bg-[#111111] pt-16 pb-32 px-6 text-white border-t border-white/5">
+        <div className="max-w-[400px] mx-auto">
+          {/* Logo in Footer */}
+          <div className="mb-10 opacity-60">
+            <img 
+              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
+              alt="효원상조 로고" 
+              className="h-[22px] w-auto object-contain brightness-0 invert"
+            />
+          </div>
 
-      {/* 푸터 영역 (App.tsx의 디자인 차용) */}
-      <footer className="bg-[#191F28] text-[#8B95A1] pt-12 pb-16 px-6 text-[12px] leading-relaxed border-t border-white/5">
-        <div className="mb-8">
-          <p className="font-bold text-white text-[14px] mb-2">효원상조 (효원프라임)</p>
-          <p>대표자: 최혁</p>
-          <p>사업자등록번호: 101-86-35071</p>
-          <p>통신판매업신고번호: 제 2011-서울영등포-0752호</p>
-          <p>본사: 서울특별시 영등포구 양산로 91, 5층 (당산동3가, 인영빌딩)</p>
-        </div>
-        <div className="flex gap-4 font-bold text-white/80">
-          <span>개인정보처리방침</span>
-          <span>이용약관</span>
+          {/* Legal Links */}
+          <div className="flex flex-wrap gap-x-5 gap-y-2 mb-10 px-1">
+            <a href="#" className="text-[13px] font-bold text-[#D1D6DB] hover:text-white transition-colors">이용약관</a>
+            <button 
+              onClick={() => setIsPrivacyModalOpen(true)}
+              className="text-[13px] font-bold text-white hover:text-white transition-colors underline underline-offset-4 decoration-white/30"
+            >
+              개인정보처리방침
+            </button>
+            <a href="#" className="text-[13px] font-bold text-[#D1D6DB] hover:text-white transition-colors">중요정보고시사항</a>
+          </div>
+
+          <div className="border-t border-white/5 pt-10">
+            {/* Distributor Info */}
+            <div className="mb-10 px-1">
+              <h5 className="text-[13px] font-bold text-white mb-3 flex items-center gap-2">
+                <span className="w-1 h-3 bg-[#3182F6] rounded-full"></span>
+                총판사
+              </h5>
+              <div className="text-[12px] text-[#8B95A1] leading-[1.8] font-medium break-keep">
+                <span className="text-white font-bold">(주)라이프앤조이</span> | 대표 : 김지훈<br/>
+                경기도 하남시 미사대로 510, 624호(아이에스비즈타워)<br/>
+                사업자등록번호: 388-86-02921 | 통신판매신고번호: 2024-경기하남-1853호<br/>
+                E-mail: lifenjoy0296@gmail.com | 개인정보보호책임자: 김지훈(lifenjoy0296@gmail.co.kr)<br/>
+                <span className="text-[11px] text-white/20 mt-1 block uppercase">Copyright(c)2026 LIFE&JOY Co.,Ltd. All Right Reserved.</span>
+              </div>
+            </div>
+
+            {/* Service Provider Info */}
+            <div className="mb-10 px-1 border-t border-white/5 pt-8">
+              <h5 className="text-[13px] font-bold text-white mb-3 flex items-center gap-2">
+                <span className="w-1 h-3 bg-[#A3B1C6] rounded-full"></span>
+                상조서비스 주관사
+              </h5>
+              <div className="text-[12px] text-[#8B95A1] leading-[1.8] font-medium break-keep">
+                <span className="text-white font-bold">(주)효원상조</span> 대표이사 : 이선주<br/>
+                서울시 강동구 풍성로 38길 9, 바로빌딩 3층<br/>
+                사업자등록번호 : 126-81-81624 | 선불식할부거래업등록번호 : 서울-2010-제28<br/>
+                <span className="text-[11px] text-white/20 mt-1 block uppercase">COPYRIGHT ⓒ (주)효원상조 Co. All Rights Reserved.</span>
+              </div>
+            </div>
+
+            {/* Customer Center Info */}
+            <div className="mb-12 px-1 bg-white/5 rounded-2xl p-5 border border-white/5">
+              <h5 className="text-[13px] font-bold text-[#3182F6] mb-4">(주)효원상조 고객센터</h5>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-[12px] text-[#8B95A1]">고객센터</span>
+                  <a href="tel:1588-8873" className="text-[18px] font-black text-white hover:text-[#3182F6] transition-colors">1588-8873</a>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex flex-col">
+                    <span className="text-[12px] text-[#8B95A1]">24시 긴급행사</span>
+                    <span className="text-[10px] text-[#3182F6]">(장례접수)</span>
+                  </div>
+                  <a href="tel:1577-8873" className="text-[18px] font-black text-white hover:text-[#3182F6] transition-colors">1577-8873</a>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between px-1 pt-4 border-t border-white/5">
+              <p className="text-[11px] text-white/20 font-medium tracking-tight">© HYOWON. All rights reserved.</p>
+              <div className="flex gap-4">
+                 {/* 관리자 전용 버튼 */}
+                 <a 
+                   href="/admin"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="text-[10px] text-white/10 hover:text-[#3182F6] transition-colors font-bold"
+                 >
+                   ADMIN
+                 </a>
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
+
+      {/* 개인정보 처리방침 모달 */}
+      <AnimatePresence>
+        {isPrivacyModalOpen && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsPrivacyModalOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-[500px] bg-white rounded-[32px] overflow-hidden shadow-2xl flex flex-col max-h-[80vh]"
+            >
+              <div className="p-6 border-b border-[#F2F4F6] flex items-center justify-between">
+                <h3 className="text-[18px] font-black text-[#191F28]">개인정보 수집 및 이용 동의</h3>
+                <button 
+                  onClick={() => setIsPrivacyModalOpen(false)}
+                  className="w-10 h-10 flex items-center justify-center bg-[#F9FAFB] rounded-full hover:bg-[#F2F4F6] transition-colors"
+                >
+                  <X className="w-5 h-5 text-[#8B95A1]" />
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto text-[14px] text-[#4E5968] leading-relaxed break-keep scrollbar-hide">
+                <p className="mb-6 font-bold text-[#191F28]">
+                  (주)효원상조와 (주)라이프앤조이는 귀하의 상담 신청과 관련하여 다음과 같이 개인정보를 수집·이용 및 제공하고자 합니다.
+                </p>
+
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="font-black text-[#191F28] mb-2 flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-[#3182F6] rounded-full"></div>
+                      1. 개인정보의 수집·이용에 관한 사항
+                    </h4>
+                    <ul className="space-y-2 pl-3.5">
+                      <li>• <span className="font-bold">수집 항목:</span> 이름, 연락처(휴대폰 번호), 문의 사항</li>
+                      <li>• <span className="font-bold">수집 및 이용 목적:</span>
+                        <ul className="pl-3 mt-1 space-y-1 text-[13px] opacity-80">
+                          <li>- 상담 신청에 따른 본인 확인 및 원활한 의사소통 경로 확보</li>
+                          <li>- 상품 안내(상조 및 가전결합 상품) 및 가입 상담</li>
+                          <li>- 계약 진행 및 서비스 제공을 위한 기초 자료 활용</li>
+                        </ul>
+                      </li>
+                      <li>• <span className="font-bold">보유 및 이용 기간:</span> 상담 완료 및 목적 달성 시까지 (단, 관련 법령에 따라 보존이 필요한 경우 해당 기간까지 보관)</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h4 className="font-black text-[#191F28] mb-2 flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-[#3182F6] rounded-full"></div>
+                      2. 개인정보의 제3자 제공에 관한 사항
+                    </h4>
+                    <p className="mb-2 pl-3.5">본 상담 서비스 제공을 위해 아래와 같이 개인정보를 제공합니다.</p>
+                    <ul className="space-y-2 pl-3.5">
+                      <li>• <span className="font-bold">제공받는 자:</span> (주)효원상조, (주)라이프앤조이</li>
+                      <li>• <span className="font-bold">제공 목적:</span> 상품 안내, 해피콜, 계약 체결 및 관리</li>
+                      <li>• <span className="font-bold">제공 항목:</span> 이름, 연락처, 상담 내용</li>
+                      <li>• <span className="font-bold">보유 및 이용 기간:</span> 제공 목적 달성 시까지</li>
+                    </ul>
+                  </div>
+
+                  <div className="p-4 bg-[#F9FAFB] rounded-2xl border border-[#F2F4F6]">
+                    <p className="font-bold text-[#191F28] mb-1">※ 동의 거부 권리 안내</p>
+                    <p className="text-[13px] opacity-80">귀하는 개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있습니다. 다만, 동의를 거부하실 경우 상담 신청 및 상품 안내 서비스 이용이 제한될 수 있습니다.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 bg-[#F9FAFB] border-t border-[#F2F4F6]">
+                <button 
+                  onClick={() => setIsPrivacyModalOpen(false)}
+                  className="w-full py-4 bg-[#3182F6] text-white font-bold rounded-2xl hover:bg-[#1B64DA] transition-all"
+                >
+                  확인했습니다
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* 플로팅 상담 신청 바 (Sticky Bottom Bar) */}
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] z-[45] px-4 pb-4 pointer-events-none">
+        <motion.div 
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          className="bg-[#191F28]/95 backdrop-blur-md p-2 rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.3)] border border-white/10 pointer-events-auto flex items-center gap-3"
+        >
+          <div className="flex-1 flex flex-col justify-center pl-4">
+             <div className="flex items-center gap-1.5 mb-1">
+               <span className="w-1 h-1 bg-[#3182F6] rounded-full animate-pulse"></span>
+               <span className="text-[9px] font-black text-[#3182F6] tracking-tighter uppercase">Special Offer</span>
+             </div>
+             <p className="text-[13px] font-bold text-white leading-none">리빙 144 단독 혜택</p>
+          </div>
+          <button 
+            onClick={() => setIsContactModalOpen(true)}
+            className="bg-[#3182F6] text-white px-5 py-3 rounded-[18px] font-black text-[13px] flex items-center gap-2 hover:bg-[#1B64DA] transition-colors shadow-lg shadow-[#3182F6]/20 active:scale-95 shrink-0"
+          >
+            상담 신청 <ArrowRight className="w-4 h-4" />
+          </button>
+        </motion.div>
+      </div>
+
+      {/* 상담 신청 모달 */}
+      <AnimatePresence>
+        {isContactModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsContactModalOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-[450px] bg-white rounded-[40px] overflow-hidden shadow-2xl flex flex-col"
+            >
+              <div className="p-8 border-b border-[#F2F4F6] flex items-center justify-between">
+                <div>
+                   <h3 className="text-[20px] font-black text-[#191F28] mb-1">빠른 상담 신청</h3>
+                   <p className="text-[13px] text-[#8B95A1] font-medium">상담원이 확인 후 연락드립니다</p>
+                </div>
+                <button 
+                  onClick={() => setIsContactModalOpen(false)}
+                  className="w-10 h-10 flex items-center justify-center bg-[#F9FAFB] rounded-full hover:bg-[#F2F4F6] transition-colors"
+                >
+                  <X className="w-5 h-5 text-[#8B95A1]" />
+                </button>
+              </div>
+
+              <div className="p-8">
+                <div className="space-y-6 mb-10">
+                  <div className="group">
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1 transition-colors group-focus-within:text-[#3182F6]">성함</label>
+                    <input 
+                      type="text" 
+                      placeholder="성함을 입력해주세요" 
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[20px] px-6 py-4.5 text-[16px] focus:ring-2 focus:ring-[#3182F6]/20 focus:border-[#3182F6] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+                    />
+
+                  </div>
+                  <div className="group">
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1 transition-colors group-focus-within:text-[#3182F6]">연락처</label>
+                    <input 
+                      type="tel" 
+                      inputMode="tel"
+                      value={phoneNumber}
+                      onChange={handlePhoneChange}
+                      placeholder="010-0000-0000" 
+                      maxLength={13}
+                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[20px] px-6 py-4.5 text-[16px] focus:ring-2 focus:ring-[#3182F6]/20 focus:border-[#3182F6] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+                    />
+                  </div>
+                  
+                  <div className="pt-2">
+                    <label className="flex items-center gap-3 p-5 bg-[#F9FAFB] rounded-[24px] cursor-pointer group hover:bg-[#F2F8FF] transition-colors border border-transparent hover:border-[#3182F6]/10">
+                      <input type="checkbox" className="w-5 h-5 rounded-full border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6] transition-all" defaultChecked />
+                      <div className="flex-1 flex justify-between items-center">
+                        <span className="text-[14px] font-bold text-[#191F28]">개인정보 동의</span>
+                        <span 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPrivacyModalOpen(true);
+                          }}
+                          className="text-[12px] text-[#8B95A1] underline decoration-[#D1D6DB] underline-offset-4 cursor-pointer hover:text-[#3182F6] transition-colors"
+                        >
+                          전문보기
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => handleSubmit()}
+                  disabled={isSubmitting}
+                  className={`w-full bg-[#3182F6] text-white font-black text-[18px] py-6 rounded-[24px] hover:bg-[#1B64DA] transition-all shadow-[0_10px_30px_rgba(49,130,246,0.3)] active:scale-[0.97] flex flex-col items-center gap-1 group ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                >
+                  <span className="text-[12px] opacity-80 font-bold tracking-wider group-hover:scale-110 transition-transform">
+                    {isSubmitting ? '접수 중...' : '🎁 특별 혜택 신청하기'}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {isSubmitting ? '잠시만 기다려주세요' : '무료 상담 신청 완료'}
+                    {!isSubmitting && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                  </div>
+                </button>
+
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

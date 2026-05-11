@@ -6,6 +6,8 @@ import ProductManagement from './pages/ProductManagement';
 import ChannelManagement from './pages/ChannelManagement';
 import Statistics from './pages/Statistics';
 import Settings from './pages/Settings';
+import LandingManagement from './pages/LandingManagement';
+import ConsentManagement from './pages/ConsentManagement';
 
 export default function AdminApp() {
   console.log('AdminApp Mounting...');
@@ -105,17 +107,23 @@ export default function AdminApp() {
     switch (activeMenu) {
       case 'customers':
         return <CustomerManagement channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
+      case 'consent':
+        return <ConsentManagement channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
       case 'products':
         return <ProductManagement />;
       case 'channels':
         return <ChannelManagement onLoginAsChannel={(channel) => {
-            const url = `${window.location.origin}${window.location.pathname}?admin=true&proxy=${channel.subdomain}&name=${encodeURIComponent(channel.channelName)}`;
+            const url = `${window.location.origin}/admin?proxy=${channel.subdomain}&name=${encodeURIComponent(channel.channelName)}`;
             window.open(url, '_blank');
         }} />;
+
+      case 'landings':
+        return <LandingManagement userType={user.type} subdomain={user.subdomain} />;
+
       case 'statistics':
         return <Statistics channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
       case 'settings':
-        return <Settings />;
+        return <Settings user={user} />;
       default:
         return <CustomerManagement channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
     }
@@ -138,7 +146,14 @@ export default function AdminApp() {
                   sessionStorage.removeItem('admin_proxy_user');
               }
           }}
+          onLogout={() => {
+              setUser(null);
+              localStorage.removeItem('admin_user');
+              sessionStorage.removeItem('admin_proxy_user');
+          }}
+          subdomain={user?.subdomain}
       >
+
         {renderContent()}
       </AdminLayout>
     );
