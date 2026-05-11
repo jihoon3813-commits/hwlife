@@ -2,6 +2,15 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  channels: defineTable({
+    accountId: v.string(),
+    password: v.string(),
+    subdomain: v.string(),
+    status: v.string(), // "승인대기", "정상", "정지"
+    channelName: v.string(),
+    managerName: v.string(),
+    managerContact: v.string(),
+  }).index("by_accountId", ["accountId"]),
   products: defineTable({
     category: v.string(),
     planId: v.number(),
@@ -65,6 +74,7 @@ export default defineSchema({
         memo: v.string()
       })
     )),
+    channelId: v.optional(v.string()),
   }),
   shorts: defineTable({
     title: v.string(),
@@ -99,6 +109,7 @@ export default defineSchema({
     userAgent: v.string(),
     referrer: v.optional(v.string()),
     path: v.string(),
+    channelId: v.optional(v.string()),
     timestamp: v.number(),
   }).index("by_timestamp", ["timestamp"]),
 });

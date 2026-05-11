@@ -9,6 +9,7 @@ export const create = mutation({
     phone: v.string(),
     productName: v.string(),
     message: v.optional(v.string()),
+    channelId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const id = await ctx.db.insert("inquiries", {
@@ -16,11 +17,22 @@ export const create = mutation({
       status: "대기",
       createdAt: Date.now(),
     });
+    // Add channel name to discord notification if available
+    let channelName = "기본";
+    if (args.channelId) {
+        const channel = await ctx.db
+            .query("channels")
+            .filter((q) => q.eq(q.field("subdomain"), args.channelId))
+            .first();
+        if (channel) channelName = channel.channelName;
+    }
+
     await ctx.scheduler.runAfter(0, internal.inquiries.sendDiscordNotification, {
       name: args.name,
       phone: args.phone,
       productName: args.productName,
       message: args.message,
+      channelName: channelName,
     });
     return id;
   },
@@ -32,6 +44,7 @@ export const sendDiscordNotification = internalAction({
     phone: v.string(),
     productName: v.string(),
     message: v.optional(v.string()),
+    channelName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
@@ -44,6 +57,7 @@ export const sendDiscordNotification = internalAction({
         fields: [
           { name: "👤 성함", value: args.name, inline: true },
           { name: "📞 연락처", value: args.phone, inline: true },
+          { name: "🏢 유입 채널", value: args.channelName || "기본", inline: true },
           { name: "📦 신청 상품", value: args.productName },
           { name: "💬 문의 내용", value: args.message || "내용 없음" },
         ],
@@ -60,10 +74,17 @@ export const sendDiscordNotification = internalAction({
   },
 });
 
-// Admin: Get all inquiries
+// Admin: Get all inquiries with optional channel filter
 export const list = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { channelId: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    if (args.channelId) {
+        return await ctx.db
+            .query("inquiries")
+            .filter((q) => q.eq(q.field("channelId"), args.channelId))
+            .order("desc")
+            .collect();
+    }
     return await ctx.db.query("inquiries").order("desc").collect();
   },
 });

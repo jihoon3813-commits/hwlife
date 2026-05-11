@@ -7,6 +7,7 @@ export const logVisit = mutation({
     userAgent: v.string(),
     referrer: v.optional(v.string()),
     path: v.string(),
+    channelId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("visits", {
@@ -19,6 +20,7 @@ export const logVisit = mutation({
 export const getDashboardStats = query({
   args: {
     period: v.optional(v.string()), // "today", "week", "month"
+    channelId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const period = args.period || "today";
@@ -47,22 +49,32 @@ export const getDashboardStats = query({
     }
 
     // Current period stats
-    const currentVisits = await ctx.db
+    let currentVisitsQuery = ctx.db
       .query("visits")
-      .withIndex("by_timestamp", (q) => q.gte("timestamp", currentStartTime))
-      .collect();
+      .withIndex("by_timestamp", (q) => q.gte("timestamp", currentStartTime));
+    
+    if (args.channelId) {
+        currentVisitsQuery = currentVisitsQuery.filter((q) => q.eq(q.field("channelId"), args.channelId));
+    }
+    const currentVisits = await currentVisitsQuery.collect();
 
-    const allInquiries = await ctx.db
-      .query("inquiries")
-      .collect();
+    let inquiriesQuery = ctx.db.query("inquiries");
+    if (args.channelId) {
+        inquiriesQuery = inquiriesQuery.filter((q) => q.eq(q.field("channelId"), args.channelId));
+    }
+    const allInquiries = await inquiriesQuery.collect();
     
     const currentInquiriesFiltered = allInquiries.filter(i => i.createdAt >= currentStartTime);
 
     // Previous period stats for comparison
-    const previousVisits = await ctx.db
+    let previousVisitsQuery = ctx.db
       .query("visits")
-      .withIndex("by_timestamp", (q) => q.gte("timestamp", previousStartTime).lt("timestamp", previousEndTime))
-      .collect();
+      .withIndex("by_timestamp", (q) => q.gte("timestamp", previousStartTime).lt("timestamp", previousEndTime));
+    
+    if (args.channelId) {
+        previousVisitsQuery = previousVisitsQuery.filter((q) => q.eq(q.field("channelId"), args.channelId));
+    }
+    const previousVisits = await previousVisitsQuery.collect();
 
     const previousInquiriesFiltered = allInquiries.filter(i => i.createdAt >= previousStartTime && i.createdAt < previousEndTime);
 
@@ -133,10 +145,14 @@ export const getDashboardStats = query({
       const start = d.getTime();
       const end = start + 24 * 60 * 60 * 1000;
       
-      const dayVisits = await ctx.db
+      let dayVisitsQuery = ctx.db
         .query("visits")
-        .withIndex("by_timestamp", (q) => q.gte("timestamp", start).lt("timestamp", end))
-        .collect();
+        .withIndex("by_timestamp", (q) => q.gte("timestamp", start).lt("timestamp", end));
+      
+      if (args.channelId) {
+        dayVisitsQuery = dayVisitsQuery.filter((q) => q.eq(q.field("channelId"), args.channelId));
+      }
+      const dayVisits = await dayVisitsQuery.collect();
       
       const dayInquiries = allInquiries.filter(inq => inq.createdAt >= start && inq.createdAt < end);
       

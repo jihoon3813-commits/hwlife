@@ -5,17 +5,29 @@ interface AdminLayoutProps {
   children: React.ReactNode;
   activeMenu: string;
   setActiveMenu: (menu: string) => void;
+  userType?: 'admin' | 'channel';
+  userName?: string;
+  isProxyMode?: boolean;
+  onExitProxy?: () => void;
 }
 
-export default function AdminLayout({ children, activeMenu, setActiveMenu }: AdminLayoutProps) {
+export default function AdminLayout({ children, activeMenu, setActiveMenu, userType = 'admin', userName, isProxyMode, onExitProxy }: AdminLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const menuItems = [
+  const allMenuItems = [
     { id: 'customers', label: '고객관리', icon: Users },
     { id: 'products', label: '제품관리', icon: Box },
+    { id: 'channels', label: '채널관리', icon: LayoutGrid },
     { id: 'statistics', label: '통계분석', icon: BarChart3 },
     { id: 'settings', label: '설정', icon: SettingsIcon },
   ];
+
+  const menuItems = allMenuItems.filter(item => {
+    if (userType === 'channel') {
+      return ['customers', 'statistics'].includes(item.id);
+    }
+    return true;
+  });
 
   const handleMenuClick = (id: string) => {
     setActiveMenu(id);
@@ -51,6 +63,30 @@ export default function AdminLayout({ children, activeMenu, setActiveMenu }: Adm
             <X className="w-6 h-6 text-[#8B95A1]" />
           </button>
         </div>
+        
+        <div className="flex items-center gap-3 px-6 py-4 border-b border-[#E5E8EB]">
+          <div className="w-10 h-10 rounded-full bg-[#3182F6] flex items-center justify-center text-white font-bold">
+            {userName?.slice(0, 1) || 'A'}
+          </div>
+          <div>
+            <p className="text-[14px] font-bold text-[#191F28]">{userName || '관리자'}</p>
+            <p className="text-[12px] text-[#8B95A1]">
+                {isProxyMode ? '채널 대리 관리중' : (userType === 'admin' ? '마스터 권한' : '채널 권한')}
+            </p>
+          </div>
+        </div>
+
+        {isProxyMode && (
+          <div className="px-4 mt-4">
+            <button 
+              onClick={onExitProxy}
+              className="w-full bg-[#191F28] text-white text-[13px] font-bold py-2.5 rounded-[10px] flex items-center justify-center gap-2 hover:bg-black transition-colors"
+            >
+              마스터 관리자로 돌아가기
+            </button>
+          </div>
+        )}
+
         <nav className="flex-1 p-4 space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;

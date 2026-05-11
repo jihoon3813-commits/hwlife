@@ -3,9 +3,9 @@ import { BarChart3, Users, MousePointerClick, TrendingUp, Calendar, RefreshCw } 
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
-export default function Statistics() {
+export default function Statistics({ channelId }: { channelId?: string }) {
   const [period, setPeriod] = useState('today');
-  const stats = useQuery(api.stats.getDashboardStats, { period });
+  const stats = useQuery(api.stats.getDashboardStats, { period, channelId });
 
   if (!stats) {
     return (

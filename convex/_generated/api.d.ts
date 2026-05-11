@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as channels from "../channels.js";
 import type * as competitors from "../competitors.js";
 import type * as images from "../images.js";
 import type * as inquiries from "../inquiries.js";
@@ -24,6 +25,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  channels: typeof channels;
   competitors: typeof competitors;
   images: typeof images;
   inquiries: typeof inquiries;

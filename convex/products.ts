@@ -32,13 +32,12 @@ export const getAllProducts = query({
 
 // For public view
 export const getVisibleProducts = query({
-  args: {},
   handler: async (ctx) => {
     const products = await ctx.db
       .query("products")
       .filter((q) => q.eq(q.field("isVisible"), true))
       .collect();
-      
+
     return await Promise.all(
       products.map(async (p) => {
         const resolveUrl = async (url: string | undefined) => {
@@ -81,6 +80,7 @@ export const create = mutation({
     detailImages: v.optional(v.array(v.string())),
     isVisible: v.boolean(),
     showOnMain: v.optional(v.boolean()),
+    landingPages: v.optional(v.array(v.string())),
     comparisons: v.array(
       v.object({
         company: v.string(),
@@ -116,6 +116,7 @@ export const update = mutation({
     detailImages: v.optional(v.array(v.string())),
     isVisible: v.optional(v.boolean()),
     showOnMain: v.optional(v.boolean()),
+    landingPages: v.optional(v.array(v.string())),
     comparisons: v.optional(
       v.array(
         v.object({

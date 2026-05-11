@@ -1,16 +1,36 @@
 import React, { useState } from 'react';
+import { useConvex } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
-export default function AdminLogin({ onLogin }: { onLogin: () => void }) {
+export default function AdminLogin({ onLogin }: { onLogin: (user: any) => void }) {
+  const convex = useConvex();
   const [id, setId] = useState('admin');
   const [password, setPassword] = useState('admin1234');
   const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
+    // Master Admin Check
     if (id === 'admin' && password === 'admin1234') {
-      onLogin();
-    } else {
-      setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+      onLogin({
+        type: 'admin',
+        accountId: 'admin',
+        channelName: '마스터 관리자'
+      });
+      return;
+    }
+
+    try {
+      const channelUser = await convex.query(api.channels.validateLogin, { accountId: id, password: password });
+      if (channelUser) {
+        onLogin(channelUser);
+      } else {
+        setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+      }
+    } catch (err: any) {
+      setError(err.message || '로그인 중 오류가 발생했습니다.');
     }
   };
 

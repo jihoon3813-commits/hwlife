@@ -3,7 +3,7 @@ import { X, Search, Filter, History, RefreshCw, Trash2, Save } from 'lucide-reac
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
-export default function CustomerManagement() {
+export default function CustomerManagement({ channelId }: { channelId?: string }) {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [memo, setMemo] = useState('');
   const [status, setStatus] = useState('대기');
@@ -14,7 +14,7 @@ export default function CustomerManagement() {
   const [editData, setEditData] = useState<any>({});
   
   const settings = useQuery(api.settings.get);
-  const inquiries = useQuery(api.inquiries.list);
+  const inquiries = useQuery(api.inquiries.list, { channelId });
   const updateInquiry = useMutation(api.inquiries.update);
   const removeInquiry = useMutation(api.inquiries.remove);
 

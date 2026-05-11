@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Check, X, ChevronDown, ChevronLeft, ChevronRight, ArrowRight, Play, Info, LayoutGrid, List,
@@ -24,6 +24,10 @@ export default function App() {
   const [isProductFullView, setIsProductFullView] = useState(false);
   const [inquiryProduct, setInquiryProduct] = useState<any | null>(null);
   const [lastViewedSection, setLastViewedSection] = useState<string | null>(null);
+  
+  // Channel Tracking
+  const channelId = window.location.pathname.split('/')[1] || undefined;
+  
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const productScrollRef = useRef<HTMLDivElement>(null);
   const logVisit = useMutation(api.stats.logVisit);
@@ -45,6 +49,7 @@ export default function App() {
           userAgent: navigator.userAgent,
           referrer: document.referrer || "직접 유입",
           path: window.location.pathname + window.location.search,
+          channelId: channelId,
         });
       } catch (e) {
         console.error("Visit tracking failed", e);
@@ -572,7 +577,7 @@ export default function App() {
                     <span className="text-[11px] font-medium text-[#8B95A1] line-clamp-1 leading-tight">{item.model}</span>
                   </div>
                   <h3 className="text-[13px] font-bold text-[#191F28] mb-3 leading-tight line-clamp-2 min-h-[32px]">
-                    {item.name}
+                    {item?.name}
                   </h3>
                   <div className="mt-auto">
                     <div className="flex flex-col gap-1">
@@ -683,7 +688,7 @@ export default function App() {
                      <span className="font-bold text-[#3182F6] whitespace-nowrap text-[15px]">53,820원</span>
                    </div>
                    <div className="pt-4 mt-1 border-t border-[#3182F6]/10 text-[11px] text-[#4E5968]/70 leading-relaxed break-keep">
-                     * 1회부터 60회까지는 상조부금과 가전 렌탈 대금이 구분되어 청구됩니다. 61회부터는 상조부금으로 전액 전환됩니다.
+                     * 1회부터 60회까지는 상조부금과 가전 렌탈 대금이 구분되어 청구됩니다. 61회~200회까지는 상조부금으로 전액 전환됩니다.
                    </div>
                  </div>
                </div>
@@ -1114,7 +1119,114 @@ export default function App() {
         </div>
       </section>
 
-      {/* 10. FAQ */}
+      {/* Funeral Service Section */}
+      <section id="funeral-service" className="bg-white py-16 px-6 rounded-[32px] my-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)] border border-[#F2F4F6]">
+        <div className="mb-10 text-center">
+          <span className="inline-block px-2.5 py-1 bg-[#3182F6]/10 text-[#3182F6] text-[11px] font-bold rounded-md mb-2 uppercase tracking-wider">Funeral Services</span>
+          <h2 className="text-[24px] font-bold text-[#191F28] leading-tight mb-4">
+            정성을 다하는<br />효원의 고품격 장례서비스
+          </h2>
+          <p className="text-[#8B95A1] text-[15px] leading-relaxed break-keep">
+            인력지원부터 물품까지, 마지막 가시는 길<br />부족함 없이 정성으로 모십니다.
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {[
+            {
+              category: "인력지원",
+              items: [
+                { label: "장례지도사", value: "1명 (3일간 전담인력 파견, 3일장 기준)" },
+                { label: "입관지원", value: "1명 (2일차 입관 시 지원)" },
+                { label: "복지사(접객도우미)", value: "4명 (1인 8시간 기준)" }
+              ]
+            },
+            {
+              category: "고인용품",
+              items: [
+                { label: "수의", value: "효원 황금문양수의 세트 특 3호" },
+                { label: "입관스페셜", value: "황금문양 孝 전통대렴, 황금문양 대렴염포" },
+                { label: "관", value: "오동나무관 (매장/화장 규격관 사용)" },
+                { label: "봉안함", value: "효원 고급형 (종교별) / 봉안 시 제공" },
+                { label: "부속품", value: "명정, 관보, 혼백, 다라니경, 수시포 등 6종 이상" }
+              ]
+            },
+            {
+              category: "장의차량",
+              items: [
+                { label: "고인운구차", value: "관내 무료 (장례식장 이송 필요 시)" },
+                { label: "전용 리무진", value: "전국 무료" },
+                { label: "전용 장의버스", value: "전국 무료" }
+              ]
+            },
+            {
+              category: "상주/빈소용품",
+              items: [
+                { label: "상복(전통/현대)", value: "남녀 전통/현대식 상복 제공 및 대여" },
+                { label: "제단/헌화", value: "제단 꽃 20만원 지원 + 헌화 20송이" },
+                { label: "빈소용품", value: "위패, 향, 초, 부의록, 영정리본 등 일체" },
+                { label: "근조기", value: "근조기 설치 서비스" }
+              ]
+            }
+          ].map((section, idx) => (
+            <div key={idx} className="bg-[#F8FAFB] rounded-[24px] overflow-hidden border border-[#F2F4F6]">
+              <div className="bg-[#191F28] px-5 py-3.5">
+                <h3 className="text-white font-bold text-[15px] flex items-center gap-2">
+                  <span className="w-1 h-3 bg-[#3182F6] rounded-full"></span>
+                  {section.category}
+                </h3>
+              </div>
+              <div className="p-5 space-y-4">
+                {section.items.map((item, itemIdx) => (
+                  <div key={itemIdx} className="flex flex-col gap-1">
+                    <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">{item.label}</span>
+                    <span className="text-[14px] font-medium text-[#333D4B] leading-snug break-keep">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          <div className="bg-[#F8FAFB] rounded-[24px] overflow-hidden border border-[#F2F4F6]">
+            <div className="bg-[#191F28] px-5 py-3.5">
+              <h3 className="text-white font-bold text-[15px] flex items-center gap-2">
+                <span className="w-1 h-3 bg-[#3182F6] rounded-full"></span>
+                발인용품
+              </h3>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">횡대</span>
+                <span className="text-[14px] font-medium text-[#333D4B] leading-snug">매장 시 오동나무 횡대 제공</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">고급차량띠/장갑</span>
+                <span className="text-[14px] font-medium text-[#333D4B] leading-snug">선도차 고급차량띠 및 운구용 장갑 제공</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Services Grid */}
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              { title: "부고알림", desc: "모바일 부고알림 서비스 제공 (온라인 장례식장)" },
+              { title: "안내서비스", desc: "행정절차 및 장례관련 일체 안내" },
+              { title: "수의대체", desc: "황실전통대렴 또는 복지사 2명 中 택 1" }
+            ].map((service, idx) => (
+              <div key={idx} className="flex items-center gap-4 bg-white border border-[#E5E8EB] p-4 rounded-[20px] shadow-sm">
+                <div className="w-10 h-10 bg-[#3182F6]/5 rounded-full flex items-center justify-center shrink-0">
+                  <Check className="w-5 h-5 text-[#3182F6]" />
+                </div>
+                <div>
+                  <h4 className="text-[14px] font-bold text-[#191F28]">{service.title}</h4>
+                  <p className="text-[12px] text-[#8B95A1]">{service.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="faq" className="bg-white py-12 px-6 rounded-[32px] my-2">
          <h2 className="text-[22px] font-bold mb-6">자주 묻는 질문</h2>
          <div className="space-y-4">
@@ -1684,7 +1796,8 @@ export default function App() {
                       name,
                       phone,
                       productName: inquiryProduct ? inquiryProduct.name : "전체 상담",
-                      message: finalMessage || undefined
+                      message: finalMessage || undefined,
+                      channelId: channelId
                     });
                     
                     // Google Ads Conversion Tracking
