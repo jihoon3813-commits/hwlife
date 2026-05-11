@@ -5,8 +5,6 @@ import {
   ChevronDown, ChevronUp, FileText, Wallet, Sparkles, CreditCard,
   Hotel, HeartPulse, Film
 } from 'lucide-react';
-import bonusPointImg from '../assets/living/bonus_point.png';
-import refundImg from '../assets/living/refund.png';
 
 export default function LivingPage() {
   const formRef = useRef<HTMLDivElement>(null);
@@ -212,7 +210,7 @@ export default function LivingPage() {
           {/* 카드 2 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-5 flex flex-col items-center text-center">
             <div className="w-24 h-24 rounded-full bg-white mb-4 overflow-hidden shadow-lg">
-              <img src={bonusPointImg} alt="포인트 보너스" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480378/DSfs_ao0lji.png" alt="포인트 보너스" className="w-full h-full object-cover" />
             </div>
             <span className="text-[11px] font-bold text-[#FFAB00] mb-1">가입 축하 혜택 2</span>
             <h4 className="text-[14px] font-bold text-white break-keep">프리미엄몰 특별 보너스 증정</h4>
@@ -221,7 +219,7 @@ export default function LivingPage() {
           {/* 카드 3 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-5 flex flex-col items-center text-center">
             <div className="w-24 h-24 rounded-full bg-white mb-4 overflow-hidden shadow-lg">
-              <img src={refundImg} alt="100% 환급" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480399/5%EB%A7%8C%EC%9B%90_2_dnu8n6.png" alt="100% 환급" className="w-full h-full object-cover" />
             </div>
             <span className="text-[11px] font-bold text-[#00C853] mb-1">스마트 혜택</span>
             <h4 className="text-[14px] font-bold text-white break-keep">납부한 금액 100% 환급 보장</h4>
