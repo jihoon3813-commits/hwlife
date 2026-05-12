@@ -841,6 +841,10 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         {allPlans?.map(plan => (
                           <option key={plan._id} value={plan.name}>{plan.name}</option>
                         ))}
+                        {/* Ensure standardized name is shown if not in the plan list */}
+                        {editData.productName && !allPlans?.some(p => p.name === editData.productName) && (
+                          <option value={editData.productName}>{editData.productName}</option>
+                        )}
                       </select>
                     </div>
                     {selectedCustomer.message && (
@@ -878,8 +882,23 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         {allProducts?.filter(p => {
                           if (!p.model) return false;
                           if (!editData.productName) return true;
+                          
+                          // 1. Try to find plan by exact name
                           const plan = allPlans?.find(pl => pl.name === editData.productName);
-                          return plan && p.planId === plan.numericId;
+                          if (plan) return p.planId === plan.numericId;
+
+                          // 2. Handle standardized naming mapping
+                          if (editData.productName.includes('리빙144')) {
+                            const targetId = (editData.productName.includes('2구좌') || editData.productName.includes('더블')) ? 2 : 3;
+                            return p.planId === targetId;
+                          }
+                          if (editData.productName.includes('스페셜299')) {
+                            // BSON is ID 1, Point is ID 4
+                            const targetId = editData.productName.includes('BSON') ? 1 : 4;
+                            return p.planId === targetId;
+                          }
+
+                          return true;
                         }).map(p => (
                           <option key={p._id} value={`${p.name} (${p.model})`}>{p.brand} {p.name} ({p.model})</option>
                         ))}
