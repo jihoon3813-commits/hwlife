@@ -105,9 +105,9 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       setEditData({
         ...selectedCustomer,
         newRegDate: selectedCustomer.newRegDate || new Date(selectedCustomer.createdAt + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
-        productName: resolvedCategoryName,
-        account: resolvedAccount,
-        appliance: resolvedAppliance
+        productName: resolvedCategoryName || selectedCustomer.productName,
+        account: resolvedAccount || selectedCustomer.account,
+        appliance: resolvedAppliance || selectedCustomer.appliance
       });
       setStatus(selectedCustomer.status);
       setMemo('');
@@ -664,7 +664,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                     title="구매동의 문자 발송"
                   >
                     {isSendingSms ? <Loader2 className="w-4 h-4 animate-spin" /> : <Smartphone className="w-4 h-4" />}
-                    문자발송
+                    구매동의 문자발송
                   </button>
                 )}
                 <button onClick={() => setSelectedCustomer(null)} className="p-2 hover:bg-[#F2F4F6] rounded-full transition-colors">

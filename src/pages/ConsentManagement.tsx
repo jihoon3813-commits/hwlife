@@ -85,15 +85,22 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
 
   // Filter for living products only
   const livingInquiries = inquiries.filter(inq => {
-    const isLivingByName = (inq.productName?.toLowerCase().includes('living') || inq.productName?.includes('리빙'));
+    const isLivingByName = (inq.productName?.toLowerCase().includes('living') || inq.productName?.includes('리빙') || inq.productName?.includes('신한카드'));
     
     // Check if the productName matches any product belonging to a living plan
     let isLivingByProduct = false;
     if (!isLivingByName) {
-      const product = allProducts.find(p => p.name === inq.productName || inq.appliance?.includes(p.name));
+      // Find product by name or appliance model
+      const product = allProducts.find(p => 
+        p.name === inq.productName || 
+        inq.appliance?.includes(p.name) || 
+        (p.model && inq.appliance?.includes(p.model)) ||
+        (p.model && inq.productName?.includes(p.model))
+      );
+      
       if (product) {
         const plan = allPlans.find(pl => pl.numericId === product.planId);
-        if (plan && (plan.name.includes('리빙') || plan.name.toLowerCase().includes('living'))) {
+        if (plan && (plan.name.includes('리빙') || plan.name.toLowerCase().includes('living') || plan.name.includes('신한카드'))) {
           isLivingByProduct = true;
         }
       }
@@ -367,7 +374,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                       <div className="space-y-6">
                         <div className="flex justify-between items-center py-2 border-b border-[#F2F4F6]">
                           <span className="text-[13px] font-bold text-[#8B95A1]">결제일</span>
-                          <span className="text-[15px] font-bold text-[#191F28]">{new Date().toLocaleDateString('ko-KR')} (당일)</span>
+                          <span className="text-[15px] font-bold text-[#191F28]">{new Date().toLocaleDateString('ko-KR')}</span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b border-[#F2F4F6]">
                           <span className="text-[13px] font-bold text-[#8B95A1]">성명</span>

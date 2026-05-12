@@ -261,7 +261,7 @@ export default function ConsentPage() {
               <div className="flex justify-between items-center py-2 border-b border-[#F2F4F6]">
                 <span className="text-[13px] font-bold text-[#8B95A1]">결제일</span>
                 <span className="text-[15px] font-bold text-[#191F28]">
-                  {new Date(Date.now() + 9 * 60 * 60 * 1000).toLocaleDateString('ko-KR')} (당일)
+                  {new Date(Date.now() + 9 * 60 * 60 * 1000).toLocaleDateString('ko-KR')}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-[#F2F4F6]">
