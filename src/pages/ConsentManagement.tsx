@@ -29,6 +29,18 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
       return;
     }
 
+    // 상품 검증: 리빙144(신한카드) 계열만 발송 가능
+    const isLiving = customer.productName?.includes('리빙') || 
+                     customer.productName?.toLowerCase().includes('living') || 
+                     customer.productName?.includes('신한카드');
+    const isSpecial = customer.productName?.includes('스페셜') || 
+                      customer.productName?.toLowerCase().includes('special');
+
+    if (!isLiving || isSpecial) {
+      alert('구매동의서 문자는 리빙144(신한카드) 상품 가입 고객에게만 발송 가능합니다.');
+      return;
+    }
+
     if (!window.confirm(`${customer.name}님에게 동의서 문자를 발송하시겠습니까?`)) return;
 
     setSendingId(customer._id);
@@ -106,33 +118,22 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
     }, 1000);
   };
 
-  // Filter for living products only
+  // Filter strictly for living products (Living 144 Shinhan Card) only
   const livingInquiries = inquiries.filter(inq => {
-    const isLivingByName = (inq.productName?.toLowerCase().includes('living') || inq.productName?.includes('리빙') || inq.productName?.includes('신한카드'));
-    
-    // Check if the productName matches any product belonging to a living plan
-    let isLivingByProduct = false;
-    if (!isLivingByName) {
-      // Find product by name or appliance model
-      const product = allProducts.find(p => 
-        p.name === inq.productName || 
-        inq.appliance?.includes(p.name) || 
-        (p.model && inq.appliance?.includes(p.model)) ||
-        (p.model && inq.productName?.includes(p.model))
-      );
-      
-      if (product) {
-        const plan = allPlans.find(pl => pl.numericId === product.planId);
-        if (plan && (plan.name.includes('리빙') || plan.name.toLowerCase().includes('living') || plan.name.includes('신한카드'))) {
-          isLivingByProduct = true;
-        }
-      }
-    }
+    // Only products starting with '리빙144' or including '신한카드' are eligible
+    // We explicitly exclude '스페셜' or 'Special' just in case
+    const isSpecial = inq.productName?.includes('스페셜') || inq.productName?.toLowerCase().includes('special');
+    if (isSpecial) return false;
 
-    const isLiving = isLivingByName || isLivingByProduct;
+    const isLiving = inq.productName?.includes('리빙') || 
+                     inq.productName?.toLowerCase().includes('living') || 
+                     inq.productName?.includes('신한카드');
+    
+    if (!isLiving) return false;
+
     const matchesSearch = inq.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          inq.phone?.toLowerCase().includes(searchQuery.toLowerCase());
-    return isLiving && matchesSearch;
+    return matchesSearch;
   });
 
   const getStatusBadge = (status?: string) => {
