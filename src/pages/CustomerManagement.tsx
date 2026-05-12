@@ -532,7 +532,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
 
       <div className="bg-white rounded-[16px] shadow-sm border border-[#E5E8EB] overflow-x-auto hide-scrollbar">
         <table className="w-full text-left min-w-[800px]">
-          <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
+          <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB] whitespace-nowrap">
             <tr>
               <th className="px-6 py-4 w-12">
                 <input 
@@ -545,7 +545,6 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">구분</th>
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">등록일시</th>
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">채널명</th>
-
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">고객명</th>
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">연락처</th>
               <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">신청상품</th>
@@ -642,10 +641,10 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                       </span>
                     </td>
 
-                    <td className="px-6 py-4 text-[14px] font-bold text-[#191F28]">{customer.name}</td>
-                    <td className="px-6 py-4 text-[14px] text-[#4E5968]">{customer.phone}</td>
-                    <td className="px-6 py-4 text-[14px] text-[#4E5968] font-medium">{finalOutput}</td>
-                    <td className="px-6 py-4 text-[14px] text-[#4E5968] max-w-[200px] truncate">{displayAppliance}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-[14px] font-bold text-[#191F28]">{customer.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#4E5968]">{customer.phone}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#4E5968] font-medium">{finalOutput}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#4E5968]">{displayAppliance}</td>
                     <td className="px-6 py-4">
                       <span 
                         className="inline-block text-[12px] font-bold px-2.5 py-1 rounded-full"

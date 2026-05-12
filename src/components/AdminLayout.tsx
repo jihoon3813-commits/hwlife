@@ -56,7 +56,13 @@ export default function AdminLayout({
     <div className="flex h-screen bg-[#F2F4F6] text-[#191F28] font-sans overflow-hidden relative">
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 h-[60px] bg-white border-b border-[#E5E8EB] flex items-center justify-between px-4 z-[40]">
-        <h1 className="text-[18px] font-bold tracking-tight">효원 관리자</h1>
+        <div className="h-[28px]">
+          <img 
+            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" 
+            alt="효원상조" 
+            className="h-full w-auto object-contain"
+          />
+        </div>
         <button onClick={() => setIsSidebarOpen(true)} className="p-2 hover:bg-[#F2F4F6] rounded-full">
           <Menu className="w-6 h-6 text-[#4E5968]" />
         </button>
@@ -76,9 +82,13 @@ export default function AdminLayout({
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-6 border-b border-[#E5E8EB] flex items-center justify-between">
-          <h1 className="text-[18px] font-bold tracking-tight text-[#191F28] truncate">
-            {userType === 'channel' ? (userName || '채널 관리자') : '효원 관리자'}
-          </h1>
+          <div className="h-[28px]">
+            <img 
+              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" 
+              alt="효원상조" 
+              className="h-full w-auto object-contain"
+            />
+          </div>
 
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-1 hover:bg-[#F2F4F6] rounded-full">
             <X className="w-6 h-6 text-[#8B95A1]" />
