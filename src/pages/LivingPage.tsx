@@ -37,9 +37,12 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
   // 2. If visiting /living directly, it's Master (본사)
   // 3. If visiting /living/subdomain, use that subdomain
   const segments = window.location.pathname.split('/').filter(Boolean);
+  const searchParams = new URLSearchParams(window.location.search);
+  
+  // Try to get channelId from query string (e.g. ?niora) or path (e.g. /living/niora)
+  const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
   const channelId = channelSubdomain || 
-                   (segments.length === 1 && segments[0] === 'living' ? '본사' : 
-                   (segments.length >= 2 ? segments[1] : undefined));
+                   (segments.length >= 2 ? segments[1] : (queryChannel || (segments.length === 1 && segments[0] === 'living' ? '본사' : undefined)));
 
 
 

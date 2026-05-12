@@ -35,9 +35,12 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
   // 2. If visiting /special directly, it's Master (본사)
   // 3. If visiting /special/subdomain, use that subdomain
   const segments = window.location.pathname.split('/').filter(Boolean);
+  const searchParams = new URLSearchParams(window.location.search);
+  
+  // Try to get channelId from query string (e.g. ?niora) or path (e.g. /special/niora)
+  const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
   const channelId = channelSubdomain || 
-                   (segments.length === 1 && segments[0] === 'special' ? '본사' : 
-                   (segments.length >= 2 ? segments[1] : undefined));
+                   (segments.length >= 2 ? segments[1] : (queryChannel || (segments.length === 1 && segments[0] === 'special' ? '본사' : undefined)));
 
 
 
