@@ -24,13 +24,13 @@ function PreviewImage({ src, className }: { src: string, className?: string }) {
 }
 
 export default function ProductManagement() {
-  const dbPlans = useQuery(api.plans.get) || [];
+  const dbPlans = useQuery(api.plans.get);
   const createPlan = useMutation(api.plans.create);
   const updatePlan = useMutation(api.plans.update);
   const deletePlan = useMutation(api.plans.remove);
   const updatePlanOrder = useMutation(api.plans.updateOrder);
 
-  const plans = dbPlans.map(p => ({
+  const plans = (dbPlans || []).map(p => ({
     id: p.numericId,
     _id: p._id,
     name: p.name,
@@ -43,7 +43,7 @@ export default function ProductManagement() {
 
   const [editingPlan, setEditingPlan] = useState<any | null>(null);
 
-  const allProducts = useQuery(api.products.getAllProducts) || [];
+  const allProducts = useQuery(api.products.getAllProducts);
   const competitors = useQuery(api.competitors.get) || [];
   const settings = useQuery(api.settings.get);
   
@@ -72,6 +72,16 @@ export default function ProductManagement() {
       setSelectedPlanId(plans[0].id);
     }
   }, [plans, selectedPlan]);
+
+  const filteredProducts = (allProducts || [])
+    .filter(p => p.planId === selectedPlanId)
+    .sort((a, b) => {
+      if (!sortConfig.key) return 0;
+      const aVal = (a as any)[sortConfig.key] || "";
+      const bVal = (b as any)[sortConfig.key] || "";
+      if (sortConfig.direction === 'asc') return aVal.localeCompare(bVal);
+      return bVal.localeCompare(aVal);
+    });
 
   const formatNumber = (val: string) => {
     if (!val) return "0";
@@ -278,15 +288,6 @@ export default function ProductManagement() {
     setDraggedPlanIndex(null);
   };
 
-  const filteredProducts = allProducts
-    .filter(p => p.planId === selectedPlanId)
-    .sort((a, b) => {
-      if (!sortConfig.key) return 0;
-      const aVal = (a as any)[sortConfig.key] || "";
-      const bVal = (b as any)[sortConfig.key] || "";
-      if (sortConfig.direction === 'asc') return aVal.localeCompare(bVal);
-      return bVal.localeCompare(aVal);
-    });
 
   const downloadTemplate = () => {
     const compHeaders = [];
