@@ -16,6 +16,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
   const dbPlans = useQuery(api.plans.get) || [];
   const plan1Products = allProducts.filter(p => p.planId === 1);
   const plan2Products = allProducts.filter(p => p.planId === 2);
+  const plan3Products = allProducts.filter(p => p.planId === 3);
 
 
   const formRef = useRef<HTMLDivElement>(null);
@@ -743,8 +744,49 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           </h2>
         </div>
 
+        {/* Product Tabs */}
+        <div className="flex p-1 bg-[#F2F4F6] rounded-[16px] mb-8">
+          <button 
+            onClick={() => setActiveTab('1')}
+            className={`flex-1 py-3 rounded-[12px] text-[14px] font-bold transition-all flex items-center justify-center gap-2 ${activeTab === '1' ? 'bg-white text-[#3182F6] shadow-sm' : 'text-[#8B95A1]'}`}
+          >
+            1구좌 제품안내
+          </button>
+          <button 
+            onClick={() => setActiveTab('2')}
+            className={`flex-1 py-3 rounded-[12px] text-[14px] font-bold transition-all flex items-center justify-center gap-2 ${activeTab === '2' ? 'bg-white text-[#3182F6] shadow-sm' : 'text-[#8B95A1]'}`}
+          >
+            2구좌 제품안내
+          </button>
+        </div>
+
+        {/* Guide Area */}
+        <div className="mb-8 p-5 bg-[#F9FAFB] rounded-[20px] border border-[#E5E8EB]">
+          {activeTab === '1' ? (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-[#3182F6] rounded-full"></span>
+                <p className="text-[13px] font-bold text-[#191F28]">실속형 1구좌 혜택</p>
+              </div>
+              <p className="text-[12px] text-[#4E5968] leading-relaxed break-keep ml-3.5">
+                부담 없는 월 납입금으로 상조 준비와 동시에 생활에 꼭 필요한 리빙 제품을 받아보실 수 있는 알뜰한 구성입니다.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-[#3182F6] rounded-full"></span>
+                <p className="text-[13px] font-bold text-[#191F28]">프리미엄 2구좌 혜택</p>
+              </div>
+              <p className="text-[12px] text-[#4E5968] leading-relaxed break-keep ml-3.5">
+                가장 인기 있는 프리미엄 가전 및 리빙 제품 라인업을 선택하실 수 있으며, 만기 시 100% 환급 혜택이 더욱 커집니다.
+              </p>
+            </div>
+          )}
+        </div>
+
         <div className="flex flex-col gap-4">
-          {plan2Products.map((item, idx) => (
+          {(activeTab === '1' ? plan3Products : plan2Products).map((item, idx) => (
             <motion.div
               key={(item as any)._id || (item as any).id}
               onClick={() => openProductDetail(item)}
@@ -778,9 +820,11 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
             </motion.div>
           ))}
           
-          {plan2Products.length === 0 && (
-            <div className="text-center py-10 bg-[#F9FAFB] rounded-[24px] border border-dashed border-[#E5E8EB]">
-              <p className="text-[#8B95A1] text-[14px]">등록된 제품이 없습니다.</p>
+          {(activeTab === '1' ? plan3Products : plan2Products).length === 0 && (
+            <div className="text-center py-12 bg-[#F9FAFB] rounded-[24px] border border-dashed border-[#E5E8EB] flex flex-col items-center justify-center">
+              <Package className="w-10 h-10 text-[#D1D6DB] mb-3" />
+              <p className="text-[#8B95A1] text-[14px] font-medium">현재 등록된 {activeTab}구좌 제품이 없습니다.</p>
+              <p className="text-[#B0B8C1] text-[12px] mt-1">준비 중인 서비스입니다.</p>
             </div>
           )}
         </div>
