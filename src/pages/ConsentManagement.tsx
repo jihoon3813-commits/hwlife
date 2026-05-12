@@ -321,9 +321,15 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                           <span className="text-[16px] font-bold text-[#191F28]">{previewCustomer.phone}</span>
                         </div>
                         <div className="px-5 py-4 flex flex-col gap-1">
-                          <span className="text-[12px] font-bold text-[#3182F6] uppercase tracking-wider">구매제품</span>
+                          <span className="text-[12px] font-bold text-[#3182F6] uppercase tracking-wider">가입상품</span>
                           <span className="text-[16px] font-bold text-[#191F28]">{previewCustomer.productName}</span>
                         </div>
+                        {previewCustomer.appliance && (
+                          <div className="px-5 py-4 flex flex-col gap-1">
+                            <span className="text-[12px] font-bold text-[#3182F6] uppercase tracking-wider">결합가전</span>
+                            <span className="text-[16px] font-bold text-[#191F28]">{previewCustomer.appliance}</span>
+                          </div>
+                        )}
                         <div className="px-5 py-4 flex flex-col gap-0.5">
                           <span className="text-[12px] font-bold text-[#3182F6] uppercase tracking-wider mb-0.5">결제금액</span>
                           <span className="text-[20px] font-black text-[#191F28] leading-tight">
@@ -437,9 +443,15 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                     <td className="p-4 text-[16px] font-bold text-[#191F28]">{downloadCustomer.phone}</td>
                   </tr>
                   <tr className="border-b border-[#E5E8EB]">
-                    <th className="bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">구매제품</th>
+                    <th className="bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">가입상품</th>
                     <td className="p-4 text-[16px] font-bold text-[#191F28]">{downloadCustomer.productName}</td>
                   </tr>
+                  {downloadCustomer.appliance && (
+                    <tr className="border-b border-[#E5E8EB]">
+                      <th className="bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">결합가전</th>
+                      <td className="p-4 text-[16px] font-bold text-[#191F28]">{downloadCustomer.appliance}</td>
+                    </tr>
+                  )}
                   <tr className="border-b border-[#E5E8EB]">
                     <th className="bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">결제금액</th>
                     <td className="p-4">

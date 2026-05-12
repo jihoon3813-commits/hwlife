@@ -198,7 +198,7 @@ export default function ConsentPage() {
                 <span className="text-[16px] font-bold text-[#191F28]">{inquiry.phone}</span>
               </div>
               <div className="px-5 py-4 flex flex-col gap-1">
-                <span className="text-[12px] font-bold text-[#3182F6] uppercase tracking-wider">구매제품</span>
+                <span className="text-[12px] font-bold text-[#3182F6] uppercase tracking-wider">가입상품</span>
                 <span className="text-[16px] font-bold text-[#191F28]">{inquiry.productName}</span>
               </div>
               {inquiry.appliance && (
