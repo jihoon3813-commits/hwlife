@@ -531,7 +531,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       </div>
 
       <div className="bg-white rounded-[16px] shadow-sm border border-[#E5E8EB] overflow-x-auto hide-scrollbar">
-        <table className="w-full text-left min-w-[800px]">
+        <table className="w-full text-left min-w-max">
           <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB] whitespace-nowrap">
             <tr>
               <th className="px-6 py-4 w-12">
@@ -622,20 +622,20 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         className="w-4 h-4 rounded border-[#E5E8EB] text-[#3182F6] focus:ring-[#3182F6] cursor-pointer"
                       />
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${customer.source === 'direct' ? 'bg-[#F2F4F6] text-[#4E5968]' : 'bg-[#3182F6]/10 text-[#3182F6]'}`}>
                         {customer.source === 'direct' ? 'D' : 'H'}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-[13px] text-[#191F28] font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-[13px] text-[#191F28] font-medium inline-block mr-2">
                         {new Date(customer.createdAt).toLocaleDateString()}
                       </div>
-                      <div className="text-[11px] text-[#8B95A1]">
+                      <div className="text-[11px] text-[#8B95A1] inline-block">
                         {new Date(customer.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`text-[12px] font-bold px-2 py-1 rounded-md ${(!customer.channelId || customer.channelId === '본사') ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-[#3182F6]'}`}>
                         {getChannelName(customer.channelId)}
                       </span>
@@ -645,7 +645,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                     <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#4E5968]">{customer.phone}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#4E5968] font-medium">{finalOutput}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#4E5968]">{displayAppliance}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span 
                         className="inline-block text-[12px] font-bold px-2.5 py-1 rounded-full"
                         style={{ 
