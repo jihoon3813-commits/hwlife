@@ -120,8 +120,8 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
       <SEO 
-        title="리빙144(신한카드)"
-        description="리빙144(신한카드) | 신한카드만 있으면 누구나 특별한 혜택!"
+        title="해피효원라이프 리빙144-신한카드"
+        description="해피효원라이프 리빙144-신한카드 | 신한카드만 있으면 누구나 특별한 혜택!"
         image="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_landing_page_hero_banner_d-1778564368252_mko2cd.png"
       />
       
@@ -138,9 +138,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           <span className="text-[10px] font-black text-[#D1D6DB]">x</span>
           <span className="text-[12px] font-black tracking-tight bg-gradient-to-r from-[#191F28] to-[#4E5968] bg-clip-text text-transparent">PREMIUM</span>
         </div>
-        <a href="tel:1588-0883" className="flex items-center justify-center w-8 h-8 bg-[#F2F4F6] rounded-full hover:bg-[#E5E8EB] transition-colors">
-          <Phone className="w-4 h-4 text-[#4E5968]" />
-        </a>
+        {/* Removed Phone Icon */}
       </header>
 
       {/* Section 1: 메인 히어로 (Hero) */}

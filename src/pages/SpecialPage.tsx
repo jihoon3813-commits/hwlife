@@ -138,9 +138,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
         </div>
 
 
-        <a href="tel:1588-0883" className="flex items-center justify-center w-8 h-8 bg-[#F2F4F6] rounded-full hover:bg-[#E5E8EB] transition-colors">
-          <Phone className="w-4 h-4 text-[#4E5968]" />
-        </a>
+        {/* Removed Phone Icon */}
       </header>
 
       {/* Section 1: 메인 히어로 (Hero) */}
