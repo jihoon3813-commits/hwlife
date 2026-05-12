@@ -81,12 +81,16 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
     setIsSubmitting(true);
     try {
+      const baseName = landingInfo?.name || '리빙144(신한카드)';
       const plan = selectedProduct ? dbPlans.find(p => p.numericId === selectedProduct.planId) : null;
+      const accountType = plan?.accountCount || (activeTab === '1' ? '1구좌' : '2구좌');
+      const suffix = accountType.includes('2') || accountType.includes('더블') ? '더블' : '싱글';
+
       await createInquiry({
         name: name.trim(),
         phone: phoneNumber,
-        productName: selectedProduct?.name || landingInfo?.name || '신한카드 리빙144',
-        account: plan?.accountCount || (activeTab === '1' ? '1구좌' : '2구좌'),
+        productName: selectedProduct ? `${baseName} ${suffix}` : `${baseName}_메인`,
+        account: accountType,
         appliance: selectedProduct ? `${selectedProduct.name} (${selectedProduct.model})` : undefined,
         channelId: channelId,
         source: 'homepage'

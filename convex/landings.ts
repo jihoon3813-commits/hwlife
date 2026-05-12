@@ -100,7 +100,7 @@ export const updateDefaultThumbnails = mutation({
       }
       if (landing.path === "/special") {
         await ctx.db.patch(landing._id, { 
-          name: "해피효원라이프 스페셜299",
+          name: "스페셜299(BSON)",
           thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778511843/IMG_3521-2_cr8tqi.png" 
         });
       }
