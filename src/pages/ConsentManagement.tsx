@@ -13,6 +13,8 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
   const sendConsentSms = useAction(api.sms.sendConsentSms);
   const settings = useQuery(api.settings.get);
   const smsConfig = (settings as any)?.sms;
+  const allProducts = useQuery(api.products.getAllProducts) || [];
+  const allPlans = useQuery(api.plans.get) || [];
 
   const handleSendConsent = async (customer: any) => {
     // SMS 설정 확인
@@ -41,7 +43,21 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
 
   // Filter for living products only
   const livingInquiries = inquiries.filter(inq => {
-    const isLiving = (inq.productName?.toLowerCase().includes('living') || inq.productName?.includes('리빙'));
+    const isLivingByName = (inq.productName?.toLowerCase().includes('living') || inq.productName?.includes('리빙'));
+    
+    // Check if the productName matches any product belonging to a living plan
+    let isLivingByProduct = false;
+    if (!isLivingByName) {
+      const product = allProducts.find(p => p.name === inq.productName || inq.appliance?.includes(p.name));
+      if (product) {
+        const plan = allPlans.find(pl => pl.numericId === product.planId);
+        if (plan && (plan.name.includes('리빙') || plan.name.toLowerCase().includes('living'))) {
+          isLivingByProduct = true;
+        }
+      }
+    }
+
+    const isLiving = isLivingByName || isLivingByProduct;
     const matchesSearch = inq.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          inq.phone?.toLowerCase().includes(searchQuery.toLowerCase());
     return isLiving && matchesSearch;

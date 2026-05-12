@@ -719,7 +719,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                     {/* If product is living (신한카드 144) */}
-                    {(selectedCustomer.productName?.toLowerCase().includes('living') || selectedCustomer.productName?.includes('리빙')) ? (
+                    {(selectedCustomer.productName?.toLowerCase().includes('living') || selectedCustomer.productName?.includes('리빙') || editData.productName?.includes('리빙')) ? (
                       <>
                         <div>
                           <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">신규 접수일</label>
