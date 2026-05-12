@@ -584,9 +584,14 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                   displayPlan = planByName.name;
                 }
 
-                // 괄호 안에 구좌수 표시
-                const accountLabel = customer.account ? `(${customer.account})` : '';
+                // 괄호 안에 구좌수 표시 (단, _메인 신청건은 구좌수 표시 제외)
+                const isMainSubmission = displayPlan?.endsWith('_메인') || customer.productName?.endsWith('_메인');
+                const accountLabel = (customer.account && !isMainSubmission) ? `(${customer.account})` : '';
                 const finalPlanDisplay = `${displayPlan}${accountLabel}`;
+                
+                // 특수 처리: 만약 displayPlan에 이미 (2구좌) 등이 붙어있다면 제거 (중복 방지)
+                const cleanedPlanDisplay = finalPlanDisplay.replace(/\s*\(.*구좌\)$/, '');
+                const finalOutput = isMainSubmission ? cleanedPlanDisplay : finalPlanDisplay;
 
                 return (
                   <tr 
@@ -623,7 +628,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
 
                     <td className="px-6 py-4 text-[14px] font-bold text-[#191F28]">{customer.name}</td>
                     <td className="px-6 py-4 text-[14px] text-[#4E5968]">{customer.phone}</td>
-                    <td className="px-6 py-4 text-[14px] text-[#4E5968] font-medium">{finalPlanDisplay}</td>
+                    <td className="px-6 py-4 text-[14px] text-[#4E5968] font-medium">{finalOutput}</td>
                     <td className="px-6 py-4 text-[14px] text-[#4E5968] max-w-[200px] truncate">{displayAppliance}</td>
                     <td className="px-6 py-4">
                       <span 
