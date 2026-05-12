@@ -11,6 +11,9 @@ import { api } from '../../convex/_generated/api';
 
 export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: string }) {
   const landingInfo = useQuery(api.landings.getByPath, { path: "/special" });
+  const allProducts = useQuery(api.products.getAllProducts) || [];
+  const dbPlans = useQuery(api.plans.get) || [];
+  const specialProducts = allProducts.filter(p => p.planId === 4);
 
 
   const formRef = useRef<HTMLDivElement>(null);
@@ -18,9 +21,10 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
   const createInquiry = useMutation(api.inquiries.create);
 
@@ -74,11 +78,15 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
 
     setIsSubmitting(true);
     try {
+      const plan = selectedProduct ? dbPlans.find(p => p.numericId === selectedProduct.planId) : null;
       await createInquiry({
         name: name.trim(),
         phone: phoneNumber,
-        productName: landingInfo?.name || '신한카드 스페셜144',
-        channelId: channelId
+        productName: selectedProduct?.name || landingInfo?.name || '신한카드 스페셜144',
+        account: plan?.accountCount || '2구좌',
+        appliance: selectedProduct ? `${selectedProduct.name} (${selectedProduct.model})` : undefined,
+        channelId: channelId,
+        source: 'homepage'
       });
       alert('상담 신청이 접수되었습니다. 빠르게 연락드리겠습니다.');
       setName('');
@@ -90,6 +98,11 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const openProductDetail = (product: any) => {
+    setSelectedProduct(product);
+    setIsContactModalOpen(true);
   };
 
 
@@ -142,6 +155,31 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
             className="h-[75%] w-auto object-contain object-bottom mt-[-35%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
         </div>
+
+        {/* 상단 바로가기 탭 (Shortcut Tabs) */}
+        <div className="absolute top-8 inset-x-0 z-30 flex justify-center px-6">
+          <div className="flex bg-black/20 backdrop-blur-md border border-white/10 p-1.5 rounded-full shadow-2xl">
+            <a 
+              href={`/living${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-2.5 rounded-full text-[13px] font-black text-white/70 hover:text-white transition-all flex items-center gap-2"
+            >
+              <CreditCard className="w-3.5 h-3.5" />
+              신한카드 결합
+            </a>
+            <a 
+              href={`/special${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-2.5 rounded-full text-[13px] font-black transition-all flex items-center gap-2 bg-white text-[#D4AF37] shadow-lg"
+            >
+              <Package className="w-3.5 h-3.5" />
+              BSON 결합
+            </a>
+          </div>
+        </div>
+
         
         {/* 하단 페이드 그라데이션 */}
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0F0F10] to-transparent z-10"></div>
@@ -170,7 +208,10 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
 
 
           <button 
-            onClick={() => setIsContactModalOpen(true)}
+            onClick={() => {
+              setSelectedProduct(null);
+              setIsContactModalOpen(true);
+            }}
             className="w-full flex items-center justify-center gap-2 bg-[#C5A059] py-4 rounded-[20px] text-[16px] font-bold text-white shadow-[0_8px_20px_rgba(197,160,89,0.3)] hover:bg-[#B38E46] transition-all active:scale-95"
           >
             단독 혜택받고 무료상담 신청 <ArrowRight className="w-5 h-5" />
@@ -467,51 +508,283 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
           </h2>
         </div>
 
-        <div className="max-w-[500px] mx-auto">
-          {/* 2구좌 전용 결합 제품 */}
-          <div className="bg-[#F8FAFB] rounded-[32px] p-8 border border-[#E5E8EB] shadow-sm">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="px-3 py-1 bg-[#191F28] text-white text-[11px] font-black rounded-full">2구좌 가입 시 제공</span>
-            </div>
-            
-            <div className="w-full aspect-[4/3] rounded-2xl bg-white overflow-hidden mb-6 shadow-inner relative group">
-              <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-[#C5A059] text-white text-[10px] font-black rounded-lg">
-                BEST SELLER
+        <div className="flex flex-col gap-4">
+          {specialProducts.map((item, idx) => (
+            <motion.div
+              key={(item as any)._id || (item as any).id}
+              onClick={() => openProductDetail(item)}
+              layoutId={`product-${(item as any)._id || (item as any).id}`}
+              className="bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-col w-full"
+            >
+              <div className="relative aspect-square bg-white shrink-0">
+                <img 
+                  src={(item.images && item.images.length > 0) ? item.images[0] : item.image} 
+                  alt={item.name} 
+                  className="w-full h-full object-cover" 
+                />
+                {item.tag && (
+                  <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold rounded-lg uppercase tracking-wider">
+                    {item.tag}
+                  </div>
+                )}
               </div>
-              <img 
-                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/3._%ED%94%84%EB%A6%AC%EB%AA%A8_mmmjvf.png" 
-                alt="프리모 매트리스" 
-                className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-110" 
-              />
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="mb-3">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <span className="text-[12px] font-bold text-[#C5A059]">{item.brand}</span>
+                    <span className="text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-2 py-0.5 rounded-[4px]">{item.category}</span>
+                  </div>
+                  <span className="text-[13px] font-medium text-[#8B95A1] leading-tight">{item.model || item.modelName}</span>
+                </div>
+                <h3 className="text-[18px] font-extrabold text-[#191F28] mb-1 leading-tight">
+                  {item?.name}
+                </h3>
+              </div>
+            </motion.div>
+          ))}
+          
+          {specialProducts.length === 0 && (
+            <div className="text-center py-10 bg-[#F9FAFB] rounded-[24px] border border-dashed border-[#E5E8EB]">
+              <p className="text-[#8B95A1] text-[14px]">등록된 제품이 없습니다.</p>
             </div>
-            
-            <div className="space-y-3">
-              <h4 className="text-[18px] font-bold text-[#191F28] leading-snug">프리모 캐나다 독립 포켓스프링 매트리스 (K/Q 선택)</h4>
-              <p className="text-[14px] text-[#4E5968] leading-relaxed break-keep">
-                캐나다 기술력으로 완성된 독립 포켓스프링이 최적의 수면 환경을 제공합니다. (빠른 배송 서비스 제공)
-              </p>
-              <div className="flex items-center gap-3 pt-2">
-                <span className="text-[12px] font-bold text-[#8B95A1] bg-[#F2F4F6] px-2 py-1 rounded">모델명: PR330-1</span>
-                <span className="text-[12px] font-bold text-[#C5A059] bg-[#C5A059]/10 px-2 py-1 rounded">프리미엄 라인</span>
+          )}
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-[11px] text-[#8B95A1] px-2">* 본 사은품은 제조사 사정에 따라 예고 없이 변경될 수 있습니다.</p>
+        </div>
+
+      </section>
+      
+      {/* Section 10: 라이프 서비스 안내 */}
+      <section className="bg-[#F9FAFB] py-16 px-6 my-2">
+        <div className="mb-10 text-center">
+          <p className="text-[13px] font-bold text-[#C5A059] mb-2">언제든 자유롭게 이용 가능합니다</p>
+          <h2 className="text-[24px] font-bold text-[#191F28] leading-tight break-keep">
+            라이프 서비스 안내
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { title: '장례', desc: '품격 있는 의전', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482388/fileView_peyuol.jpg' },
+            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482393/photo_best02_product09_ratqci.jpg' },
+            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482785/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_w9mkhs.png' },
+            { title: '웨딩', desc: '아름다운 시작', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482894/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_1_eohmjh.png' },
+            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483177/A_modern_Korean_family_celebrating_a_70th_birthday-1778483158578_ka1tmy.png' },
+            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483181/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_2_wrklcr.png' },
+          ].map((service, i) => (
+            <div key={i} className="relative aspect-square rounded-[20px] overflow-hidden group shadow-sm">
+              <img src={service.img} alt={service.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              <div className="absolute bottom-4 left-4 text-white">
+                <h4 className="text-[16px] font-bold mb-0.5">{service.title}</h4>
+                <p className="text-[11px] opacity-70">{service.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-8 text-[11px] text-[#8B95A1] leading-relaxed px-2 break-keep">
+          * 본 상품의 서비스는 계약마다 상이하며, 서비스 전환 시 추가 비용이 발생할 수 있습니다. 자세한 내용은 효원상조 홈페이지를 참고하시기 바랍니다.
+        </p>
+      </section>
+
+      {/* Section 11: 멤버십 혜택 안내 */}
+      <section className="bg-white py-16 px-0 my-2 overflow-hidden">
+        <div className="px-6 mb-10">
+          <p className="text-[13px] font-bold text-[#C5A059] mb-2">효원상조 가입 고객만을 위한</p>
+          <h2 className="text-[24px] font-bold text-[#191F28] leading-tight break-keep">
+            다양한 멤버십 서비스
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 px-6">
+          {[
+            { title: '기차여행', desc: 'KTX, SRT 등\n최대 35% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483384/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._4_mko5lm.png' },
+            { title: '호텔/리조트', desc: '전국 주요 숙박시설\n최대 80% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483539/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._5_ownbho.png' },
+            { title: '건강검진', desc: 'KMI 등 전문기관\n최대 70% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483641/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._6_isio8t.png' },
+            { title: '영화·공연', desc: 'CGV, 롯데시네마 등\n최대 40% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483644/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_7_dqdjc4.png' },
+          ].map((item, i) => (
+            <div key={i} className="relative aspect-square rounded-[24px] overflow-hidden group shadow-md">
+              <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10"></div>
+              <div className="absolute inset-0 p-5 flex flex-col justify-end">
+                <h4 className="text-[16px] font-bold text-white mb-1.5">{item.title}</h4>
+                <p className="text-[11px] text-white/70 leading-snug whitespace-pre-line">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p className="px-6 text-[11px] text-[#8B95A1] mt-6">* 상세 내용은 효원상조 공식 홈페이지를 통해 확인하세요.</p>
+      </section>
+
+      {/* Funeral Service Section */}
+      <section id="funeral-service" className="bg-white py-16 px-6 rounded-[32px] my-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)] border border-[#F2F4F6]">
+        <div className="mb-10 text-center">
+          <span className="inline-block px-2.5 py-1 bg-[#C5A059]/10 text-[#C5A059] text-[11px] font-bold rounded-md mb-2 uppercase tracking-wider">Funeral Services</span>
+          <h2 className="text-[24px] font-bold text-[#191F28] leading-tight mb-4">
+            정성을 다하는<br />효원의 고품격 장례서비스
+          </h2>
+          <p className="text-[#8B95A1] text-[15px] leading-relaxed break-keep">
+            인력지원부터 물품까지, 마지막 가시는 길<br />부족함 없이 정성으로 모십니다.
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {[
+            {
+              category: "인력지원",
+              items: [
+                { label: "장례지도사", value: "1명 (3일간 전담인력 파견, 3일장 기준)" },
+                { label: "입관지원", value: "1명 (2일차 입관 시 지원)" },
+                { label: "복지사(접객도우미)", value: "4명 (1인 8시간 기준)" }
+              ]
+            },
+            {
+              category: "고인용품",
+              items: [
+                { label: "수의", value: "효원 황금문양수의 세트 특 3호" },
+                { label: "입관스페셜", value: "황금문양 孝 전통대렴, 황금문양 대렴염포" },
+                { label: "관", value: "오동나무관 (매장/화장 규격관 사용)" },
+                { label: "봉안함", value: "효원 고급형 (종교별) / 봉안 시 제공" },
+                { label: "부속품", value: "명정, 관보, 혼백, 다라니경, 수시포 등 6종 이상" }
+              ]
+            },
+            {
+              category: "장의차량",
+              items: [
+                { label: "고인운구차", value: "관내 무료 (장례식장 이송 필요 시)" },
+                { label: "전용 리무진", value: "전국 무료" },
+                { label: "전용 장의버스", value: "전국 무료" }
+              ]
+            },
+            {
+              category: "상주/빈소용품",
+              items: [
+                { label: "상복(전통/현대)", value: "남녀 전통/현대식 상복 제공 및 대여" },
+                { label: "제단/헌화", value: "제단 꽃 20만원 지원 + 헌화 20송이" },
+                { label: "빈소용품", value: "위패, 향, 초, 부의록, 영정리본 등 일체" },
+                { label: "근조기", value: "근조기 설치 서비스" }
+              ]
+            }
+          ].map((section, idx) => (
+            <div key={idx} className="bg-[#F8FAFB] rounded-[24px] overflow-hidden border border-[#F2F4F6]">
+              <div className="bg-[#191F28] px-5 py-3.5">
+                <h3 className="text-white font-bold text-[15px] flex items-center gap-2">
+                  <span className="w-1 h-3 bg-[#C5A059] rounded-full"></span>
+                  {section.category}
+                </h3>
+              </div>
+              <div className="p-5 space-y-4">
+                {section.items.map((item, itemIdx) => (
+                  <div key={itemIdx} className="flex flex-col gap-1">
+                    <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">{item.label}</span>
+                    <span className="text-[14px] font-medium text-[#333D4B] leading-snug break-keep">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          <div className="bg-[#F8FAFB] rounded-[24px] overflow-hidden border border-[#F2F4F6]">
+            <div className="bg-[#191F28] px-5 py-3.5">
+              <h3 className="text-white font-bold text-[15px] flex items-center gap-2">
+                <span className="w-1 h-3 bg-[#C5A059] rounded-full"></span>
+                발인용품
+              </h3>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">횡대</span>
+                <span className="text-[14px] font-medium text-[#333D4B] leading-snug">매장 시 오동나무 횡대 제공</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">고급차량띠/장갑</span>
+                <span className="text-[14px] font-medium text-[#333D4B] leading-snug">선도차 고급차량띠 및 운구용 장갑 제공</span>
               </div>
             </div>
           </div>
+
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              { title: "부고알림", desc: "모바일 부고알림 서비스 제공 (온라인 장례식장)" },
+              { title: "안내서비스", desc: "행정절차 및 장례관련 일체 안내" },
+              { title: "수의대체", desc: "황실전통대렴 또는 복지사 2명 中 택 1" }
+            ].map((service, idx) => (
+              <div key={idx} className="flex items-center gap-4 bg-white border border-[#E5E8EB] p-4 rounded-[20px] shadow-sm">
+                <div className="w-10 h-10 bg-[#C5A059]/5 rounded-full flex items-center justify-center shrink-0">
+                  <Check className="w-5 h-5 text-[#C5A059]" />
+                </div>
+                <div>
+                  <h4 className="text-[14px] font-bold text-[#191F28]">{service.title}</h4>
+                  <p className="text-[12px] text-[#8B95A1]">{service.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section: 특별함을 더하다 Plus */}
+      <section className="bg-[#191F28] py-20 px-6 my-2 text-white overflow-hidden">
+        <div className="mb-10 text-center">
+          <h2 className="text-[24px] font-black mb-3">특별함을 더하다 <span className="text-[#C5A059]">Plus</span></h2>
+          <p className="text-[14px] text-white/60 leading-relaxed break-keep">
+            효원상조는 20년 전통의 노하우를 바탕으로<br/>유족의 슬픔을 함께 나눕니다.
+          </p>
         </div>
 
-        <div className="mt-6">
-          <div className="bg-white border border-[#C5A059] rounded-[24px] p-5 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#1A1A1C] rounded-2xl flex items-center justify-center text-[#C5A059]">
-                <Package className="w-6 h-6" />
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { title: '황금 수의', desc: '품격을 높이는 최고급 수의', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484181/img_mnzkaq.jpg' },
+            { title: '궁중 염습', desc: '정성을 다하는 궁중 염습', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484273/031_nihilist71_rwwsfl.jpg' },
+            { title: '링컨 리무진', desc: '최고급 고인 전용 리무진', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484299/4_mpwp2l.jpg' },
+            { title: '제단 꽃장식', desc: '풍성한 빈소 제단 장식', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484373/8e5d644c-146b-481a-9f57-d71770dd8166_fbug9x.webp' },
+          ].map((item, i) => (
+            <div key={i} className="flex flex-col">
+              <div className="relative aspect-[4/5] rounded-[24px] overflow-hidden mb-3 shadow-2xl">
+                <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute bottom-3 left-3">
+                  <h4 className="text-[14px] font-bold text-white">{item.title}</h4>
+                </div>
               </div>
-              <div className="text-left">
-                <span className="text-[12px] font-bold text-[#C5A059] block mb-0.5">BSON 렌탈 서비스</span>
-                <p className="text-[15px] font-bold text-[#191F28]">복잡한 서류 없이 간편하게!</p>
-              </div>
+              <p className="text-[11px] text-white/40 leading-snug px-1 break-keep">{item.desc}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section: 브랜드 신뢰도 & 모델 영역 (Trust) */}
+      <section className="bg-white py-16 px-6 my-2">
+        <div className="bg-[#E9F4EE] rounded-[32px] overflow-hidden relative mb-4 shadow-sm">
+          <div className="p-8 pb-4">
+            <h4 className="text-[11px] sm:text-[13px] font-bold text-[#006E4E] mb-3 whitespace-nowrap">20년간 오직 한 길만 걸어온 정통 상조회사</h4>
+            <h2 className="text-[22px] sm:text-[28px] font-black text-[#191F28] leading-tight mb-2 whitespace-nowrap">효원상조와 함께하세요!</h2>
+            <p className="text-[14px] text-[#4E5968] font-medium">정직과 신뢰로 보답하겠습니다.</p>
+          </div>
+          <div className="px-4 flex justify-center">
+            <img 
+              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476138/IMG_3660_l4vlag.png" 
+              alt="효원상조 전속모델" 
+              className="w-full h-auto object-contain max-h-[320px]"
+            />
           </div>
         </div>
 
+        <div className="bg-white border border-[#E5E8EB] rounded-[32px] p-8 flex items-center gap-5 shadow-sm">
+          <div className="w-20 h-20 bg-[#F2F4F6] rounded-full overflow-hidden shrink-0 border-2 border-white shadow-inner">
+            <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476138/IMG_3660_l4vlag.png" alt="안내 모델" className="w-full h-full object-cover object-top" />
+          </div>
+          <div>
+            <span className="text-[12px] font-bold text-[#C5A059] block mb-1">바른 소비의 첫걸음</span>
+            <p className="text-[13px] sm:text-[15px] font-bold text-[#191F28] leading-relaxed break-keep">
+              고객과 함께 발맞춰 걷는 효원상조가 되겠습니다.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Section 16: 가입 절차 안내 및 최종 CTA */}
@@ -845,7 +1118,10 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
              <p className="text-[13px] font-bold text-white leading-none">스페셜 299 단독 혜택</p>
           </div>
           <button 
-            onClick={() => setIsContactModalOpen(true)}
+            onClick={() => {
+              setSelectedProduct(null);
+              setIsContactModalOpen(true);
+            }}
             className="bg-[#C5A059] text-white px-5 py-3 rounded-[18px] font-black text-[13px] flex items-center gap-2 hover:bg-[#B38E46] transition-colors shadow-lg shadow-[#C5A059]/20 active:scale-95 shrink-0"
           >
             상담 신청 <ArrowRight className="w-4 h-4" />
@@ -884,6 +1160,25 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
               </div>
 
               <div className="p-8">
+                {selectedProduct && (
+                  <div className="mb-8 p-4 bg-[#C5A059]/5 rounded-[24px] border border-[#C5A059]/10 flex items-center gap-4">
+                    <div className="w-20 h-20 bg-white rounded-xl overflow-hidden shrink-0 border border-[#E5E8EB]">
+                      <img 
+                        src={(selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : selectedProduct.image} 
+                        alt={selectedProduct.name} 
+                        className="w-full h-full object-contain p-2" 
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 bg-[#C5A059] text-white text-[10px] font-bold rounded-md">선택 제품</span>
+                        <span className="text-[11px] font-bold text-[#8B95A1]">{selectedProduct.brand}</span>
+                      </div>
+                      <h4 className="text-[15px] font-black text-[#191F28] truncate leading-tight mb-0.5">{selectedProduct.name}</h4>
+                      <p className="text-[12px] text-[#8B95A1] truncate">{selectedProduct.model || selectedProduct.modelName}</p>
+                    </div>
+                  </div>
+                )}
                 <div className="space-y-6 mb-10">
                   <div className="group">
                     <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1 transition-colors group-focus-within:text-[#C5A059]">성함</label>

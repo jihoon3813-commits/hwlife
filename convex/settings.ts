@@ -47,6 +47,13 @@ export const update = mutation({
       email: v.string(),
       notice: v.string(),
     })),
+    sms: v.optional(v.object({
+      apiKey: v.string(),
+      userId: v.string(),
+      sender: v.string(),
+      consentMessage: v.optional(v.string()),
+      consentPageUrl: v.optional(v.string()),
+    })),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db.query("settings").first();
@@ -56,6 +63,7 @@ export const update = mutation({
     if (args.brands !== undefined) data.brands = args.brands;
     if (args.categories !== undefined) data.categories = args.categories;
     if (args.footer !== undefined) data.footer = args.footer;
+    if (args.sms !== undefined) data.sms = args.sms;
 
     if (existing) {
       await ctx.db.patch(existing._id, data);

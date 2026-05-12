@@ -29,13 +29,14 @@ export default function AdminLayout({
     { id: 'statistics', label: '통계분석', icon: BarChart3 },
     { id: 'consent', label: '구매동의 관리', icon: ShieldCheck },
     { id: 'shinhan48', label: '신한48 관리', icon: ExternalLink, url: 'https://partner.48mall.co.kr/' },
+    { id: 'bson', label: 'BSON 관리', icon: ExternalLink, url: 'https://mob.bs-on.com/origin/hwsj/login' },
     { id: 'sangjo', label: '상조접수 관리', icon: ExternalLink, url: 'https://hwsj.kr/intranet/' },
     { id: 'settings', label: '설정', icon: SettingsIcon },
   ];
 
   const menuItems = allMenuItems.filter(item => {
     if (userType === 'channel') {
-      return ['customers', 'landings', 'statistics', 'consent', 'shinhan48', 'sangjo', 'settings'].includes(item.id);
+      return ['customers', 'landings', 'statistics', 'consent', 'shinhan48', 'bson', 'sangjo', 'settings'].includes(item.id);
     }
 
     return true;

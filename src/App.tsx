@@ -201,6 +201,7 @@ export default function App() {
 
   const products = useQuery(api.products.getVisibleProducts) || [];
   const competitors = useQuery(api.competitors.get) || [];
+  const dbPlans = useQuery(api.plans.get) || [];
   const settings = useQuery(api.settings.get);
   const categories = ["전체", ...(settings?.categories || [])];
   
@@ -1294,7 +1295,8 @@ export default function App() {
                 name,
                 phone,
                 productName: "랜딩 하단 상담",
-                message: finalMessage || undefined
+                message: finalMessage || undefined,
+                source: 'homepage'
               });
               
               // Google Ads Conversion Tracking
@@ -1796,12 +1798,16 @@ export default function App() {
                   e.preventDefault();
                   try {
                     const finalMessage = inquiryType === '직접 입력하기' ? message : inquiryType;
+                    const plan = inquiryProduct ? dbPlans.find(p => p.numericId === inquiryProduct.planId) : null;
                     await createInquiry({
                       name,
                       phone,
                       productName: inquiryProduct ? inquiryProduct.name : (landingInfo?.name || "전체 상담"),
+                      account: plan?.accountCount,
+                      appliance: inquiryProduct ? `${inquiryProduct.name} (${inquiryProduct.model})` : undefined,
                       message: finalMessage || undefined,
-                      channelId: channelId
+                      channelId: channelId,
+                      source: 'homepage'
                     });
                     
                     // Google Ads Conversion Tracking

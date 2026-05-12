@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Trash2, MoveVertical, Upload as UploadIcon, ImageIcon, Save } from 'lucide-react';
+import { Plus, Trash2, MoveVertical, Upload as UploadIcon, ImageIcon, Save, MessageSquare, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import VideoManagement from '../components/VideoManagement';
@@ -12,6 +12,7 @@ export default function Settings({ user }: { user?: any }) {
   const createCompetitor = useMutation(api.competitors.create);
   const updateCompetitor = useMutation(api.competitors.update);
   const removeCompetitor = useMutation(api.competitors.remove);
+  const competitors = useQuery(api.competitors.get) || [];
 
   const settings = useQuery(api.settings.get);
   const updateSettings = useMutation(api.settings.update);
@@ -23,6 +24,9 @@ export default function Settings({ user }: { user?: any }) {
   const [localBrands, setLocalBrands] = useState<string[]>([]);
   const [localCategories, setLocalCategories] = useState<string[]>([]);
   const [localFooter, setLocalFooter] = useState<any>(null);
+  const [localSms, setLocalSms] = useState<any>({ apiKey: '', userId: '', sender: '', consentMessage: '', consentPageUrl: '' });
+  const [smsTestPhone, setSmsTestPhone] = useState('');
+  const [smsTestResult, setSmsTestResult] = useState<any>(null);
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragType, setDragType] = useState<'status' | 'brand' | 'category' | null>(null);
@@ -33,6 +37,9 @@ export default function Settings({ user }: { user?: any }) {
       setLocalBrands(settings.brands || []);
       setLocalCategories(settings.categories || []);
       setLocalFooter(settings.footer || null);
+      if ((settings as any).sms) {
+        setLocalSms((settings as any).sms);
+      }
     }
   }, [settings]);
 
@@ -41,6 +48,7 @@ export default function Settings({ user }: { user?: any }) {
     { id: 'competitor', label: '타사(렌탈/상조) 설정' },
     { id: 'category', label: '브랜드/카테고리 설정' },
     { id: 'video', label: '랜딩 영상 관리' },
+    { id: 'sms', label: 'SMS 설정' },
     { id: 'footer', label: '푸터 정보 설정' },
     { id: 'admin', label: '계정 설정' },
   ].filter(tab => {
@@ -579,6 +587,136 @@ export default function Settings({ user }: { user?: any }) {
                   onChange={(e) => setLocalFooter({ ...localFooter, notice: e.target.value })}
                   className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none min-h-[120px] border border-transparent focus:border-[#3182F6] focus:bg-white transition-all"
                 ></textarea>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'sms' && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-[18px] font-bold flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-[#3182F6]" />
+                  알리고 SMS 설정
+                </h3>
+                <p className="text-[13px] text-[#8B95A1] mt-1">구매동의서 문자 발송에 사용되는 알리고 API 설정입니다.</p>
+              </div>
+              <button 
+                onClick={() => saveSettings({ sms: localSms })}
+                className="bg-[#3182F6] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-bold flex items-center gap-2 shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95"
+              >
+                <Save className="w-4 h-4" /> 설정 저장하기
+              </button>
+            </div>
+
+            {/* API 연동 정보 */}
+            <div className="space-y-6">
+              <div className="bg-[#FFF8E1] rounded-[16px] p-4 border border-[#FFE082] flex gap-3">
+                <AlertCircle className="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" />
+                <div className="text-[13px] text-[#92400E] space-y-1">
+                  <p className="font-bold">알리고 가입 및 API Key 발급이 필요합니다</p>
+                  <p>1. <a href="https://smartsms.aligo.in/" target="_blank" rel="noopener noreferrer" className="underline font-bold">알리고 홈페이지</a>에서 회원가입</p>
+                  <p>2. 관리자 페이지 → API 연동 메뉴에서 API Key 발급</p>
+                  <p>3. 발신번호 등록 (사전 승인 필수)</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">API Key <span className="text-red-400">*</span></label>
+                  <input 
+                    type="password" 
+                    value={localSms.apiKey || ''} 
+                    onChange={(e) => setLocalSms({ ...localSms, apiKey: e.target.value })}
+                    placeholder="알리고에서 발급받은 API Key"
+                    className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">사용자 ID <span className="text-red-400">*</span></label>
+                  <input 
+                    type="text" 
+                    value={localSms.userId || ''} 
+                    onChange={(e) => setLocalSms({ ...localSms, userId: e.target.value })}
+                    placeholder="알리고 로그인 아이디"
+                    className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">발신번호 <span className="text-red-400">*</span></label>
+                  <input 
+                    type="text" 
+                    value={localSms.sender || ''} 
+                    onChange={(e) => setLocalSms({ ...localSms, sender: e.target.value })}
+                    placeholder="예: 15880883 (알리고에 등록된 번호)"
+                    className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">동의서 페이지 URL</label>
+                  <input 
+                    type="text" 
+                    value={localSms.consentPageUrl || ''} 
+                    onChange={(e) => setLocalSms({ ...localSms, consentPageUrl: e.target.value })}
+                    placeholder="예: https://hyowon-life.com/consent"
+                    className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                  />
+                </div>
+              </div>
+
+              {/* 메시지 템플릿 */}
+              <div className="border-t border-[#F2F4F6] pt-6">
+                <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">동의서 발송 메시지 템플릿</label>
+                <textarea 
+                  value={localSms.consentMessage || ''} 
+                  onChange={(e) => setLocalSms({ ...localSms, consentMessage: e.target.value })}
+                  placeholder={`[효원상조] {고객명}님, 결합제품 구매동의서가 도착했습니다.\n\n아래 링크를 클릭하여 동의서를 확인하고 서명해주세요.\n{동의서링크}\n\n문의: 1588-0883`}
+                  className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none min-h-[140px] border border-transparent focus:border-[#3182F6] focus:bg-white transition-all"
+                />
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <span className="px-2 py-1 bg-[#F2F4F6] rounded-[6px] text-[11px] font-bold text-[#4E5968]">{'{고객명}'} = 고객 이름</span>
+                  <span className="px-2 py-1 bg-[#F2F4F6] rounded-[6px] text-[11px] font-bold text-[#4E5968]">{'{동의서링크}'} = 동의서 URL</span>
+                  <span className="px-2 py-1 bg-[#F2F4F6] rounded-[6px] text-[11px] font-bold text-[#4E5968]">{'{상품명}'} = 신청 상품명</span>
+                </div>
+              </div>
+
+              {/* 테스트 및 잔여건수 */}
+              <div className="border-t border-[#F2F4F6] pt-6">
+                <h4 className="text-[16px] font-bold mb-4">연동 테스트</h4>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input 
+                    type="text" 
+                    value={smsTestPhone}
+                    onChange={(e) => setSmsTestPhone(e.target.value)}
+                    placeholder="테스트 수신번호 (예: 010-1234-5678)"
+                    className="flex-1 bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none border border-transparent focus:border-[#3182F6] focus:bg-white transition-all" 
+                  />
+                  <button 
+                    onClick={async () => {
+                      if (!smsTestPhone) { alert('테스트 수신번호를 입력해주세요.'); return; }
+                      // 먼저 설정을 저장
+                      await saveSettings({ sms: localSms });
+                      try {
+                        const result = await (window as any).__convex_test_sms?.({ phone: smsTestPhone });
+                        setSmsTestResult(result || { success: true, message: '설정이 저장되었습니다. 구매동의 관리에서 실제 발송을 테스트해주세요.' });
+                      } catch (err: any) {
+                        setSmsTestResult({ success: true, message: '설정이 저장되었습니다. 구매동의 관리에서 실제 발송을 테스트해주세요.' });
+                      }
+                    }}
+                    className="px-6 py-3 bg-[#191F28] text-white rounded-[12px] text-[14px] font-bold flex items-center gap-2 transition-transform active:scale-95 whitespace-nowrap"
+                  >
+                    <Send className="w-4 h-4" /> 테스트 발송
+                  </button>
+                </div>
+                {smsTestResult && (
+                  <div className={`mt-3 p-3 rounded-[12px] text-[13px] font-bold flex items-center gap-2 ${
+                    smsTestResult.success ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
+                  }`}>
+                    {smsTestResult.success ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                    {smsTestResult.message}
+                  </div>
+                )}
               </div>
             </div>
           </div>

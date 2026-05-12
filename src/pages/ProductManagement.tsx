@@ -5,19 +5,43 @@ import { api } from '../../convex/_generated/api';
 import * as XLSX from 'xlsx';
 
 interface Plan {
-  id: number;
-  name: string;
-  basePrice: string;
-  benefitPrice: string;
   mainCount: number;
   isMainActive: boolean;
+  accountCount?: string;
+}
+
+function PreviewImage({ src, className }: { src: string, className?: string }) {
+  const isStorageId = src && !src.startsWith('http') && !src.startsWith('blob') && !src.startsWith('data');
+  const imageUrl = useQuery(api.images.getImageUrl, isStorageId ? { storageId: src as any } : "skip");
+
+  const displayUrl = isStorageId ? imageUrl : src;
+
+  if (isStorageId && imageUrl === undefined) {
+    return <div className={`${className} flex items-center justify-center bg-gray-50`}><div className="w-4 h-4 border-2 border-[#3182F6] border-t-transparent rounded-full animate-spin"></div></div>;
+  }
+
+  return <img src={displayUrl || ''} className={className} alt="" />;
 }
 
 export default function ProductManagement() {
-  const [plans, setPlans] = useState<Plan[]>([
-    { id: 1, name: '스페셜 299 더블', basePrice: '59,800', benefitPrice: '29,800', mainCount: 4, isMainActive: true },
-    { id: 2, name: '스페셜 399 실속', basePrice: '69,800', benefitPrice: '39,800', mainCount: 4, isMainActive: false },
-  ]);
+  const dbPlans = useQuery(api.plans.get) || [];
+  const createPlan = useMutation(api.plans.create);
+  const updatePlan = useMutation(api.plans.update);
+  const deletePlan = useMutation(api.plans.remove);
+  const updatePlanOrder = useMutation(api.plans.updateOrder);
+
+  const plans = dbPlans.map(p => ({
+    id: p.numericId,
+    _id: p._id,
+    name: p.name,
+    basePrice: p.basePrice,
+    benefitPrice: p.benefitPrice,
+    mainCount: p.mainCount,
+    isMainActive: p.isMainActive,
+    accountCount: p.accountCount
+  }));
+
+  const [editingPlan, setEditingPlan] = useState<any | null>(null);
 
   const allProducts = useQuery(api.products.getAllProducts) || [];
   const competitors = useQuery(api.competitors.get) || [];
@@ -127,7 +151,6 @@ export default function ProductManagement() {
       price: '0', 
       discountPrice: '0',
       isVisible: true,
-      tag: '',
       image: '',
       images: [],
       detailImage: '',
@@ -219,6 +242,35 @@ export default function ProductManagement() {
     setDraggedItemIndex(null);
   };
 
+  const [draggedPlanIndex, setDraggedPlanIndex] = useState<number | null>(null);
+  const handlePlanDragStart = (idx: number) => {
+    setTimeout(() => {
+      setDraggedPlanIndex(idx);
+    }, 0);
+  };
+  const handlePlanDrop = async (idx: number) => {
+    if (draggedPlanIndex === null || draggedPlanIndex === idx) {
+      setDraggedPlanIndex(null);
+      return;
+    }
+
+    const newList = [...plans];
+    const [movedItem] = newList.splice(draggedPlanIndex, 1);
+    newList.splice(idx, 0, movedItem);
+
+    const orders = newList.map((item, index) => ({
+      id: (item as any)._id,
+      order: index,
+    }));
+
+    try {
+      await updatePlanOrder({ orders });
+    } catch (e) {
+      console.error(e);
+    }
+    setDraggedPlanIndex(null);
+  };
+
   const filteredProducts = allProducts
     .filter(p => p.planId === selectedPlanId)
     .sort((a, b) => {
@@ -290,6 +342,7 @@ export default function ProductManagement() {
             const price = String(row[5] || '0').replace(/\D/g, '');
             const discountPrice = String(row[6] || '0').replace(/\D/g, '');
             const tag = String(row[7] || '').trim();
+            const accountCount = planVal; // Mapping '구좌' column value to accountCount
             
             const comparisons = [];
             for (let j = 0; j < 10; j++) {
@@ -324,6 +377,7 @@ export default function ProductManagement() {
               discountPrice,
               tag,
               isVisible: true,
+              accountCount,
               comparisons,
               images: thumbnailUrl ? [thumbnailUrl] : [],
               detailImages: detailUrls
@@ -378,19 +432,50 @@ export default function ProductManagement() {
         <div className="w-full lg:w-[260px] flex flex-col bg-white rounded-[24px] border border-[#E5E8EB] overflow-hidden shadow-sm shrink-0">
           <div className="p-4 lg:p-5 border-b border-[#F2F4F6] bg-[#F9FAFB] flex justify-between items-center">
             <h3 className="font-bold text-[14px] text-[#4E5968]">구좌 선택</h3>
-            <button className="p-1.5 bg-[#3182F6] text-white rounded-[8px]"><Plus className="w-4 h-4"/></button>
+             <button 
+              onClick={() => {
+                setEditingPlan({ name: '', basePrice: '', benefitPrice: '', mainCount: 4, isMainActive: true, accountCount: '1구좌', numericId: (plans[plans.length-1]?.id || 0) + 1 });
+                setViewMode('edit_plan');
+              }}
+              className="p-1.5 bg-[#3182F6] text-white rounded-[8px] hover:bg-[#1B64DA] transition-colors"
+            >
+              <Plus className="w-4 h-4"/>
+            </button>
           </div>
-          <div className="flex lg:flex-col overflow-x-auto lg:overflow-y-auto p-3 gap-2 no-scrollbar">
-            {plans.map(plan => (
+           <div className="flex lg:flex-col overflow-x-auto lg:overflow-y-auto p-3 gap-2 no-scrollbar">
+            {plans.map((plan, idx) => (
               <div 
-                key={plan.id}
+                key={plan._id || plan.id}
+                draggable
+                onDragStart={() => handlePlanDragStart(idx)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => handlePlanDrop(idx)}
+                onDragEnd={() => setDraggedPlanIndex(null)}
                 onClick={() => { setSelectedPlanId(plan.id); setViewMode('list'); setSelectedIds([]); }}
-                className={`flex-none lg:w-full p-4 rounded-[16px] cursor-pointer border transition-all whitespace-nowrap lg:whitespace-normal ${
+                className={`flex-none lg:w-full p-4 rounded-[16px] cursor-pointer border transition-all whitespace-nowrap lg:whitespace-normal flex flex-col gap-1 ${
                   selectedPlanId === plan.id ? 'bg-[#3182F6] text-white shadow-md border-[#3182F6]' : 'bg-white border-transparent hover:bg-[#F2F4F6]'
-                }`}
+                } ${draggedPlanIndex === idx ? 'opacity-50 border-dashed border-[#3182F6]' : ''}`}
               >
-                <div className="text-[14px] font-bold truncate">{plan.name}</div>
-                <div className={`text-[11px] mt-1 ${selectedPlanId === plan.id ? 'text-white/70' : 'text-[#8B95A1]'}`}>{formatNumber(plan.basePrice)}원</div>
+                 <div className="flex justify-between items-start gap-2">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <MoveVertical className={`w-3.5 h-3.5 shrink-0 ${selectedPlanId === plan.id ? 'text-white/50' : 'text-[#D1D6DB]'}`} />
+                    <div className="text-[14px] font-bold truncate">{plan.name}</div>
+                  </div>
+                  <button 
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      setEditingPlan({ ...plan, numericId: plan.id }); 
+                      setViewMode('edit_plan'); 
+                    }}
+                    className={`p-1 rounded-md transition-colors shrink-0 ${selectedPlanId === plan.id ? 'hover:bg-white/20' : 'hover:bg-[#E5E8EB]'}`}
+                  >
+                    <Edit className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className={`text-[11px] ${selectedPlanId === plan.id ? 'text-white/70' : 'text-[#8B95A1]'}`}>
+                  {formatNumber(plan.basePrice)}원
+                  {plan.accountCount && ` · ${plan.accountCount}`}
+                </div>
               </div>
             ))}
           </div>
@@ -506,6 +591,7 @@ export default function ProductManagement() {
                         <td className="px-4 py-4 text-[13px] text-[#8B95A1] font-medium">{p.category}</td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2 mb-1">
+                            {selectedPlan.accountCount && <span className="text-[10px] font-bold bg-[#191F28] text-white px-1.5 py-0.5 rounded">{selectedPlan.accountCount}</span>}
                             {p.tag && <span className="text-[10px] font-bold bg-[#3182F6] text-white px-1.5 py-0.5 rounded">{p.tag}</span>}
                             <div className="text-[14px] font-bold text-[#191F28]">{p.name}</div>
                           </div>
@@ -710,9 +796,9 @@ export default function ProductManagement() {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        {(editingProduct.images || []).map((img: string, idx: number) => (
+                         {(editingProduct.images || []).map((img: string, idx: number) => (
                           <div key={idx} className="aspect-square bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] overflow-hidden relative group">
-                            <img src={img} className="w-full h-full object-cover" />
+                            <PreviewImage src={img} className="w-full h-full object-cover" />
                             <button 
                               onClick={() => removeImage('images', idx)}
                               className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -752,9 +838,9 @@ export default function ProductManagement() {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        {(editingProduct.detailImages || []).map((img: string, idx: number) => (
+                         {(editingProduct.detailImages || []).map((img: string, idx: number) => (
                           <div key={idx} className="aspect-square bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] overflow-hidden relative group">
-                            <img src={img} className="w-full h-full object-cover" />
+                            <PreviewImage src={img} className="w-full h-full object-cover" />
                             <button 
                               onClick={() => removeImage('detailImages', idx)}
                               className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -784,10 +870,11 @@ export default function ProductManagement() {
                           const productData = { ...editingProduct, comparisons: sortedComparisons };
 
                           if (editingProduct._id) {
-                            const { _id, _creationTime, ...data } = productData;
+                            const { _id, _creationTime, id, ...data } = productData;
                             await updateProduct({ id: _id, ...data });
                           } else {
-                            await createProduct(productData);
+                            const { _id, _creationTime, id, ...data } = productData;
+                            await createProduct(data);
                           }
                           setViewMode('list');
                           setEditingProduct(null);
@@ -798,6 +885,118 @@ export default function ProductManagement() {
                       className="flex-[2] bg-[#3182F6] text-white font-bold py-4 rounded-[20px] shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95"
                     >
                       정보 저장하기
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : viewMode === 'edit_plan' && editingPlan ? (
+            <div className="flex flex-col h-full overflow-hidden">
+              <div className="px-4 lg:px-8 py-6 border-b border-[#F2F4F6] flex justify-between items-center bg-[#F9FAFB]">
+                <div>
+                  <h3 className="font-bold text-[18px] lg:text-[20px] mb-1">구좌(상품군) 관리</h3>
+                  <p className="text-[12px] text-[#8B95A1]">상품군별 명칭과 기본 가격을 설정합니다.</p>
+                </div>
+                <button onClick={() => setViewMode('list')} className="p-2 hover:bg-[#F2F4F6] rounded-full transition-colors">
+                  <X className="w-6 h-6 text-[#4E5968]" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-8 bg-white no-scrollbar">
+                <div className="max-w-xl mx-auto space-y-6">
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2">구좌 고유 ID (숫자)</label>
+                    <input 
+                      type="number" 
+                      value={editingPlan.numericId} 
+                      onChange={(e) => setEditingPlan({...editingPlan, numericId: parseInt(e.target.value)})} 
+                      className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold"
+                    />
+                    <p className="mt-1 text-[11px] text-[#8B95A1]">이 숫자는 제품 등록 시 '구좌 ID'로 사용됩니다.</p>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2">구좌명</label>
+                    <input 
+                      type="text" 
+                      value={editingPlan.name} 
+                      onChange={(e) => setEditingPlan({...editingPlan, name: e.target.value})} 
+                      className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold"
+                      placeholder="예: 스페셜 299 더블"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2">기본 월납입금</label>
+                      <input 
+                        type="text" 
+                        value={editingPlan.basePrice} 
+                        onChange={(e) => setEditingPlan({...editingPlan, basePrice: formatNumber(e.target.value)})} 
+                        className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2">제휴카드 혜택가</label>
+                      <input 
+                        type="text" 
+                        value={editingPlan.benefitPrice} 
+                        onChange={(e) => setEditingPlan({...editingPlan, benefitPrice: formatNumber(e.target.value)})} 
+                        className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold"
+                      />
+                    </div>
+                    </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1 text-[#3182F6]">기본 구좌수 설정</label>
+                    <input 
+                      type="text" 
+                      value={editingPlan.accountCount || ''} 
+                      onChange={(e) => setEditingPlan({...editingPlan, accountCount: e.target.value})} 
+                      className="w-full bg-[#F0F7FF] border border-[#3182F6]/20 px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold"
+                      placeholder="예: 1구좌, 2구좌"
+                    />
+                    <p className="mt-1 text-[11px] text-[#8B95A1]">이 구좌수 정보는 해당 카테고리 모든 제품의 기본 정보로 활용됩니다.</p>
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-[16px]">
+                    <div className="text-[14px] font-bold text-[#4E5968]">메인 페이지 노출 활성화</div>
+                    <button 
+                      onClick={() => setEditingPlan({...editingPlan, isMainActive: !editingPlan.isMainActive})}
+                      className={`w-12 h-6 rounded-full transition-all relative ${editingPlan.isMainActive ? 'bg-[#3182F6]' : 'bg-[#D1D6DB]'}`}
+                    >
+                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${editingPlan.isMainActive ? 'left-7' : 'left-1'}`}></div>
+                    </button>
+                  </div>
+                  
+                  <div className="pt-10 flex gap-4">
+                    {editingPlan._id && (
+                      <button 
+                        onClick={async () => {
+                          if (window.confirm('정말 이 구좌를 삭제하시겠습니까? 연결된 제품들이 표시되지 않을 수 있습니다.')) {
+                            await deletePlan({ id: editingPlan._id });
+                            setViewMode('list');
+                          }
+                        }}
+                        className="flex-1 bg-red-50 text-red-500 font-bold py-4 rounded-[20px] hover:bg-red-100 transition-all"
+                      >
+                        삭제하기
+                      </button>
+                    )}
+                    <button 
+                      onClick={async () => {
+                        if (!editingPlan.name) return alert('구좌명을 입력해주세요.');
+                        try {
+                          const { id, _id, ...rest } = editingPlan;
+                          if (editingPlan._id) {
+                            await updatePlan({ id: _id, ...rest });
+                          } else {
+                            await createPlan(rest);
+                          }
+                          setViewMode('list');
+                        } catch (e) {
+                          console.error(e);
+                          alert('저장 중 오류가 발생했습니다.');
+                        }
+                      }}
+                      className="flex-[2] bg-[#3182F6] text-white font-bold py-4 rounded-[20px] shadow-lg shadow-[#3182F6]/20 active:scale-95 transition-all"
+                    >
+                      저장하기
                     </button>
                   </div>
                 </div>

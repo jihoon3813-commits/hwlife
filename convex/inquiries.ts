@@ -10,6 +10,14 @@ export const create = mutation({
     productName: v.string(),
     message: v.optional(v.string()),
     channelId: v.optional(v.string()),
+    gender: v.optional(v.string()),
+    birth: v.optional(v.string()),
+    address: v.optional(v.string()),
+    detailAddress: v.optional(v.string()),
+    account: v.optional(v.string()),
+    appliance: v.optional(v.string()),
+    status: v.optional(v.string()),
+    source: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const id = await ctx.db.insert("inquiries", {
@@ -151,5 +159,44 @@ export const remove = mutation({
   args: { id: v.id("inquiries") },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id);
+  },
+});
+
+// 동의서 페이지용 - ID로 단건 조회 (공개)
+export const getById = query({
+  args: { id: v.id("inquiries") },
+  handler: async (ctx, args) => {
+    const doc = await ctx.db.get(args.id);
+    if (!doc) return null;
+    // 고객에게 필요한 정보만 반환 (보안)
+    return {
+      _id: doc._id,
+      name: doc.name,
+      phone: doc.phone,
+      productName: doc.productName,
+      account: doc.account,
+      appliance: doc.appliance,
+      consentStatus: doc.consentStatus,
+      purchaseConsentDate: doc.purchaseConsentDate,
+    };
+  },
+});
+
+// 동의서 서명 완료 처리
+export const completeConsent = mutation({
+  args: {
+    id: v.id("inquiries"),
+    signatureData: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const now = new Date(Date.now() + 9 * 60 * 60 * 1000);
+    const dateStr = now.toISOString().split("T")[0];
+    const timeStr = now.toISOString().replace("T", " ").slice(0, 19);
+    
+    await ctx.db.patch(args.id, {
+      consentStatus: "서명완료",
+      purchaseConsentDate: dateStr,
+      consentFileUrl: args.signatureData || undefined,
+    });
   },
 });

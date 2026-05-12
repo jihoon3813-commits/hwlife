@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowRight, Phone, Check, Calendar, Coins, ShieldCheck, 
   ChevronDown, ChevronUp, ChevronRight, FileText, Wallet, Sparkles, CreditCard, X,
-  Hotel, HeartPulse, Film
+  Hotel, HeartPulse, Film, Package
 } from 'lucide-react';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -11,6 +11,10 @@ import { api } from '../../convex/_generated/api';
 
 export default function LivingPage({ channelSubdomain }: { channelSubdomain?: string }) {
   const landingInfo = useQuery(api.landings.getByPath, { path: "/living" });
+  const allProducts = useQuery(api.products.getAllProducts) || [];
+  const dbPlans = useQuery(api.plans.get) || [];
+  const plan1Products = allProducts.filter(p => p.planId === 1);
+  const plan2Products = allProducts.filter(p => p.planId === 2);
 
 
   const formRef = useRef<HTMLDivElement>(null);
@@ -21,6 +25,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
   const createInquiry = useMutation(api.inquiries.create);
 
@@ -74,11 +79,15 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
     setIsSubmitting(true);
     try {
+      const plan = selectedProduct ? dbPlans.find(p => p.numericId === selectedProduct.planId) : null;
       await createInquiry({
         name: name.trim(),
         phone: phoneNumber,
-        productName: landingInfo?.name || '신한카드 리빙144',
-        channelId: channelId
+        productName: selectedProduct?.name || landingInfo?.name || '신한카드 리빙144',
+        account: plan?.accountCount || (activeTab === '1' ? '1구좌' : '2구좌'),
+        appliance: selectedProduct ? `${selectedProduct.name} (${selectedProduct.model})` : undefined,
+        channelId: channelId,
+        source: 'homepage'
       });
       alert('상담 신청이 접수되었습니다. 빠르게 연락드리겠습니다.');
       setName('');
@@ -92,6 +101,15 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
     }
   };
 
+  const formatNumber = (val: string | number | undefined) => {
+    if (!val) return '0';
+    return Number(val).toLocaleString();
+  };
+
+  const openProductDetail = (product: any) => {
+    setSelectedProduct(product);
+    setIsContactModalOpen(true);
+  };
 
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
@@ -136,6 +154,31 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
             className="h-[75%] w-auto object-contain object-bottom mt-[-35%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
         </div>
+
+        {/* 상단 바로가기 탭 (Shortcut Tabs) */}
+        <div className="absolute top-8 inset-x-0 z-30 flex justify-center px-6">
+          <div className="flex bg-black/20 backdrop-blur-md border border-white/10 p-1.5 rounded-full shadow-2xl">
+            <a 
+              href={`/living${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-2.5 rounded-full text-[13px] font-black transition-all flex items-center gap-2 bg-white text-[#1B64DA] shadow-lg"
+            >
+              <CreditCard className="w-3.5 h-3.5" />
+              신한카드 결합
+            </a>
+            <a 
+              href={`/special${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-2.5 rounded-full text-[13px] font-black text-white/70 hover:text-white transition-all flex items-center gap-2"
+            >
+              <Package className="w-3.5 h-3.5" />
+              BSON 결합
+            </a>
+          </div>
+        </div>
+
         
         {/* 하단 페이드 그라데이션 */}
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0A1128] to-transparent z-10"></div>
@@ -162,7 +205,10 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           </p>
 
           <button 
-            onClick={() => setIsContactModalOpen(true)}
+            onClick={() => {
+              setSelectedProduct(null);
+              setIsContactModalOpen(true);
+            }}
             className="w-full flex items-center justify-center gap-2 bg-[#3182F6] py-4 rounded-[20px] text-[16px] font-bold text-white shadow-[0_8px_20px_rgba(49,130,246,0.4)] hover:bg-[#1B64DA] transition-all active:scale-95"
           >
             단독 혜택받고 무료상담 신청 <ArrowRight className="w-5 h-5" />
@@ -385,7 +431,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       {/* Section 6: 상품 금액 및 상세 표 */}
       <section className="bg-white py-14 px-6 my-2 border-t border-[#F2F4F6]">
         <div className="mb-8">
-          <h2 className="text-[22px] font-bold text-[#191F28] leading-snug break-keep mb-3">
+          <h2 className="text-[22px] font-black text-[#191F28] leading-snug break-keep mb-3">
             리빙제품에 특별 보너스까지!<br/>
             해피효원라이프·리빙 144 상세표
           </h2>
@@ -686,92 +732,51 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       <section className="bg-white py-16 px-6 my-2">
         <div className="mb-10 text-center">
           <p className="text-[13px] font-bold text-[#3182F6] mb-2">상조 가입 시 프리미엄 리빙 선물을 제공해 드립니다</p>
-          <h2 className="text-[24px] font-bold text-[#191F28] leading-tight break-keep">
+          <h2 className="text-[24px] font-black text-[#191F28] leading-tight break-keep">
             결합 리빙 제품 안내
           </h2>
         </div>
 
-        <div className="space-y-12">
-          {/* 1구좌 제품 */}
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <span className="px-3 py-1 bg-[#3182F6] text-white text-[11px] font-black rounded-full">1구좌 가입 시</span>
-              <span className="text-[13px] font-bold text-[#4E5968]">(택 1)</span>
+        <div className="flex flex-col gap-4">
+          {plan2Products.map((item, idx) => (
+            <motion.div
+              key={(item as any)._id || (item as any).id}
+              onClick={() => openProductDetail(item)}
+              layoutId={`product-${(item as any)._id || (item as any).id}`}
+              className="bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-col w-full"
+            >
+              <div className="relative aspect-square bg-white shrink-0">
+                <img 
+                  src={(item.images && item.images.length > 0) ? item.images[0] : item.image} 
+                  alt={item.name} 
+                  className="w-full h-full object-cover" 
+                />
+                {item.tag && (
+                  <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold rounded-lg uppercase tracking-wider">
+                    {item.tag}
+                  </div>
+                )}
+              </div>
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="mb-3">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <span className="text-[12px] font-bold text-[#3182F6]">{item.brand}</span>
+                    <span className="text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-2 py-0.5 rounded-[4px]">{item.category}</span>
+                  </div>
+                  <span className="text-[13px] font-medium text-[#8B95A1] leading-tight">{item.model || item.modelName}</span>
+                </div>
+                <h3 className="text-[18px] font-black text-[#191F28] mb-1 leading-tight">
+                  {item?.name}
+                </h3>
+              </div>
+            </motion.div>
+          ))}
+          
+          {plan2Products.length === 0 && (
+            <div className="text-center py-10 bg-[#F9FAFB] rounded-[24px] border border-dashed border-[#E5E8EB]">
+              <p className="text-[#8B95A1] text-[14px]">등록된 제품이 없습니다.</p>
             </div>
-            <div className="space-y-4">
-              <div className="bg-[#F9FAFB] rounded-[24px] p-6 border border-[#E5E8EB]">
-                <div className="w-full aspect-square rounded-xl bg-white overflow-hidden mb-4 shadow-sm relative">
-                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-[#3182F6] text-white text-[10px] font-black rounded-lg shadow-sm">
-                    1구좌
-                  </div>
-                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/1._%EB%B0%94%EB%A1%9C%ED%81%90_qehlsv.png" alt="바로큐" className="w-full h-full object-contain p-2" />
-                </div>
-                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">바로큐 복부 근육통증 완화 의료기기</h4>
-                <p className="text-[13px] text-[#4E5968] leading-snug mb-1">복부 근육통 완화와 건강 관리를 위한 전문 의료기기</p>
-                <p className="text-[12px] text-[#8B95A1]">HBSAZ-001</p>
-              </div>
-              <div className="bg-[#F9FAFB] rounded-[24px] p-6 border border-[#E5E8EB]">
-                <div className="w-full aspect-square rounded-xl bg-white overflow-hidden mb-4 shadow-sm relative">
-                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-[#3182F6] text-white text-[10px] font-black rounded-lg shadow-sm">
-                    1구좌
-                  </div>
-                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/2._%EB%A7%88%ED%95%98%EB%82%98%EC%9E%84_%EA%B1%B4%EC%8B%9D%EC%A1%B1%EC%9A%95%EA%B8%B0_udjx9h.png" alt="건식족욕기" className="w-full h-full object-contain p-2" />
-                </div>
-                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">미하나임 건식족욕기</h4>
-                <p className="text-[13px] text-[#4E5968] leading-snug mb-1">언제 어디서나 간편하게 즐기는 따뜻한 휴식</p>
-                <p className="text-[12px] text-[#8B95A1]">MH-101</p>
-              </div>
-            </div>
-          </div>
-
-          {/* 2구좌 제품 */}
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <span className="px-3 py-1 bg-[#191F28] text-white text-[11px] font-black rounded-full">2구좌 가입 시</span>
-              <span className="text-[13px] font-bold text-[#4E5968]">(택 1)</span>
-            </div>
-            <div className="space-y-4">
-              {/* 2구좌 1번: LG 퓨리케어 */}
-              <div className="bg-[#F9FAFB] rounded-[24px] p-6 border border-[#3182F6]/30 bg-gradient-to-br from-[#F2F8FF] to-white">
-                <div className="w-full aspect-square rounded-xl bg-white overflow-hidden mb-4 shadow-sm relative">
-                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-[#191F28] text-white text-[10px] font-black rounded-lg shadow-sm">
-                    2구좌
-                  </div>
-                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/large03_drecnx.jpg" alt="공기청정기" className="w-full h-full object-contain p-2" />
-                </div>
-                <div className="inline-block px-2 py-0.5 bg-[#3182F6] text-white text-[10px] font-bold rounded mb-2">BEST</div>
-                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">LG 퓨리케어 360 공기청정기 HIT</h4>
-                <p className="text-[13px] text-[#4E5968] leading-snug mb-1">깨끗한 공기로 완성되는 쾌적한 공간</p>
-                <p className="text-[12px] text-[#8B95A1]">AS156HWWC</p>
-              </div>
-
-              {/* 2구좌 2번: 프리모 매트리스 */}
-              <div className="bg-[#F9FAFB] rounded-[24px] p-6 border border-[#E5E8EB]">
-                <div className="w-full aspect-square rounded-xl bg-white overflow-hidden mb-4 shadow-sm relative">
-                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-[#191F28] text-white text-[10px] font-black rounded-lg shadow-sm">
-                    2구좌
-                  </div>
-                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/3._%ED%94%84%EB%A6%AC%EB%AA%A8_mmmjvf.png" alt="매트리스" className="w-full h-full object-contain p-2" />
-                </div>
-                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">프리모 캐나다 독립 포켓스프링 매트리스(K,Q)</h4>
-                <p className="text-[13px] text-[#4E5968] leading-snug mb-1">독립 포켓스프링의 프리미엄 매트리스(빠른 배송)</p>
-                <p className="text-[12px] text-[#8B95A1]">PR330-1_K/Q</p>
-              </div>
-
-              {/* 2구좌 3번: 바로큐+마하나임 세트 */}
-              <div className="bg-[#F9FAFB] rounded-[24px] p-6 border border-[#E5E8EB]">
-                <div className="w-full aspect-square rounded-xl bg-white overflow-hidden mb-4 shadow-sm relative">
-                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-[#191F28] text-white text-[10px] font-black rounded-lg shadow-sm">
-                    2구좌
-                  </div>
-                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482271/4._%EB%B0%94%EB%A1%9C%ED%81%90_%EB%A7%88%ED%95%98%EB%82%98%EC%9E%84_zcp5lo.png" alt="결합세트" className="w-full h-full object-contain p-2" />
-                </div>
-                <h4 className="text-[16px] font-bold text-[#191F28] mb-1">바로큐 안마기+마하나임 족욕기</h4>
-                <p className="text-[13px] text-[#4E5968] leading-snug mb-1">복부 안마기와 족욕기를 동시에 제공</p>
-                <p className="text-[12px] text-[#8B95A1]">HBSAZ-001+MH101</p>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
         
         <p className="mt-8 text-[11px] text-[#8B95A1] px-2">* 본 사은품은 제조사 사정에 따라 예고 없이 변경될 수 있습니다.</p>
@@ -781,7 +786,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       <section className="bg-[#F9FAFB] py-16 px-6 my-2">
         <div className="mb-10 text-center">
           <p className="text-[13px] font-bold text-[#3182F6] mb-2">언제든 자유롭게 이용 가능합니다</p>
-          <h2 className="text-[24px] font-bold text-[#191F28] leading-tight break-keep">
+          <h2 className="text-[24px] font-black text-[#191F28] leading-tight break-keep">
             라이프 서비스 안내
           </h2>
         </div>
@@ -815,7 +820,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       <section className="bg-white py-16 px-0 my-2 overflow-hidden">
         <div className="px-6 mb-10">
           <p className="text-[13px] font-bold text-[#3182F6] mb-2">효원상조 가입 고객만을 위한</p>
-          <h2 className="text-[24px] font-bold text-[#191F28] leading-tight break-keep">
+          <h2 className="text-[24px] font-black text-[#191F28] leading-tight break-keep">
             다양한 멤버십 서비스
           </h2>
         </div>
@@ -1358,7 +1363,10 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
              <p className="text-[13px] font-bold text-white leading-none">리빙 144 단독 혜택</p>
           </div>
           <button 
-            onClick={() => setIsContactModalOpen(true)}
+            onClick={() => {
+              setSelectedProduct(null);
+              setIsContactModalOpen(true);
+            }}
             className="bg-[#3182F6] text-white px-5 py-3 rounded-[18px] font-black text-[13px] flex items-center gap-2 hover:bg-[#1B64DA] transition-colors shadow-lg shadow-[#3182F6]/20 active:scale-95 shrink-0"
           >
             상담 신청 <ArrowRight className="w-4 h-4" />
@@ -1397,6 +1405,25 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
               </div>
 
               <div className="p-8">
+                {selectedProduct && (
+                  <div className="mb-8 p-4 bg-[#F2F8FF] rounded-[24px] border border-[#3182F6]/10 flex items-center gap-4">
+                    <div className="w-20 h-20 bg-white rounded-xl overflow-hidden shrink-0 border border-[#E5E8EB]">
+                      <img 
+                        src={(selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : selectedProduct.image} 
+                        alt={selectedProduct.name} 
+                        className="w-full h-full object-contain p-2" 
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 bg-[#3182F6] text-white text-[10px] font-bold rounded-md">선택 제품</span>
+                        <span className="text-[11px] font-bold text-[#8B95A1]">{selectedProduct.brand}</span>
+                      </div>
+                      <h4 className="text-[15px] font-black text-[#191F28] truncate leading-tight mb-0.5">{selectedProduct.name}</h4>
+                      <p className="text-[12px] text-[#8B95A1] truncate">{selectedProduct.model || selectedProduct.modelName}</p>
+                    </div>
+                  </div>
+                )}
                 <div className="space-y-6 mb-10">
                   <div className="group">
                     <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1 transition-colors group-focus-within:text-[#3182F6]">성함</label>

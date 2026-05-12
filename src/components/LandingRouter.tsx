@@ -4,10 +4,14 @@ import { api } from "../../convex/_generated/api";
 import App from '../App';
 import LivingPage from '../pages/LivingPage';
 import SpecialPage from '../pages/SpecialPage';
+import ConsentPage from '../pages/ConsentPage';
 
 export default function LandingRouter() {
   const path = window.location.pathname.toLowerCase();
   const segments = path.split('/').filter(Boolean);
+  
+  // /consent 경로 → 동의서 서명 페이지
+  const isConsentPath = path.startsWith('/consent');
   
   // Parse segments
   // /living/bestone -> template: /living, subdomain: bestone
@@ -20,7 +24,12 @@ export default function LandingRouter() {
   
   const subdomainFromPath = (isLivingPath || isSpecialPath)
     ? (segments.length >= 2 ? segments[1] : null) 
-    : (segments.length >= 1 ? segments[0] : null);
+    : (segments.length >= 1 && !isConsentPath ? segments[0] : null);
+
+  // Consent page - 동의서 서명 (채널 조회 불필요)
+  if (isConsentPath) {
+    return <ConsentPage />;
+  }
 
   // Queries
   const channelBySubdomain = useQuery(api.channels.getBySubdomain, 

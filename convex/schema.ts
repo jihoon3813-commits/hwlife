@@ -32,7 +32,7 @@ export default defineSchema({
     model: v.string(),
     name: v.string(),
     price: v.string(),
-    discountPrice: v.string(),
+    discountPrice: v.optional(v.string()),
     image: v.optional(v.string()),
     images: v.optional(v.array(v.string())),
     tag: v.optional(v.string()),
@@ -42,6 +42,7 @@ export default defineSchema({
     detailImages: v.optional(v.array(v.string())),
     isVisible: v.boolean(),
     showOnMain: v.optional(v.boolean()),
+    landingPages: v.optional(v.array(v.string())),
     comparisons: v.array(
       v.object({
         company: v.string(),
@@ -94,6 +95,7 @@ export default defineSchema({
       })
     )),
     channelId: v.optional(v.string()),
+    source: v.optional(v.string()), // "homepage", "direct"
   }),
   shorts: defineTable({
     title: v.string(),
@@ -122,6 +124,13 @@ export default defineSchema({
       email: v.string(),
       notice: v.string(),
     }),
+    sms: v.optional(v.object({
+      apiKey: v.string(),
+      userId: v.string(),
+      sender: v.string(),
+      consentMessage: v.optional(v.string()),
+      consentPageUrl: v.optional(v.string()),
+    })),
   }),
   visits: defineTable({
     ip: v.string(),
@@ -131,4 +140,16 @@ export default defineSchema({
     channelId: v.optional(v.string()),
     timestamp: v.number(),
   }).index("by_timestamp", ["timestamp"]),
+
+  plans: defineTable({
+    numericId: v.number(),
+    name: v.string(),
+    basePrice: v.string(),
+    benefitPrice: v.string(),
+    mainCount: v.number(),
+    isMainActive: v.boolean(),
+    accountCount: v.optional(v.string()),
+    order: v.optional(v.number()),
+  }).index("by_numericId", ["numericId"])
+    .index("by_order", ["order"]),
 });
