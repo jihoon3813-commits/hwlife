@@ -637,10 +637,31 @@ export default function ProductManagement() {
                 </table>
               </div>
             </>
-          ) : viewMode === 'list' ? (
+          ) : viewMode === 'list' && dbPlans === undefined ? (
             <div className="flex-1 flex flex-col items-center justify-center p-20 text-[#8B95A1]">
               <div className="w-12 h-12 border-4 border-[#3182F6] border-t-transparent rounded-full animate-spin mb-4"></div>
               <p className="text-[14px] font-bold">상품 정보를 불러오는 중입니다...</p>
+            </div>
+          ) : viewMode === 'list' && plans.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-20 text-center">
+              <Settings2 className="w-12 h-12 text-[#D1D6DB] mb-4" />
+              <h3 className="text-[18px] font-bold text-[#191F28] mb-2">설정된 구좌 정보가 없습니다.</h3>
+              <p className="text-[#8B95A1] text-[14px] mb-6">먼저 왼쪽의 '+' 버튼을 눌러 구좌(Plan)를 생성하거나<br/>초기 데이터를 생성해 주세요.</p>
+              <button 
+                onClick={async () => {
+                  if (window.confirm('기본 구좌 데이터(리빙144, 스페셜299 등)를 생성하시겠습니까?')) {
+                    await createPlan({ numericId: 1, name: '스페셜299-UP가전', basePrice: '59,800', benefitPrice: '29,800', mainCount: 4, isMainActive: true, accountCount: '2구좌' });
+                    await createPlan({ numericId: 2, name: '해피효원라이프 리빙144-2구좌', basePrice: '70,000', benefitPrice: '0', mainCount: 4, isMainActive: true, accountCount: '2구좌' });
+                  }
+                }}
+                className="bg-[#3182F6] text-white px-6 py-3 rounded-[12px] font-bold text-[14px]"
+              >
+                초기 데이터 생성하기
+              </button>
+            </div>
+          ) : viewMode === 'list' ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-20 text-[#8B95A1]">
+              <p className="text-[14px] font-bold">구좌를 선택해 주세요.</p>
             </div>
           ) : viewMode === 'edit_product' && editingProduct ? (
             <div className="flex flex-col h-full overflow-hidden">
