@@ -66,6 +66,13 @@ export default function ProductManagement() {
   const selectedPlan = plans.find(p => p.id === selectedPlanId);
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
 
+  // Ensure a plan is selected if the current one is invalid
+  React.useEffect(() => {
+    if (plans.length > 0 && !selectedPlan) {
+      setSelectedPlanId(plans[0].id);
+    }
+  }, [plans, selectedPlan]);
+
   const formatNumber = (val: string) => {
     if (!val) return "0";
     return val.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -561,66 +568,79 @@ export default function ProductManagement() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#F2F4F6]">
-                    {filteredProducts.map((p, index) => (
-                      <tr 
-                        key={p._id} 
-                        draggable
-                        onDragStart={() => onDragStart(index)}
-                        onDragOver={onDragOver}
-                        onDrop={() => onDrop(index)}
-                        className={`hover:bg-[#F9FAFB] cursor-move group ${draggedItemIndex === index ? 'opacity-50 border-dashed border-[#3182F6] bg-[#F2F4F6]' : 'transition-colors'} ${selectedIds.includes(p._id) ? 'bg-[#E8F3FF]/30' : ''}`}
-                      >
-                        <td className="px-4 py-4 text-center">
-                          <button onClick={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(p._id) ? prev.filter(i => i !== p._id) : [...prev, p._id]); }}>
-                            {selectedIds.includes(p._id) ? <CheckSquare className="w-5 h-5 text-[#3182F6]"/> : <Square className="w-5 h-5 text-[#D1D6DB]"/>}
-                          </button>
-                        </td>
-                        <td className="px-2 py-4 text-[#D1D6DB] group-hover:text-[#3182F6]"><MoveVertical className="w-5 h-5" /></td>
-                        <td className="px-2 py-4">
-                          <div className="w-12 h-12 bg-white border border-[#F2F4F6] rounded-lg overflow-hidden flex items-center justify-center">
-                            {(p.images && p.images.length > 0) ? (
-                              <img src={p.images[0]} className="w-full h-full object-contain" alt="thumb" />
-                            ) : p.image ? (
-                              <img src={p.image} className="w-full h-full object-contain" alt="thumb" />
-                            ) : (
-                              <ImageIcon className="w-5 h-5 text-[#D1D6DB]" />
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 text-[14px] text-[#4E5968] font-bold">{p.brand}</td>
-                        <td className="px-4 py-4 text-[13px] text-[#8B95A1] font-medium">{p.category}</td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-2 mb-1">
-                            {selectedPlan.accountCount && <span className="text-[10px] font-bold bg-[#191F28] text-white px-1.5 py-0.5 rounded">{selectedPlan.accountCount}</span>}
-                            {p.tag && <span className="text-[10px] font-bold bg-[#3182F6] text-white px-1.5 py-0.5 rounded">{p.tag}</span>}
-                            <div className="text-[14px] font-bold text-[#191F28]">{p.name}</div>
-                          </div>
-                          <div className="text-[12px] text-[#A3B1C6]">{p.model}</div>
-                        </td>
-                        <td className="px-4 py-4 text-[14px] font-bold text-right text-[#3182F6]">{formatNumber(p.price)}원</td>
-                        <td className="px-4 py-4 text-center">
-                          <button onClick={(e) => { e.stopPropagation(); toggleVisibility(p._id, p.isVisible); }} className={`p-1.5 rounded-full transition-colors ${p.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-400'}`}>
-                            {p.isVisible ? <Eye className="w-4 h-4"/> : <EyeOff className="w-4 h-4"/>}
-                          </button>
-                        </td>
-                        <td className="px-4 py-4 text-center">
-                          <button onClick={(e) => { e.stopPropagation(); toggleMainExposure(p._id, p.showOnMain); }} className={`p-1.5 rounded-full transition-colors ${p.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-400'}`}>
-                            {p.showOnMain ? <Star className="w-4 h-4 fill-current"/> : <Star className="w-4 h-4"/>}
-                          </button>
-                        </td>
-                        <td className="px-4 py-4 text-right">
-                          <div className="flex justify-end gap-1">
-                            <button onClick={(e) => { e.stopPropagation(); copyProduct(p._id); }} className="p-1.5 hover:bg-white rounded-md text-[#3182F6]" title="복사"><Copy className="w-4 h-4"/></button>
-                            <button onClick={(e) => { e.stopPropagation(); setEditingProduct(p); setViewMode('edit_product'); }} className="p-1.5 hover:bg-white rounded-md text-[#4E5968]" title="수정"><Edit className="w-4 h-4"/></button>
-                            <button onClick={(e) => { e.stopPropagation(); deleteProduct(p._id); }} className="p-1.5 hover:bg-white rounded-md text-red-500" title="삭제"><Trash2 className="w-4 h-4"/></button>
-                          </div>
+                    {filteredProducts.length === 0 ? (
+                      <tr>
+                        <td colSpan={10} className="px-4 py-20 text-center text-[#8B95A1] text-[14px]">
+                          등록된 제품이 없습니다. '등록' 버튼을 눌러 제품을 추가해 주세요.
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      filteredProducts.map((p, index) => (
+                        <tr 
+                          key={p._id} 
+                          draggable
+                          onDragStart={() => onDragStart(index)}
+                          onDragOver={onDragOver}
+                          onDrop={() => onDrop(index)}
+                          className={`hover:bg-[#F9FAFB] cursor-move group ${draggedItemIndex === index ? 'opacity-50 border-dashed border-[#3182F6] bg-[#F2F4F6]' : 'transition-colors'} ${selectedIds.includes(p._id) ? 'bg-[#E8F3FF]/30' : ''}`}
+                        >
+                          <td className="px-4 py-4 text-center">
+                            <button onClick={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(p._id) ? prev.filter(i => i !== p._id) : [...prev, p._id]); }}>
+                              {selectedIds.includes(p._id) ? <CheckSquare className="w-5 h-5 text-[#3182F6]"/> : <Square className="w-5 h-5 text-[#D1D6DB]"/>}
+                            </button>
+                          </td>
+                          <td className="px-2 py-4 text-[#D1D6DB] group-hover:text-[#3182F6]"><MoveVertical className="w-5 h-5" /></td>
+                          <td className="px-2 py-4">
+                            <div className="w-12 h-12 bg-white border border-[#F2F4F6] rounded-lg overflow-hidden flex items-center justify-center">
+                              {(p.images && p.images.length > 0) ? (
+                                <img src={p.images[0]} className="w-full h-full object-contain" alt="thumb" />
+                              ) : p.image ? (
+                                <img src={p.image} className="w-full h-full object-contain" alt="thumb" />
+                              ) : (
+                                <ImageIcon className="w-5 h-5 text-[#D1D6DB]" />
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 text-[14px] text-[#4E5968] font-bold">{p.brand}</td>
+                          <td className="px-4 py-4 text-[13px] text-[#8B95A1] font-medium">{p.category}</td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-2 mb-1">
+                              {selectedPlan?.accountCount && <span className="text-[10px] font-bold bg-[#191F28] text-white px-1.5 py-0.5 rounded">{selectedPlan.accountCount}</span>}
+                              {p.tag && <span className="text-[10px] font-bold bg-[#3182F6] text-white px-1.5 py-0.5 rounded">{p.tag}</span>}
+                              <div className="text-[14px] font-bold text-[#191F28]">{p.name}</div>
+                            </div>
+                            <div className="text-[12px] text-[#A3B1C6]">{p.model}</div>
+                          </td>
+                          <td className="px-4 py-4 text-[14px] font-bold text-right text-[#3182F6]">{formatNumber(p.price)}원</td>
+                          <td className="px-4 py-4 text-center">
+                            <button onClick={(e) => { e.stopPropagation(); toggleVisibility(p._id, p.isVisible); }} className={`p-1.5 rounded-full transition-colors ${p.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-400'}`}>
+                              {p.isVisible ? <Eye className="w-4 h-4"/> : <EyeOff className="w-4 h-4"/>}
+                            </button>
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <button onClick={(e) => { e.stopPropagation(); toggleMainExposure(p._id, p.showOnMain); }} className={`p-1.5 rounded-full transition-colors ${p.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-400'}`}>
+                              {p.showOnMain ? <Star className="w-4 h-4 fill-current"/> : <Star className="w-4 h-4"/>}
+                            </button>
+                          </td>
+                          <td className="px-4 py-4 text-right">
+                            <div className="flex justify-end gap-1">
+                              <button onClick={(e) => { e.stopPropagation(); copyProduct(p._id); }} className="p-1.5 hover:bg-white rounded-md text-[#3182F6]" title="복사"><Copy className="w-4 h-4"/></button>
+                              <button onClick={(e) => { e.stopPropagation(); setEditingProduct(p); setViewMode('edit_product'); }} className="p-1.5 hover:bg-white rounded-md text-[#4E5968]" title="수정"><Edit className="w-4 h-4"/></button>
+                              <button onClick={(e) => { e.stopPropagation(); deleteProduct(p._id); }} className="p-1.5 hover:bg-white rounded-md text-red-500" title="삭제"><Trash2 className="w-4 h-4"/></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
             </>
+          ) : viewMode === 'list' ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-20 text-[#8B95A1]">
+              <div className="w-12 h-12 border-4 border-[#3182F6] border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-[14px] font-bold">상품 정보를 불러오는 중입니다...</p>
+            </div>
           ) : viewMode === 'edit_product' && editingProduct ? (
             <div className="flex flex-col h-full overflow-hidden">
               <div className="px-4 lg:px-8 py-6 border-b border-[#F2F4F6] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0 bg-[#F9FAFB]">

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import SEO from '../components/SEO';
 
 
 export default function LivingPage({ channelSubdomain }: { channelSubdomain?: string }) {
@@ -113,6 +114,11 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
+      <SEO 
+        title="해피효원라이프 리빙144-신한카드"
+        description="해피효원라이프 리빙144-신한카드 | 신한카드만 있으면 누구나 특별한 혜택!"
+        image="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_landing_page_hero_banner_d-1778564368252_mko2cd.png"
+      />
       
       {/* GNB / 상단 헤더 */}
       <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-5 flex items-center justify-between h-[60px] border-b border-[#F2F4F6]">

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import SEO from '../components/SEO';
 
 
 export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: string }) {
@@ -108,6 +109,11 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
 
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
+      <SEO 
+        title="해피효원라이프 스페셜299-BSON"
+        description="해피효원라이프 스페셜299-BSON | 카드 한도 관계없이 신용만으로 특별한 혜택!"
+        image="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_web_banner_design_for_Kore-1778564383659_rwnzkq.png"
+      />
       
       {/* GNB / 상단 헤더 */}
       <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-5 flex items-center justify-between h-[60px] border-b border-[#F2F4F6]">
