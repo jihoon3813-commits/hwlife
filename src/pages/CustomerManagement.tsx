@@ -70,8 +70,13 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       let resolvedAccount = selectedCustomer.account;
       let resolvedAppliance = selectedCustomer.appliance;
 
-      // 1. Try to find if productName is already a Category Name
-      const planByName = allPlans.find(p => p.name === selectedCustomer.productName);
+      // 1. Check if the name is already standardized (starts with 리빙144 or 스페셜299)
+      const isStandardized = selectedCustomer.productName?.startsWith('리빙144') || 
+                            selectedCustomer.productName?.startsWith('스페셜299');
+
+      if (!isStandardized) {
+        // 2. Try to find if productName is already a Category Name
+        const planByName = allPlans.find(p => p.name === selectedCustomer.productName);
       
       if (!planByName) {
         // 2. If not, productName might be the appliance name. Try to find the product.
@@ -97,9 +102,10 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
             resolvedAppliance = `${product.name} (${product.model})`;
           }
         }
-      } else {
-         // It's already a category name, ensure account is sync'd if missing
-         if (!resolvedAccount) resolvedAccount = planByName.accountCount;
+         } else {
+          // It's already a category name, ensure account is sync'd if missing
+          if (!resolvedAccount) resolvedAccount = planByName.accountCount;
+        }
       }
 
       setEditData({
@@ -568,30 +574,40 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                   }
                 }
 
-                // 1. productName이 가전명인 경우 (홈페이지 신청 등) 처리
-                const planByName = allPlans?.find(p => p.name === customer.productName);
-                if (!planByName && allProducts && allPlans) {
-                  const matchedProduct = allProducts.find(p => 
-                    p.name === customer.productName || 
-                    `${p.brand} ${p.name}` === customer.productName ||
-                    (p.model && customer.appliance?.includes(p.model))
-                  );
-                  if (matchedProduct) {
-                    const plan = allPlans.find(pl => pl.numericId === matchedProduct.planId);
-                    if (plan) displayPlan = plan.name;
+                // 1. Prioritize standardized names (Living 144 / Special 299)
+                const isStandardized = customer.productName?.startsWith('리빙144') || 
+                                     customer.productName?.startsWith('스페셜299');
+                
+                if (isStandardized) {
+                  displayPlan = customer.productName;
+                } else {
+                  // 2. Handle legacy/appliance-named inquiries
+                  const planByName = allPlans?.find(p => p.name === customer.productName);
+                  if (!planByName && allProducts && allPlans) {
+                    const matchedProduct = allProducts.find(p => 
+                      p.name === customer.productName || 
+                      `${p.brand} ${p.name}` === customer.productName ||
+                      (p.model && customer.appliance?.includes(p.model))
+                    );
+                    if (matchedProduct) {
+                      const plan = allPlans.find(pl => pl.numericId === matchedProduct.planId);
+                      if (plan) displayPlan = plan.name;
+                    }
+                  } else if (planByName) {
+                    displayPlan = planByName.name;
                   }
-                } else if (planByName) {
-                  displayPlan = planByName.name;
                 }
 
-                // 괄호 안에 구좌수 표시 (단, _메인 신청건은 구좌수 표시 제외)
+                // Ensure account info is not duplicated if it's already in the displayPlan
                 const isMainSubmission = displayPlan?.endsWith('_메인') || customer.productName?.endsWith('_메인');
-                const accountLabel = (customer.account && !isMainSubmission) ? `(${customer.account})` : '';
-                const finalPlanDisplay = `${displayPlan}${accountLabel}`;
+                let finalOutput = displayPlan;
                 
-                // 특수 처리: 만약 displayPlan에 이미 (2구좌) 등이 붙어있다면 제거 (중복 방지)
-                const cleanedPlanDisplay = finalPlanDisplay.replace(/\s*\(.*구좌\)$/, '');
-                const finalOutput = isMainSubmission ? cleanedPlanDisplay : finalPlanDisplay;
+                if (!isMainSubmission && customer.account) {
+                  const accountStr = `(${customer.account})`;
+                  if (!displayPlan.includes(accountStr)) {
+                    finalOutput = `${displayPlan}${accountStr}`;
+                  }
+                }
 
                 return (
                   <tr 
