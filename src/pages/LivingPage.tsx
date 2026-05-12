@@ -120,7 +120,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
       <SEO 
-        title="해피효원라이프 리빙144-신한카드"
+        title="해피효원라이프 리빙144-신한카드 | 신한카드만 있으면 누구나 특별한 혜택!"
         description="해피효원라이프 리빙144-신한카드 | 신한카드만 있으면 누구나 특별한 혜택!"
         image="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_landing_page_hero_banner_d-1778564368252_mko2cd.png"
       />
