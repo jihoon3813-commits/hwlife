@@ -97,10 +97,15 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
   };
 
   const getCustomUrl = (path: string) => {
-    if (userType !== 'channel' || !subdomain) return path;
+    // If no subdomain is provided, return the base path
+    if (!subdomain) return path;
+    
+    // For root path, use /subdomain
     if (path === '/') return `/${subdomain}`;
-    // For subpaths like /living or /special, use /? to ensure correct SNS meta tags on static hosting
-    return `${path}/?${subdomain}`;
+    
+    // For subpaths like /living or /special, always use /?subdomain for SNS compatibility
+    const cleanPath = path.endsWith('/') ? path : `${path}/`;
+    return `${cleanPath}?${subdomain}`;
   };
 
   return (

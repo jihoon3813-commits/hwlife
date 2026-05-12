@@ -170,6 +170,7 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">채널명</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">담당자</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">연락처</th>
+                <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">대표 랜딩 URL</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">상위 채널</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">상태</th>
 
@@ -188,6 +189,20 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                     <td className="py-4 px-6 text-[14px] font-bold text-[#191F28]">{channel.channelName}</td>
                     <td className="py-4 px-6 text-[14px] font-medium text-[#191F28]">{channel.managerName}</td>
                     <td className="py-4 px-6 text-[14px] text-[#4E5968]">{channel.managerContact}</td>
+                    <td className="py-4 px-6">
+                      <div className="flex flex-col gap-1">
+                        {channel.landingPage && (
+                          <div className="flex items-center gap-1 text-[12px] text-[#3182F6] font-bold bg-[#E8F3FF] px-2 py-1 rounded-md w-fit">
+                            {channel.landingPage === '/' ? `/${channel.subdomain}` : `${channel.landingPage}/?${channel.subdomain}`}
+                          </div>
+                        )}
+                        {channel.landingPages?.filter((p: string) => p !== channel.landingPage).map((p: string) => (
+                          <div key={p} className="text-[11px] text-[#8B95A1] px-2">
+                            {p === '/' ? `/${channel.subdomain}` : `${p}/?${channel.subdomain}`}
+                          </div>
+                        ))}
+                      </div>
+                    </td>
                     <td className="py-4 px-6 text-[13px] text-[#8B95A1]">
                       {channel.parentChannelId ? (
                         <span className="font-medium text-[#191F28]">{channels.find(c => c.subdomain === channel.parentChannelId)?.channelName || channel.parentChannelId}</span>
