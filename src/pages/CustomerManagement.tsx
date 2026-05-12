@@ -560,6 +560,14 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                 let displayPlan = customer.productName;
                 let displayAppliance = customer.appliance || '-';
 
+                // 결합제품명이 모델명으로만 되어있을 경우 제품명(모델명)으로 변환
+                if (displayAppliance !== '-' && allProducts) {
+                  const matchedProduct = allProducts.find(p => p.model === displayAppliance);
+                  if (matchedProduct) {
+                    displayAppliance = `${matchedProduct.name} (${matchedProduct.model})`;
+                  }
+                }
+
                 // 1. productName이 가전명인 경우 (홈페이지 신청 등) 처리
                 const planByName = allPlans?.find(p => p.name === customer.productName);
                 if (!planByName && allProducts && allPlans) {
@@ -840,8 +848,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                           const product = allProducts?.find(p => p.model === model);
                           setEditData({
                             ...editData, 
-                            appliance: model,
-                            // Optionally update productName here if needed, but productName is the category name now
+                            appliance: product ? `${product.name} (${product.model})` : model,
                           });
                         }}
                         className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
@@ -853,7 +860,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                           const plan = allPlans?.find(pl => pl.name === editData.productName);
                           return plan && p.planId === plan.numericId;
                         }).map(p => (
-                          <option key={p._id} value={p.model}>{p.brand} {p.name} ({p.model})</option>
+                          <option key={p._id} value={`${p.name} (${p.model})`}>{p.brand} {p.name} ({p.model})</option>
                         ))}
                       </select>
                     </div>
@@ -1031,7 +1038,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                             const plan = allPlans?.find(pl => pl.name === registerForm.productName);
                             return plan && p.planId === plan.numericId;
                           }).map(p => (
-                            <option key={p._id} value={p.model}>{p.brand} {p.name} ({p.model})</option>
+                            <option key={p._id} value={`${p.name} (${p.model})`}>{p.brand} {p.name} ({p.model})</option>
                           ))}
                         </select>
                       </div>
