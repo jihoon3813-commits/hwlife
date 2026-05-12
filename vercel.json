@@ -5,6 +5,14 @@
       "destination": "/index.html"
     },
     {
+      "source": "/living/:path*",
+      "destination": "/living/index.html"
+    },
+    {
+      "source": "/special/:path*",
+      "destination": "/special/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
