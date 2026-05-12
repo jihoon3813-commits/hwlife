@@ -79,7 +79,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
 
     setIsSubmitting(true);
     try {
-      const baseName = landingInfo?.name || '스페셜299(BSON)';
+      const baseName = '스페셜299(BSON)';
       const plan = selectedProduct ? dbPlans.find(p => p.numericId === selectedProduct.planId) : null;
       const accountType = plan?.accountCount || '2구좌';
       const suffix = accountType.includes('2') || accountType.includes('더블') ? '더블' : '싱글';
@@ -87,7 +87,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       await createInquiry({
         name: name.trim(),
         phone: phoneNumber,
-        productName: selectedProduct ? `${baseName} ${suffix}` : `${baseName}_메인`,
+        productName: selectedProduct ? `${baseName} ${suffix}(${accountType})` : `${baseName}_메인`,
         account: accountType,
         appliance: selectedProduct ? `${selectedProduct.name} (${selectedProduct.model})` : undefined,
         channelId: channelId,
