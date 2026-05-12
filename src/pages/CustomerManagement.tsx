@@ -530,7 +530,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
         </div>
       </div>
 
-      <div className="bg-white rounded-[16px] shadow-sm border border-[#E5E8EB] overflow-x-auto hide-scrollbar">
+      <div className="bg-white rounded-[16px] shadow-sm border border-[#E5E8EB] overflow-x-auto custom-scrollbar">
         <table className="w-full text-left min-w-max">
           <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB] whitespace-nowrap">
             <tr>
