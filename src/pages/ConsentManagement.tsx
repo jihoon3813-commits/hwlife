@@ -445,9 +445,6 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
           <div 
             ref={pdfRef}
             data-pdf-template
-          <div 
-            ref={pdfRef}
-            data-pdf-template
             style={{ width: '210mm', height: '297mm', backgroundColor: 'white', padding: '10mm 20mm', position: 'relative' }}
             className="flex flex-col font-sans"
           >
