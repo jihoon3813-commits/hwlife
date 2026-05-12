@@ -289,7 +289,7 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                   <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">접속 경로 <span className="text-[#F04452]">*</span></label>
                   <div className="flex items-center">
                     <span className="bg-[#E5E8EB] text-[#4E5968] px-4 py-3.5 rounded-l-[16px] text-[15px] font-medium border-r border-[#D1D6DB]">
-                      hyowon-life.com/
+                      hyowon-life.com/living/?
                     </span>
                     <input 
                       type="text" 
