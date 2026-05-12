@@ -333,16 +333,16 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                         <div className="px-5 py-4 flex flex-col gap-0.5">
                           <span className="text-[12px] font-bold text-[#3182F6] uppercase tracking-wider mb-0.5">결제금액</span>
                           <span className="text-[20px] font-black text-[#191F28] leading-tight">
-                            {previewCustomer.productName.includes('2구좌') ? '3,360,000원' : '1,680,000원'}
+                            {(previewCustomer.productName?.includes('2구좌') || previewCustomer.productName?.includes('더블') || previewCustomer.productName?.toLowerCase().includes('double')) ? '3,360,000원' : '1,680,000원'}
                           </span>
                           <span className="text-[12px] text-[#8B95A1] font-bold">
-                            {previewCustomer.productName.includes('2구좌') ? '(제품 288만, 상조 48만)' : '(제품 144만, 상조 24만)'}
+                            {(previewCustomer.productName?.includes('2구좌') || previewCustomer.productName?.includes('더블') || previewCustomer.productName?.toLowerCase().includes('double')) ? '(제품 288만, 상조 48만)' : '(제품 144만, 상조 24만)'}
                           </span>
                         </div>
                         <div className="px-5 py-4 flex flex-col gap-2">
                           <span className="text-[12px] font-bold text-[#3182F6] uppercase tracking-wider">비고</span>
                           <p className="text-[13px] text-[#4E5968] leading-relaxed break-keep font-medium">
-                            {previewCustomer.productName.includes('2구좌') 
+                            {(previewCustomer.productName?.includes('2구좌') || previewCustomer.productName?.includes('더블') || previewCustomer.productName?.toLowerCase().includes('double'))
                               ? '1~48회 상조회비 24만원x2구좌는 별도로 신한 48pay 결제가 각각 한번씩 총 두번 더 이루어집니다.'
                               : '1~48회 상조회비 24만원은 별도로 신한 48pay 결제가 한번 더 이루어집니다.'}
                           </p>
@@ -456,10 +456,10 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                     <th className="bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">결제금액</th>
                     <td className="p-4">
                       <div className="text-[20px] font-black text-[#191F28]">
-                        {downloadCustomer.productName.includes('2구좌') ? '3,360,000원' : '1,680,000원'}
+                        {(downloadCustomer.productName?.includes('2구좌') || downloadCustomer.productName?.includes('더블') || downloadCustomer.productName?.toLowerCase().includes('double')) ? '3,360,000원' : '1,680,000원'}
                       </div>
                       <div className="text-[12px] text-[#8B95A1] font-bold">
-                        {downloadCustomer.productName.includes('2구좌') ? '(제품 288만, 상조 48만)' : '(제품 144만, 상조 24만)'}
+                        {(downloadCustomer.productName?.includes('2구좌') || downloadCustomer.productName?.includes('더블') || downloadCustomer.productName?.toLowerCase().includes('double')) ? '(제품 288만, 상조 48만)' : '(제품 144만, 상조 24만)'}
                       </div>
                     </td>
                   </tr>

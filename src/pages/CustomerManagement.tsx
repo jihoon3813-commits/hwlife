@@ -93,8 +93,8 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
           if (plan) {
             resolvedCategoryName = plan.name;
             resolvedAccount = plan.accountCount;
-            // Set appliance to the model of the matched product if it matches the context
-            resolvedAppliance = product.model;
+            // Show both name and model for clarity
+            resolvedAppliance = `${product.name} (${product.model})`;
           }
         }
       } else {
