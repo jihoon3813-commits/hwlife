@@ -52,39 +52,49 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
     setIsDownloading(customer._id);
     setDownloadCustomer(customer);
     
-    // Wait for template to render
+    // Wait for template to render (increased timeout for image loading)
     setTimeout(async () => {
       try {
         const element = pdfRef.current;
         if (!element) throw new Error('PDF template not found');
 
-        // Force all images (like signatures) to load
-        const images = element.getElementsByTagName('img');
-        await Promise.all(Array.from(images).map(img => {
-          if (img.complete) return Promise.resolve();
-          return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
-        }));
-
         const canvas = await html2canvas(element, {
-          scale: 3, // Higher scale for better quality
+          scale: 2,
           useCORS: true,
+          allowTaint: true,
           logging: false,
           backgroundColor: '#ffffff',
-          windowWidth: 794, // Standard A4 width in px at 96 DPI
+          onclone: (clonedDoc) => {
+            const el = clonedDoc.querySelector('[data-pdf-template]') as HTMLElement;
+            if (el) {
+              el.style.position = 'relative';
+              el.style.left = '0';
+              el.style.top = '0';
+            }
+          }
         });
 
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
-        
-        const imgProps = pdf.getImageProperties(imgData);
-        const canvasPdfWidth = pdfWidth;
-        const canvasPdfHeight = (imgProps.height * canvasPdfWidth) / imgProps.width;
+        const imgWidth = pdfWidth;
+        const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        // If content is too long for one page, we might need to handle it, 
-        // but here we adjust the template to fit.
-        pdf.addImage(imgData, 'PNG', 0, 0, canvasPdfWidth, canvasPdfHeight);
+        // Handle multi-page: if content exceeds one page, split it
+        if (imgHeight <= pdfHeight) {
+          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        } else {
+          let yOffset = 0;
+          let page = 0;
+          while (yOffset < imgHeight) {
+            if (page > 0) pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, -yOffset, imgWidth, imgHeight);
+            yOffset += pdfHeight;
+            page++;
+          }
+        }
+
         pdf.save(`구매동의서_${customer.name}_${customer.purchaseConsentDate?.split(' ')[0] || new Date().toISOString().split('T')[0]}.pdf`);
       } catch (e) {
         console.error(e);
@@ -93,7 +103,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
         setIsDownloading(null);
         setDownloadCustomer(null);
       }
-    }, 500);
+    }, 1000);
   };
 
   // Filter for living products only
@@ -430,63 +440,64 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
       </AnimatePresence>
 
       {/* Hidden PDF Template */}
-      <div className="fixed left-[-9999px] top-[-9999px]">
+      <div style={{ position: 'absolute', left: '-9999px', top: '0', overflow: 'visible' }}>
         {downloadCustomer && (
           <div 
             ref={pdfRef}
+            data-pdf-template
             style={{ width: '210mm', minHeight: '297mm', backgroundColor: 'white', padding: '15mm 20mm' }}
             className="flex flex-col font-sans"
           >
-            <div className="text-center mb-10">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" alt="Logo" className="h-10 mx-auto mb-6" />
-              <h1 className="text-[24px] font-black text-[#191F28] border-b-2 border-[#3182F6] pb-3 inline-block">
+            <div className="text-center mb-12">
+              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" alt="Logo" className="h-12 mx-auto mb-8" />
+              <h1 className="text-[28px] font-black text-[#191F28] border-b-2 border-[#3182F6] pb-4 inline-block">
                 결합제품 구매 및 상조회비 선결제 이용 동의서
               </h1>
             </div>
 
-            <div className="border-2 border-[#E5E8EB] rounded-[16px] overflow-hidden mb-8">
+            <div className="border-2 border-[#E5E8EB] rounded-[16px] overflow-hidden mb-10">
               <table className="w-full border-collapse">
                 <tbody>
                   <tr className="border-b border-[#E5E8EB]">
-                    <th className="w-1/4 bg-[#F9FAFB] p-3 text-left text-[13px] font-bold text-[#3182F6]">성명</th>
-                    <td className="p-3 text-[15px] font-bold text-[#191F28]">{downloadCustomer.name}</td>
+                    <th className="w-1/4 bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">성명</th>
+                    <td className="p-4 text-[16px] font-bold text-[#191F28]">{downloadCustomer.name}</td>
                   </tr>
                   <tr className="border-b border-[#E5E8EB]">
-                    <th className="bg-[#F9FAFB] p-3 text-left text-[13px] font-bold text-[#3182F6]">연락처</th>
-                    <td className="p-3 text-[15px] font-bold text-[#191F28]">{downloadCustomer.phone}</td>
+                    <th className="bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">연락처</th>
+                    <td className="p-4 text-[16px] font-bold text-[#191F28]">{downloadCustomer.phone}</td>
                   </tr>
                   <tr className="border-b border-[#E5E8EB]">
-                    <th className="bg-[#F9FAFB] p-3 text-left text-[13px] font-bold text-[#3182F6]">가입상품</th>
-                    <td className="p-3 text-[15px] font-bold text-[#191F28]">{downloadCustomer.productName}</td>
+                    <th className="bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">가입상품</th>
+                    <td className="p-4 text-[16px] font-bold text-[#191F28]">{downloadCustomer.productName}</td>
                   </tr>
                   {downloadCustomer.appliance && (
                     <tr className="border-b border-[#E5E8EB]">
-                      <th className="bg-[#F9FAFB] p-3 text-left text-[13px] font-bold text-[#3182F6]">결합가전</th>
-                      <td className="p-3 text-[15px] font-bold text-[#191F28]">{downloadCustomer.appliance}</td>
+                      <th className="bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">결합가전</th>
+                      <td className="p-4 text-[16px] font-bold text-[#191F28]">{downloadCustomer.appliance}</td>
                     </tr>
                   )}
                   <tr className="border-b border-[#E5E8EB]">
-                    <th className="bg-[#F9FAFB] p-3 text-left text-[13px] font-bold text-[#3182F6]">결제금액</th>
-                    <td className="p-3">
-                      <div className="text-[18px] font-black text-[#191F28]">
+                    <th className="bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">결제금액</th>
+                    <td className="p-4">
+                      <div className="text-[20px] font-black text-[#191F28]">
                         {(downloadCustomer.productName?.includes('2구좌') || downloadCustomer.productName?.includes('더블') || downloadCustomer.productName?.toLowerCase().includes('double')) ? '3,360,000원' : '1,680,000원'}
                       </div>
-                      <div className="text-[11px] text-[#8B95A1] font-bold">
+                      <div className="text-[12px] text-[#8B95A1] font-bold">
                         {(downloadCustomer.productName?.includes('2구좌') || downloadCustomer.productName?.includes('더블') || downloadCustomer.productName?.toLowerCase().includes('double')) ? '(제품 288만, 상조 48만)' : '(제품 144만, 상조 24만)'}
                       </div>
                     </td>
                   </tr>
                   <tr>
-                    <th className="bg-[#F9FAFB] p-3 text-left text-[13px] font-bold text-[#3182F6]">동의일시</th>
-                    <td className="p-3 text-[15px] font-bold text-[#191F28]">{downloadCustomer.purchaseConsentDate}</td>
+                    <th className="bg-[#F9FAFB] p-4 text-left text-[14px] font-bold text-[#3182F6]">동의일시</th>
+                    <td className="p-4 text-[16px] font-bold text-[#191F28]">{downloadCustomer.purchaseConsentDate}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            <div className="bg-[#F2F4F6] p-6 rounded-[16px] mb-8">
-              <h3 className="text-[16px] font-bold text-[#191F28] mb-3">주요 안내 사항</h3>
-              <ul className="space-y-2">
+            <div className="bg-[#F2F4F6] p-8 rounded-[16px] mb-10">
+              <h3 className="text-[18px] font-bold text-[#191F28] mb-4">주요 안내 사항</h3>
+              <ul className="space-y-3">
                 {[
                   '본 내용은 리빙제품 결합상조 상품 <리빙144(신한카드)> 가입과 동시에 이루어지는 결합제품 결제 내역입니다.',
                   '구매 제품은 택배를 통해 배송되며, 제품 수령 및 포장 훼손 등의 실 사용 시에는 환불은 불가합니다.',
@@ -494,8 +505,8 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                   '따라서 상조회비는 자동으로 48회까지 완납으로 처리되며, 49회부터는 효원상조에서 청구합니다.',
                   '본 결제 총액은 상조상품 만기 시 효원상조로부터 전액을 환급받을 수 있으며 자세한 내용은 효원상조 해피콜 시 안내해 드립니다.'
                 ].map((item, i) => (
-                  <li key={i} className="text-[12px] text-[#4E5968] leading-relaxed flex gap-2">
-                    <span className="shrink-0">•</span> <span>{item}</span>
+                  <li key={i} className="text-[13px] text-[#4E5968] leading-relaxed flex gap-2">
+                    <span>•</span> {item}
                   </li>
                 ))}
               </ul>
@@ -511,9 +522,13 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                 </div>
                 <div className="text-left">
                   <p className="text-[14px] text-[#8B95A1] font-bold mb-1">서명 (인)</p>
-                  <div className="w-40 h-20 border border-[#E5E8EB] rounded-[8px] flex items-center justify-center overflow-hidden bg-[#F9FAFB]">
+                  <div className="w-40 h-20 border border-[#E5E8EB] rounded-[8px] flex items-center justify-center overflow-hidden bg-white">
                     {downloadCustomer.signatureData ? (
-                      <img src={downloadCustomer.signatureData} alt="Signature" className="max-w-full max-h-full object-contain" />
+                      <img 
+                        src={downloadCustomer.signatureData} 
+                        alt="Signature" 
+                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
+                      />
                     ) : (
                       <span className="text-[#8B95A1] text-[12px] italic">서명 없음</span>
                     )}
