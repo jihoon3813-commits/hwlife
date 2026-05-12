@@ -182,13 +182,15 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
           <div>
             <h4 className="font-bold text-[#191F28] mb-1">구매동의 관리 안내</h4>
             <ul className="text-[14px] text-[#4E5968] space-y-1 list-disc ml-4">
-              <li>신한카드(Living) 상품 가입 고객에게만 발송 가능합니다.</li>
+              <li>리빙144(신한카드) 상품 가입 고객에게만 발송 가능합니다.</li>
               <li>고객이 동의서 서명을 완료하면 시스템에 자동으로 '구매동의일'이 기록됩니다.</li>
               <li>서명 완료된 문서는 PDF 파일로 보관되며 언제든지 확인 및 다운로드가 가능합니다.</li>
             </ul>
           </div>
         </div>
       </div>
+      
+      {/* Terms & Notice Section within Preview should also be checked if needed */}
 
       {/* Consent Preview Modal */}
       <AnimatePresence>
@@ -278,7 +280,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                       </h3>
                       <ul className="space-y-3">
                         {[
-                          '본 내용은 리빙제품 결합상조 상품 <해피효원라이프 리빙 144> 가입과 동시에 이루어지는 결합제품 결제 내역입니다.',
+                          '본 내용은 리빙제품 결합상조 상품 <리빙144(신한카드)> 가입과 동시에 이루어지는 결합제품 결제 내역입니다.',
                           '구매 제품은 택배를 통해 배송되며, 제품 수령 및 포장 훼손 등의 실 사용 시에는 환불은 불가합니다.',
                           '본 결제 금액은 결합제품 대금 전액과 1~48회까지의 상조 회비(월 5,000원)를 포함한 총액입니다.',
                           '따라서 상조회비는 자동으로 48회까지 완납으로 처리되며, 49회부터는 효원상조에서 청구합니다.',

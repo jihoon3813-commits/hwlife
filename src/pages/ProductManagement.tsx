@@ -651,7 +651,7 @@ export default function ProductManagement() {
                 onClick={async () => {
                   if (window.confirm('기본 구좌 데이터(리빙144, 스페셜299 등)를 생성하시겠습니까?')) {
                     await createPlan({ numericId: 1, name: '스페셜299-UP가전', basePrice: '59,800', benefitPrice: '29,800', mainCount: 4, isMainActive: true, accountCount: '2구좌' });
-                    await createPlan({ numericId: 2, name: '해피효원라이프 리빙144-2구좌', basePrice: '70,000', benefitPrice: '0', mainCount: 4, isMainActive: true, accountCount: '2구좌' });
+                    await createPlan({ numericId: 2, name: '리빙144(신한카드)-2구좌', basePrice: '70,000', benefitPrice: '0', mainCount: 4, isMainActive: true, accountCount: '2구좌' });
                   }
                 }}
                 className="bg-[#3182F6] text-white px-6 py-3 rounded-[12px] font-bold text-[14px]"

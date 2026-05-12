@@ -116,8 +116,8 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
       <SEO 
-        title="해피효원라이프 리빙144-신한카드"
-        description="해피효원라이프 리빙144-신한카드 | 신한카드만 있으면 누구나 특별한 혜택!"
+        title="리빙144(신한카드)"
+        description="리빙144(신한카드) | 신한카드만 있으면 누구나 특별한 혜택!"
         image="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_landing_page_hero_banner_d-1778564368252_mko2cd.png"
       />
       
@@ -309,7 +309,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           </p>
           
           <div className="bg-white/5 backdrop-blur-md rounded-[20px] p-5 border border-white/10 shadow-inner">
-            <p className="text-[#3182F6] text-[13px] font-bold mb-1">해피효원라이프 리빙144</p>
+            <p className="text-[#3182F6] text-[13px] font-bold mb-1">리빙144(신한카드)</p>
             <p className="text-white/80 text-[14px] font-medium">2구좌 가입 조건</p>
           </div>
         </div>
@@ -440,7 +440,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
         <div className="mb-8">
           <h2 className="text-[22px] font-black text-[#191F28] leading-snug break-keep mb-3">
             리빙제품에 특별 보너스까지!<br/>
-            해피효원라이프·리빙 144 상세표
+            리빙144(신한카드) 상세표
           </h2>
           <span className="inline-block px-3 py-1 bg-[#FFFF00] text-[#191F28] text-[11px] font-bold rounded-md shadow-sm">
             오직 프리미엄몰에서만 가입 가능합니다
@@ -1088,7 +1088,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       {/* Section 16: 가입 절차 안내 및 최종 CTA */}
       <section className="bg-[#0A1128] py-20 px-6 my-2 text-white">
         <div className="mb-12 text-center">
-          <h2 className="text-[24px] font-bold mb-10 tracking-tight">해피효원라이프 리빙144 가입절차 안내</h2>
+          <h2 className="text-[24px] font-bold mb-10 tracking-tight">리빙144(신한카드) 가입절차 안내</h2>
           
           <div className="grid grid-cols-2 gap-4">
             {[
@@ -1410,7 +1410,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                <span className="w-1 h-1 bg-[#3182F6] rounded-full animate-pulse"></span>
                <span className="text-[9px] font-black text-[#3182F6] tracking-tighter uppercase">Special Offer</span>
              </div>
-             <p className="text-[13px] font-bold text-white leading-none">리빙 144 단독 혜택</p>
+             <p className="text-[13px] font-bold text-white leading-none">리빙144(신한카드) 단독 혜택</p>
           </div>
           <button 
             onClick={() => {

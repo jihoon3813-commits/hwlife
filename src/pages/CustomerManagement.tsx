@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { X, Search, Filter, History, RefreshCw, Trash2, Save, Plus } from 'lucide-react';
-import { useQuery, useMutation } from 'convex/react';
+import { X, Search, Filter, History, RefreshCw, Trash2, Save, Plus, Smartphone, Send, Loader2 } from 'lucide-react';
+import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
 export default function CustomerManagement({ channelId }: { channelId?: string }) {
@@ -9,6 +9,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const [status, setStatus] = useState('대기');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isSendingSms, setIsSendingSms] = useState(false);
   
   // Local state for editing details
   const [editData, setEditData] = useState<any>({});
@@ -48,6 +49,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const removeInquiry = useMutation(api.inquiries.remove);
   const createInquiry = useMutation(api.inquiries.create);
   const allProducts = useQuery(api.products.getAllProducts);
+  const sendConsentSms = useAction(api.sms.sendConsentSms);
   const landings = useQuery(api.landings.get);
   const allPlans = useQuery(api.plans.get);
 
@@ -223,6 +225,35 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       channelId: channelId || '본사'
     }));
     setIsRegisterModalOpen(true);
+  };
+
+  const handleSendConsent = async () => {
+    if (!selectedCustomer) return;
+    
+    // SMS 설정 확인
+    const smsConfig = (settings as any)?.sms;
+    if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
+      alert('SMS 설정이 완료되지 않았습니다.\n환경설정 > SMS 설정에서 알리고 API 정보를 먼저 입력해주세요.');
+      return;
+    }
+
+    if (!window.confirm(`${selectedCustomer.name}님에게 동의서 문자를 발송하시겠습니까?`)) return;
+
+    setIsSendingSms(true);
+    try {
+      const result = await sendConsentSms({
+        inquiryId: selectedCustomer._id,
+        customerName: selectedCustomer.name,
+        customerPhone: selectedCustomer.phone,
+        productName: editData.productName, // Use current edited productName
+      });
+      alert(result.message || '문자 발송이 완료되었습니다.');
+    } catch (e: any) {
+      alert(e.message || '발송 중 오류가 발생했습니다.');
+    } finally {
+      setIsSendingSms(null as any);
+      setIsSendingSms(false);
+    }
   };
 
   const handleUpdate = async () => {
@@ -625,6 +656,17 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                 <button onClick={handleDelete} className="p-2 hover:bg-red-50 text-red-500 rounded-full transition-colors" title="삭제">
                   <Trash2 className="w-5 h-5" />
                 </button>
+                {(selectedCustomer.productName?.toLowerCase().includes('living') || selectedCustomer.productName?.includes('리빙') || editData.productName?.includes('리빙')) && (
+                  <button 
+                    onClick={handleSendConsent} 
+                    disabled={isSendingSms}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-[13px] font-bold transition-all ${isSendingSms ? 'bg-gray-100 text-gray-400' : 'bg-[#3182F6] text-white hover:bg-[#1B64DA] shadow-sm'}`}
+                    title="구매동의 문자 발송"
+                  >
+                    {isSendingSms ? <Loader2 className="w-4 h-4 animate-spin" /> : <Smartphone className="w-4 h-4" />}
+                    문자발송
+                  </button>
+                )}
                 <button onClick={() => setSelectedCustomer(null)} className="p-2 hover:bg-[#F2F4F6] rounded-full transition-colors">
                   <X className="w-6 h-6 text-[#4E5968]" />
                 </button>

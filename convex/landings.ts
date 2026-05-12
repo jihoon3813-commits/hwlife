@@ -66,7 +66,7 @@ export const seed = mutation({
         isActive: true,
       });
       await ctx.db.insert("landings", {
-        name: "해피효원라이프 리빙144",
+        name: "리빙144(신한카드)",
         path: "/living",
         description: "생활가전 및 매트리스 특화 랜딩페이지",
         thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778506774/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C2_xogxll.png",
@@ -94,7 +94,7 @@ export const updateDefaultThumbnails = mutation({
       }
       if (landing.path === "/living") {
         await ctx.db.patch(landing._id, { 
-          name: "해피효원라이프 리빙144",
+          name: "리빙144(신한카드)",
           thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778506774/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C2_xogxll.png" 
         });
       }
