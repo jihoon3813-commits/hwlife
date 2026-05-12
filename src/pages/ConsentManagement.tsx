@@ -223,7 +223,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                       <div className="flex justify-center gap-2">
                         <button 
                           onClick={() => setPreviewCustomer(customer)}
-                          className="px-3 py-1.5 rounded-[8px] bg-white border border-[#E5E8EB] text-[#4E5968] text-[13px] font-bold flex items-center gap-1.5 hover:bg-[#F9FAFB] transition-all whitespace-nowrap"
+                          className="w-[90px] h-[36px] rounded-[8px] bg-white border border-[#E5E8EB] text-[#4E5968] text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-[#F9FAFB] transition-all whitespace-nowrap"
                         >
                           <Eye className="w-3.5 h-3.5" /> 미리보기
                         </button>
@@ -232,7 +232,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                           <button 
                             onClick={() => handleDownloadPDF(customer)}
                             disabled={isDownloading === customer._id}
-                            className={`px-3 py-1.5 rounded-[8px] bg-[#191F28] text-white text-[13px] font-bold flex items-center gap-1.5 hover:bg-black transition-all whitespace-nowrap ${isDownloading === customer._id ? 'opacity-50 cursor-wait' : ''}`}
+                            className={`w-[110px] h-[36px] rounded-[8px] bg-[#191F28] text-white text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-black transition-all whitespace-nowrap ${isDownloading === customer._id ? 'opacity-50 cursor-wait' : ''}`}
                           >
                             {isDownloading === customer._id ? (
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -244,7 +244,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                         ) : (
                           <button 
                             onClick={() => handleSendConsent(customer)}
-                            className={`px-4 py-2 rounded-[10px] text-[13px] font-bold flex items-center gap-2 transition-all whitespace-nowrap ${
+                            className={`w-[110px] h-[36px] rounded-[8px] text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all whitespace-nowrap ${
                               sendingId === customer._id
                               ? 'bg-[#F2F4F6] text-[#8B95A1] cursor-wait'
                               : customer.consentStatus === '발송완료' 
@@ -254,7 +254,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                             disabled={sendingId === customer._id}
                           >
                             {sendingId === customer._id ? (
-                              <><Loader2 className="w-3.5 h-3.5 animate-spin" /> 발송중...</>
+                              <><Loader2 className="w-3.5 h-3.5 animate-spin" /> 발송중</>
                             ) : customer.consentStatus === '발송완료' ? (
                               <><Send className="w-3.5 h-3.5" /> 재발송</>
                             ) : (
