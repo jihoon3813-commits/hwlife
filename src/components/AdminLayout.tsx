@@ -130,16 +130,6 @@ export default function AdminLayout({
         </nav>
         <div className="p-4 border-t border-[#E5E8EB] space-y-1">
           <button 
-            className="w-full flex items-center gap-3 px-4 py-3 text-[#4E5968] hover:text-[#191F28] hover:bg-[#F2F4F6] rounded-[12px] font-medium transition-colors"
-            onClick={() => {
-              const targetPath = userType === 'channel' && subdomain ? `./${subdomain}` : './';
-              window.open(targetPath, '_blank');
-            }}
-          >
-            <Globe className="w-5 h-5" />
-            사이트로 바로가기
-          </button>
-          <button 
             className="w-full flex items-center gap-3 px-4 py-3 text-[#F04452] hover:bg-red-50 rounded-[12px] font-medium transition-colors"
             onClick={onLogout}
           >
