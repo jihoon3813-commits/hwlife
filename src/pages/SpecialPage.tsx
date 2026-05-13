@@ -221,7 +221,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778509099/IMG_3521-1_k6wd0u.png" 
             alt="모델" 
-            className="h-[75%] w-auto object-contain object-bottom mt-[-10%] sm:mt-[-35%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
+            className="h-[75%] w-auto object-contain object-bottom mt-[-10%] sm:mt-[-45%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
         </div>
 
@@ -1075,7 +1075,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
                    rel="noopener noreferrer"
                    className="text-[10px] text-white/10 hover:text-[#C5A059] transition-colors font-bold"
                  >
-                   ADMIN
+                   관리자 전용 페이지
                  </a>
               </div>
             </div>

@@ -224,7 +224,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476137/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C_mw4c0e.png" 
             alt="신한카드 모델" 
-            className="h-[75%] w-auto object-contain object-bottom mt-[-10%] sm:mt-[-35%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
+            className="h-[75%] w-auto object-contain object-bottom mt-[-10%] sm:mt-[-45%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
         </div>
 
@@ -1338,7 +1338,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                    rel="noopener noreferrer"
                    className="text-[10px] text-white/10 hover:text-[#3182F6] transition-colors font-bold"
                  >
-                   ADMIN
+                    관리자 전용 페이지
                  </a>
               </div>
             </div>
