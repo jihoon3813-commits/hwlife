@@ -23,6 +23,18 @@ export default function AdminLogin({ onLogin }: { onLogin: (user: any) => void }
     }
 
     try {
+      // 1. Check Settings for Head Office Account
+      const settings = await convex.query(api.settings.get);
+      if (settings?.headOfficeAccount && id === settings.headOfficeAccount.accountId && password === settings.headOfficeAccount.password) {
+        onLogin({
+          type: 'head_office',
+          accountId: settings.headOfficeAccount.accountId,
+          channelName: '효원상조 본사'
+        });
+        return;
+      }
+
+      // 2. Check Channels for Partner Accounts
       const channelUser = await convex.query(api.channels.validateLogin, { accountId: id, password: password });
       if (channelUser) {
         onLogin(channelUser);

@@ -730,18 +730,24 @@ export default function Settings({ user }: { user?: any }) {
   );
 }
 
-function AdminAccountSettings({ user, updateChannel }: { user: any, updateChannel: any }) {
+function AdminAccountSettings({ user }: { user: any }) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
-  // For channel users, we need their full info to update
+  const [hoPassword, setHoPassword] = useState('');
+  const [hoConfirmPassword, setHoConfirmPassword] = useState('');
+  
+  const updateChannel = useMutation(api.channels.update);
+  const updateSettings = useMutation(api.settings.update);
+  const settings = useQuery(api.settings.get);
   const channelData = useQuery(api.channels.getBySubdomain, { subdomain: user?.subdomain || '' });
 
   const handlePasswordChange = async () => {
-    if (user.type !== 'channel') {
+    if (user.type !== 'channel' && user.type !== 'head_office' as any) {
       alert('마스터 관리자 비밀번호 변경은 현재 코드에서 관리됩니다.');
       return;
     }
+
     if (!newPassword) {
       alert('새 비밀번호를 입력해주세요.');
       return;
@@ -750,63 +756,176 @@ function AdminAccountSettings({ user, updateChannel }: { user: any, updateChanne
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-    if (!channelData) {
-      alert('채널 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+
+    if (user.type === 'channel') {
+      if (!channelData) {
+        alert('채널 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+      try {
+        await updateChannel({
+          id: channelData._id,
+          password: newPassword,
+          subdomain: channelData.subdomain,
+          status: channelData.status,
+          channelName: channelData.channelName,
+          managerName: channelData.managerName,
+          managerContact: channelData.managerContact,
+          landingPage: channelData.landingPage,
+        });
+        alert('비밀번호가 성공적으로 변경되었습니다.');
+        setNewPassword('');
+        setConfirmPassword('');
+      } catch (err) {
+        alert('비밀번호 변경 중 오류가 발생했습니다.');
+      }
+    } else if (user.type === 'head_office' as any) {
+      if (!settings) return;
+      try {
+        await updateSettings({
+          headOfficeAccount: {
+            accountId: user.accountId,
+            password: newPassword
+          }
+        });
+        alert('본사 계정 비밀번호가 성공적으로 변경되었습니다.');
+        setNewPassword('');
+        setConfirmPassword('');
+      } catch (err) {
+        alert('비밀번호 변경 중 오류가 발생했습니다.');
+      }
+    }
+  };
+
+  const handleHoPasswordUpdate = async () => {
+    if (!hoPassword) {
+      alert('새 비밀번호를 입력해주세요.');
       return;
     }
+    if (hoPassword !== hoConfirmPassword) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    if (!settings) return;
 
     try {
-      await updateChannel({
-        id: channelData._id,
-        password: newPassword,
-        subdomain: channelData.subdomain,
-        status: channelData.status,
-        channelName: channelData.channelName,
-        managerName: channelData.managerName,
-        managerContact: channelData.managerContact,
-        landingPage: channelData.landingPage,
+      await updateSettings({
+        headOfficeAccount: {
+          accountId: settings.headOfficeAccount?.accountId || "hyowon",
+          password: hoPassword
+        }
       });
-      alert('비밀번호가 성공적으로 변경되었습니다.');
-      setNewPassword('');
-      setConfirmPassword('');
+      alert('효원상조 본사 계정 비밀번호가 업데이트되었습니다.');
+      setHoPassword('');
+      setHoConfirmPassword('');
     } catch (err) {
-      alert('비밀번호 변경 중 오류가 발생했습니다.');
+      alert('비밀번호 업데이트 중 오류가 발생했습니다.');
     }
   };
 
   return (
-    <div>
-      <h3 className="text-[18px] font-bold mb-6">계정 비밀번호 변경</h3>
-      <div className="space-y-4 max-w-sm">
-        <div>
-          <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">새 비밀번호</label>
-          <input 
-            type="password" 
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="새 비밀번호 입력" 
-            className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" 
-          />
-        </div>
-        <div>
-          <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">새 비밀번호 확인</label>
-          <input 
-            type="password" 
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="새 비밀번호 다시 입력" 
-            className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" 
-          />
-        </div>
-      </div>
-      <div className="mt-8 pt-8 border-t border-[#F2F4F6] flex justify-center">
-        <button 
-          onClick={handlePasswordChange}
-          className="bg-[#3182F6] text-white px-10 py-3.5 rounded-[16px] font-bold shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95"
-        >
-          비밀번호 변경
-        </button>
-      </div>
+    <div className="space-y-12">
+      {/* 1. My Password Change */}
+      {(user.type === 'channel' || user.type === 'head_office' as any) && (
+        <section>
+          <h3 className="text-[18px] font-bold mb-6">내 계정 비밀번호 변경</h3>
+          <div className="space-y-4 max-w-sm">
+            <div>
+              <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">새 비밀번호</label>
+              <input 
+                type="password" 
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="새 비밀번호 입력" 
+                className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" 
+              />
+            </div>
+            <div>
+              <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">새 비밀번호 확인</label>
+              <input 
+                type="password" 
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="새 비밀번호 다시 입력" 
+                className="w-full bg-[#F2F4F6] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none" 
+              />
+            </div>
+          </div>
+          <div className="mt-8 pt-8 border-t border-[#F2F4F6]">
+            <button 
+              onClick={handlePasswordChange}
+              className="bg-[#3182F6] text-white px-10 py-3.5 rounded-[16px] font-bold shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95"
+            >
+              비밀번호 변경
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* 2. Head Office Account Management (For Master Admin) */}
+      {user.type === 'admin' && (
+        <section>
+          <div className="flex flex-col gap-2 mb-6">
+            <h3 className="text-[18px] font-bold">효원상조 본사 계정 관리</h3>
+            <p className="text-[13px] text-[#8B95A1]">고객관리 전용 본사 계정(ID: hyowon)의 비밀번호를 설정합니다.</p>
+          </div>
+          
+          <div className="bg-[#F9FAFB] p-6 rounded-[24px] border border-[#E5E8EB] max-w-md">
+            <div className="mb-6">
+              <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">접속 아이디</label>
+              <input 
+                type="text" 
+                value={settings?.headOfficeAccount?.accountId || 'hyowon'} 
+                readOnly
+                className="w-full bg-white border border-[#E5E8EB] px-4 py-3 rounded-[12px] text-[14px] font-bold text-[#8B95A1] outline-none" 
+              />
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">새 비밀번호</label>
+                <input 
+                  type="password" 
+                  value={hoPassword}
+                  onChange={(e) => setHoPassword(e.target.value)}
+                  placeholder="새 비밀번호 입력" 
+                  className="w-full bg-white border border-[#E5E8EB] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none focus:border-[#3182F6] transition-all" 
+                />
+              </div>
+              <div>
+                <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">새 비밀번호 확인</label>
+                <input 
+                  type="password" 
+                  value={hoConfirmPassword}
+                  onChange={(e) => setHoConfirmPassword(e.target.value)}
+                  placeholder="새 비밀번호 다시 입력" 
+                  className="w-full bg-white border border-[#E5E8EB] px-4 py-3 rounded-[12px] text-[14px] font-bold focus:outline-none focus:border-[#3182F6] transition-all" 
+                />
+              </div>
+            </div>
+            
+            <button 
+              onClick={handleHoPasswordUpdate}
+              className="w-full mt-8 bg-[#191F28] text-white py-3.5 rounded-[16px] font-bold shadow-lg shadow-black/10 transition-transform active:scale-95"
+            >
+              본사 계정 정보 업데이트
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* 3. Master Admin Info */}
+      {user.type === 'admin' && (
+        <section className="pt-12 border-t border-[#F2F4F6]">
+          <h3 className="text-[18px] font-bold mb-4">마스터 계정 정보</h3>
+          <div className="p-5 bg-blue-50 rounded-[20px] border border-blue-100 flex items-start gap-3">
+            <div className="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-[12px] shrink-0 mt-0.5">!</div>
+            <p className="text-[13px] text-blue-800 leading-relaxed">
+              마스터 관리자(admin)의 비밀번호 변경은 보안을 위해 현재 시스템 설정 파일에서 직접 관리됩니다. 변경이 필요한 경우 개발팀에 문의해 주세요.
+            </p>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

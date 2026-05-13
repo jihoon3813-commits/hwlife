@@ -35,6 +35,9 @@ export default function AdminLayout({
   ];
 
   const menuItems = allMenuItems.filter(item => {
+    if (userType === 'head_office' as any) {
+      return ['customers'].includes(item.id);
+    }
     if (userType === 'channel') {
       return ['customers', 'landings', 'channels', 'statistics', 'consent', 'shinhan48', 'bson', 'sangjo', 'settings'].includes(item.id);
     }
@@ -102,7 +105,7 @@ export default function AdminLayout({
           <div>
             <p className="text-[14px] font-bold text-[#191F28]">{userName || '관리자'}</p>
             <p className="text-[12px] text-[#8B95A1]">
-                {isProxyMode ? '채널 대리 관리중' : (userType === 'admin' ? '마스터 권한' : '채널 권한')}
+                {isProxyMode ? '채널 대리 관리중' : (userType === 'admin' ? '마스터 권한' : (userType === 'head_office' as any ? '본사 권한' : '채널 권한'))}
             </p>
           </div>
         </div>

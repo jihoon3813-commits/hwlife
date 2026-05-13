@@ -54,6 +54,10 @@ export const update = mutation({
       consentMessage: v.optional(v.string()),
       consentPageUrl: v.optional(v.string()),
     })),
+    headOfficeAccount: v.optional(v.object({
+      accountId: v.string(),
+      password: v.string(),
+    })),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db.query("settings").first();
@@ -64,6 +68,7 @@ export const update = mutation({
     if (args.categories !== undefined) data.categories = args.categories;
     if (args.footer !== undefined) data.footer = args.footer;
     if (args.sms !== undefined) data.sms = args.sms;
+    if (args.headOfficeAccount !== undefined) data.headOfficeAccount = args.headOfficeAccount;
 
     if (existing) {
       await ctx.db.patch(existing._id, data);
@@ -98,4 +103,37 @@ export const update = mutation({
       return id;
     }
   },
+});
+
+export const seedHeadOfficeAccount = mutation({
+  handler: async (ctx) => {
+    const existing = await ctx.db.query("settings").first();
+    if (existing && !existing.headOfficeAccount) {
+      await ctx.db.patch(existing._id, {
+        headOfficeAccount: {
+          accountId: "hyowon",
+          password: "1111"
+        }
+      });
+    } else if (!existing) {
+        await ctx.db.insert("settings", {
+            statuses: [],
+            brands: [],
+            categories: [],
+            footer: {
+                companyName: '',
+                representative: '',
+                businessNumber: '',
+                phone: '',
+                address: '',
+                email: '',
+                notice: ''
+            },
+            headOfficeAccount: {
+                accountId: "hyowon",
+                password: "1111"
+            }
+        });
+    }
+  }
 });

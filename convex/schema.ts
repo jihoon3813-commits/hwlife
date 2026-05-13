@@ -132,6 +132,10 @@ export default defineSchema({
       consentMessage: v.optional(v.string()),
       consentPageUrl: v.optional(v.string()),
     })),
+    headOfficeAccount: v.optional(v.object({
+      accountId: v.string(),
+      password: v.string(),
+    })),
   }),
   visits: defineTable({
     ip: v.string(),
