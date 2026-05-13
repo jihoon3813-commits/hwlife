@@ -1,0 +1,8 @@
+{
+  "name": "hwlife-static",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo 'Static branch - skip build'",
+    "install": "echo 'Skip install'"
+  }
+}
