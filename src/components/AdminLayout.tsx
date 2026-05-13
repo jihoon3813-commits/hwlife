@@ -118,7 +118,7 @@ export default function AdminLayout({
           </div>
         )}
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeMenu === item.id;
