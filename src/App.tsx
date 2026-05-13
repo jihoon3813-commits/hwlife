@@ -273,7 +273,7 @@ export default function App() {
           </p>
 
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png" 
+            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778653198/Professional_hero_section_image_featuring_a_confid-1778653149667_eu8pa3.png" 
             alt="프리미엄 가전 결합 서비스" 
             className="w-full aspect-[4/3] object-cover rounded-2xl mb-8 shadow-lg"
           />
