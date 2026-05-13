@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# 관리자 페이지 등 검색엔진에 노출되지 않아야 하는 경로가 있다면 아래처럼 추가하세요.
+# Disallow: /admin
+# Disallow: /login
+
+Sitemap: https://hyowon-life.com/sitemap.xml
