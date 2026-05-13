@@ -94,10 +94,7 @@ export default function AdminApp() {
   if (!user) {
     return <AdminLogin onLogin={(userData) => {
         setUser(userData);
-        // Set default menu based on user type
-        if (userData.type === 'channel') {
-            setActiveMenu('customers');
-        }
+        setActiveMenu('customers');
     }} />;
   }
 
@@ -126,6 +123,7 @@ export default function AdminApp() {
       case 'statistics':
         return <Statistics channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
       case 'settings':
+        if (user.type === 'head_office' as any) return <CustomerManagement channelId={undefined} />;
         return <Settings user={user} />;
       default:
         return <CustomerManagement channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
