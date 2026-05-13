@@ -189,14 +189,14 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
         {/* 상단 바로가기 탭 (Shortcut Tabs) */}
         <div className="flex bg-[#F2F4F6] p-0.5 sm:p-1 rounded-full border border-[#E5E8EB]">
           <a 
-            href={`/living${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
+            href={`/living${channelId && channelId !== '본사' ? '/?' + channelId : ''}`}
             className="px-2.5 py-1 sm:px-5 sm:py-2 rounded-full text-[9px] sm:text-[12px] font-bold transition-all flex items-center gap-1 bg-white text-[#1B64DA] shadow-sm whitespace-nowrap"
           >
             <CreditCard className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             신한카드
           </a>
           <a 
-            href={`/special${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
+            href={`/special${channelId && channelId !== '본사' ? '/?' + channelId : ''}`}
             className="px-2.5 py-1 sm:px-5 sm:py-2 rounded-full text-[9px] sm:text-[12px] font-bold text-[#8B95A1] hover:text-[#191F28] transition-all flex items-center gap-1 whitespace-nowrap"
           >
             <Package className="w-2.5 h-2.5 sm:w-3 sm:h-3" />

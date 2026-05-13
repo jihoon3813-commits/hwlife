@@ -21,10 +21,12 @@ export default function LandingRouter() {
   
   const isLivingPath = path.startsWith('/living');
   const isSpecialPath = path.startsWith('/special');
+  const searchParams = new URLSearchParams(window.location.search);
+  const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
   
   const subdomainFromPath = (isLivingPath || isSpecialPath)
-    ? (segments.length >= 2 ? segments[1] : null) 
-    : (segments.length >= 1 && !isConsentPath ? segments[0] : null);
+    ? (segments.length >= 2 ? segments[1] : (queryChannel || null)) 
+    : (segments.length >= 1 && !isConsentPath ? segments[0] : (queryChannel || null));
 
   // Consent page - 동의서 서명 (채널 조회 불필요)
   if (isConsentPath) {
