@@ -112,10 +112,13 @@ export default function AdminApp() {
       case 'products':
         return <ProductManagement />;
       case 'channels':
-        return <ChannelManagement onLoginAsChannel={(channel) => {
-            const url = `${window.location.origin}/admin?proxy=${channel.subdomain}&name=${encodeURIComponent(channel.channelName)}`;
-            window.open(url, '_blank');
-        }} />;
+        return <ChannelManagement 
+            currentChannelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined}
+            onLoginAsChannel={(channel) => {
+                const url = `${window.location.origin}/admin?proxy=${channel.subdomain}&name=${encodeURIComponent(channel.channelName)}`;
+                window.open(url, '_blank');
+            }} 
+        />;
 
       case 'landings':
         return <LandingManagement userType={user.type} subdomain={user.subdomain} />;

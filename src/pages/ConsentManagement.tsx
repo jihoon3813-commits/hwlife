@@ -14,7 +14,18 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
   const [isDownloading, setIsDownloading] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
   const pdfRef = useRef<HTMLDivElement>(null);
-  const inquiries = useQuery(api.inquiries.list, channelId ? { channelId } : {}) || [];
+  
+  const channels = useQuery(api.channels.get) || [];
+  
+  const subChannelIds = useQuery(api.channels.getSubChannelIds, 
+    channelId ? { subdomain: channelId } : 'skip'
+  );
+
+  const inquiries = useQuery(api.inquiries.list, 
+    channelId 
+      ? (subChannelIds ? { channelIds: subChannelIds } : 'skip') 
+      : {}
+  ) || [];
   const updateInquiry = useMutation(api.inquiries.update);
   const sendConsentSms = useAction(api.sms.sendConsentSms);
   const settings = useQuery(api.settings.get);
@@ -136,6 +147,11 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
     return matchesSearch;
   });
 
+  const getChannelName = (id?: string) => {
+    if (!id || id === '본사' || id === 'default') return '본사';
+    return channels.find(c => c.subdomain === id)?.channelName || id;
+  };
+
   const getStatusBadge = (status?: string) => {
     switch (status) {
       case '서명완료':
@@ -184,6 +200,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
             <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
               <tr>
                 <th className="px-6 py-5 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">접수일</th>
+                <th className="px-6 py-5 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">채널</th>
                 <th className="px-6 py-5 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">고객명</th>
                 <th className="px-6 py-5 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">연락처</th>
                 <th className="px-6 py-5 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">신청상품</th>
@@ -207,6 +224,11 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                   <tr key={customer._id} className="hover:bg-[#F9FAFB] transition-colors">
                     <td className="px-6 py-5 text-[14px] text-[#4E5968] font-medium whitespace-nowrap">
                       {new Date(customer.createdAt).toLocaleDateString('ko-KR')}
+                    </td>
+                    <td className="px-6 py-5 whitespace-nowrap">
+                      <span className={`text-[12px] font-bold px-2 py-1 rounded-md ${(!customer.channelId || customer.channelId === '본사') ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-[#3182F6]'}`}>
+                        {getChannelName(customer.channelId)}
+                      </span>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
                       <span className="text-[14px] font-bold text-[#191F28]">{customer.name}</span>

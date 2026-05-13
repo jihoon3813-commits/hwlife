@@ -3,7 +3,13 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Plus, Search, Edit2, Trash2, Eye, EyeOff, X, ExternalLink } from 'lucide-react';
 
-export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChannel?: (channel: any) => void }) {
+export default function ChannelManagement({ 
+  currentChannelId,
+  onLoginAsChannel 
+}: { 
+  currentChannelId?: string;
+  onLoginAsChannel?: (channel: any) => void 
+}) {
   const channels = useQuery(api.channels.get) || [];
   const createChannel = useMutation(api.channels.create);
   const updateChannel = useMutation(api.channels.update);
@@ -126,11 +132,23 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
     }
   };
 
-  const filteredChannels = channels.filter(channel => 
-    channel.channelName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    channel.managerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    channel.accountId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredChannels = channels.filter(channel => {
+    // 1. Basic search filter
+    const matchesSearch = channel.channelName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         channel.managerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         channel.accountId.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (!matchesSearch) return false;
+
+    // 2. Hierarchical permission filter
+    if (!currentChannelId) return true; // Master admin sees everything
+
+    // Channel admin sees themselves and their direct sub-channels
+    const isSelf = channel.subdomain === currentChannelId;
+    const isSub = channel.parentChannelId === currentChannelId;
+    
+    return isSelf || isSub;
+  });
 
   return (
     <div className="p-4 sm:p-8 max-w-7xl mx-auto">
@@ -170,7 +188,6 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">채널명</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">담당자</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">연락처</th>
-                <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">대표 랜딩 URL</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">상위 채널</th>
                 <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">상태</th>
 
@@ -189,20 +206,6 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                     <td className="py-4 px-6 text-[14px] font-bold text-[#191F28]">{channel.channelName}</td>
                     <td className="py-4 px-6 text-[14px] font-medium text-[#191F28]">{channel.managerName}</td>
                     <td className="py-4 px-6 text-[14px] text-[#4E5968]">{channel.managerContact}</td>
-                    <td className="py-4 px-6">
-                      <div className="flex flex-col gap-1">
-                        {channel.landingPage && (
-                          <div className="flex items-center gap-1 text-[12px] text-[#3182F6] font-bold bg-[#E8F3FF] px-2 py-1 rounded-md w-fit">
-                            {channel.landingPage === '/' ? `/${channel.subdomain}` : `${channel.landingPage}/?${channel.subdomain}`}
-                          </div>
-                        )}
-                        {channel.landingPages?.filter((p: string) => p !== channel.landingPage).map((p: string) => (
-                          <div key={p} className="text-[11px] text-[#8B95A1] px-2">
-                            {p === '/' ? `/${channel.subdomain}` : `${p}/?${channel.subdomain}`}
-                          </div>
-                        ))}
-                      </div>
-                    </td>
                     <td className="py-4 px-6 text-[13px] text-[#8B95A1]">
                       {channel.parentChannelId ? (
                         <span className="font-medium text-[#191F28]">{channels.find(c => c.subdomain === channel.parentChannelId)?.channelName || channel.parentChannelId}</span>
@@ -231,7 +234,7 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-[#8B95A1] text-[14px]">
+                  <td colSpan={7} className="py-12 text-center text-[#8B95A1] text-[14px]">
                     등록된 채널이 없습니다.
                   </td>
                 </tr>
@@ -427,15 +430,16 @@ export default function ChannelManagement({ onLoginAsChannel }: { onLoginAsChann
                   <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">파트너 상태 <span className="text-[#F04452]">*</span></label>
                   <div className="flex gap-2">
                     {['승인대기', '정상', '정지'].map(status => (
-                      <label key={status} className={`flex-1 flex items-center justify-center py-3 rounded-[12px] cursor-pointer font-medium text-[14px] transition-colors border ${
+                      <label key={status} className={`flex-1 flex items-center justify-center py-3 rounded-[12px] font-medium text-[14px] transition-colors border ${
                         formData.status === status 
                           ? 'border-[#3182F6] bg-[#E8F3FF] text-[#3182F6]' 
-                          : 'border-[#E5E8EB] bg-white text-[#4E5968] hover:bg-[#F9FAFB]'
-                      }`}>
+                          : 'border-[#E5E8EB] bg-white text-[#4E5968]'
+                      } ${!!currentChannelId ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-[#F9FAFB]'}`}>
                         <input 
                           type="radio" 
                           name="status"
                           value={status}
+                          disabled={!!currentChannelId}
                           checked={formData.status === status}
                           onChange={(e) => setFormData({...formData, status: e.target.value})}
                           className="hidden" 

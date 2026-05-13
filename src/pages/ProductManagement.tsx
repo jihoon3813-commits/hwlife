@@ -99,8 +99,8 @@ export default function ProductManagement() {
           const postUrl = await generateUploadUrl();
           const result = await fetch(postUrl, {
             method: "POST",
-            headers: { "Content-Type": file.type },
-            body: file,
+            headers: { "Content-Type": (file as any).type },
+            body: file as any,
           });
           const { storageId } = await result.json();
           uploadedUrls.push(storageId);
@@ -125,8 +125,8 @@ export default function ProductManagement() {
           const postUrl = await generateUploadUrl();
           const result = await fetch(postUrl, {
             method: "POST",
-            headers: { "Content-Type": file.type },
-            body: file,
+            headers: { "Content-Type": (file as any).type },
+            body: file as any,
           });
           const { storageId } = await result.json();
           uploadedUrls.push(storageId);
@@ -389,7 +389,7 @@ export default function ProductManagement() {
               comparisons,
               images: thumbnailUrl ? [thumbnailUrl] : [],
               detailImages: detailUrls
-            });
+            } as any);
             successCount++;
           } catch (rowErr) {
             console.error(`Row ${i + 2} processing error:`, rowErr, row);

@@ -29,7 +29,9 @@ export default function App() {
   
   // Channel Tracking
   const segments = window.location.pathname.split('/').filter(Boolean);
-  const channelId = segments.length === 0 ? '본사' : segments[0];
+  const searchParams = new URLSearchParams(window.location.search);
+  const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
+  const channelId = segments.length === 0 ? (queryChannel || '본사') : segments[0];
 
   
   const categoryScrollRef = useRef<HTMLDivElement>(null);
@@ -53,7 +55,7 @@ export default function App() {
           userAgent: navigator.userAgent,
           referrer: document.referrer || "직접 유입",
           path: window.location.pathname + window.location.search,
-          channelId: channelId,
+          channelId: channelId === '본사' ? undefined : channelId,
         });
       } catch (e) {
         console.error("Visit tracking failed", e);
@@ -61,7 +63,7 @@ export default function App() {
     };
 
     trackVisit();
-  }, [logVisit]);
+  }, [logVisit, channelId]);
 
   const isFullViewRef = useRef(isProductFullView);
 

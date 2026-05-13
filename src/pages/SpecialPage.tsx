@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { useEffect } from 'react';
 import SEO from '../components/SEO';
 
 
@@ -31,16 +32,58 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
 
 
   // Channel Tracking
-  // 1. Prioritize explicitly passed channelSubdomain
-  // 2. If visiting /special directly, it's Master (본사)
-  // 3. If visiting /special/subdomain, use that subdomain
   const segments = window.location.pathname.split('/').filter(Boolean);
   const searchParams = new URLSearchParams(window.location.search);
   
   // Try to get channelId from query string (e.g. ?niora) or path (e.g. /special/niora)
   const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
   const channelId = channelSubdomain || 
-                   (segments.length >= 2 ? segments[1] : (queryChannel || (segments.length === 1 && segments[0] === 'special' ? '본사' : undefined)));
+                   (segments.length >= 2 ? segments[1] : (queryChannel || '본사'));
+
+  const logVisit = useMutation(api.stats.logVisit);
+
+  useEffect(() => {
+    const trackVisit = async () => {
+      try {
+        let ip = "0.0.0.0";
+        try {
+          const response = await fetch("https://api.ipify.org?format=json");
+          const data = await response.json();
+          ip = data.ip;
+        } catch (e) {}
+
+        await logVisit({
+          ip,
+          userAgent: navigator.userAgent,
+          referrer: document.referrer || "직접 유입",
+          path: window.location.pathname + window.location.search,
+          channelId: channelId === '본사' ? undefined : channelId,
+        });
+      } catch (e) {
+        console.error("Visit tracking failed", e);
+      }
+    };
+    trackVisit();
+  }, [logVisit, channelId]);
+
+  // Browser Back Button Modal Handling
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (isContactModalOpen || isPrivacyModalOpen) {
+        setIsContactModalOpen(false);
+        setIsPrivacyModalOpen(false);
+      }
+    };
+
+    if (isContactModalOpen || isPrivacyModalOpen) {
+      window.history.pushState({ modal: true }, "");
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isContactModalOpen, isPrivacyModalOpen]);
 
 
 
@@ -123,29 +166,44 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       />
       
       {/* GNB / 상단 헤더 */}
-      <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-5 flex items-center justify-between h-[60px] border-b border-[#F2F4F6]">
-        <div className="flex items-center gap-1.5">
+      <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-3 sm:px-5 flex items-center justify-between h-[48px] sm:h-[60px] border-b border-[#F2F4F6]">
+        <div className="flex items-center gap-1 sm:gap-1.5">
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
             alt="효원상조" 
-            className="h-[18px] w-auto object-contain"
+            className="h-[14px] sm:h-[18px] w-auto object-contain"
           />
-          <span className="text-[10px] font-black text-[#D1D6DB]">x</span>
+          <span className="text-[8px] sm:text-[10px] font-black text-[#D1D6DB]">x</span>
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778509015/bson_%EB%A1%9C%EA%B3%A0_u08pw7.png" 
             alt="BSON" 
-            className="h-[22px] w-auto object-contain"
+            className="h-[18px] sm:h-[22px] w-auto object-contain"
           />
-          <span className="text-[10px] font-black text-[#D1D6DB]">x</span>
-          <span className="text-[12px] font-black tracking-tight bg-gradient-to-r from-[#191F28] to-[#4E5968] bg-clip-text text-transparent">PREMIUM</span>
+          <span className="text-[8px] sm:text-[10px] font-black text-[#D1D6DB]">x</span>
+          <span className="text-[10px] sm:text-[12px] font-black tracking-tight bg-gradient-to-r from-[#191F28] to-[#4E5968] bg-clip-text text-transparent">PREMIUM</span>
         </div>
 
-
-        {/* Removed Phone Icon */}
+        {/* 상단 바로가기 탭 (Shortcut Tabs) */}
+        <div className="flex bg-[#F2F4F6] p-0.5 sm:p-1 rounded-full border border-[#E5E8EB]">
+          <a 
+            href={`/living${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
+            className="px-2.5 py-1 sm:px-5 sm:py-2 rounded-full text-[9px] sm:text-[12px] font-bold text-[#8B95A1] hover:text-[#191F28] transition-all flex items-center gap-1 whitespace-nowrap"
+          >
+            <CreditCard className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+            신한카드
+          </a>
+          <a 
+            href={`/special${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
+            className="px-2.5 py-1 sm:px-5 sm:py-2 rounded-full text-[9px] sm:text-[12px] font-bold transition-all flex items-center gap-1 bg-white text-[#D4AF37] shadow-sm whitespace-nowrap"
+          >
+            <Package className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+            BSON
+          </a>
+        </div>
       </header>
 
       {/* Section 1: 메인 히어로 (Hero) */}
-      <section className="relative w-full h-[85vh] min-h-[600px] flex flex-col justify-end pb-12 px-6 overflow-hidden">
+      <section className="relative w-full h-[65vh] sm:h-[85vh] min-h-[450px] sm:min-h-[600px] flex flex-col justify-end pb-8 sm:pb-12 px-6 overflow-hidden">
         {/* 배경 레이어 */}
         <div className="absolute inset-0">
           <img 
@@ -163,33 +221,11 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778509099/IMG_3521-1_k6wd0u.png" 
             alt="모델" 
-            className="h-[75%] w-auto object-contain object-bottom mt-[-35%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
+            className="h-[75%] w-auto object-contain object-bottom mt-[-10%] sm:mt-[-35%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
         </div>
 
-        {/* 상단 바로가기 탭 (Shortcut Tabs) */}
-        <div className="absolute top-8 inset-x-0 z-30 flex justify-center px-6">
-          <div className="flex bg-black/20 backdrop-blur-md border border-white/10 p-1.5 rounded-full shadow-2xl">
-            <a 
-              href={`/living${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2.5 rounded-full text-[13px] font-black text-white/70 hover:text-white transition-all flex items-center gap-2"
-            >
-              <CreditCard className="w-3.5 h-3.5" />
-              신한카드 결합
-            </a>
-            <a 
-              href={`/special${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2.5 rounded-full text-[13px] font-black transition-all flex items-center gap-2 bg-white text-[#D4AF37] shadow-lg"
-            >
-              <Package className="w-3.5 h-3.5" />
-              BSON 결합
-            </a>
-          </div>
-        </div>
+
 
         
         {/* 하단 페이드 그라데이션 */}
@@ -202,16 +238,16 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
           transition={{ duration: 0.7, delay: 0.2 }}
           className="relative z-10 text-white"
         >
-          <div className="inline-block px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[11px] font-bold text-white mb-4">
+          <div className="inline-block px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[11px] font-bold text-white mb-1 sm:mb-4">
             효원상조 x BSON x PREMIUM
           </div>
           
-          <h2 className="text-[38px] font-black leading-[1.2] mb-5 tracking-tight break-keep">
+          <h2 className="text-[32px] sm:text-[38px] font-black leading-[1.2] mb-1 sm:mb-5 tracking-tight break-keep">
             해피효원라이프<br/>
             <span className="text-[#C5A059]">스페셜299 출시</span>
           </h2>
 
-          <p className="text-white/80 text-[16px] leading-[1.6] mb-8 break-keep font-medium">
+          <p className="text-white/80 text-[14px] sm:text-[16px] leading-[1.6] mb-3 sm:mb-8 break-keep font-medium">
             카드 한도 관계없이<br/>
             신용만으로 신청 가능!<br/>
             <span className="text-white font-bold">특별한 제품과 보너스 혜택까지!</span>
@@ -223,7 +259,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
               setSelectedProduct(null);
               setIsContactModalOpen(true);
             }}
-            className="w-full flex items-center justify-center gap-2 bg-[#C5A059] py-4 rounded-[20px] text-[16px] font-bold text-white shadow-[0_8px_20px_rgba(197,160,89,0.3)] hover:bg-[#B38E46] transition-all active:scale-95"
+            className="w-full flex items-center justify-center gap-2 bg-[#C5A059] py-3.5 sm:py-4 rounded-[20px] text-[16px] font-bold text-white shadow-[0_8px_20px_rgba(197,160,89,0.3)] hover:bg-[#B38E46] transition-all active:scale-95"
           >
             단독 혜택받고 무료상담 신청 <ArrowRight className="w-5 h-5" />
           </button>
@@ -232,7 +268,18 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
 
       {/* Section 2: 프리미엄 실물 카드 부각 섹션 */}
-      <section className="relative py-24 px-6 overflow-hidden bg-[#0F0F10]">
+      <section className="relative pt-12 pb-10 sm:py-24 px-6 overflow-hidden bg-[#0F0F10]">
+        {/* 세로 연결 선 (Visual Connector) */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex justify-center pointer-events-none">
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            whileInView={{ height: 100, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="w-[1.5px] bg-gradient-to-b from-[#C5A059] via-[#C5A059]/50 to-transparent"
+          ></motion.div>
+        </div>
+
         {/* 배경 빛 번짐 효과 */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#C5A059] opacity-10 blur-[120px] rounded-full"></div>
         
@@ -316,7 +363,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
 
       {/* Section 3: 단독 프로모션 4대 혜택 (Benefits Grid) */}
-      <section className="bg-[#191F28] py-14 px-6 my-2 text-white">
+      <section className="bg-[#191F28] py-8 sm:py-14 px-6 text-white">
         <div className="mb-8 text-center">
           <p className="text-[13px] font-bold text-[#C5A059] mb-2">오직 프리미엄몰 회원에게만 드리는</p>
           <h2 className="text-[22px] font-bold leading-tight break-keep">
@@ -372,7 +419,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
 
       {/* Section 4: 가입 필요성 강조 (어필 영역) */}
-      <section className="bg-white py-14 px-6 my-2">
+      <section className="bg-white py-8 sm:py-14 px-6">
         <div className="text-center mb-10">
           <h2 className="text-[22px] font-bold text-[#191F28] leading-snug break-keep mb-3">
             상조, 아직 이르다고<br/>생각하셨나요?
@@ -436,64 +483,66 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
 
       {/* Section 6: 상품 금액 및 상세 표 */}
-      <section className="bg-[#0F0F10] py-20 px-6 my-2">
-        <div className="mb-10 text-center">
-          <h2 className="text-[26px] font-black text-white leading-tight break-keep mb-4">
+      <section className="bg-[#0F0F10] py-4 sm:py-20 px-6">
+        <div className="mb-6 sm:mb-10 text-center">
+          <h2 className="text-[22px] sm:text-[26px] font-black text-white leading-tight break-keep mb-3 sm:mb-4">
             특별 보너스 혜택까지!<br/>
             <span className="text-[#C5A059]">해피효원라이프·스페셜 299</span> 상세표
           </h2>
-          <span className="inline-block px-4 py-1.5 bg-[#FFFF00] text-[#191F28] text-[12px] font-black rounded-lg shadow-lg">
+          <span className="inline-block px-3 py-1 bg-[#FFFF00] text-[#191F28] text-[11px] font-bold rounded-md shadow-sm">
             오직 프리미엄몰에서만 가입 가능합니다
           </span>
         </div>
 
         {/* Account selection box (Fixed to 2 accounts) */}
-        <div className="flex p-1 bg-white/5 rounded-[20px] mb-8 max-w-[500px] mx-auto border border-white/10">
-          <div className="flex-1 py-4 bg-[#C5A059] rounded-[16px] text-[16px] font-black text-white shadow-lg text-center tracking-wider">
+        <div className="flex p-1 bg-white/5 rounded-[12px] sm:rounded-[20px] mb-3 sm:mb-8 max-w-[500px] mx-auto border border-white/10">
+          <div className="flex-1 py-2 sm:py-4 bg-[#C5A059] rounded-[10px] sm:rounded-[16px] text-[14px] sm:text-[16px] font-black text-white shadow-lg text-center tracking-wider">
             2구좌 가입
           </div>
         </div>
 
         {/* Tab Content (Fixed to 2 accounts) - Dark Card */}
         <div className="bg-[#1A1A1C] rounded-[32px] border border-white/10 overflow-hidden shadow-2xl max-w-[500px] mx-auto">
-          <div className="p-8 space-y-8">
+          <div className="p-4 sm:p-8 space-y-4 sm:space-y-8">
             <div className="flex justify-between items-center">
-              <span className="text-[15px] text-white/50 font-bold">총 납입금액</span>
+              <span className="text-[14px] sm:text-[15px] text-white/50 font-bold">총 납입금액</span>
               <div className="text-right">
-                <span className="text-[22px] font-black text-white block">11,960,000원</span>
-                <span className="text-[12px] text-white/30 font-bold">(총 200회 납입 기준)</span>
+                <span className="text-[18px] sm:text-[22px] font-black text-white block">11,960,000원</span>
+                <span className="text-[11px] sm:text-[12px] text-white/30 font-bold">(총 200회 납입 기준)</span>
               </div>
             </div>
             
             <div className="w-full h-[1px] bg-white/5"></div>
             
-            <div className="space-y-4">
-              <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex justify-between items-center px-1">
                 <span className="text-[14px] text-white/60 font-bold">1~60회 납입</span>
-                <span className="text-[18px] font-black text-[#C5A059]">59,800원</span>
+                <span className="text-[16px] sm:text-[18px] font-black text-[#C5A059]">59,800원</span>
               </div>
-              <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
+              <div className="flex justify-between items-center px-1">
                 <span className="text-[14px] text-white/60 font-bold">61~200회 납입</span>
-                <span className="text-[18px] font-black text-white">59,800원</span>
+                <span className="text-[16px] sm:text-[18px] font-black text-white">59,800원</span>
               </div>
             </div>
 
             <div className="w-full h-[1px] bg-white/5"></div>
 
-            <div className="bg-gradient-to-br from-[#C5A059]/20 to-[#C5A059]/5 p-6 rounded-[24px] border border-[#C5A059]/20">
-              <div className="flex justify-between items-center mb-1">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-[#C5A059]/10 p-4 rounded-[16px] border border-[#C5A059]/20 gap-1 sm:gap-0">
+              <div className="flex justify-between items-center sm:block">
                 <span className="text-[14px] text-[#C5A059] font-black">만기 시 환급금</span>
-                <span className="text-[20px] font-black text-[#C5A059]">100% 환급</span>
+                <span className="text-[13px] font-bold text-[#C5A059] sm:ml-1 sm:hidden">(100%)</span>
               </div>
-              <p className="text-[24px] font-black text-white">11,960,000원</p>
-              <p className="text-[11px] text-[#C5A059]/60 mt-2">* 만기 납입 완료 시 해약환급금 100% 보장</p>
+              <div className="flex items-center justify-between sm:justify-end gap-2">
+                <span className="text-[18px] sm:text-[22px] font-black text-white">11,960,000원</span>
+                <span className="hidden sm:inline text-[13px] font-bold text-[#C5A059]">(100%)</span>
+              </div>
             </div>
 
             <div>
-              <span className="text-[13px] font-bold text-white/40 mb-4 block uppercase tracking-widest">Membership Benefits</span>
+              <span className="text-[13px] font-bold text-white/50 mb-3 block">가입 특전</span>
               <div className="flex flex-wrap gap-2">
                 {['라이프서비스 2회', '특별 사은품 증정', '프리미엄몰 보너스'].map((benefit, i) => (
-                  <span key={i} className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[12px] font-bold text-white/70 shadow-inner">
+                  <span key={i} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-[12px] font-bold text-white/70 shadow-sm">
                     {benefit}
                   </span>
                 ))}
@@ -511,7 +560,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
 
 
       {/* Section 9: 결합 리빙 제품 안내 */}
-      <section className="bg-white py-20 px-6 my-2">
+      <section className="bg-white py-10 sm:py-20 px-6">
         <div className="mb-12 text-center">
           <p className="text-[13px] font-bold text-[#C5A059] mb-3 uppercase tracking-wider">Product Information</p>
           <h2 className="text-[28px] font-black text-[#191F28] leading-tight break-keep">
@@ -519,35 +568,35 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
           </h2>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className={`grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2`}>
           {specialProducts.map((item, idx) => (
             <motion.div
               key={(item as any)._id || (item as any).id}
               onClick={() => openProductDetail(item)}
               layoutId={`product-${(item as any)._id || (item as any).id}`}
-              className="bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-col w-full"
+              className="bg-white rounded-[16px] sm:rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-row sm:flex-col w-full h-full"
             >
-              <div className="relative aspect-square bg-white shrink-0">
+              <div className="relative w-24 h-24 sm:w-full sm:h-auto sm:aspect-square bg-white shrink-0">
                 <img 
                   src={(item.images && item.images.length > 0) ? item.images[0] : item.image} 
                   alt={item.name} 
                   className="w-full h-full object-cover" 
                 />
                 {item.tag && (
-                  <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold rounded-lg uppercase tracking-wider">
+                  <div className="absolute top-1 left-1 sm:top-4 sm:left-4 px-1.5 py-0.5 sm:px-3 sm:py-1.5 bg-black/60 backdrop-blur-md text-white text-[8px] sm:text-[11px] font-bold rounded-md uppercase tracking-wider">
                     {item.tag}
                   </div>
                 )}
               </div>
-              <div className="p-6 flex-1 flex flex-col">
-                <div className="mb-3">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="text-[12px] font-bold text-[#C5A059]">{item.brand}</span>
-                    <span className="text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-2 py-0.5 rounded-[4px]">{item.category}</span>
+              <div className="p-3 sm:p-6 flex-1 flex flex-col justify-center sm:justify-start min-w-0">
+                <div className="mb-1 sm:mb-3">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-0.5 sm:mb-2 flex-wrap">
+                    <span className="text-[9px] sm:text-[12px] font-bold text-[#C5A059]">{item.brand}</span>
+                    <span className="text-[8px] sm:text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-1.5 py-0.5 rounded-[4px]">{item.category}</span>
                   </div>
-                  <span className="text-[13px] font-medium text-[#8B95A1] leading-tight">{item.model || item.modelName}</span>
+                  <span className="text-[10px] sm:text-[13px] font-medium text-[#8B95A1] leading-tight line-clamp-1">{(item as any).model || (item as any).modelName}</span>
                 </div>
-                <h3 className="text-[18px] font-extrabold text-[#191F28] mb-1 leading-tight">
+                <h3 className="text-[12px] sm:text-[18px] font-extrabold text-[#191F28] leading-tight break-keep">
                   {item?.name}
                 </h3>
               </div>
@@ -568,7 +617,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
       
       {/* Section 10: 라이프 서비스 안내 */}
-      <section className="bg-[#F9FAFB] py-16 px-6 my-2">
+      <section className="bg-[#F8F9FA] py-8 sm:py-14 px-6">
         <div className="mb-10 text-center">
           <p className="text-[13px] font-bold text-[#C5A059] mb-2">언제든 자유롭게 이용 가능합니다</p>
           <h2 className="text-[24px] font-bold text-[#191F28] leading-tight break-keep">
@@ -602,7 +651,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
 
       {/* Section 11: 멤버십 혜택 안내 */}
-      <section className="bg-white py-16 px-0 my-2 overflow-hidden">
+      <section className="bg-white py-8 sm:py-16 px-0 my-1 overflow-hidden">
         <div className="px-6 mb-10">
           <p className="text-[13px] font-bold text-[#C5A059] mb-2">효원상조 가입 고객만을 위한</p>
           <h2 className="text-[24px] font-bold text-[#191F28] leading-tight break-keep">
@@ -632,7 +681,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
 
       {/* Funeral Service Section */}
-      <section id="funeral-service" className="bg-white py-16 px-6 rounded-[32px] my-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)] border border-[#F2F4F6]">
+      <section id="funeral-service" className="bg-white py-8 sm:py-16 px-6 rounded-[32px] my-1 shadow-[0_2px_12px_rgb(0,0,0,0.03)] border border-[#F2F4F6]">
         <div className="mb-10 text-center">
           <span className="inline-block px-2.5 py-1 bg-[#C5A059]/10 text-[#C5A059] text-[11px] font-bold rounded-md mb-2 uppercase tracking-wider">Funeral Services</span>
           <h2 className="text-[24px] font-bold text-[#191F28] leading-tight mb-4">
@@ -643,7 +692,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {[
             {
               category: "인력지원",
@@ -682,15 +731,15 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
             }
           ].map((section, idx) => (
             <div key={idx} className="bg-[#F8FAFB] rounded-[24px] overflow-hidden border border-[#F2F4F6]">
-              <div className="bg-[#191F28] px-5 py-3.5">
+              <div className="bg-[#191F28] px-5 py-2.5 sm:py-3.5">
                 <h3 className="text-white font-bold text-[15px] flex items-center gap-2">
                   <span className="w-1 h-3 bg-[#C5A059] rounded-full"></span>
                   {section.category}
                 </h3>
               </div>
-              <div className="p-5 space-y-4">
+              <div className="p-4 sm:p-5 space-y-2.5 sm:space-y-4">
                 {section.items.map((item, itemIdx) => (
-                  <div key={itemIdx} className="flex flex-col gap-1">
+                  <div key={itemIdx} className="flex flex-col gap-0.5">
                     <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">{item.label}</span>
                     <span className="text-[14px] font-medium text-[#333D4B] leading-snug break-keep">{item.value}</span>
                   </div>
@@ -700,18 +749,18 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
           ))}
 
           <div className="bg-[#F8FAFB] rounded-[24px] overflow-hidden border border-[#F2F4F6]">
-            <div className="bg-[#191F28] px-5 py-3.5">
+            <div className="bg-[#191F28] px-5 py-2.5 sm:py-3.5">
               <h3 className="text-white font-bold text-[15px] flex items-center gap-2">
                 <span className="w-1 h-3 bg-[#C5A059] rounded-full"></span>
                 발인용품
               </h3>
             </div>
-            <div className="p-5 space-y-4">
-              <div className="flex flex-col gap-1">
+            <div className="p-4 sm:p-5 space-y-2.5 sm:space-y-4">
+              <div className="flex flex-col gap-0.5">
                 <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">횡대</span>
                 <span className="text-[14px] font-medium text-[#333D4B] leading-snug">매장 시 오동나무 횡대 제공</span>
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-0.5">
                 <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">고급차량띠/장갑</span>
                 <span className="text-[14px] font-medium text-[#333D4B] leading-snug">선도차 고급차량띠 및 운구용 장갑 제공</span>
               </div>
@@ -739,7 +788,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
 
       {/* Section: 특별함을 더하다 Plus */}
-      <section className="bg-[#191F28] py-20 px-6 my-2 text-white overflow-hidden">
+      <section className="bg-[#191F28] py-8 sm:py-20 px-6 text-white overflow-hidden">
         <div className="mb-10 text-center">
           <h2 className="text-[24px] font-black mb-3">특별함을 더하다 <span className="text-[#C5A059]">Plus</span></h2>
           <p className="text-[14px] text-white/60 leading-relaxed break-keep">
@@ -769,7 +818,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
 
       {/* Section: 브랜드 신뢰도 & 모델 영역 (Trust) */}
-      <section className="bg-white py-16 px-6 my-2">
+      <section className="bg-white py-8 sm:py-16 px-6">
         <div className="bg-[#E9F4EE] rounded-[32px] overflow-hidden relative mb-4 shadow-sm">
           <div className="p-8 pb-4">
             <h4 className="text-[11px] sm:text-[13px] font-bold text-[#006E4E] mb-3 whitespace-nowrap">20년간 오직 한 길만 걸어온 정통 상조회사</h4>
@@ -799,9 +848,11 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
 
       {/* Section 16: 가입 절차 안내 및 최종 CTA */}
-      <section className="bg-[#0F0F10] py-20 px-6 my-2 text-white">
+      <section className="bg-[#0F0F10] py-10 sm:py-20 px-6 text-white">
         <div className="mb-12 text-center">
-          <h2 className="text-[24px] font-bold mb-10 tracking-tight">해피효원라이프 스페셜299 가입절차 안내</h2>
+          <h2 className="text-[24px] font-bold mb-10 tracking-tight break-keep">
+            해피효원라이프 스페셜299<br />가입절차 안내
+          </h2>
           
           <div className="grid grid-cols-2 gap-4">
             {[
@@ -1155,7 +1206,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-[450px] bg-white rounded-[40px] overflow-hidden shadow-2xl flex flex-col"
+              className="relative w-full max-w-[450px] bg-white rounded-[20px] sm:rounded-[40px] overflow-hidden shadow-2xl flex flex-col"
             >
               <div className="p-8 border-b border-[#F2F4F6] flex items-center justify-between">
                 <div>
@@ -1170,10 +1221,10 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
                 </button>
               </div>
 
-              <div className="p-8">
+              <div className="p-6 sm:p-8">
                 {selectedProduct && (
-                  <div className="mb-8 p-4 bg-[#C5A059]/5 rounded-[24px] border border-[#C5A059]/10 flex items-center gap-4">
-                    <div className="w-20 h-20 bg-white rounded-xl overflow-hidden shrink-0 border border-[#E5E8EB]">
+                  <div className="mb-6 sm:mb-8 p-3 sm:p-4 bg-[#C5A059]/5 rounded-[16px] sm:rounded-[24px] border border-[#C5A059]/10 flex items-center gap-4">
+                    <div className="hidden sm:block w-20 h-20 bg-white rounded-xl overflow-hidden shrink-0 border border-[#E5E8EB]">
                       <img 
                         src={(selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : selectedProduct.image} 
                         alt={selectedProduct.name} 
@@ -1185,25 +1236,25 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
                         <span className="px-2 py-0.5 bg-[#C5A059] text-white text-[10px] font-bold rounded-md">선택 제품</span>
                         <span className="text-[11px] font-bold text-[#8B95A1]">{selectedProduct.brand}</span>
                       </div>
-                      <h4 className="text-[15px] font-black text-[#191F28] truncate leading-tight mb-0.5">{selectedProduct.name}</h4>
-                      <p className="text-[12px] text-[#8B95A1] truncate">{selectedProduct.model || selectedProduct.modelName}</p>
+                      <h4 className="text-[14px] sm:text-[15px] font-black text-[#191F28] leading-tight mb-1">{selectedProduct.name}</h4>
+                      <p className="text-[12px] text-[#8B95A1] leading-relaxed">{selectedProduct.model || selectedProduct.modelName}</p>
                     </div>
                   </div>
                 )}
-                <div className="space-y-6 mb-10">
+                <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-10">
                   <div className="group">
-                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1 transition-colors group-focus-within:text-[#C5A059]">성함</label>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-1.5 sm:mb-2.5 ml-1 transition-colors group-focus-within:text-[#C5A059]">성함</label>
                     <input 
                       type="text" 
                       placeholder="성함을 입력해주세요" 
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[20px] px-6 py-4.5 text-[16px] focus:ring-2 focus:ring-[#C5A059]/20 focus:border-[#C5A059] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[12px] sm:rounded-[20px] px-5 sm:px-6 py-3.5 sm:py-4.5 text-[16px] focus:ring-2 focus:ring-[#C5A059]/20 focus:border-[#C5A059] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
                     />
 
                   </div>
                   <div className="group">
-                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1 transition-colors group-focus-within:text-[#C5A059]">연락처</label>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-1.5 sm:mb-2.5 ml-1 transition-colors group-focus-within:text-[#C5A059]">연락처</label>
                     <input 
                       type="tel" 
                       inputMode="tel"
@@ -1211,12 +1262,12 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
                       onChange={handlePhoneChange}
                       placeholder="010-0000-0000" 
                       maxLength={13}
-                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[20px] px-6 py-4.5 text-[16px] focus:ring-2 focus:ring-[#C5A059]/20 focus:border-[#C5A059] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[12px] sm:rounded-[20px] px-5 sm:px-6 py-3.5 sm:py-4.5 text-[16px] focus:ring-2 focus:ring-[#C5A059]/20 focus:border-[#C5A059] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
                     />
                   </div>
                   
-                  <div className="pt-2">
-                    <label className="flex items-center gap-3 p-5 bg-[#F9FAFB] rounded-[24px] cursor-pointer group hover:bg-[#1A1A1C] transition-colors border border-transparent hover:border-[#C5A059]/10">
+                  <div className="pt-0.5 sm:pt-2">
+                    <label className="flex items-center gap-3 p-4 sm:p-5 bg-[#F9FAFB] rounded-[12px] sm:rounded-[24px] cursor-pointer group hover:bg-[#1A1A1C] transition-colors border border-transparent hover:border-[#C5A059]/10">
                       <input type="checkbox" className="w-5 h-5 rounded-full border-[#D1D6DB] text-[#C5A059] focus:ring-[#C5A059] transition-all" defaultChecked />
                       <div className="flex-1 flex justify-between items-center">
                         <span className="text-[14px] font-bold text-[#191F28]">개인정보 동의</span>
@@ -1237,9 +1288,9 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
                 <button 
                   onClick={() => handleSubmit()}
                   disabled={isSubmitting}
-                  className={`w-full bg-[#C5A059] text-white font-black text-[18px] py-6 rounded-[24px] hover:bg-[#B38E46] transition-all shadow-[0_10px_30px_rgba(49,130,246,0.3)] active:scale-[0.97] flex flex-col items-center gap-1 group ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  className={`w-full bg-[#C5A059] text-white font-black text-[16px] sm:text-[18px] py-4 sm:py-6 rounded-[12px] sm:rounded-[24px] hover:bg-[#B38E46] transition-all shadow-[0_10px_30px_rgba(49,130,246,0.3)] active:scale-[0.97] flex flex-col items-center gap-0.5 sm:gap-1 group ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
-                  <span className="text-[12px] opacity-80 font-bold tracking-wider group-hover:scale-110 transition-transform">
+                  <span className="text-[11px] sm:text-[12px] opacity-80 font-bold tracking-wider group-hover:scale-110 transition-transform">
                     {isSubmitting ? '접수 중...' : '🎁 특별 혜택 신청하기'}
                   </span>
                   <div className="flex items-center gap-2">
@@ -1247,7 +1298,6 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
                     {!isSubmitting && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                   </div>
                 </button>
-
               </div>
             </motion.div>
           </div>

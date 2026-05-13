@@ -43,6 +43,7 @@ export default defineSchema({
     isVisible: v.boolean(),
     showOnMain: v.optional(v.boolean()),
     landingPages: v.optional(v.array(v.string())),
+    accountCount: v.optional(v.string()),
     comparisons: v.array(
       v.object({
         company: v.string(),

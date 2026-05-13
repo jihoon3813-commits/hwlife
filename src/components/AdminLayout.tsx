@@ -36,7 +36,7 @@ export default function AdminLayout({
 
   const menuItems = allMenuItems.filter(item => {
     if (userType === 'channel') {
-      return ['customers', 'landings', 'statistics', 'consent', 'shinhan48', 'bson', 'sangjo', 'settings'].includes(item.id);
+      return ['customers', 'landings', 'channels', 'statistics', 'consent', 'shinhan48', 'bson', 'sangjo', 'settings'].includes(item.id);
     }
 
     return true;

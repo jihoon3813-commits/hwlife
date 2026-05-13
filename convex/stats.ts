@@ -51,9 +51,25 @@ export const getDashboardStats = query({
 
     const filterByChannels = (q: any) => {
         if (args.channelIds && args.channelIds.length > 0) {
-            return q.or(...args.channelIds.map(id => q.eq(q.field("channelId"), id)));
+            const conditions = args.channelIds.map(id => {
+                if (id === 'default' || id === '본사') {
+                    return q.or(
+                        q.eq(q.field("channelId"), id),
+                        q.eq(q.field("channelId"), undefined)
+                    );
+                }
+                return q.eq(q.field("channelId"), id);
+            });
+            return q.or(...conditions);
         }
         if (args.channelId) {
+            if (args.channelId === 'default' || args.channelId === '본사') {
+                return q.or(
+                    q.eq(q.field("channelId"), "default"),
+                    q.eq(q.field("channelId"), "본사"),
+                    q.eq(q.field("channelId"), undefined)
+                );
+            }
             return q.eq(q.field("channelId"), args.channelId);
         }
         return q;

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { useEffect } from 'react';
 import SEO from '../components/SEO';
 
 
@@ -33,16 +34,59 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
 
   // Channel Tracking
-  // 1. Prioritize explicitly passed channelSubdomain
-  // 2. If visiting /living directly, it's Master (본사)
-  // 3. If visiting /living/subdomain, use that subdomain
   const segments = window.location.pathname.split('/').filter(Boolean);
   const searchParams = new URLSearchParams(window.location.search);
   
   // Try to get channelId from query string (e.g. ?niora) or path (e.g. /living/niora)
   const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
   const channelId = channelSubdomain || 
-                   (segments.length >= 2 ? segments[1] : (queryChannel || (segments.length === 1 && segments[0] === 'living' ? '본사' : undefined)));
+                   (segments.length >= 2 ? segments[1] : (queryChannel || '본사'));
+
+  const logVisit = useMutation(api.stats.logVisit);
+
+  useEffect(() => {
+    const trackVisit = async () => {
+      try {
+        let ip = "0.0.0.0";
+        try {
+          const response = await fetch("https://api.ipify.org?format=json");
+          const data = await response.json();
+          ip = data.ip;
+        } catch (e) {}
+
+        await logVisit({
+          ip,
+          userAgent: navigator.userAgent,
+          referrer: document.referrer || "직접 유입",
+          path: window.location.pathname + window.location.search,
+          channelId: channelId === '본사' ? undefined : channelId,
+        });
+      } catch (e) {
+        console.error("Visit tracking failed", e);
+      }
+    };
+    trackVisit();
+  }, [logVisit, channelId]);
+
+  // Browser Back Button Modal Handling
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (isContactModalOpen || isPrivacyModalOpen) {
+        // Prevent default navigation
+        setIsContactModalOpen(false);
+        setIsPrivacyModalOpen(false);
+      }
+    };
+
+    if (isContactModalOpen || isPrivacyModalOpen) {
+      window.history.pushState({ modal: true }, "");
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isContactModalOpen, isPrivacyModalOpen]);
 
 
 
@@ -129,23 +173,40 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       />
       
       {/* GNB / 상단 헤더 */}
-      <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-5 flex items-center justify-between h-[60px] border-b border-[#F2F4F6]">
-        <div className="flex items-center gap-1.5">
+      <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-3 sm:px-5 flex items-center justify-between h-[48px] sm:h-[60px] border-b border-[#F2F4F6]">
+        <div className="flex items-center gap-1 sm:gap-1.5">
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
             alt="효원상조" 
-            className="h-[18px] w-auto object-contain"
+            className="h-[14px] sm:h-[18px] w-auto object-contain"
           />
-          <span className="text-[10px] font-black text-[#D1D6DB]">x</span>
-          <span className="text-[12px] font-black text-[#1B64DA] tracking-tight">신한카드</span>
-          <span className="text-[10px] font-black text-[#D1D6DB]">x</span>
-          <span className="text-[12px] font-black tracking-tight bg-gradient-to-r from-[#191F28] to-[#4E5968] bg-clip-text text-transparent">PREMIUM</span>
+          <span className="text-[8px] sm:text-[10px] font-black text-[#D1D6DB]">x</span>
+          <span className="text-[10px] sm:text-[12px] font-black text-[#1B64DA] tracking-tight">신한카드</span>
+          <span className="text-[8px] sm:text-[10px] font-black text-[#D1D6DB]">x</span>
+          <span className="text-[10px] sm:text-[12px] font-black tracking-tight bg-gradient-to-r from-[#191F28] to-[#4E5968] bg-clip-text text-transparent">PREMIUM</span>
         </div>
-        {/* Removed Phone Icon */}
+
+        {/* 상단 바로가기 탭 (Shortcut Tabs) */}
+        <div className="flex bg-[#F2F4F6] p-0.5 sm:p-1 rounded-full border border-[#E5E8EB]">
+          <a 
+            href={`/living${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
+            className="px-2.5 py-1 sm:px-5 sm:py-2 rounded-full text-[9px] sm:text-[12px] font-bold transition-all flex items-center gap-1 bg-white text-[#1B64DA] shadow-sm whitespace-nowrap"
+          >
+            <CreditCard className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+            신한카드
+          </a>
+          <a 
+            href={`/special${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
+            className="px-2.5 py-1 sm:px-5 sm:py-2 rounded-full text-[9px] sm:text-[12px] font-bold text-[#8B95A1] hover:text-[#191F28] transition-all flex items-center gap-1 whitespace-nowrap"
+          >
+            <Package className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+            BSON
+          </a>
+        </div>
       </header>
 
       {/* Section 1: 메인 히어로 (Hero) */}
-      <section className="relative w-full h-[85vh] min-h-[600px] flex flex-col justify-end pb-12 px-6 overflow-hidden">
+      <section className="relative w-full h-[65vh] sm:h-[85vh] min-h-[450px] sm:min-h-[600px] flex flex-col justify-end pb-8 sm:pb-12 px-6 overflow-hidden">
         {/* 배경 레이어 */}
         <div className="absolute inset-0">
           <img 
@@ -163,33 +224,11 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476137/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C_mw4c0e.png" 
             alt="신한카드 모델" 
-            className="h-[75%] w-auto object-contain object-bottom mt-[-35%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
+            className="h-[75%] w-auto object-contain object-bottom mt-[-10%] sm:mt-[-35%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
         </div>
 
-        {/* 상단 바로가기 탭 (Shortcut Tabs) */}
-        <div className="absolute top-8 inset-x-0 z-30 flex justify-center px-6">
-          <div className="flex bg-black/20 backdrop-blur-md border border-white/10 p-1.5 rounded-full shadow-2xl">
-            <a 
-              href={`/living${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2.5 rounded-full text-[13px] font-black transition-all flex items-center gap-2 bg-white text-[#1B64DA] shadow-lg"
-            >
-              <CreditCard className="w-3.5 h-3.5" />
-              신한카드 결합
-            </a>
-            <a 
-              href={`/special${channelId && channelId !== '본사' ? '/' + channelId : ''}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2.5 rounded-full text-[13px] font-black text-white/70 hover:text-white transition-all flex items-center gap-2"
-            >
-              <Package className="w-3.5 h-3.5" />
-              BSON 결합
-            </a>
-          </div>
-        </div>
+
 
         
         {/* 하단 페이드 그라데이션 */}
@@ -201,16 +240,16 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           transition={{ duration: 0.7, delay: 0.2 }}
           className="relative z-10 text-white"
         >
-          <div className="inline-block px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[11px] font-bold text-white mb-4">
+          <div className="inline-block px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[11px] font-bold text-white mb-1 sm:mb-4">
             효원상조 x 신한카드 x PREMIUM
           </div>
           
-          <h2 className="text-[38px] font-black leading-[1.2] mb-5 tracking-tight break-keep">
+          <h2 className="text-[32px] sm:text-[38px] font-black leading-[1.2] mb-1 sm:mb-5 tracking-tight break-keep">
             해피효원라이프<br/>
             <span className="text-[#3182F6]">리빙144 출시</span>
           </h2>
 
-          <p className="text-white/80 text-[16px] leading-[1.6] mb-8 break-keep font-medium">
+          <p className="text-white/80 text-[14px] sm:text-[16px] leading-[1.6] mb-3 sm:mb-8 break-keep font-medium">
             복잡한 가입 조건 없이<br/>
             신한카드만 있으면 누구나<br/>
             <span className="text-white font-bold">특별한 리빙 제품과 보너스 혜택까지!</span>
@@ -221,7 +260,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
               setSelectedProduct(null);
               setIsContactModalOpen(true);
             }}
-            className="w-full flex items-center justify-center gap-2 bg-[#3182F6] py-4 rounded-[20px] text-[16px] font-bold text-white shadow-[0_8px_20px_rgba(49,130,246,0.4)] hover:bg-[#1B64DA] transition-all active:scale-95"
+            className="w-full flex items-center justify-center gap-2 bg-[#3182F6] py-3.5 sm:py-4 rounded-[20px] text-[16px] font-bold text-white shadow-[0_8px_20px_rgba(49,130,246,0.4)] hover:bg-[#1B64DA] transition-all active:scale-95"
           >
             단독 혜택받고 무료상담 신청 <ArrowRight className="w-5 h-5" />
           </button>
@@ -229,7 +268,18 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 2: 프리미엄 실물 카드 부각 섹션 */}
-      <section className="relative py-24 px-6 overflow-hidden bg-[#0A1128]">
+      <section className="relative pt-12 pb-10 sm:py-24 px-6 overflow-hidden bg-[#0A1128]">
+        {/* 세로 연결 선 (Visual Connector) */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex justify-center pointer-events-none">
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            whileInView={{ height: 100, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="w-[1.5px] bg-gradient-to-b from-[#3182F6] via-[#3182F6]/50 to-transparent"
+          ></motion.div>
+        </div>
+
         {/* 배경 빛 번짐 효과 */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#3182F6] opacity-20 blur-[120px] rounded-full"></div>
         
@@ -321,7 +371,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 3: 단독 프로모션 4대 혜택 (Benefits Grid) */}
-      <section className="bg-[#191F28] py-14 px-6 my-2 text-white">
+      <section className="bg-[#191F28] py-8 sm:py-14 px-6 text-white">
         <div className="mb-8 text-center">
           <p className="text-[13px] font-bold text-[#3182F6] mb-2">오직 프리미엄몰 회원에게만 드리는</p>
           <h2 className="text-[22px] font-bold leading-tight break-keep">
@@ -377,7 +427,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 4: 가입 필요성 강조 (어필 영역) */}
-      <section className="bg-white py-14 px-6 my-2">
+      <section className="bg-white py-8 sm:py-14 px-6">
         <div className="text-center mb-10">
           <h2 className="text-[22px] font-bold text-[#191F28] leading-snug break-keep mb-3">
             상조, 아직 이르다고<br/>생각하셨나요?
@@ -441,11 +491,11 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 6: 상품 금액 및 상세 표 */}
-      <section className="bg-white py-14 px-6 my-2 border-t border-[#F2F4F6]">
-        <div className="mb-8">
-          <h2 className="text-[22px] font-black text-[#191F28] leading-snug break-keep mb-3">
+      <section className="bg-[#F8F9FA] py-4 sm:py-16 px-6 border-y border-[#E5E8EB]">
+        <div className="mb-6 sm:mb-10 text-center">
+          <h2 className="text-[22px] sm:text-[26px] font-black text-[#191F28] leading-tight break-keep mb-3 sm:mb-4">
             리빙제품에 특별 보너스까지!<br/>
-            리빙144(신한카드) 상세표
+            <span className="text-[#3182F6]">해피효원라이프 리빙144</span> 상세표
           </h2>
           <span className="inline-block px-3 py-1 bg-[#FFFF00] text-[#191F28] text-[11px] font-bold rounded-md shadow-sm">
             오직 프리미엄몰에서만 가입 가능합니다
@@ -453,16 +503,16 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
         </div>
 
         {/* Tab Buttons */}
-        <div className="flex p-1 bg-[#F2F4F6] rounded-[16px] mb-6">
+        <div className="flex p-1 bg-[#F2F4F6] rounded-[16px] mb-3 sm:mb-6">
           <button 
             onClick={() => setActiveTab('1')}
-            className={`flex-1 py-3 rounded-[12px] text-[15px] font-bold transition-all ${activeTab === '1' ? 'bg-white text-[#3182F6] shadow-sm' : 'text-[#8B95A1]'}`}
+            className={`flex-1 py-2 sm:py-3 rounded-[10px] sm:rounded-[12px] text-[14px] sm:text-[15px] font-bold transition-all ${activeTab === '1' ? 'bg-white text-[#3182F6] shadow-sm' : 'text-[#8B95A1]'}`}
           >
             1구좌
           </button>
           <button 
             onClick={() => setActiveTab('2')}
-            className={`flex-1 py-3 rounded-[12px] text-[15px] font-bold transition-all ${activeTab === '2' ? 'bg-white text-[#3182F6] shadow-sm' : 'text-[#8B95A1]'}`}
+            className={`flex-1 py-2 sm:py-3 rounded-[10px] sm:rounded-[12px] text-[14px] sm:text-[15px] font-bold transition-all ${activeTab === '2' ? 'bg-white text-[#3182F6] shadow-sm' : 'text-[#8B95A1]'}`}
           >
             2구좌
           </button>
@@ -478,7 +528,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
             transition={{ duration: 0.2 }}
             className="bg-[#F9FAFB] rounded-[24px] border border-[#E5E8EB] overflow-hidden"
           >
-            <div className="p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
               <div className="flex justify-between items-center">
                 <span className="text-[14px] text-[#4E5968] font-medium">총 납입금액</span>
                 <span className="text-[18px] font-bold text-[#191F28]">{activeTab === '1' ? '5,936,000원' : '11,872,000원'} <span className="text-[12px] text-[#8B95A1] font-normal">(총 200회)</span></span>
@@ -523,32 +573,32 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 7: 신한카드 48pay 슬림할부 금융 솔루션 안내 */}
-      <section className="bg-[#0A1128] py-16 px-6 my-2 text-white overflow-hidden relative">
+      <section className="bg-[#0A1128] py-10 sm:py-16 px-6 text-white overflow-hidden relative">
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#3182F6] opacity-10 blur-[100px] rounded-full"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#FFAB00] opacity-5 blur-[100px] rounded-full"></div>
         
-        <div className="relative z-10 text-center mb-12">
-          <div className="flex items-center justify-center gap-2 mb-6">
+        <div className="relative z-10 text-center mb-8 sm:mb-12">
+          <div className="flex items-center justify-center gap-2 mb-4 sm:mb-6">
             <div className="bg-white px-3 py-1 rounded-md">
               <span className="text-[16px] font-black text-[#0A1128]">48pay</span>
             </div>
             <span className="text-white/40 text-[18px]">|</span>
             <span className="text-[16px] font-bold text-white tracking-tight">신한카드</span>
           </div>
-          <h2 className="text-[28px] font-black leading-tight mb-4 break-keep">
+          <h2 className="text-[26px] sm:text-[28px] font-black leading-tight mb-4 break-keep">
             무이자급 혜택,<br/>
             <span className="text-[#3182F6]">48개월 스마트 할부</span>
           </h2>
-          <p className="text-white/60 text-[15px] leading-relaxed break-keep">
+          <p className="text-white/60 text-[14px] sm:text-[15px] leading-relaxed break-keep">
             이자는 없애고 혜택은 더하고,<br/>
             나눌수록 더해지는 똑똑한 금융결제 솔루션
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <motion.div 
             whileInView={{ opacity: 1, x: 0 }} initial={{ opacity: 0, x: -20 }} viewport={{ once: true }}
-            className="bg-white/5 border border-white/10 p-6 rounded-[24px] backdrop-blur-sm"
+            className="bg-white/5 border border-white/10 p-4 sm:p-6 rounded-[24px] backdrop-blur-sm"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-[#3182F6] rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -570,7 +620,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
           <motion.div 
             whileInView={{ opacity: 1, x: 0 }} initial={{ opacity: 0, x: 20 }} viewport={{ once: true }}
-            className="bg-white/5 border border-white/10 p-6 rounded-[24px] backdrop-blur-sm"
+            className="bg-white/5 border border-white/10 p-4 sm:p-6 rounded-[24px] backdrop-blur-sm"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-[#FFAB00] rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-500/20">
@@ -586,7 +636,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
           <motion.div 
             whileInView={{ opacity: 1, x: 0 }} initial={{ opacity: 0, x: -20 }} viewport={{ once: true }}
-            className="bg-white/5 border border-white/10 p-6 rounded-[24px] backdrop-blur-sm"
+            className="bg-white/5 border border-white/10 p-4 sm:p-6 rounded-[24px] backdrop-blur-sm"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-[#00C853] rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/20">
@@ -602,7 +652,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 8: 신한카드 48개월 슬림할부 예상 금액표 (Accordion) */}
-      <section className="bg-white py-14 px-6 my-2">
+      <section className="bg-white py-8 sm:py-14 px-6">
         <div className="mb-8">
           <h2 className="text-[22px] font-bold text-[#191F28] leading-tight break-keep">
             신한카드 48개월<br/>슬림 할부 예상 금액표
@@ -741,7 +791,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 9: 결합 리빙 제품 안내 */}
-      <section className="bg-white py-16 px-6 my-2">
+      <section className="bg-white py-10 sm:py-16 px-6 my-1">
         <div className="mb-10 text-center">
           <p className="text-[13px] font-bold text-[#3182F6] mb-2">상조 가입 시 프리미엄 리빙 선물을 제공해 드립니다</p>
           <h2 className="text-[24px] font-black text-[#191F28] leading-tight break-keep">
@@ -790,35 +840,35 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           )}
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className={`grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2`}>
           {(activeTab === '1' ? plan3Products : plan2Products).map((item, idx) => (
             <motion.div
               key={(item as any)._id || (item as any).id}
               onClick={() => openProductDetail(item)}
               layoutId={`product-${(item as any)._id || (item as any).id}`}
-              className="bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-col w-full"
+              className="bg-white rounded-[16px] sm:rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-row sm:flex-col w-full h-full"
             >
-              <div className="relative aspect-square bg-white shrink-0">
+              <div className="relative w-24 h-24 sm:w-full sm:h-auto sm:aspect-square bg-white shrink-0">
                 <img 
                   src={(item.images && item.images.length > 0) ? item.images[0] : item.image} 
                   alt={item.name} 
                   className="w-full h-full object-cover" 
                 />
                 {item.tag && (
-                  <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold rounded-lg uppercase tracking-wider">
+                  <div className="absolute top-1 left-1 sm:top-4 sm:left-4 px-1.5 py-0.5 sm:px-3 sm:py-1.5 bg-black/60 backdrop-blur-md text-white text-[8px] sm:text-[11px] font-bold rounded-md uppercase tracking-wider">
                     {item.tag}
                   </div>
                 )}
               </div>
-              <div className="p-6 flex-1 flex flex-col">
-                <div className="mb-3">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="text-[12px] font-bold text-[#3182F6]">{item.brand}</span>
-                    <span className="text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-2 py-0.5 rounded-[4px]">{item.category}</span>
+              <div className="p-3 sm:p-6 flex-1 flex flex-col justify-center sm:justify-start min-w-0">
+                <div className="mb-1 sm:mb-3">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-0.5 sm:mb-2 flex-wrap">
+                    <span className="text-[9px] sm:text-[12px] font-bold text-[#3182F6]">{item.brand}</span>
+                    <span className="text-[8px] sm:text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-1.5 py-0.5 rounded-[4px]">{item.category}</span>
                   </div>
-                  <span className="text-[13px] font-medium text-[#8B95A1] leading-tight">{item.model || item.modelName}</span>
+                  <span className="text-[10px] sm:text-[13px] font-medium text-[#8B95A1] leading-tight line-clamp-1">{(item as any).model || (item as any).modelName}</span>
                 </div>
-                <h3 className="text-[18px] font-black text-[#191F28] mb-1 leading-tight">
+                <h3 className="text-[12px] sm:text-[18px] font-black text-[#191F28] leading-tight break-keep">
                   {item?.name}
                 </h3>
               </div>
@@ -838,7 +888,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 10: 라이프 서비스 안내 */}
-      <section className="bg-[#F9FAFB] py-16 px-6 my-2">
+      <section className="bg-[#F9FAFB] py-8 sm:py-16 px-6">
         <div className="mb-10 text-center">
           <p className="text-[13px] font-bold text-[#3182F6] mb-2">언제든 자유롭게 이용 가능합니다</p>
           <h2 className="text-[24px] font-black text-[#191F28] leading-tight break-keep">
@@ -872,7 +922,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 11: 멤버십 혜택 안내 */}
-      <section className="bg-white py-16 px-0 my-2 overflow-hidden">
+      <section className="bg-white py-8 sm:py-16 px-0 overflow-hidden">
         <div className="px-6 mb-10">
           <p className="text-[13px] font-bold text-[#3182F6] mb-2">효원상조 가입 고객만을 위한</p>
           <h2 className="text-[24px] font-black text-[#191F28] leading-tight break-keep">
@@ -902,7 +952,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Funeral Service Section (메인 랜딩과 동일) */}
-      <section id="funeral-service" className="bg-white py-16 px-6 rounded-[32px] my-2 shadow-[0_2px_12px_rgb(0,0,0,0.03)] border border-[#F2F4F6]">
+      <section id="funeral-service" className="bg-white py-8 sm:py-16 px-6 rounded-[32px] shadow-[0_2px_12px_rgb(0,0,0,0.03)] border border-[#F2F4F6]">
         <div className="mb-10 text-center">
           <span className="inline-block px-2.5 py-1 bg-[#3182F6]/10 text-[#3182F6] text-[11px] font-bold rounded-md mb-2 uppercase tracking-wider">Funeral Services</span>
           <h2 className="text-[24px] font-bold text-[#191F28] leading-tight mb-4">
@@ -913,7 +963,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {[
             {
               category: "인력지원",
@@ -952,15 +1002,15 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
             }
           ].map((section, idx) => (
             <div key={idx} className="bg-[#F8FAFB] rounded-[24px] overflow-hidden border border-[#F2F4F6]">
-              <div className="bg-[#191F28] px-5 py-3.5">
+              <div className="bg-[#191F28] px-5 py-2.5 sm:py-3.5">
                 <h3 className="text-white font-bold text-[15px] flex items-center gap-2">
                   <span className="w-1 h-3 bg-[#3182F6] rounded-full"></span>
                   {section.category}
                 </h3>
               </div>
-              <div className="p-5 space-y-4">
+              <div className="p-4 sm:p-5 space-y-2.5 sm:space-y-4">
                 {section.items.map((item, itemIdx) => (
-                  <div key={itemIdx} className="flex flex-col gap-1">
+                  <div key={itemIdx} className="flex flex-col gap-0.5">
                     <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">{item.label}</span>
                     <span className="text-[14px] font-medium text-[#333D4B] leading-snug break-keep">{item.value}</span>
                   </div>
@@ -970,18 +1020,18 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           ))}
 
           <div className="bg-[#F8FAFB] rounded-[24px] overflow-hidden border border-[#F2F4F6]">
-            <div className="bg-[#191F28] px-5 py-3.5">
+            <div className="bg-[#191F28] px-5 py-2.5 sm:py-3.5">
               <h3 className="text-white font-bold text-[15px] flex items-center gap-2">
                 <span className="w-1 h-3 bg-[#3182F6] rounded-full"></span>
                 발인용품
               </h3>
             </div>
-            <div className="p-5 space-y-4">
-              <div className="flex flex-col gap-1">
+            <div className="p-4 sm:p-5 space-y-2.5 sm:space-y-4">
+              <div className="flex flex-col gap-0.5">
                 <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">횡대</span>
                 <span className="text-[14px] font-medium text-[#333D4B] leading-snug">매장 시 오동나무 횡대 제공</span>
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-0.5">
                 <span className="text-[12px] font-bold text-[#8B95A1] uppercase tracking-tight">고급차량띠/장갑</span>
                 <span className="text-[14px] font-medium text-[#333D4B] leading-snug">선도차 고급차량띠 및 운구용 장갑 제공</span>
               </div>
@@ -1010,7 +1060,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 14: 특별함을 더하다 Plus */}
-      <section className="bg-[#191F28] py-20 px-6 my-2 text-white overflow-hidden">
+      <section className="bg-[#191F28] py-8 sm:py-20 px-6 text-white overflow-hidden">
         <div className="mb-10 text-center">
           <h2 className="text-[24px] font-black mb-3">특별함을 더하다 <span className="text-[#3182F6]">Plus</span></h2>
           <p className="text-[14px] text-white/60 leading-relaxed break-keep">
@@ -1040,7 +1090,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </section>
 
       {/* Section 15: 브랜드 신뢰도 & 모델 영역 (Trust) */}
-      <section className="bg-white py-16 px-6 my-2">
+      <section className="bg-white py-8 sm:py-16 px-6">
         <div className="bg-[#E9F4EE] rounded-[32px] overflow-hidden relative mb-4 shadow-sm">
           <div className="p-8 pb-4">
             <h4 className="text-[11px] sm:text-[13px] font-bold text-[#006E4E] mb-3 whitespace-nowrap">20년간 오직 한 길만 걸어온 정통 상조회사</h4>
@@ -1068,32 +1118,14 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           </div>
         </div>
 
-        {/* 신한카드 이용한도 확인 링크 */}
-        <div className="mt-6">
-          <a 
-            href="https://www.shinhancard.com/pconts/html/bridge/MOBFM052R01.html?crustMenuId=ms560" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center justify-between bg-white border border-[#3182F6] rounded-[24px] p-5 transition-all hover:bg-[#F2F8FF] group shadow-sm"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#F2F8FF] rounded-2xl flex items-center justify-center text-[#3182F6]">
-                <CreditCard className="w-6 h-6" />
-              </div>
-              <div className="text-left">
-                <span className="text-[12px] font-bold text-[#3182F6] block mb-0.5">결제 전 확인해 보세요</span>
-                <p className="text-[14px] sm:text-[15px] font-bold text-[#191F28] whitespace-nowrap">신한카드 이용한도 조회하기</p>
-              </div>
-            </div>
-            <ChevronRight className="w-5 h-5 text-[#ADB5BD] group-hover:text-[#3182F6] transition-colors" />
-          </a>
-        </div>
       </section>
 
       {/* Section 16: 가입 절차 안내 및 최종 CTA */}
-      <section className="bg-[#0A1128] py-20 px-6 my-2 text-white">
+      <section className="bg-[#0A1128] py-10 sm:py-20 px-6 text-white">
         <div className="mb-12 text-center">
-          <h2 className="text-[24px] font-bold mb-10 tracking-tight">리빙144(신한카드) 가입절차 안내</h2>
+          <h2 className="text-[24px] font-bold mb-10 tracking-tight break-keep">
+            해피효원라이프 리빙144<br />가입절차 안내
+          </h2>
           
           <div className="grid grid-cols-2 gap-4">
             {[
@@ -1218,7 +1250,6 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
             </div>
           </button>
 
-          
           <div className="mt-8 flex flex-col items-center gap-2">
             <div className="flex items-center gap-1.5 px-3 py-1 bg-[#F9FAFB] rounded-full border border-[#F2F4F6]">
               <div className="w-1.5 h-1.5 bg-[#00D084] rounded-full animate-pulse"></div>
@@ -1234,7 +1265,6 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       {/* 푸터 영역 */}
       <footer className="bg-[#111111] pt-16 pb-32 px-6 text-white border-t border-white/5">
         <div className="max-w-[400px] mx-auto">
-          {/* Logo in Footer */}
           <div className="mb-10 opacity-60">
             <img 
               src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
@@ -1243,7 +1273,6 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
             />
           </div>
 
-          {/* Legal Links */}
           <div className="flex flex-wrap gap-x-5 gap-y-2 mb-10 px-1">
             <a href="#" className="text-[13px] font-bold text-[#D1D6DB] hover:text-white transition-colors">이용약관</a>
             <button 
@@ -1256,7 +1285,6 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           </div>
 
           <div className="border-t border-white/5 pt-10">
-            {/* Distributor Info */}
             <div className="mb-10 px-1">
               <h5 className="text-[13px] font-bold text-white mb-3 flex items-center gap-2">
                 <span className="w-1 h-3 bg-[#3182F6] rounded-full"></span>
@@ -1271,7 +1299,6 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
               </div>
             </div>
 
-            {/* Service Provider Info */}
             <div className="mb-10 px-1 border-t border-white/5 pt-8">
               <h5 className="text-[13px] font-bold text-white mb-3 flex items-center gap-2">
                 <span className="w-1 h-3 bg-[#A3B1C6] rounded-full"></span>
@@ -1285,7 +1312,6 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
               </div>
             </div>
 
-            {/* Customer Center Info */}
             <div className="mb-12 px-1 bg-white/5 rounded-2xl p-5 border border-white/5">
               <h5 className="text-[13px] font-bold text-[#3182F6] mb-4">(주)효원상조 고객센터</h5>
               <div className="space-y-4">
@@ -1306,7 +1332,6 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
             <div className="flex items-center justify-between px-1 pt-4 border-t border-white/5">
               <p className="text-[11px] text-white/20 font-medium tracking-tight">© HYOWON. All rights reserved.</p>
               <div className="flex gap-4">
-                 {/* 관리자 전용 버튼 */}
                  <a 
                    href="/admin"
                    target="_blank"
@@ -1336,7 +1361,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-[500px] bg-white rounded-[32px] overflow-hidden shadow-2xl flex flex-col max-h-[80vh]"
+              className="relative w-full max-w-[500px] bg-white rounded-[20px] sm:rounded-[32px] overflow-hidden shadow-2xl flex flex-col max-h-[80vh]"
             >
               <div className="p-6 border-b border-[#F2F4F6] flex items-center justify-between">
                 <h3 className="text-[18px] font-black text-[#191F28]">개인정보 수집 및 이용 동의</h3>
@@ -1347,7 +1372,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                   <X className="w-5 h-5 text-[#8B95A1]" />
                 </button>
               </div>
-              <div className="p-6 overflow-y-auto text-[14px] text-[#4E5968] leading-relaxed break-keep scrollbar-hide">
+              <div className="p-6 overflow-y-auto text-[14px] text-[#4E5968] font-medium leading-relaxed break-keep scrollbar-hide">
                 <p className="mb-6 font-bold text-[#191F28]">
                   (주)효원상조와 (주)라이프앤조이는 귀하의 상담 신청과 관련하여 다음과 같이 개인정보를 수집·이용 및 제공하고자 합니다.
                 </p>
@@ -1403,6 +1428,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           </div>
         )}
       </AnimatePresence>
+
       {/* 플로팅 상담 신청 바 (Sticky Bottom Bar) */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] z-[45] px-4 pb-4 pointer-events-none">
         <motion.div 
@@ -1444,12 +1470,12 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-[450px] bg-white rounded-[40px] overflow-hidden shadow-2xl flex flex-col"
+              className="relative w-full max-w-[450px] bg-white rounded-[20px] sm:rounded-[40px] overflow-hidden shadow-2xl flex flex-col"
             >
-              <div className="p-8 border-b border-[#F2F4F6] flex items-center justify-between">
+              <div className="p-6 sm:p-8 border-b border-[#F2F4F6] flex items-center justify-between">
                 <div>
-                   <h3 className="text-[20px] font-black text-[#191F28] mb-1">빠른 상담 신청</h3>
-                   <p className="text-[13px] text-[#8B95A1] font-medium">상담원이 확인 후 연락드립니다</p>
+                   <h3 className="text-[18px] sm:text-[20px] font-black text-[#191F28] mb-0.5 sm:mb-1">빠른 상담 신청</h3>
+                   <p className="text-[12px] sm:text-[13px] text-[#8B95A1] font-medium">상담원이 확인 후 연락드립니다</p>
                 </div>
                 <button 
                   onClick={() => setIsContactModalOpen(false)}
@@ -1459,10 +1485,10 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                 </button>
               </div>
 
-              <div className="p-8">
+              <div className="p-6 sm:p-8">
                 {selectedProduct && (
-                  <div className="mb-8 p-4 bg-[#F2F8FF] rounded-[24px] border border-[#3182F6]/10 flex items-center gap-4">
-                    <div className="w-20 h-20 bg-white rounded-xl overflow-hidden shrink-0 border border-[#E5E8EB]">
+                  <div className="mb-6 sm:mb-8 p-3 sm:p-4 bg-[#F2F8FF] rounded-[16px] sm:rounded-[24px] border border-[#3182F6]/10 flex items-center gap-4">
+                    <div className="hidden sm:block w-20 h-20 bg-white rounded-xl overflow-hidden shrink-0 border border-[#E5E8EB]">
                       <img 
                         src={(selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : selectedProduct.image} 
                         alt={selectedProduct.name} 
@@ -1474,25 +1500,25 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                         <span className="px-2 py-0.5 bg-[#3182F6] text-white text-[10px] font-bold rounded-md">선택 제품</span>
                         <span className="text-[11px] font-bold text-[#8B95A1]">{selectedProduct.brand}</span>
                       </div>
-                      <h4 className="text-[15px] font-black text-[#191F28] truncate leading-tight mb-0.5">{selectedProduct.name}</h4>
-                      <p className="text-[12px] text-[#8B95A1] truncate">{selectedProduct.model || selectedProduct.modelName}</p>
+                      <h4 className="text-[14px] sm:text-[15px] font-black text-[#191F28] leading-tight mb-1">{selectedProduct.name}</h4>
+                      <p className="text-[12px] text-[#8B95A1] leading-relaxed">{selectedProduct.model || selectedProduct.modelName}</p>
                     </div>
                   </div>
                 )}
-                <div className="space-y-6 mb-10">
+                <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-10">
                   <div className="group">
-                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1 transition-colors group-focus-within:text-[#3182F6]">성함</label>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-1.5 sm:mb-2.5 ml-1 transition-colors group-focus-within:text-[#3182F6]">성함</label>
                     <input 
                       type="text" 
                       placeholder="성함을 입력해주세요" 
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[20px] px-6 py-4.5 text-[16px] focus:ring-2 focus:ring-[#3182F6]/20 focus:border-[#3182F6] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[12px] sm:rounded-[20px] px-5 sm:px-6 py-3.5 sm:py-4.5 text-[16px] focus:ring-2 focus:ring-[#3182F6]/20 focus:border-[#3182F6] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
                     />
 
                   </div>
                   <div className="group">
-                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2.5 ml-1 transition-colors group-focus-within:text-[#3182F6]">연락처</label>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-1.5 sm:mb-2.5 ml-1 transition-colors group-focus-within:text-[#3182F6]">연락처</label>
                     <input 
                       type="tel" 
                       inputMode="tel"
@@ -1500,12 +1526,12 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                       onChange={handlePhoneChange}
                       placeholder="010-0000-0000" 
                       maxLength={13}
-                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[20px] px-6 py-4.5 text-[16px] focus:ring-2 focus:ring-[#3182F6]/20 focus:border-[#3182F6] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[12px] sm:rounded-[20px] px-5 sm:px-6 py-3.5 sm:py-4.5 text-[16px] focus:ring-2 focus:ring-[#3182F6]/20 focus:border-[#3182F6] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
                     />
                   </div>
                   
-                  <div className="pt-2">
-                    <label className="flex items-center gap-3 p-5 bg-[#F9FAFB] rounded-[24px] cursor-pointer group hover:bg-[#F2F8FF] transition-colors border border-transparent hover:border-[#3182F6]/10">
+                  <div className="pt-0.5 sm:pt-2">
+                    <label className="flex items-center gap-3 p-4 sm:p-5 bg-[#F9FAFB] rounded-[12px] sm:rounded-[24px] cursor-pointer group hover:bg-[#F2F8FF] transition-colors border border-transparent hover:border-[#3182F6]/10">
                       <input type="checkbox" className="w-5 h-5 rounded-full border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6] transition-all" defaultChecked />
                       <div className="flex-1 flex justify-between items-center">
                         <span className="text-[14px] font-bold text-[#191F28]">개인정보 동의</span>
@@ -1526,9 +1552,9 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                 <button 
                   onClick={() => handleSubmit()}
                   disabled={isSubmitting}
-                  className={`w-full bg-[#3182F6] text-white font-black text-[18px] py-6 rounded-[24px] hover:bg-[#1B64DA] transition-all shadow-[0_10px_30px_rgba(49,130,246,0.3)] active:scale-[0.97] flex flex-col items-center gap-1 group ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  className={`w-full bg-[#3182F6] text-white font-black text-[16px] sm:text-[18px] py-4 sm:py-6 rounded-[12px] sm:rounded-[24px] hover:bg-[#1B64DA] transition-all shadow-[0_10px_30px_rgba(49,130,246,0.3)] active:scale-[0.97] flex flex-col items-center gap-0.5 sm:gap-1 group ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
-                  <span className="text-[12px] opacity-80 font-bold tracking-wider group-hover:scale-110 transition-transform">
+                  <span className="text-[11px] sm:text-[12px] opacity-80 font-bold tracking-wider group-hover:scale-110 transition-transform">
                     {isSubmitting ? '접수 중...' : '🎁 특별 혜택 신청하기'}
                   </span>
                   <div className="flex items-center gap-2">
@@ -1536,7 +1562,6 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                     {!isSubmitting && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                   </div>
                 </button>
-
               </div>
             </motion.div>
           </div>

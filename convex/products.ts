@@ -81,6 +81,7 @@ export const create = mutation({
     isVisible: v.boolean(),
     showOnMain: v.optional(v.boolean()),
     landingPages: v.optional(v.array(v.string())),
+    accountCount: v.optional(v.string()),
     comparisons: v.array(
       v.object({
         company: v.string(),
@@ -117,6 +118,7 @@ export const update = mutation({
     isVisible: v.optional(v.boolean()),
     showOnMain: v.optional(v.boolean()),
     landingPages: v.optional(v.array(v.string())),
+    accountCount: v.optional(v.string()),
     comparisons: v.optional(
       v.array(
         v.object({
