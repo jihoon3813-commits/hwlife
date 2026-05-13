@@ -275,7 +275,7 @@ export default function App() {
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778653198/Professional_hero_section_image_featuring_a_confid-1778653149667_eu8pa3.png" 
             alt="프리미엄 가전 결합 서비스" 
-            className="w-full aspect-[4/3] object-cover rounded-2xl mb-8 shadow-lg"
+            className="w-full h-auto rounded-2xl mb-8 shadow-lg"
           />
           <div className="space-y-4 mb-10">
             <h3 className="text-[18px] font-bold text-[#191F28] px-1 mb-4">효원상조 가전결합상조는</h3>
