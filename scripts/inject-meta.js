@@ -23,6 +23,18 @@ const pages = [
     title: '해피효원라이프 스페셜299-BSON | 카드 한도 관계없이 신용만으로 특별한 혜택!',
     description: '해피효원라이프 스페셜299-BSON | 카드 한도 관계없이 신용만으로 특별한 혜택!',
     image: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_web_banner_design_for_Kore-1778564383659_rwnzkq.png'
+  },
+  {
+    name: 'living2',
+    title: '해피효원라이프 리빙144-신한카드 2 | 신한카드만 있으면 누구나 특별한 혜택!',
+    description: '해피효원라이프 리빙144-신한카드 2 | 신한카드만 있으면 누구나 특별한 혜택!',
+    image: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_landing_page_hero_banner_d-1778564368252_mko2cd.png'
+  },
+  {
+    name: 'special2',
+    title: '해피효원라이프 스페셜299-BSON 2 | 카드 한도 관계없이 신용만으로 특별한 혜택!',
+    description: '해피효원라이프 스페셜299-BSON 2 | 카드 한도 관계없이 신용만으로 특별한 혜택!',
+    image: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_web_banner_design_for_Kore-1778564383659_rwnzkq.png'
   }
 ];
 

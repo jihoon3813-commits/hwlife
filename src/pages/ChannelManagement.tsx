@@ -362,32 +362,16 @@ export default function ChannelManagement({
                 </div>
 
                 {/* Landing Page Selection (Multiple) */}
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-3 px-1">적용 랜딩페이지 (복수 선택)</label>
-                  <div className="space-y-2 max-h-[200px] overflow-y-auto p-4 bg-[#F2F4F6] rounded-[16px]">
-                    <label className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors group">
-                      <input 
-                        type="checkbox"
-                        checked={formData.landingPages.includes('/') || formData.landingPage === '/'}
-                        onChange={(e) => {
-                          const val = '/';
-                          const current = formData.landingPages;
-                          setFormData({
-                            ...formData,
-                            landingPages: e.target.checked ? [...current, val] : current.filter(v => v !== val)
-                          });
-                        }}
-                        className="w-5 h-5 rounded border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6]"
-                      />
-                      <span className="text-[14px] font-medium text-[#191F28]">메인 페이지 (/)</span>
-                    </label>
-                    {landings.filter(l => l.isActive && l.path !== '/').map(landing => (
-                      <label key={landing._id} className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors group">
+                {!currentChannelId && (
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-3 px-1">적용 랜딩페이지 (복수 선택)</label>
+                    <div className="space-y-2 max-h-[200px] overflow-y-auto p-4 bg-[#F2F4F6] rounded-[16px]">
+                      <label className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors group">
                         <input 
                           type="checkbox"
-                          checked={formData.landingPages.includes(landing.path) || formData.landingPage === landing.path}
+                          checked={formData.landingPages.includes('/') || formData.landingPage === '/'}
                           onChange={(e) => {
-                            const val = landing.path;
+                            const val = '/';
                             const current = formData.landingPages;
                             setFormData({
                               ...formData,
@@ -396,14 +380,32 @@ export default function ChannelManagement({
                           }}
                           className="w-5 h-5 rounded border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6]"
                         />
-                        <div className="flex flex-col">
-                          <span className="text-[14px] font-medium text-[#191F28]">{landing.name}</span>
-                          <span className="text-[11px] text-[#8B95A1]">{landing.path}</span>
-                        </div>
+                        <span className="text-[14px] font-medium text-[#191F28]">메인 페이지 (/)</span>
                       </label>
-                    ))}
+                      {landings.filter(l => l.isActive && l.path !== '/').map(landing => (
+                        <label key={landing._id} className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors group">
+                          <input 
+                            type="checkbox"
+                            checked={formData.landingPages.includes(landing.path) || formData.landingPage === landing.path}
+                            onChange={(e) => {
+                              const val = landing.path;
+                              const current = formData.landingPages;
+                              setFormData({
+                                ...formData,
+                                landingPages: e.target.checked ? [...current, val] : current.filter(v => v !== val)
+                              });
+                            }}
+                            className="w-5 h-5 rounded border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6]"
+                          />
+                          <div className="flex flex-col">
+                            <span className="text-[14px] font-medium text-[#191F28]">{landing.name}</span>
+                            <span className="text-[11px] text-[#8B95A1]">{landing.path}</span>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
 
                 {/* Parent Channel Selection */}

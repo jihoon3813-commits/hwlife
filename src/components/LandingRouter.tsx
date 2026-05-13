@@ -3,7 +3,9 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import App from '../App';
 import LivingPage from '../pages/LivingPage';
+import LivingPage2 from '../pages/LivingPage2';
 import SpecialPage from '../pages/SpecialPage';
+import SpecialPage2 from '../pages/SpecialPage2';
 import ConsentPage from '../pages/ConsentPage';
 
 export default function LandingRouter() {
@@ -19,12 +21,14 @@ export default function LandingRouter() {
   // /living -> template: /living, subdomain: null
   // /bestone -> template: null, subdomain: bestone
   
-  const isLivingPath = path.startsWith('/living');
-  const isSpecialPath = path.startsWith('/special');
+  const isLiving2Path = path.startsWith('/living2');
+  const isLivingPath = !isLiving2Path && path.startsWith('/living');
+  const isSpecial2Path = path.startsWith('/special2');
+  const isSpecialPath = !isSpecial2Path && path.startsWith('/special');
   const searchParams = new URLSearchParams(window.location.search);
   const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
   
-  const subdomainFromPath = (isLivingPath || isSpecialPath)
+  const subdomainFromPath = (isLivingPath || isLiving2Path || isSpecialPath || isSpecial2Path)
     ? (segments.length >= 2 ? segments[1] : (queryChannel || null)) 
     : (segments.length >= 1 && !isConsentPath ? segments[0] : (queryChannel || null));
 
@@ -53,12 +57,16 @@ export default function LandingRouter() {
   }
 
   // Routing
-  // 1. If it's a living path, show LivingPage
+  if (isLiving2Path) {
+    return <LivingPage2 channelSubdomain={channel?.subdomain} />;
+  }
   if (isLivingPath) {
     return <LivingPage channelSubdomain={channel?.subdomain} />;
   }
 
-  // 2. If it's a special path, show SpecialPage
+  if (isSpecial2Path) {
+    return <SpecialPage2 channelSubdomain={channel?.subdomain} />;
+  }
   if (isSpecialPath) {
     return <SpecialPage channelSubdomain={channel?.subdomain} />;
   }
@@ -71,8 +79,14 @@ export default function LandingRouter() {
     if (primaryPath === '/living') {
       return <LivingPage channelSubdomain={channel.subdomain} />;
     }
+    if (primaryPath === '/living2') {
+      return <LivingPage2 channelSubdomain={channel.subdomain} />;
+    }
     if (primaryPath === '/special') {
       return <SpecialPage channelSubdomain={channel.subdomain} />;
+    }
+    if (primaryPath === '/special2') {
+      return <SpecialPage2 channelSubdomain={channel.subdomain} />;
     }
   }
 

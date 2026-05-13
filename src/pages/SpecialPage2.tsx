@@ -11,8 +11,8 @@ import { useEffect } from 'react';
 import SEO from '../components/SEO';
 
 
-export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: string }) {
-  const landingInfo = useQuery(api.landings.getByPath, { path: "/special" });
+export default function SpecialPage2({ channelSubdomain }: { channelSubdomain?: string }) {
+  const landingInfo = useQuery(api.landings.getByPath, { path: "/special2" });
   const allProducts = useQuery(api.products.getAllProducts) || [];
   const dbPlans = useQuery(api.plans.get) || [];
   const specialProducts = allProducts.filter(p => p.planId === 4);
@@ -160,8 +160,8 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
       <SEO 
-        title="해피효원라이프 스페셜299-BSON | 카드 한도 관계없이 신용만으로 특별한 혜택!"
-        description="해피효원라이프 스페셜299-BSON | 카드 한도 관계없이 신용만으로 특별한 혜택!"
+        title="해피효원라이프 스페셜299-BSON 2 | 카드 한도 관계없이 신용만으로 특별한 혜택!"
+        description="해피효원라이프 스페셜299-BSON 2 | 카드 한도 관계없이 신용만으로 특별한 혜택!"
         image="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_web_banner_design_for_Kore-1778564383659_rwnzkq.png"
       />
       
@@ -186,14 +186,14 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
         {/* 상단 바로가기 탭 (Shortcut Tabs) */}
         <div className="flex bg-[#F2F4F6] p-0.5 sm:p-1 rounded-full border border-[#E5E8EB]">
           <a 
-            href={`/living${channelId && channelId !== '본사' ? '/?' + channelId : ''}`}
+            href={`/living2${channelId && channelId !== '본사' ? '/?' + channelId : ''}`}
             className="px-2.5 py-1 sm:px-5 sm:py-2 rounded-full text-[9px] sm:text-[12px] font-bold text-[#8B95A1] hover:text-[#191F28] transition-all flex items-center gap-1 whitespace-nowrap"
           >
             <CreditCard className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             신한카드
           </a>
           <a 
-            href={`/special${channelId && channelId !== '본사' ? '/?' + channelId : ''}`}
+            href={`/special2${channelId && channelId !== '본사' ? '/?' + channelId : ''}`}
             className="px-2.5 py-1 sm:px-5 sm:py-2 rounded-full text-[9px] sm:text-[12px] font-bold transition-all flex items-center gap-1 bg-white text-[#D4AF37] shadow-sm whitespace-nowrap"
           >
             <Package className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
@@ -922,26 +922,63 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
         </div>
 
         <div className="bg-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white max-w-[500px] mx-auto">
-          <div className="flex flex-col items-center py-4">
-            <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778639752/KakaoTalk_20230718_144359973_gnyomv.png" 
-              alt="프리미엄몰" 
-              className="h-12 sm:h-16 object-contain mb-6" 
-            />
-            <p className="text-[15px] sm:text-[17px] font-bold text-[#191F28] mb-10 text-center break-keep">
-              본 상품은 <span className="text-[#C5A059]">&lt;프리미엄몰&gt;</span>을 통해서 접수 가능합니다.
-            </p>
+          <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-10">
+            <div className="group">
+              <label className="block text-[13px] font-bold text-[#4E5968] mb-2 ml-1 transition-colors group-focus-within:text-[#C5A059]">성함</label>
+              <input 
+                type="text" 
+                placeholder="성함을 입력해주세요" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[20px] px-6 py-3.5 sm:py-4.5 text-[16px] focus:ring-2 focus:ring-[#C5A059]/20 focus:border-[#C5A059] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+              />
 
-            <a 
-              href="https://www.premiummall.co.kr/rental/list-view.html?uid=1450"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full bg-[#C5A059] text-white font-black text-[18px] py-4.5 sm:py-6 rounded-[24px] hover:bg-[#B38E46] transition-all shadow-[0_10px_30px_rgba(197,160,89,0.3)] active:scale-[0.97] flex items-center justify-center gap-2 group"
-            >
-              프리미엄몰 접수 바로가기
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
+            </div>
+            <div className="group">
+              <label className="block text-[13px] font-bold text-[#4E5968] mb-2 ml-1 transition-colors group-focus-within:text-[#C5A059]">연락처</label>
+              <input 
+                type="tel" 
+                inputMode="tel"
+                value={phoneNumber}
+                onChange={handlePhoneChange}
+                placeholder="010-0000-0000" 
+                maxLength={13}
+                className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[20px] px-6 py-4.5 text-[16px] focus:ring-2 focus:ring-[#C5A059]/20 focus:border-[#C5A059] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+              />
+            </div>
+            
+            <div className="pt-2">
+              <label className="flex items-center gap-3 p-5 bg-[#F9FAFB] rounded-[24px] cursor-pointer group hover:bg-[#1A1A1C] transition-colors border border-transparent hover:border-[#C5A059]/10">
+                <input type="checkbox" className="w-5 h-5 rounded-full border-[#D1D6DB] text-[#C5A059] focus:ring-[#C5A059] transition-all" defaultChecked />
+                <div className="flex-1 flex justify-between items-center">
+                  <span className="text-[14px] font-bold text-[#191F28]">개인정보 수집 및 이용 동의</span>
+                  <span 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsPrivacyModalOpen(true);
+                    }}
+                    className="text-[12px] text-[#8B95A1] underline decoration-[#D1D6DB] underline-offset-4 cursor-pointer hover:text-[#C5A059] transition-colors"
+                  >
+                    전문보기
+                  </span>
+                </div>
+              </label>
+            </div>
           </div>
+
+          <button 
+            onClick={() => handleSubmit()}
+            disabled={isSubmitting}
+            className={`w-full bg-[#C5A059] text-white font-black text-[18px] py-6 rounded-[24px] hover:bg-[#B38E46] transition-all shadow-[0_10px_30px_rgba(49,130,246,0.3)] active:scale-[0.97] flex flex-col items-center gap-1 group ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+          >
+            <span className="text-[12px] opacity-80 font-bold tracking-wider group-hover:scale-110 transition-transform">
+              {isSubmitting ? '접수 중...' : '🎁 특별 혜택 신청하기'}
+            </span>
+            <div className="flex items-center gap-2">
+              {isSubmitting ? '잠시만 기다려주세요' : '무료 상담 예약'}
+              {!isSubmitting && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+            </div>
+          </button>
 
           
           <div className="mt-8 flex flex-col items-center gap-2">
@@ -1204,26 +1241,63 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
                     </div>
                   </div>
                 )}
-                <div className="flex flex-col items-center py-2 sm:py-4">
-                  <img 
-                    src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778639752/KakaoTalk_20230718_144359973_gnyomv.png" 
-                    alt="프리미엄몰" 
-                    className="h-10 sm:h-14 object-contain mb-4 sm:mb-6" 
-                  />
-                  <p className="text-[14px] sm:text-[16px] font-bold text-[#191F28] mb-6 sm:mb-8 text-center break-keep">
-                    본 상품은 <span className="text-[#C5A059]">&lt;프리미엄몰&gt;</span>을 통해서 접수 가능합니다.
-                  </p>
+                <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-10">
+                  <div className="group">
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-1.5 sm:mb-2.5 ml-1 transition-colors group-focus-within:text-[#C5A059]">성함</label>
+                    <input 
+                      type="text" 
+                      placeholder="성함을 입력해주세요" 
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[12px] sm:rounded-[20px] px-5 sm:px-6 py-3.5 sm:py-4.5 text-[16px] focus:ring-2 focus:ring-[#C5A059]/20 focus:border-[#C5A059] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+                    />
 
-                  <a 
-                    href="https://www.premiummall.co.kr/rental/list-view.html?uid=1450"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-[#C5A059] text-white font-black text-[16px] sm:text-[18px] py-4 sm:py-5 rounded-[12px] sm:rounded-[24px] hover:bg-[#B38E46] transition-all shadow-[0_10px_30px_rgba(49,130,246,0.3)] active:scale-[0.97] flex items-center justify-center gap-2 group"
-                  >
-                    프리미엄몰 접수 바로가기
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </a>
+                  </div>
+                  <div className="group">
+                    <label className="block text-[13px] font-bold text-[#4E5968] mb-1.5 sm:mb-2.5 ml-1 transition-colors group-focus-within:text-[#C5A059]">연락처</label>
+                    <input 
+                      type="tel" 
+                      inputMode="tel"
+                      value={phoneNumber}
+                      onChange={handlePhoneChange}
+                      placeholder="010-0000-0000" 
+                      maxLength={13}
+                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[12px] sm:rounded-[20px] px-5 sm:px-6 py-3.5 sm:py-4.5 text-[16px] focus:ring-2 focus:ring-[#C5A059]/20 focus:border-[#C5A059] focus:bg-white outline-none transition-all placeholder:text-[#ADB5BD] font-medium" 
+                    />
+                  </div>
+                  
+                  <div className="pt-0.5 sm:pt-2">
+                    <label className="flex items-center gap-3 p-4 sm:p-5 bg-[#F9FAFB] rounded-[12px] sm:rounded-[24px] cursor-pointer group hover:bg-[#1A1A1C] transition-colors border border-transparent hover:border-[#C5A059]/10">
+                      <input type="checkbox" className="w-5 h-5 rounded-full border-[#D1D6DB] text-[#C5A059] focus:ring-[#C5A059] transition-all" defaultChecked />
+                      <div className="flex-1 flex justify-between items-center">
+                        <span className="text-[14px] font-bold text-[#191F28]">개인정보 동의</span>
+                        <span 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPrivacyModalOpen(true);
+                          }}
+                          className="text-[12px] text-[#8B95A1] underline decoration-[#D1D6DB] underline-offset-4 cursor-pointer hover:text-[#C5A059] transition-colors"
+                        >
+                          전문보기
+                        </span>
+                      </div>
+                    </label>
+                  </div>
                 </div>
+
+                <button 
+                  onClick={() => handleSubmit()}
+                  disabled={isSubmitting}
+                  className={`w-full bg-[#C5A059] text-white font-black text-[16px] sm:text-[18px] py-4 sm:py-6 rounded-[12px] sm:rounded-[24px] hover:bg-[#B38E46] transition-all shadow-[0_10px_30px_rgba(49,130,246,0.3)] active:scale-[0.97] flex flex-col items-center gap-0.5 sm:gap-1 group ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                >
+                  <span className="text-[11px] sm:text-[12px] opacity-80 font-bold tracking-wider group-hover:scale-110 transition-transform">
+                    {isSubmitting ? '접수 중...' : '🎁 특별 혜택 신청하기'}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {isSubmitting ? '잠시만 기다려주세요' : '무료 상담 신청 완료'}
+                    {!isSubmitting && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                  </div>
+                </button>
               </div>
             </motion.div>
           </div>

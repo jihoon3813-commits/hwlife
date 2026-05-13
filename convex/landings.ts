@@ -86,6 +86,30 @@ export const seed = mutation({
 export const updateDefaultThumbnails = mutation({
   handler: async (ctx) => {
     const landings = await ctx.db.query("landings").collect();
+    const paths = landings.map(l => l.path);
+
+    // Ensure Living2 exists
+    if (!paths.includes("/living2")) {
+      await ctx.db.insert("landings", {
+        name: "리빙144(신한카드) 2",
+        path: "/living2",
+        description: "생활가전 및 매트리스 특화 랜딩페이지 (버전 2)",
+        thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778506774/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C2_xogxll.png",
+        isActive: true,
+      });
+    }
+
+    // Ensure Special2 exists
+    if (!paths.includes("/special2")) {
+      await ctx.db.insert("landings", {
+        name: "스페셜299(BSON) 2",
+        path: "/special2",
+        description: "BSON 렌탈 결합 스페셜 상품 랜딩페이지 (버전 2)",
+        thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778511843/IMG_3521-2_cr8tqi.png",
+        isActive: true,
+      });
+    }
+
     for (const landing of landings) {
       if (landing.path === "/") {
         await ctx.db.patch(landing._id, { 
