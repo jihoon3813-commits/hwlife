@@ -766,12 +766,6 @@ function AdminAccountSettings({ user }: { user: any }) {
         await updateChannel({
           id: channelData._id,
           password: newPassword,
-          subdomain: channelData.subdomain,
-          status: channelData.status,
-          channelName: channelData.channelName,
-          managerName: channelData.managerName,
-          managerContact: channelData.managerContact,
-          landingPage: channelData.landingPage,
         });
         alert('비밀번호가 성공적으로 변경되었습니다.');
         setNewPassword('');
