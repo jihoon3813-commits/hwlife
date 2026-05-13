@@ -207,13 +207,14 @@ export default function App() {
   const settings = useQuery(api.settings.get);
   const categories = ["전체", ...(settings?.categories || [])];
   
-  const filteredProducts = activeCategory === "전체" 
+  const filteredProducts = (activeCategory === "전체" 
     ? products 
-    : products.filter(p => p.category?.replace(/\s/g, '') === activeCategory.replace(/\s/g, ''));
+    : products.filter(p => p.category?.replace(/\s/g, '') === activeCategory.replace(/\s/g, ''))
+  ).filter(p => p.planId === 1);
 
-  const mainProducts = products.filter(p => p.showOnMain).length > 0 
-    ? products.filter(p => p.showOnMain).slice(0, 8) 
-    : products.slice(0, 8);
+  const mainProducts = products.filter(p => p.planId === 1 && p.showOnMain).length > 0 
+    ? products.filter(p => p.planId === 1 && p.showOnMain).slice(0, 8) 
+    : products.filter(p => p.planId === 1).slice(0, 8);
 
   const shorts = useQuery(api.shorts.get) || [];
 
