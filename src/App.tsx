@@ -227,7 +227,6 @@ export default function App() {
 
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
-      
       {/* Header */}
       <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-5 flex justify-between items-center h-[60px]">
         <img 
@@ -241,43 +240,46 @@ export default function App() {
       </header>
 
       {/* 1. Hero Section (Toss Style Focus on Typography) */}
-      <section className="bg-white px-6 pt-10 pb-12 rounded-b-[32px]">
+      <section className="bg-white pt-10 pb-12 rounded-b-[32px] overflow-hidden">
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <h2 className="text-[30px] font-bold leading-[1.2] mb-5 tracking-tight break-keep text-[#191F28]">
-            가전결합상조는 비싸다?<br/>
-            그 인식을 바꾸기 위해<br/>
-            <div className="flex">
-              {"다시 설계했습니다.".split("").map((char, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ y: 0 }}
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    delay: index * 0.1,
-                    ease: "easeInOut"
-                  }}
-                  className="text-[#3182F6] text-[38px] mt-1 font-black tracking-tight inline-block"
-                  style={{ marginRight: char === " " ? "12px" : "0" }}
-                >
-                  {char}
-                </motion.span>
-              ))}
-            </div>
-          </h2>
+          <div className="px-6">
+            <h2 className="text-[30px] font-bold leading-[1.2] mb-5 tracking-tight break-keep text-[#191F28]">
+              가전결합상조는 비싸다?<br/>
+              그 인식을 바꾸기 위해<br/>
+              <div className="flex">
+                {"다시 설계했습니다.".split("").map((char, index) => (
+                  <motion.span
+                    key={index}
+                    initial={{ y: 0 }}
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      delay: index * 0.1,
+                      ease: "easeInOut"
+                    }}
+                    className="text-[#3182F6] text-[38px] mt-1 font-black tracking-tight inline-block"
+                    style={{ marginRight: char === " " ? "12px" : "0" }}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+              </div>
+            </h2>
 
-          <p className="text-[#4E5968] text-[16px] leading-[1.6] mb-8 break-keep">
-            기존 가전결합상조는 만기 혜택은 분명했지만, 월 납입금 부담이 컸습니다. 
-            효원상조는 그 혜택은 유지하면서도, <strong className="text-[#191F28]">일반 렌탈과 비슷하거나 더 저렴한 상품</strong>을 새롭게 출시했습니다.
-          </p>
+            <p className="text-[#4E5968] text-[16px] leading-[1.6] mb-8 break-keep">
+              기존 가전결합상조는 만기 혜택은 분명했지만, 월 납입금 부담이 컸습니다. 
+              효원상조는 그 혜택은 유지하면서도, <strong className="text-[#191F28]">일반 렌탈과 비슷하거나 더 저렴한 상품</strong>을 새롭게 출시했습니다.
+            </p>
+          </div>
 
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778653198/Professional_hero_section_image_featuring_a_confid-1778653149667_eu8pa3.png" 
             alt="프리미엄 가전 결합 서비스" 
-            className="w-full h-auto rounded-2xl mb-8 shadow-lg"
+            className="w-full h-auto mb-10"
           />
-          <div className="space-y-4 mb-10">
+
+          <div className="px-6 space-y-4 mb-10">
             <h3 className="text-[18px] font-bold text-[#191F28] px-1 mb-4">효원상조 가전결합상조는</h3>
             <div className="grid gap-3">
               <div className="bg-[#191F28] p-5 rounded-[24px] shadow-lg shadow-blue-900/10 border border-white/5">
@@ -322,7 +324,6 @@ export default function App() {
             </div>
           </div>
         </motion.div>
-
       </section>
 
       {/* 2. 10 Second Understanding */}
