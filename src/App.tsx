@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Check, X, ChevronDown, ChevronLeft, ChevronRight, ArrowRight, Play, Info, LayoutGrid, List,
   ShieldAlert, Coins, LockKeyhole, Megaphone,
-  Search, FileText, Smartphone, Gift
+  Search, FileText, Smartphone, Gift, Phone
 } from 'lucide-react';
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
@@ -1528,16 +1528,33 @@ export default function App() {
       </footer>
 
       {/* Sticky Bottom CTA */}
-      <div className="fixed bottom-0 w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] bg-white border-t border-[#F2F4F6] px-5 py-4 pb-6 flex gap-3 z-40 sm:border-x sm:border-[#E5E8EB]">
-        <a href="tel:1588-0883" className="flex-1 bg-[#F2F4F6] text-[#333D4B] text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#D1D6DB] transition-colors">
-          전화하기
-        </a>
-        <button 
-          onClick={() => setIsContactModalOpen(true)}
-          className="flex-[2] bg-[#3182F6] text-white text-center py-[15px] rounded-[16px] text-[16px] font-bold active:bg-[#1B64DA] transition-colors"
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] px-5 z-40 pointer-events-none">
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="bg-[#191F28]/95 backdrop-blur-md p-2 rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.3)] border border-white/10 pointer-events-auto flex items-center gap-2"
         >
-          상담 신청하기
-        </button>
+          <a 
+            href="tel:1588-0883" 
+            className="flex-none bg-white/10 text-white w-12 h-12 rounded-[18px] flex items-center justify-center hover:bg-white/20 transition-colors"
+          >
+            <Phone className="w-5 h-5" />
+          </a>
+          <div className="flex-1 flex flex-col justify-center pl-2">
+             <div className="flex items-center gap-1.5 mb-0.5">
+               <span className="w-1 h-1 bg-[#3182F6] rounded-full animate-pulse"></span>
+               <span className="text-[9px] font-black text-[#3182F6] tracking-tighter uppercase">Premium Join</span>
+             </div>
+             <p className="text-[13px] font-bold text-white leading-none">가전결합상조 상담센터</p>
+          </div>
+          <button 
+            onClick={() => setIsContactModalOpen(true)}
+            className="bg-[#3182F6] text-white px-5 py-3 rounded-[18px] font-black text-[13px] flex items-center gap-2 hover:bg-[#1B64DA] transition-colors shadow-lg shadow-[#3182F6]/20 active:scale-95 shrink-0"
+          >
+            상담 신청 <ArrowRight className="w-4 h-4" />
+          </button>
+        </motion.div>
       </div>
 
       {/* Shorts Modal */}
