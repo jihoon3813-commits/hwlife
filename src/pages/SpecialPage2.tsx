@@ -309,53 +309,14 @@ export default function SpecialPage2({ channelSubdomain }: { channelSubdomain?: 
 
 
         {/* 실물 카드 레이어 */}
-        <div className="relative flex flex-col items-center justify-center perspective-[1000px] mb-16">
-          <motion.div
-            style={{ rotateY: 15, rotateX: 10 }}
-            animate={{ 
-              rotateY: [-15, 15],
-              rotateX: [10, -10],
-              y: [0, -10, 0]
-            }}
-            transition={{ 
-              duration: 5, 
-              repeat: Infinity, 
-              repeatType: "mirror",
-              ease: "easeInOut"
-            }}
-            whileHover={{ scale: 1.05, rotateY: 0, rotateX: 0 }}
-            className="relative w-[300px] aspect-[1.6/1] rounded-[14px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] cursor-pointer group"
-          >
+        <div className="relative flex flex-col items-center justify-center mb-16">
+          <div className="relative w-full aspect-[16/9] rounded-[24px] overflow-hidden shadow-2xl">
             <img 
               src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674657/5._%EC%8A%AC%EB%A6%BD%EC%95%A4%EB%B9%84_owqjvp.png" 
-              alt="BSON 카드" 
+              alt="새로운 혜택" 
               className="w-full h-full object-cover"
             />
-            
-            {/* 움직이는 광택(Shine) 효과 */}
-            <motion.div 
-              animate={{ 
-                left: ['-100%', '200%']
-              }}
-              transition={{ 
-                duration: 2.5, 
-                repeat: Infinity, 
-                repeatDelay: 0.5,
-                ease: "easeInOut"
-              }}
-              className="absolute top-0 bottom-0 w-20 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-25deg]"
-            />
-          </motion.div>
-
-          {/* 카드 하단 글로우 및 입자 효과 (반짝임) */}
-          <div className="absolute -bottom-4 w-40 h-2 bg-[#C5A059] blur-[20px] opacity-50"></div>
-          <motion.div 
-            animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="absolute -top-10 -right-10 text-yellow-400 opacity-60"
-          >
-            <Sparkles className="w-8 h-8" />
-          </motion.div>
+          </div>
         </div>
 
         <div className="max-w-[320px] mx-auto text-center space-y-6 mt-12">
