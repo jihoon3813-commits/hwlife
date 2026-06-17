@@ -328,7 +328,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
             className="relative w-[300px] aspect-[1.6/1] rounded-[14px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] cursor-pointer group"
           >
             <img 
-              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674601/bson_card_v1_xyz789.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674657/5._%EC%8A%AC%EB%A6%BD%EC%95%A4%EB%B9%84_owqjvp.png" 
               alt="BSON 카드" 
               className="w-full h-full object-cover"
             />
