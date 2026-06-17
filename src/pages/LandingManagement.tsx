@@ -16,6 +16,7 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [hasChecked, setHasChecked] = useState(false);
   const [formData, setFormData] = useState({
     _id: '',
     name: '',
@@ -38,11 +39,12 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
     if (userType === 'admin') {
       if (landings.length === 0) {
         seedLandings();
-      } else {
+      } else if (!hasChecked) {
         updateDefaultThumbnails();
+        setHasChecked(true);
       }
     }
-  }, [landings, seedLandings, updateDefaultThumbnails, userType]);
+  }, [landings, seedLandings, updateDefaultThumbnails, userType, hasChecked]);
 
 
   const openCreateModal = () => {

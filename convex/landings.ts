@@ -79,6 +79,13 @@ export const seed = mutation({
         thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778511843/IMG_3521-2_cr8tqi.png",
         isActive: true,
       });
+      await ctx.db.insert("landings", {
+        name: "KCC홈씨씨 제휴 랜딩",
+        path: "/kcc",
+        description: "효원상조 X KCC홈씨씨 B2B 결합상품 랜딩페이지",
+        thumbnail: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=500",
+        isActive: true,
+      });
     }
   },
 });
@@ -110,24 +117,15 @@ export const updateDefaultThumbnails = mutation({
       });
     }
 
-    for (const landing of landings) {
-      if (landing.path === "/") {
-        await ctx.db.patch(landing._id, { 
-          thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png" 
-        });
-      }
-      if (landing.path === "/living") {
-        await ctx.db.patch(landing._id, { 
-          name: "리빙144(신한카드)",
-          thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778506774/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C2_xogxll.png" 
-        });
-      }
-      if (landing.path === "/special") {
-        await ctx.db.patch(landing._id, { 
-          name: "스페셜299(BSON)",
-          thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778511843/IMG_3521-2_cr8tqi.png" 
-        });
-      }
+    // Ensure Kcc exists
+    if (!paths.includes("/kcc")) {
+      await ctx.db.insert("landings", {
+        name: "KCC홈씨씨 제휴 랜딩",
+        path: "/kcc",
+        description: "효원상조 X KCC홈씨씨 B2B 결합상품 랜딩페이지",
+        thumbnail: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=500",
+        isActive: true,
+      });
     }
   },
 });
