@@ -76,7 +76,7 @@ export const seed = mutation({
         name: "해피효원라이프 스페셜299",
         path: "/special",
         description: "BSON 렌탈 결합 스페셜 상품 랜딩페이지",
-        thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778511843/IMG_3521-2_cr8tqi.png",
+        thumbnail: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png",
         isActive: true,
       });
       await ctx.db.insert("landings", {
@@ -112,7 +112,7 @@ export const updateDefaultThumbnails = mutation({
         name: "스페셜299(BSON) 2",
         path: "/special2",
         description: "BSON 렌탈 결합 스페셜 상품 랜딩페이지 (버전 2)",
-        thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778511843/IMG_3521-2_cr8tqi.png",
+        thumbnail: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png",
         isActive: true,
       });
     }

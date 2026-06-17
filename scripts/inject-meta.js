@@ -22,7 +22,7 @@ const pages = [
     name: 'special',
     title: '해피효원라이프 스페셜299-BSON | 카드 한도 관계없이 신용만으로 특별한 혜택!',
     description: '해피효원라이프 스페셜299-BSON | 카드 한도 관계없이 신용만으로 특별한 혜택!',
-    image: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_web_banner_design_for_Kore-1778564383659_rwnzkq.png'
+    image: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676343/special299_og_image_j7024p.png'
   },
   {
     name: 'living2',
@@ -34,7 +34,7 @@ const pages = [
     name: 'special2',
     title: '해피효원라이프 스페셜299-BSON 2 | 카드 한도 관계없이 신용만으로 특별한 혜택!',
     description: '해피효원라이프 스페셜299-BSON 2 | 카드 한도 관계없이 신용만으로 특별한 혜택!',
-    image: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_web_banner_design_for_Kore-1778564383659_rwnzkq.png'
+    image: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676343/special299_og_image_j7024p.png'
   },
   {
     name: 'kcc',
