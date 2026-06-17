@@ -229,11 +229,23 @@ export default function App() {
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
       {/* Header */}
       <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-5 flex justify-between items-center h-[60px]">
-        <img 
-          src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
-          alt="효원상조 로고" 
-          className="h-[24px] w-auto object-contain"
-        />
+        <div className="flex items-center gap-2">
+          <img 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" 
+            alt="효원상조 로고" 
+            className="h-[24px] w-auto object-contain"
+          />
+          {channelId === 'soomgo' && (
+            <>
+              <span className="text-[#D1D6DB] text-[14px]">|</span>
+              <img 
+                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778724890/3660690690_20250307173458_5148749377_tx006k.png" 
+                alt="숨고" 
+                className="h-[20px] w-auto object-contain"
+              />
+            </>
+          )}
+        </div>
         <a href="tel:1588-0883" className="text-[13px] font-semibold text-[#4E5968] bg-[#F2F4F6] px-3 py-1.5 rounded-full hover:bg-[#E5E8EB] transition-colors">
           상담 1588-0883
         </a>
@@ -274,7 +286,7 @@ export default function App() {
           </div>
 
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778653198/Professional_hero_section_image_featuring_a_confid-1778653149667_eu8pa3.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620540/Professional_hero_section_image_featuring_a_confid-1778653149667_owqlgb.png" 
             alt="프리미엄 가전 결합 서비스" 
             className="w-full h-auto mb-10"
           />
@@ -477,7 +489,7 @@ export default function App() {
         
         <div className="mt-10 mb-8 rounded-[22px] overflow-hidden shadow-2xl border border-white/5">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777964414/Generated_Image_May_05_2026_-_3_59PM_hw1sge.jpg" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620540/A_photorealistic_medium_shot_of_a_focused_South_Ko-1778416293447_mbxvtu.png" 
             alt="의심하는 시장" 
             className="w-full h-auto object-cover opacity-90"
           />
@@ -528,7 +540,7 @@ export default function App() {
           <p className="text-[#4E5968] text-[15px]">{planInfo.desc}</p>
           <div className="mt-6 rounded-[24px] overflow-hidden shadow-sm border border-[#F2F4F6]">
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_medium_shot_of_a_focused_South_Ko-1778416293447_fw1ng1.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620540/A_photorealistic_wide-angle_shot_of_a_newly_moved--1778416711833_fx1x1a.png" 
               alt="가격비교 혜택" 
               className="w-full h-auto"
             />
@@ -536,23 +548,28 @@ export default function App() {
         </div>
 
         {/* Categories & Product Focus View Trigger */}
-        <div className="px-6 flex flex-col items-start mb-4" id="product-list">
+        <div className="px-6 flex flex-col items-center text-center mb-6" id="product-list">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            className="flex flex-col items-center w-full"
           >
             <span className="inline-block px-2.5 py-1 bg-[#3182F6]/10 text-[#3182F6] text-[11px] font-bold rounded-md mb-2">PRODUCT LIST</span>
-            <h2 className="text-[22px] font-bold text-[#191F28] leading-tight">
+            <h2 className="text-[22px] font-bold text-[#191F28] leading-tight text-center">
               가전 렌탈료 비교하기
             </h2>
-            <p className="text-[12px] text-[#8B95A1] mt-2 mb-4 break-keep">
+            <p className="text-[12px] text-[#8B95A1] mt-2 mb-4 break-keep text-center">
               제품을 클릭하면 타렌탈사(상조사)와 가격 비교표를 확인 할 수 있습니다.
             </p>
             <div className="mb-2">
-              <span className="inline-block bg-[#1B64DA] text-white text-[13px] font-bold px-3.5 py-1.5 rounded-full shadow-md">
-                {planInfo.name}
-              </span>
+              <motion.span 
+                animate={{ opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="inline-block bg-[#1B64DA] text-white text-[13px] font-extrabold px-4 py-1.5 rounded-full shadow-md"
+              >
+                전 제품 균일가 월 59,800원에 제공
+              </motion.span>
             </div>
           </motion.div>
         </div>
@@ -848,7 +865,7 @@ export default function App() {
         </p>
         <div className="mb-10 rounded-[24px] overflow-hidden shadow-sm border border-[#F2F4F6]">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_wide-angle_shot_of_a_newly_moved--1778416711833_yxp1ym.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620538/Generated_Image_May_05_2026_-_3_59PM_o1apxm.jpg" 
             alt="효원 차별화" 
             className="w-full h-auto"
           />
@@ -953,6 +970,15 @@ export default function App() {
         </motion.div>
       </section>
 
+      {/* Promotion Image Banner */}
+      <div className="w-full my-4 overflow-hidden rounded-[32px]">
+        <img 
+          src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620542/Generated_Image_May_05_2026_-_4_07PM_qruice.jpg" 
+          alt="Promotion Info Image" 
+          className="w-full h-auto"
+        />
+      </div>
+
       {/* 7. Step-by-Step Process - Infographic Version */}
       <section id="step-process" className="bg-[#F8FAFB] py-16 px-6 rounded-[40px] my-4 shadow-sm border border-[#F2F4F6]">
         <div className="text-center mb-12">
@@ -1034,7 +1060,7 @@ export default function App() {
         
         <div className="mb-8 rounded-[24px] overflow-hidden shadow-sm border border-[#F2F4F6]">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777965369/Generated_Image_May_05_2026_-_4_14PM_hqrq75.jpg" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620539/Generated_Image_May_05_2026_-_4_14PM_jgkryr.jpg" 
             alt="적합도 가이드" 
             className="w-full h-auto"
           />
@@ -1277,6 +1303,15 @@ export default function App() {
          </div>
       </section>
 
+      {/* Promotion Image Banner 2 */}
+      <div className="w-full my-4 overflow-hidden rounded-[32px]">
+        <img 
+          src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620538/Generated_Image_May_04_2026_-_9_04PM_aroulh.jpg" 
+          alt="Promotion FAQ Info Image" 
+          className="w-full h-auto"
+        />
+      </div>
+
       {/* 11. Footer Consultation Form */}
       <section id="contact" className="bg-[#191F28] py-16 px-6 rounded-[40px] my-4 text-white">
         <div className="max-w-[400px] mx-auto">
@@ -1438,7 +1473,7 @@ export default function App() {
           {/* Logo in Footer */}
           <div className="mb-10 opacity-60">
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" 
               alt="효원상조 로고" 
               className="h-[22px] w-auto object-contain brightness-0 invert"
             />
@@ -1692,7 +1727,7 @@ export default function App() {
                             <div className="flex-1 flex items-center gap-2.5 min-w-0">
                               {comp.isOurs ? (
                                 <div className="w-[40px] h-[40px] bg-white rounded-[10px] border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-                                  <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" className="w-full h-full object-contain p-1" alt="hyowon" />
+                                  <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" className="w-full h-full object-contain p-1" alt="hyowon" />
                                 </div>
                               ) : partner?.logo ? (
                                 <div className="w-[40px] h-[40px] bg-white rounded-[10px] border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
