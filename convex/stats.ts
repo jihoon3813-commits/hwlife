@@ -133,6 +133,41 @@ export const getDashboardStats = query({
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
+    // Landing Page Stats (Top paths)
+    const pathMap = new Map<string, { pv: number; ips: Set<string> }>();
+    currentVisits.forEach(v => {
+      const path = v.path || "/";
+      const cleanPath = path.split('?')[0].toLowerCase();
+      if (!pathMap.has(cleanPath)) {
+        pathMap.set(cleanPath, { pv: 0, ips: new Set() });
+      }
+      const data = pathMap.get(cleanPath)!;
+      data.pv += 1;
+      data.ips.add(v.ip);
+    });
+
+    const landingStats = Array.from(pathMap.entries()).map(([path, data]) => {
+      let name = path;
+      if (path === '/') name = '메인 랜딩 (/)';
+      else if (path === '/living') name = '리빙144 (/living)';
+      else if (path.startsWith('/living/')) name = `리빙144 (${path})`;
+      else if (path === '/living2') name = '리빙144 v2 (/living2)';
+      else if (path.startsWith('/living2/')) name = `리빙144 v2 (${path})`;
+      else if (path === '/special') name = '스페셜299 (/special)';
+      else if (path.startsWith('/special/')) name = `스페셜299 (${path})`;
+      else if (path === '/special2') name = '스페셜299 v2 (/special2)';
+      else if (path.startsWith('/special2/')) name = `스페셜299 v2 (${path})`;
+      else if (path === '/kcc') name = 'KCC홈씨씨 (/kcc)';
+      else if (path.startsWith('/kcc/')) name = `KCC홈씨씨 (${path})`;
+      
+      return {
+        path,
+        name,
+        uv: data.ips.size,
+        pv: data.pv
+      };
+    }).sort((a, b) => b.pv - a.pv);
+
     // IP Logs (Recent 20)
     const ipLogsMap = new Map<string, any>();
     currentVisits.forEach(v => {
@@ -207,6 +242,7 @@ export const getDashboardStats = query({
         inquiryChange: getChange(currentInquiriesFiltered.length, previousInquiriesFiltered.length),
       },
       referrers: topReferrers,
+      landingStats,
       ipLogs: ipLogs.map(({ip, count, lastVisit}) => ({ ip, count, lastVisit, location: '확인중' })),
       dailyStats
     };

@@ -169,17 +169,27 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
       <SEO 
         title="해피효원라이프 리빙144-신한카드 2 | 신한카드만 있으면 누구나 특별한 혜택!"
         description="해피효원라이프 리빙144-신한카드 2 | 신한카드만 있으면 누구나 특별한 혜택!"
-        image="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_landing_page_hero_banner_d-1778564368252_mko2cd.png"
+        image="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674844/living144_og_image_f6gghd.png"
       />
       
       {/* GNB / 상단 헤더 */}
       <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-3 sm:px-5 flex items-center justify-between h-[48px] sm:h-[60px] border-b border-[#F2F4F6]">
         <div className="flex items-center gap-1 sm:gap-1.5">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" 
             alt="효원상조" 
             className="h-[14px] sm:h-[18px] w-auto object-contain"
           />
+          {channelId === 'soomgo' && (
+            <>
+              <span className="text-[#D1D6DB] text-[10px] sm:text-[14px]">|</span>
+              <img 
+                src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674812/soomgo_logo_v1_xyzhk9.png" 
+                alt="숨고" 
+                className="h-[12px] sm:h-[16px] w-auto object-contain"
+              />
+            </>
+          )}
           <span className="text-[8px] sm:text-[10px] font-black text-[#D1D6DB]">x</span>
           <span className="text-[10px] sm:text-[12px] font-black text-[#1B64DA] tracking-tight">신한카드</span>
           <span className="text-[8px] sm:text-[10px] font-black text-[#D1D6DB]">x</span>
@@ -222,7 +232,7 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
         {/* 모델 레이어 (앞에 배치) */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476137/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C_mw4c0e.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674553/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C_rus6ls.png" 
             alt="신한카드 모델" 
             className="h-[75%] w-auto object-contain object-bottom mt-[-10%] sm:mt-[-45%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
@@ -383,7 +393,7 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
           {/* 카드 1 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
             <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/3._%ED%94%84%EB%A6%AC%EB%AA%A8_mmmjvf.png" alt="고급 리빙제품" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674657/5._%EC%8A%AC%EB%A6%BD%EC%95%A4%EB%B9%84_owqjvp.png" alt="고급 리빙제품" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-[#3182F6] mb-1 block">가입 축하 혜택 1</span>
@@ -394,7 +404,7 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
           {/* 카드 2 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
             <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480574/%ED%8F%AC%EC%9D%B8%ED%8A%B8_tj8ujg.png" alt="포인트 보너스" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674702/DSfs_cnjzei.png" alt="포인트 보너스" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-[#FFAB00] mb-1 block">가입 축하 혜택 2</span>
@@ -405,7 +415,7 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
           {/* 카드 3 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
             <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480399/5%EB%A7%8C%EC%9B%90_2_dnu8n6.png" alt="100% 환급" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674767/5%EB%A7%8C%EC%9B%90_u0iplm.png" alt="100% 환급" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-[#00C853] mb-1 block">스마트 혜택</span>
@@ -416,7 +426,7 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
           {/* 카드 4 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
             <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
-              <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?w=300&q=80&fit=crop" alt="크루즈" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674775/1ec789bfcdceb_rccp2d.png" alt="크루즈" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-[#E91E63] mb-1 block">라이프 케어 혜택</span>
@@ -441,7 +451,7 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
           {/* 포인트 1 */}
           <div className="flex flex-col">
             <div className="w-full aspect-[4/3] rounded-2xl bg-[#F2F4F6] overflow-hidden mb-3">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480713/photo01_qowgk1.jpg" alt="안심 케어" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674803/fileView_2_rjy4wd.jpg" alt="안심 케어" className="w-full h-full object-cover" />
             </div>
             <p className="text-[13px] font-medium text-[#4E5968] leading-snug break-keep">
               <span className="font-bold text-[#191F28] block mb-1">안심 케어</span>
@@ -463,7 +473,7 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
           {/* 포인트 3 */}
           <div className="flex flex-col">
             <div className="w-full aspect-[4/3] rounded-2xl bg-[#F2F4F6] overflow-hidden mb-3">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480897/%EC%BD%94%EC%8A%A4%ED%83%80_nbsz5n.png" alt="유연한 전환" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674852/shutterstock_1225821256_r2rqdf.jpg" alt="유연한 전환" className="w-full h-full object-cover" />
             </div>
             <p className="text-[13px] font-medium text-[#4E5968] leading-snug break-keep">
               <span className="font-bold text-[#191F28] block mb-1">유연한 전환</span>
@@ -898,12 +908,12 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
 
         <div className="grid grid-cols-2 gap-3">
           {[
-            { title: '장례', desc: '품격 있는 의전', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482388/fileView_peyuol.jpg' },
-            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482393/photo_best02_product09_ratqci.jpg' },
-            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482785/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_w9mkhs.png' },
-            { title: '웨딩', desc: '아름다운 시작', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482894/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_1_eohmjh.png' },
-            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483177/A_modern_Korean_family_celebrating_a_70th_birthday-1778483158578_ka1tmy.png' },
-            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483181/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_2_wrklcr.png' },
+            { title: '장례', desc: '품격 있는 의전', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674935/3edba92e79423_jwnpip.png' },
+            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674938/f57dcce933490_vlbul4.png' },
+            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/1ebbbfdbe6b9f_vccju1.png' },
+            { title: '웨딩', desc: '아름다운 시작', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674938/9cb896b8ac3c3_xkcwpx.png' },
+            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/af9663c5799c5_loxood.png' },
+            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/49b67816b20d5_ep0ejw.png' },
           ].map((service, i) => (
             <div key={i} className="relative aspect-square rounded-[20px] overflow-hidden group shadow-sm">
               <img src={service.img} alt={service.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
@@ -932,10 +942,10 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
 
         <div className="grid grid-cols-2 gap-3 px-6">
           {[
-            { title: '기차여행', desc: 'KTX, SRT 등\n최대 35% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483384/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._4_mko5lm.png' },
-            { title: '호텔/리조트', desc: '전국 주요 숙박시설\n최대 80% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483539/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._5_ownbho.png' },
-            { title: '건강검진', desc: 'KMI 등 전문기관\n최대 70% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483641/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._6_isio8t.png' },
-            { title: '영화·공연', desc: 'CGV, 롯데시네마 등\n최대 40% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483644/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._7_dqdjc4.png' },
+            { title: '기차여행', desc: 'KTX, SRT 등\n최대 35% 할인', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675660/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_02_52_37_1_ziolie.png' },
+            { title: '호텔/리조트', desc: '전국 주요 숙박시설\n최대 80% 할인', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675660/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_02_52_37_2_m9nrdm.png' },
+            { title: '건강검진', desc: 'KMI 등 전문기관\n최대 70% 할인', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675659/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_02_52_37_3_hflbqc.png' },
+            { title: '영화·공연', desc: 'CGV, 롯데시네마 등\n최대 40% 할인', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675660/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_02_52_37_4_eqmvxx.png' },
           ].map((item, i) => (
             <div key={i} className="relative aspect-square rounded-[24px] overflow-hidden group shadow-md">
               <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
@@ -1070,10 +1080,10 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
 
         <div className="grid grid-cols-2 gap-3">
           {[
-            { title: '황금 수의', desc: '품격을 높이는 최고급 수의', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484181/img_mnzkaq.jpg' },
-            { title: '궁중 염습', desc: '정성을 다하는 궁중 염습', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484273/031_nihilist71_rwwsfl.jpg' },
-            { title: '링컨 리무진', desc: '최고급 고인 전용 리무진', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484299/4_mpwp2l.jpg' },
-            { title: '제단 꽃장식', desc: '풍성한 빈소 제단 장식', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484373/8e5d644c-146b-481a-9f57-d71770dd8166_fbug9x.webp' },
+            { title: '황금 수의', desc: '품격을 높이는 최고급 수의', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676368/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_03_05_53_1_loqf0q.png' },
+            { title: '궁중 염습', desc: '정성을 다하는 궁중 염습', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676367/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_03_05_53_2_cpncww.png' },
+            { title: '링컨 리무진', desc: '최고급 고인 전용 리무진', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676369/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_03_05_53_3_rozhrp.png' },
+            { title: '제단 꽃장식', desc: '풍성한 빈소 제단 장식', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676366/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_03_05_53_4_qn9jll.png' },
           ].map((item, i) => (
             <div key={i} className="flex flex-col">
               <div className="relative aspect-[4/5] rounded-[24px] overflow-hidden mb-3 shadow-2xl">
@@ -1099,7 +1109,7 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
           </div>
           <div className="px-4 flex justify-center">
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476138/IMG_3660_l4vlag.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png" 
               alt="효원상조 전속모델" 
               className="w-full h-auto object-contain max-h-[320px]"
             />
@@ -1108,7 +1118,7 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
 
         <div className="bg-white border border-[#E5E8EB] rounded-[32px] p-8 flex items-center gap-5 shadow-sm">
           <div className="w-20 h-20 bg-[#F2F4F6] rounded-full overflow-hidden shrink-0 border-2 border-white shadow-inner">
-            <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476138/IMG_3660_l4vlag.png" alt="안내 모델" className="w-full h-full object-cover object-top" />
+            <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675800/IMG_3660_sepfbz.png" alt="안내 모델" className="w-full h-full object-cover object-top" />
           </div>
           <div>
             <span className="text-[12px] font-bold text-[#3182F6] block mb-1">바른 소비의 첫걸음</span>
@@ -1177,10 +1187,10 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
       <section ref={formRef} className="bg-[#F2F4F6] py-16 sm:py-24 px-6">
         <div className="mb-8 sm:mb-12 text-center">
           <div className="flex items-center justify-center gap-4 mb-4">
-            <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" alt="효원상조" className="h-4 sm:h-5 object-contain" />
+            <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" alt="효원상조" className="h-4 sm:h-5 object-contain" />
             <span className="text-[14px] font-medium text-[#ADB5BD]">×</span>
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485695/images_k1hjt8.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675975/logo_ewkbpd.png" 
               alt="신한카드" 
               className="h-4 sm:h-5 object-contain mix-blend-multiply" 
             />
@@ -1267,7 +1277,7 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
         <div className="max-w-[400px] mx-auto">
           <div className="mb-10 opacity-60">
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" 
               alt="효원상조 로고" 
               className="h-[22px] w-auto object-contain brightness-0 invert"
             />

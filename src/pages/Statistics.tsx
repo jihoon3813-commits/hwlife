@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BarChart3, Users, MousePointerClick, TrendingUp, Calendar, RefreshCw } from 'lucide-react';
+import { BarChart3, Users, MousePointerClick, TrendingUp, Calendar, RefreshCw, Globe } from 'lucide-react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
@@ -109,6 +109,44 @@ export default function Statistics({ channelId }: { channelId?: string }) {
                   </td>
                 </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 랜딩페이지별 유입 현황 */}
+      <div className="bg-white p-5 lg:p-8 rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
+          <h3 className="text-[16px] lg:text-[18px] font-bold flex items-center gap-2 text-[#191F28]">
+            <Globe className="w-5 h-5 text-[#3182F6]" /> 랜딩페이지별 유입 현황
+          </h3>
+          <span className="text-[11px] lg:text-[12px] text-[#8B95A1] font-medium">접속 경로별 실시간 유입 분석입니다.</span>
+        </div>
+        <div className="overflow-x-auto rounded-[16px] border border-[#F2F4F6] hide-scrollbar">
+          <table className="w-full text-left border-collapse min-w-[500px]">
+            <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
+              <tr>
+                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">랜딩페이지명</th>
+                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">접속 경로 (Path)</th>
+                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968] text-right">유입 인원 (UV)</th>
+                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968] text-right">페이지 뷰 (PV)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#F2F4F6]">
+              {stats.landingStats && stats.landingStats.length > 0 ? (
+                stats.landingStats.map((lStat: any, idx: number) => (
+                  <tr key={idx} className="hover:bg-[#F9FAFB] transition-colors">
+                    <td className="px-6 py-4 text-[14px] font-bold text-[#191F28]">{lStat.name}</td>
+                    <td className="px-6 py-4 text-[13px] text-[#4E5968] font-mono">{lStat.path}</td>
+                    <td className="px-6 py-4 text-[14px] text-[#4E5968] text-right font-medium">{lStat.uv.toLocaleString()}명</td>
+                    <td className="px-6 py-4 text-[14px] text-[#3182F6] text-right font-black">{lStat.pv.toLocaleString()}회</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="text-center py-10 text-[#8B95A1] text-[13px]">데이터가 없습니다.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

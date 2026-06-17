@@ -239,7 +239,7 @@ export default function App() {
             <>
               <span className="text-[#D1D6DB] text-[14px]">|</span>
               <img 
-                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778724890/3660690690_20250307173458_5148749377_tx006k.png" 
+                src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674812/soomgo_logo_v1_xyzhk9.png" 
                 alt="숨고" 
                 className="h-[20px] w-auto object-contain"
               />

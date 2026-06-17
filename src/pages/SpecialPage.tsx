@@ -173,6 +173,16 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
             alt="효원상조" 
             className="h-[14px] sm:h-[18px] w-auto object-contain"
           />
+          {channelId === 'soomgo' && (
+            <>
+              <span className="text-[#D1D6DB] text-[10px] sm:text-[14px]">|</span>
+              <img 
+                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778724890/3660690690_20250307173458_5148749377_tx006k.png" 
+                alt="숨고" 
+                className="h-[12px] sm:h-[16px] w-auto object-contain"
+              />
+            </>
+          )}
           <span className="text-[8px] sm:text-[10px] font-black text-[#D1D6DB]">x</span>
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778509015/bson_%EB%A1%9C%EA%B3%A0_u08pw7.png" 
@@ -527,6 +537,37 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
 
             <div className="w-full h-[1px] bg-white/5"></div>
 
+            {/* 초기 60회 납입 상세 구성 안내 */}
+            <div className="bg-[#C5A059]/5 rounded-[24px] p-5 sm:p-6 border border-[#C5A059]/20">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-6 h-6 bg-[#C5A059] rounded-full flex items-center justify-center">
+                  <span className="text-white text-[12px] font-black italic">i</span>
+                </div>
+                <span className="text-[15px] font-black text-white/90">초기 60회 납입 상세 구성 안내</span>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center text-[14px]">
+                  <span className="text-white/40 font-medium">상조부금 (월 납입금의 10%)</span>
+                  <span className="text-[#C5A059] font-bold">5,980원</span>
+                </div>
+                <div className="flex justify-between items-center text-[14px]">
+                  <span className="text-white/40 font-medium">가전 렌탈 대금 (기타 90%)</span>
+                  <span className="text-[#C5A059] font-bold">53,820원</span>
+                </div>
+                <div className="pt-3 mt-3 border-t border-white/5 flex justify-between items-center text-[14px]">
+                  <span className="text-white/40 font-bold">합계</span>
+                  <span className="text-white font-black text-[17px]">59,800원</span>
+                </div>
+              </div>
+              
+              <p className="mt-5 text-[11px] text-white/30 leading-relaxed break-keep">
+                * 1회부터 60회까지는 상조부금과 가전 렌탈 대금이 구분되어 청구됩니다. 61회~200회차까지는 상조부금으로 전액 전환됩니다.
+              </p>
+            </div>
+
+            <div className="w-full h-[1px] bg-white/5"></div>
+
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-[#C5A059]/10 p-4 rounded-[16px] border border-[#C5A059]/20 gap-1 sm:gap-0">
               <div className="flex justify-between items-center sm:block">
                 <span className="text-[14px] text-[#C5A059] font-black">만기 시 환급금</span>
@@ -538,13 +579,83 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
               </div>
             </div>
 
-            <div>
-              <span className="text-[13px] font-bold text-white/50 mb-3 block">가입 특전</span>
-              <div className="flex flex-wrap gap-2">
-                {['라이프서비스 2회', '특별 사은품 증정', '프리미엄몰 보너스'].map((benefit, i) => (
-                  <span key={i} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-[12px] font-bold text-white/70 shadow-sm">
-                    {benefit}
-                  </span>
+            <div className="pt-2">
+              <span className="text-[14px] font-black text-[#C5A059] mb-4 block tracking-wider uppercase">Join Benefits</span>
+              <div className="grid grid-cols-1 gap-3">
+                {[
+                  { title: '라이프서비스 2회 이용', desc: '상조 또는 크루즈 여행 중 선택 가능', icon: <HeartPulse className="w-4 h-4" /> },
+                  { title: '특별 사은품 100% 증정', desc: '가입 고객 전원 고급 사은품 혜택', icon: <Package className="w-4 h-4" /> },
+                  { 
+                    title: '프리미엄몰 보너스 제품', 
+                    desc: '상담 시 다양한 보너스 제품 선택', 
+                    icon: <Sparkles className="w-4 h-4" />,
+                    isSpecial: true
+                  },
+                ].map((benefit, i) => (
+                  <motion.div 
+                    key={i} 
+                    {...(benefit.isSpecial ? {
+                      animate: { 
+                        borderColor: ["rgba(255,255,255,0.1)", "#FF0080", "rgba(255,255,255,0.1)"],
+                        boxShadow: [
+                          "0 0 0px rgba(255,0,128,0)",
+                          "0 0 25px rgba(255,0,128,0.6)",
+                          "0 0 0px rgba(255,0,128,0)"
+                        ],
+                      },
+                      transition: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                    } : {})}
+                    className={`relative flex items-center gap-4 border ${benefit.isSpecial ? 'bg-gradient-to-br from-[#FF0080] to-[#7928CA] border-[#FF0080]/50' : 'bg-white/5 border-white/10'} p-4 rounded-[24px] group transition-all shadow-sm overflow-hidden`}
+                  >
+                    {/* Fireworks Effect for Special Benefit */}
+                    {benefit.isSpecial && (
+                      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                        {[...Array(8)].map((_, j) => (
+                          <motion.div
+                            key={j}
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ 
+                              scale: [0, 1.2, 0],
+                              opacity: [0, 1, 0],
+                              x: [0, (j % 2 === 0 ? 1 : -1) * (Math.random() * 120 + 60)],
+                              y: [0, (Math.random() * -120 - 60)],
+                            }}
+                            transition={{ 
+                              duration: 1.2, 
+                              repeat: Infinity, 
+                              delay: j * 0.3,
+                              ease: "easeOut"
+                            }}
+                            className="absolute left-1/2 top-1/2 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_8px_white]"
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    <div className={`w-11 h-11 rounded-2xl ${benefit.isSpecial ? 'bg-white text-[#FF0080] shadow-lg shadow-pink-500/30' : 'bg-[#C5A059]/20 text-[#C5A059]'} flex items-center justify-center group-hover:scale-110 transition-transform z-10`}>
+                      {benefit.icon}
+                    </div>
+                    <div className="z-10">
+                      <h5 className={`text-[14px] font-bold ${benefit.isSpecial ? 'text-white' : 'text-white/90'}`}>
+                        {benefit.title}
+                        {benefit.isSpecial && (
+                          <motion.span 
+                            animate={{ opacity: [1, 0, 1] }}
+                            transition={{ duration: 0.5, repeat: Infinity }}
+                            className="ml-2 inline-block w-2 h-2 bg-[#00FFFF] rounded-full shadow-[0_0_10px_#00FFFF]"
+                          />
+                        )}
+                      </h5>
+                      <p className={`text-[11px] ${benefit.isSpecial ? 'text-white/80' : 'text-white/40'}`}>{benefit.desc}</p>
+                    </div>
+                    
+                    {/* Special Label */}
+                    {benefit.isSpecial && (
+                      <div className="absolute top-0 right-0 px-3 py-1 bg-[#00FFFF] text-[#191F28] text-[9px] font-black rounded-bl-xl shadow-sm">
+                        TOP BENEFIT
+                      </div>
+                    )}
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -957,7 +1068,7 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
       </section>
 
       {/* 푸터 영역 */}
-      <footer className="bg-[#111111] pt-16 pb-32 px-6 text-white border-t border-white/5">
+<footer className="bg-[#111111] pt-16 pb-32 px-6 text-white border-t border-white/5">
         <div className="max-w-[400px] mx-auto">
           {/* Logo in Footer */}
           <div className="mb-10 opacity-60">
@@ -1032,14 +1143,22 @@ export default function SpecialPage({ channelSubdomain }: { channelSubdomain?: s
               <p className="text-[11px] text-white/20 font-medium tracking-tight">© HYOWON. All rights reserved.</p>
               <div className="flex gap-4">
                  {/* 관리자 전용 버튼 */}
-                 <a 
-                   href="/admin"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   className="text-[10px] text-white/10 hover:text-[#C5A059] transition-colors font-bold"
-                 >
-                   관리자 전용 페이지
-                 </a>
+                  <a 
+                    href="/lecture/special"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-white/10 hover:text-[#C5A059] transition-colors font-bold"
+                  >
+                    영업자 교육안
+                  </a>
+                  <a 
+                    href="/admin"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-white/10 hover:text-[#C5A059] transition-colors font-bold"
+                  >
+                    관리자 전용 페이지
+                  </a>
               </div>
             </div>
           </div>

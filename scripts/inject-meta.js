@@ -16,7 +16,7 @@ const pages = [
     name: 'living',
     title: '해피효원라이프 리빙144-신한카드 | 신한카드만 있으면 누구나 특별한 혜택!',
     description: '해피효원라이프 리빙144-신한카드 | 신한카드만 있으면 누구나 특별한 혜택!',
-    image: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_landing_page_hero_banner_d-1778564368252_mko2cd.png'
+    image: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674844/living144_og_image_f6gghd.png'
   },
   {
     name: 'special',
@@ -28,13 +28,19 @@ const pages = [
     name: 'living2',
     title: '해피효원라이프 리빙144-신한카드 2 | 신한카드만 있으면 누구나 특별한 혜택!',
     description: '해피효원라이프 리빙144-신한카드 2 | 신한카드만 있으면 누구나 특별한 혜택!',
-    image: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_landing_page_hero_banner_d-1778564368252_mko2cd.png'
+    image: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674844/living144_og_image_f6gghd.png'
   },
   {
     name: 'special2',
     title: '해피효원라이프 스페셜299-BSON 2 | 카드 한도 관계없이 신용만으로 특별한 혜택!',
     description: '해피효원라이프 스페셜299-BSON 2 | 카드 한도 관계없이 신용만으로 특별한 혜택!',
     image: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_web_banner_design_for_Kore-1778564383659_rwnzkq.png'
+  },
+  {
+    name: 'kcc',
+    title: 'KCC홈씨씨-LG전자-효원상조 제휴 결합상품',
+    description: 'KCC홈씨씨-LG전자-효원상조 제휴 프로모션 안내\nLG가전 최대 30% 저렴하게, 320만원 혜택 지원까지!',
+    image: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1779251513/Edit_this_image_to_create_a_professional_KakaoTalk-1779251495541_e6e6hq.png'
   }
 ];
 
@@ -69,3 +75,9 @@ pages.forEach(page => {
   fs.writeFileSync(path.join(pageDir, 'index.html'), content);
   console.log(`Generated SEO-friendly HTML for /${page.name}`);
 });
+
+// Generate 404.html fallback for client-side routing (Vercel, GitHub Pages, etc.)
+const fourOhFourPath = path.join(distPath, '404.html');
+fs.writeFileSync(fourOhFourPath, indexHtml);
+console.log('Generated 404.html fallback for robust client-side SPA routing.');
+

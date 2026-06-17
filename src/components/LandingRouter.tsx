@@ -7,9 +7,30 @@ import LivingPage2 from '../pages/LivingPage2';
 import SpecialPage from '../pages/SpecialPage';
 import SpecialPage2 from '../pages/SpecialPage2';
 import ConsentPage from '../pages/ConsentPage';
+import LecturePage from '../pages/LecturePage';
+import LectureLivingPage from '../pages/LectureLivingPage';
+import LectureSpecialPage from '../pages/LectureSpecialPage';
+import KccPage from '../pages/KccPage';
 
 export default function LandingRouter() {
   const path = window.location.pathname.toLowerCase();
+  
+  // /kcc 경로 → B2B 제휴 랜딩페이지
+  if (path === '/kcc' || path.startsWith('/kcc/')) {
+    return <KccPage channelSubdomain="kcc" />;
+  }
+  
+  // /lecture 경로 → 영업자 교육용 슬라이드
+  if (path === '/lecture/living') {
+    return <LectureLivingPage />;
+  }
+  if (path === '/lecture/special') {
+    return <LectureSpecialPage />;
+  }
+  if (path === '/lecture') {
+    return <LecturePage />;
+  }
+
   const segments = path.split('/').filter(Boolean);
   
   // /consent 경로 → 동의서 서명 페이지

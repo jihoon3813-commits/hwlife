@@ -169,17 +169,27 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       <SEO 
         title="해피효원라이프 리빙144-신한카드 | 신한카드만 있으면 누구나 특별한 혜택!"
         description="해피효원라이프 리빙144-신한카드 | 신한카드만 있으면 누구나 특별한 혜택!"
-        image="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778564428/Professional_horizontal_landing_page_hero_banner_d-1778564368252_mko2cd.png"
+        image="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674844/living144_og_image_f6gghd.png"
       />
       
       {/* GNB / 상단 헤더 */}
       <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-3 sm:px-5 flex items-center justify-between h-[48px] sm:h-[60px] border-b border-[#F2F4F6]">
         <div className="flex items-center gap-1 sm:gap-1.5">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" 
             alt="효원상조" 
             className="h-[14px] sm:h-[18px] w-auto object-contain"
           />
+          {channelId === 'soomgo' && (
+            <>
+              <span className="text-[#D1D6DB] text-[10px] sm:text-[14px]">|</span>
+              <img 
+                src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674812/soomgo_logo_v1_xyzhk9.png" 
+                alt="숨고" 
+                className="h-[12px] sm:h-[16px] w-auto object-contain"
+              />
+            </>
+          )}
           <span className="text-[8px] sm:text-[10px] font-black text-[#D1D6DB]">x</span>
           <span className="text-[10px] sm:text-[12px] font-black text-[#1B64DA] tracking-tight">신한카드</span>
           <span className="text-[8px] sm:text-[10px] font-black text-[#D1D6DB]">x</span>
@@ -210,7 +220,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
         {/* 배경 레이어 */}
         <div className="absolute inset-0">
           <img 
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674828/hero_bg_pattern_zq1wqa.jpg" 
             alt="비즈니스 배경" 
             className="w-full h-full object-cover opacity-30"
           />
@@ -222,7 +232,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
         {/* 모델 레이어 (앞에 배치) */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476137/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C_mw4c0e.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674553/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C_rus6ls.png" 
             alt="신한카드 모델" 
             className="h-[75%] w-auto object-contain object-bottom mt-[-10%] sm:mt-[-45%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
@@ -383,7 +393,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           {/* 카드 1 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
             <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/3._%ED%94%84%EB%A6%AC%EB%AA%A8_mmmjvf.png" alt="고급 리빙제품" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674657/5._%EC%8A%AC%EB%A6%BD%EC%95%A4%EB%B9%84_owqjvp.png" alt="고급 리빙제품" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-[#3182F6] mb-1 block">가입 축하 혜택 1</span>
@@ -394,7 +404,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           {/* 카드 2 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
             <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480574/%ED%8F%AC%EC%9D%B8%ED%8A%B8_tj8ujg.png" alt="포인트 보너스" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674702/DSfs_cnjzei.png" alt="포인트 보너스" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-[#FFAB00] mb-1 block">가입 축하 혜택 2</span>
@@ -405,7 +415,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           {/* 카드 3 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
             <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480399/5%EB%A7%8C%EC%9B%90_2_dnu8n6.png" alt="100% 환급" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674767/5%EB%A7%8C%EC%9B%90_u0iplm.png" alt="100% 환급" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-[#00C853] mb-1 block">스마트 혜택</span>
@@ -416,7 +426,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           {/* 카드 4 */}
           <div className="bg-white/5 border border-white/10 rounded-[24px] p-4 sm:p-5 flex flex-row sm:flex-col items-center sm:text-center text-left">
             <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden shadow-lg shrink-0 mr-4 sm:mr-0 sm:mb-4">
-              <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?w=300&q=80&fit=crop" alt="크루즈" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674775/1ec789bfcdceb_rccp2d.png" alt="크루즈" className="w-full h-full object-cover" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-[#E91E63] mb-1 block">라이프 케어 혜택</span>
@@ -441,7 +451,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           {/* 포인트 1 */}
           <div className="flex flex-col">
             <div className="w-full aspect-[4/3] rounded-2xl bg-[#F2F4F6] overflow-hidden mb-3">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480713/photo01_qowgk1.jpg" alt="안심 케어" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674803/fileView_2_rjy4wd.jpg" alt="안심 케어" className="w-full h-full object-cover" />
             </div>
             <p className="text-[13px] font-medium text-[#4E5968] leading-snug break-keep">
               <span className="font-bold text-[#191F28] block mb-1">안심 케어</span>
@@ -463,7 +473,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           {/* 포인트 3 */}
           <div className="flex flex-col">
             <div className="w-full aspect-[4/3] rounded-2xl bg-[#F2F4F6] overflow-hidden mb-3">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480897/%EC%BD%94%EC%8A%A4%ED%83%80_nbsz5n.png" alt="유연한 전환" className="w-full h-full object-cover" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674852/shutterstock_1225821256_r2rqdf.jpg" alt="유연한 전환" className="w-full h-full object-cover" />
             </div>
             <p className="text-[13px] font-medium text-[#4E5968] leading-snug break-keep">
               <span className="font-bold text-[#191F28] block mb-1">유연한 전환</span>
@@ -537,13 +547,74 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-[14px] text-[#4E5968] font-medium">1~48회 납입</span>
-                  <span className="text-[16px] font-bold text-[#3182F6]">{activeTab === '1' ? '35,000원' : '70,000원'}</span>
+                  <span className="text-[16px] font-bold text-[#3182F6]">
+                    {activeTab === '1' ? (
+                      <>35,000원 <span className="text-[12px] font-normal opacity-70">(1,680,000원)</span></>
+                    ) : (
+                      <>70,000원 <span className="text-[12px] font-normal opacity-70">(3,360,000원)</span></>
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-[14px] text-[#4E5968] font-medium">49~200회 납입</span>
-                  <span className="text-[16px] font-bold text-[#191F28]">{activeTab === '1' ? '28,000원' : '56,000원'}</span>
+                  <span className="text-[16px] font-bold text-[#191F28]">
+                    {activeTab === '1' ? (
+                      <>28,000원 <span className="text-[12px] font-normal opacity-70">(4,256,000원)</span></>
+                    ) : (
+                      <>56,000원 <span className="text-[12px] font-normal opacity-70">(8,512,000원)</span></>
+                    )}
+                  </span>
                 </div>
               </div>
+              <div className="w-full h-[1px] bg-[#E5E8EB]"></div>
+              
+              {/* 초기 48회 납입 상세 구성 안내 */}
+              <div className="bg-[#F2F8FF] rounded-[20px] p-4 sm:p-5 border border-[#3182F6]/10">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-6 h-6 bg-[#3182F6] rounded-full flex items-center justify-center">
+                    <span className="text-white text-[12px] font-black">!</span>
+                  </div>
+                  <span className="text-[14px] font-black text-[#191F28]">초기 48회 납입 상세 구성 안내</span>
+                </div>
+                
+                <div className="space-y-2.5">
+                  <div className="flex justify-between items-center text-[13px]">
+                    <span className="text-[#4E5968] font-medium">상조부금</span>
+                    <span className="text-[#191F28] font-bold">
+                      {activeTab === '1' ? (
+                        <>5,000원 <span className="text-[11px] font-normal opacity-60">(총 240,000원)</span></>
+                      ) : (
+                        <>10,000원 <span className="text-[11px] font-normal opacity-60">(총 480,000원)</span></>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-[13px]">
+                    <span className="text-[#4E5968] font-medium">멤버십대금</span>
+                    <span className="text-[#191F28] font-bold">
+                      {activeTab === '1' ? (
+                        <>30,000원 <span className="text-[11px] font-normal opacity-60">(총 1,440,000원)</span></>
+                      ) : (
+                        <>60,000원 <span className="text-[11px] font-normal opacity-60">(총 2,880,000원)</span></>
+                      )}
+                    </span>
+                  </div>
+                  <div className="pt-2 mt-2 border-t border-[#3182F6]/10 flex justify-between items-center text-[13px]">
+                    <span className="text-[#3182F6] font-bold">합계</span>
+                    <span className="text-[#3182F6] font-black text-[15px]">
+                      {activeTab === '1' ? (
+                        <>35,000원 <span className="text-[12px] font-normal opacity-80">(1,680,000원)</span></>
+                      ) : (
+                        <>70,000원 <span className="text-[12px] font-normal opacity-80">(3,360,000원)</span></>
+                      )}
+                    </span>
+                  </div>
+                </div>
+                
+                <p className="mt-4 text-[11px] text-[#8B95A1] leading-relaxed break-keep">
+                  * 1회부터 48회까지는 상조부금과 멤버십대금이 구분되어 청구됩니다. 49회~200회차까지는 상조부금으로 전액 전환됩니다.
+                </p>
+              </div>
+
               <div className="w-full h-[1px] bg-[#E5E8EB]"></div>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-[#3182F6]/5 p-4 rounded-[16px] gap-2 sm:gap-0">
                 <span className="text-[14px] text-[#3182F6] font-bold whitespace-nowrap">만기 시 환급금</span>
@@ -552,13 +623,83 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                   <span className="text-[13px] font-bold ml-1">(100%)</span>
                 </span>
               </div>
-              <div>
-                <span className="text-[13px] font-bold text-[#4E5968] mb-3 block">가입 특전</span>
-                <div className="flex flex-wrap gap-2">
-                  {['라이프서비스 ' + (activeTab === '1' ? '1회' : '2회'), '리빙제품 증정', '프리미엄몰 보너스'].map((benefit, i) => (
-                    <span key={i} className="px-3 py-1.5 bg-white border border-[#E5E8EB] rounded-full text-[12px] font-bold text-[#4E5968] shadow-sm">
-                      {benefit}
-                    </span>
+              <div className="pt-2">
+                <span className="text-[14px] font-black text-[#3182F6] mb-4 block tracking-wider uppercase">Join Benefits</span>
+                <div className="grid grid-cols-1 gap-3">
+                  {[
+                    { title: '라이프서비스 ' + (activeTab === '1' ? '1회' : '2회') + ' 이용', desc: '상조 또는 크루즈 여행 중 선택 가능', icon: <HeartPulse className="w-4 h-4" /> },
+                    { title: '리빙제품 100% 증정', desc: '가입 고객 전원 인기 가전 증정', icon: <Package className="w-4 h-4" /> },
+                    { 
+                      title: '프리미엄몰 보너스 혜택', 
+                      desc: '상담 시 다양한 추가 보너스 제공', 
+                      icon: <Sparkles className="w-4 h-4" />,
+                      isSpecial: true
+                    },
+                  ].map((benefit, i) => (
+                    <motion.div 
+                      key={i} 
+                      {...(benefit.isSpecial ? {
+                        animate: { 
+                          borderColor: ["#E5E8EB", "#A061FF", "#E5E8EB"],
+                          boxShadow: [
+                            "0 0 0px rgba(160,97,255,0)",
+                            "0 0 25px rgba(160,97,255,0.6)",
+                            "0 0 0px rgba(160,97,255,0)"
+                          ],
+                        },
+                        transition: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                      } : {})}
+                      className={`relative flex items-center gap-4 border ${benefit.isSpecial ? 'bg-gradient-to-br from-[#6366F1] to-[#A061FF] border-[#A061FF]/50' : 'bg-white border-[#E5E8EB]'} p-4 rounded-[24px] group transition-all shadow-sm overflow-hidden`}
+                    >
+                      {/* Fireworks Effect for Special Benefit */}
+                      {benefit.isSpecial && (
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                          {[...Array(8)].map((_, j) => (
+                            <motion.div
+                              key={j}
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ 
+                                scale: [0, 1.2, 0],
+                                opacity: [0, 1, 0],
+                                x: [0, (j % 2 === 0 ? 1 : -1) * (Math.random() * 120 + 60)],
+                                y: [0, (Math.random() * -120 - 60)],
+                              }}
+                              transition={{ 
+                                duration: 1.2, 
+                                repeat: Infinity, 
+                                delay: j * 0.3,
+                                ease: "easeOut"
+                              }}
+                              className="absolute left-1/2 top-1/2 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_8px_white]"
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      <div className={`w-11 h-11 rounded-2xl ${benefit.isSpecial ? 'bg-white text-[#A061FF] shadow-lg shadow-purple-500/30' : 'bg-[#3182F6]/10 text-[#3182F6]'} flex items-center justify-center group-hover:scale-110 transition-transform z-10`}>
+                        {benefit.icon}
+                      </div>
+                      <div className="z-10">
+                        <h5 className={`text-[14px] font-bold ${benefit.isSpecial ? 'text-white' : 'text-[#191F28]'}`}>
+                          {benefit.title}
+                          {benefit.isSpecial && (
+                            <motion.span 
+                              animate={{ opacity: [1, 0, 1] }}
+                              transition={{ duration: 0.5, repeat: Infinity }}
+                              className="ml-2 inline-block w-2 h-2 bg-[#FFFF00] rounded-full shadow-[0_0_10px_#FFFF00]"
+                            />
+                          )}
+                        </h5>
+                        <p className={`text-[11px] ${benefit.isSpecial ? 'text-white/80' : 'text-[#8B95A1]'}`}>{benefit.desc}</p>
+                      </div>
+                      
+                      {/* Special Label */}
+                      {benefit.isSpecial && (
+                        <div className="absolute top-0 right-0 px-3 py-1 bg-[#FFFF00] text-[#191F28] text-[9px] font-black rounded-bl-xl shadow-sm">
+                          POPULAR
+                        </div>
+                      )}
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -898,12 +1039,12 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
         <div className="grid grid-cols-2 gap-3">
           {[
-            { title: '장례', desc: '품격 있는 의전', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482388/fileView_peyuol.jpg' },
-            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482393/photo_best02_product09_ratqci.jpg' },
-            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482785/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_w9mkhs.png' },
-            { title: '웨딩', desc: '아름다운 시작', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482894/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_1_eohmjh.png' },
-            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483177/A_modern_Korean_family_celebrating_a_70th_birthday-1778483158578_ka1tmy.png' },
-            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483181/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_2_wrklcr.png' },
+            { title: '장례', desc: '품격 있는 의전', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674935/3edba92e79423_jwnpip.png' },
+            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674938/f57dcce933490_vlbul4.png' },
+            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/1ebbbfdbe6b9f_vccju1.png' },
+            { title: '웨딩', desc: '아름다운 시작', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674938/9cb896b8ac3c3_xkcwpx.png' },
+            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/af9663c5799c5_loxood.png' },
+            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/49b67816b20d5_ep0ejw.png' },
           ].map((service, i) => (
             <div key={i} className="relative aspect-square rounded-[20px] overflow-hidden group shadow-sm">
               <img src={service.img} alt={service.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
@@ -932,10 +1073,10 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
         <div className="grid grid-cols-2 gap-3 px-6">
           {[
-            { title: '기차여행', desc: 'KTX, SRT 등\n최대 35% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483384/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._4_mko5lm.png' },
-            { title: '호텔/리조트', desc: '전국 주요 숙박시설\n최대 80% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483539/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._5_ownbho.png' },
-            { title: '건강검진', desc: 'KMI 등 전문기관\n최대 70% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483641/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._6_isio8t.png' },
-            { title: '영화·공연', desc: 'CGV, 롯데시네마 등\n최대 40% 할인', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483644/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._7_dqdjc4.png' },
+            { title: '기차여행', desc: 'KTX, SRT 등\n최대 35% 할인', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675660/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_02_52_37_1_ziolie.png' },
+            { title: '호텔/리조트', desc: '전국 주요 숙박시설\n최대 80% 할인', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675660/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_02_52_37_2_m9nrdm.png' },
+            { title: '건강검진', desc: 'KMI 등 전문기관\n최대 70% 할인', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675659/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_02_52_37_3_hflbqc.png' },
+            { title: '영화·공연', desc: 'CGV, 롯데시네마 등\n최대 40% 할인', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675660/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_02_52_37_4_eqmvxx.png' },
           ].map((item, i) => (
             <div key={i} className="relative aspect-square rounded-[24px] overflow-hidden group shadow-md">
               <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
@@ -1070,10 +1211,10 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
         <div className="grid grid-cols-2 gap-3">
           {[
-            { title: '황금 수의', desc: '품격을 높이는 최고급 수의', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484181/img_mnzkaq.jpg' },
-            { title: '궁중 염습', desc: '정성을 다하는 궁중 염습', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484273/031_nihilist71_rwwsfl.jpg' },
-            { title: '링컨 리무진', desc: '최고급 고인 전용 리무진', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484299/4_mpwp2l.jpg' },
-            { title: '제단 꽃장식', desc: '풍성한 빈소 제단 장식', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778484373/8e5d644c-146b-481a-9f57-d71770dd8166_fbug9x.webp' },
+            { title: '황금 수의', desc: '품격을 높이는 최고급 수의', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676368/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_03_05_53_1_loqf0q.png' },
+            { title: '궁중 염습', desc: '정성을 다하는 궁중 염습', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676367/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_03_05_53_2_cpncww.png' },
+            { title: '링컨 리무진', desc: '최고급 고인 전용 리무진', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676369/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_03_05_53_3_rozhrp.png' },
+            { title: '제단 꽃장식', desc: '풍성한 빈소 제단 장식', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676366/ChatGPT_Image_2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%ED%9B%84_03_05_53_4_qn9jll.png' },
           ].map((item, i) => (
             <div key={i} className="flex flex-col">
               <div className="relative aspect-[4/5] rounded-[24px] overflow-hidden mb-3 shadow-2xl">
@@ -1099,7 +1240,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           </div>
           <div className="px-4 flex justify-center">
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476138/IMG_3660_l4vlag.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png" 
               alt="효원상조 전속모델" 
               className="w-full h-auto object-contain max-h-[320px]"
             />
@@ -1108,7 +1249,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
         <div className="bg-white border border-[#E5E8EB] rounded-[32px] p-8 flex items-center gap-5 shadow-sm">
           <div className="w-20 h-20 bg-[#F2F4F6] rounded-full overflow-hidden shrink-0 border-2 border-white shadow-inner">
-            <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476138/IMG_3660_l4vlag.png" alt="안내 모델" className="w-full h-full object-cover object-top" />
+            <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675800/IMG_3660_sepfbz.png" alt="안내 모델" className="w-full h-full object-cover object-top" />
           </div>
           <div>
             <span className="text-[12px] font-bold text-[#3182F6] block mb-1">바른 소비의 첫걸음</span>
@@ -1177,10 +1318,10 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       <section ref={formRef} className="bg-[#F2F4F6] py-16 sm:py-24 px-6">
         <div className="mb-8 sm:mb-12 text-center">
           <div className="flex items-center justify-center gap-4 mb-4">
-            <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" alt="효원상조" className="h-4 sm:h-5 object-contain" />
+            <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" alt="효원상조" className="h-4 sm:h-5 object-contain" />
             <span className="text-[14px] font-medium text-[#ADB5BD]">×</span>
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485695/images_k1hjt8.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675975/logo_ewkbpd.png" 
               alt="신한카드" 
               className="h-4 sm:h-5 object-contain mix-blend-multiply" 
             />
@@ -1194,7 +1335,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
         <div className="bg-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white max-w-[500px] mx-auto">
           <div className="flex flex-col items-center py-4">
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778639752/KakaoTalk_20230718_144359973_gnyomv.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675925/edited-photo_69_razvf4.png" 
               alt="프리미엄몰" 
               className="h-12 sm:h-16 object-contain mb-6" 
             />
@@ -1230,7 +1371,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
         <div className="max-w-[400px] mx-auto">
           <div className="mb-10 opacity-60">
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" 
               alt="효원상조 로고" 
               className="h-[22px] w-auto object-contain brightness-0 invert"
             />
@@ -1295,14 +1436,22 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
             <div className="flex items-center justify-between px-1 pt-4 border-t border-white/5">
               <p className="text-[11px] text-white/20 font-medium tracking-tight">© HYOWON. All rights reserved.</p>
               <div className="flex gap-4">
-                 <a 
-                   href="/admin"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   className="text-[10px] text-white/10 hover:text-[#3182F6] transition-colors font-bold"
-                 >
+                  <a 
+                    href="/lecture/living"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-white/10 hover:text-[#3182F6] transition-colors font-bold"
+                  >
+                    영업자 교육안
+                  </a>
+                  <a 
+                    href="/admin"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-white/10 hover:text-[#3182F6] transition-colors font-bold"
+                  >
                     관리자 전용 페이지
-                 </a>
+                  </a>
               </div>
             </div>
           </div>
@@ -1470,7 +1619,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                 )}
                 <div className="flex flex-col items-center py-2 sm:py-4">
                   <img 
-                    src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778639752/KakaoTalk_20230718_144359973_gnyomv.png" 
+                    src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675925/edited-photo_69_razvf4.png" 
                     alt="프리미엄몰" 
                     className="h-10 sm:h-14 object-contain mb-4 sm:mb-6" 
                   />

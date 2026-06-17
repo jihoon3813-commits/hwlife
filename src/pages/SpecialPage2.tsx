@@ -173,6 +173,16 @@ export default function SpecialPage2({ channelSubdomain }: { channelSubdomain?: 
             alt="효원상조" 
             className="h-[14px] sm:h-[18px] w-auto object-contain"
           />
+          {channelId === 'soomgo' && (
+            <>
+              <span className="text-[#D1D6DB] text-[10px] sm:text-[14px]">|</span>
+              <img 
+                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778724890/3660690690_20250307173458_5148749377_tx006k.png" 
+                alt="숨고" 
+                className="h-[12px] sm:h-[16px] w-auto object-contain"
+              />
+            </>
+          )}
           <span className="text-[8px] sm:text-[10px] font-black text-[#D1D6DB]">x</span>
           <img 
             src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778509015/bson_%EB%A1%9C%EA%B3%A0_u08pw7.png" 

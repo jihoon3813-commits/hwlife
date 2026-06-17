@@ -723,7 +723,7 @@ export default function Settings({ user }: { user?: any }) {
         )}
 
         {activeTab === 'admin' && (
-          <AdminAccountSettings user={user} updateChannel={updateChannel} />
+          <AdminAccountSettings user={user} />
         )}
       </div>
     </div>

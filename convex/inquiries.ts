@@ -148,6 +148,9 @@ export const update = mutation({
         memo: v.string()
       })
     )),
+    productName: v.optional(v.string()),
+    channelId: v.optional(v.string()),
+    source: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { id, ...updates } = args;

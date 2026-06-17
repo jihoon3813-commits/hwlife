@@ -137,4 +137,29 @@ export const getSubChannelIds = query({
   },
 });
 
+export const seedKccChannel = mutation({
+  handler: async (ctx) => {
+    const existing = await ctx.db
+      .query("channels")
+      .filter((q) => q.eq(q.field("subdomain"), "kcc"))
+      .first();
+      
+    if (existing) {
+      return "KCC channel already exists";
+    }
+
+    await ctx.db.insert("channels", {
+      accountId: "kcc",
+      password: "kcc",
+      subdomain: "kcc",
+      status: "정상",
+      channelName: "KCC홈씨씨",
+      managerName: "본사 담당자",
+      managerContact: "010-0000-0000",
+      landingPages: ["/kcc"],
+    });
+    return "KCC channel seeded successfully";
+  }
+});
+
 
