@@ -61,7 +61,7 @@ export default function AdminLayout({
       <header className="lg:hidden fixed top-0 left-0 right-0 h-[60px] bg-white border-b border-[#E5E8EB] flex items-center justify-between px-4 z-[40]">
         <div className="h-[28px]">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" 
             alt="효원상조" 
             className="h-full w-auto object-contain"
           />
@@ -87,7 +87,7 @@ export default function AdminLayout({
         <div className="p-6 border-b border-[#E5E8EB] flex items-center justify-between">
           <div className="h-[28px]">
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" 
               alt="효원상조" 
               className="h-full w-auto object-contain"
             />

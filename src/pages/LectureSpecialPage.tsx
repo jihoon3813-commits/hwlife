@@ -671,7 +671,7 @@ const SLIDES = [
         </div>
         
         <div className="absolute bottom-10 left-10 flex items-center gap-3">
-          <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1777895641/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_wnz5aa.png" className="h-5 brightness-0 invert opacity-30" />
+          <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" className="h-5 brightness-0 invert opacity-30" />
         </div>
       </div>
     )

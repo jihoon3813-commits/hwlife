@@ -346,7 +346,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                 <div className="max-w-[430px] mx-auto min-h-full flex flex-col">
                   {/* Form Logo & Title */}
                   <div className="pt-10 pb-6 text-center bg-white">
-                    <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" alt="Hyowon Life" className="h-10 mx-auto mb-6 object-contain" />
+                    <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" alt="Hyowon Life" className="h-10 mx-auto mb-6 object-contain" />
                     <h1 className="text-[22px] font-black text-[#191F28] tracking-tight leading-[1.2]">
                       결합제품 구매 및 상조회비 선결제,<br />
                       이용 동의서
@@ -442,7 +442,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                     </div>
 
                     <div className="mt-10 mb-6 text-center">
-                      <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" alt="Logo" className="h-6 mx-auto opacity-30 grayscale object-contain" />
+                      <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" alt="Logo" className="h-6 mx-auto opacity-30 grayscale object-contain" />
                     </div>
                   </div>
                 </div>
@@ -472,7 +472,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
             className="flex flex-col font-sans"
           >
             <div className="text-center mb-10">
-              <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" alt="Logo" className="h-10 mx-auto mb-6" />
+              <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" alt="Logo" className="h-10 mx-auto mb-6" />
               <h1 className="text-[26px] font-black text-[#191F28] border-b-2 border-[#3182F6] pb-3 inline-block">
                 결합제품 구매 및 상조회비 선결제 이용 동의서
               </h1>
@@ -562,7 +562,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
               </div>
 
               <div className="mt-12 mb-4">
-                <img src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778485617/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns2tmp.png" alt="Logo" className="h-7 mx-auto opacity-50" />
+                <img src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" alt="Logo" className="h-7 mx-auto opacity-50" />
               </div>
             </div>
           </div>
