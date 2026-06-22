@@ -4,7 +4,8 @@ import {
   ChevronLeft, ChevronRight, Check, Target, Zap, 
   Coins, Heart, Rocket, ShieldCheck, Sparkles,
   CreditCard, Package, Wallet, Globe, Calendar, Phone,
-  ArrowRight, HeartPulse, Film, Hotel, ChevronUp, ChevronDown, MousePointer2
+  ArrowRight, HeartPulse, Film, Hotel, ChevronUp, ChevronDown, MousePointer2,
+  ExternalLink
 } from 'lucide-react';
 import DrawingOverlay from '../components/DrawingOverlay';
 
@@ -187,6 +188,81 @@ const SLIDES = [
             카드 한도 관계 없이 신용만으로 간편 신청!<br/>
             <span className="text-white font-bold text-2xl">특별한 가전 제품과 압도적 혜택까지!</span>
           </p>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 'safety',
+    bg: 'bg-[#0F0F10]',
+    content: (
+      <div className="h-full flex flex-col justify-center px-16 text-white relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#00C853]/5 opacity-10 blur-[150px] rounded-full"></div>
+        
+        <div className="text-center mb-8 relative z-10">
+          <span className="inline-block px-4 py-1.5 bg-[#00C853]/20 text-[#00C853] text-sm font-bold rounded-full mb-3 tracking-wider uppercase">
+            Safety & Trust
+          </span>
+          <h3 className="text-4xl font-black leading-tight text-white mb-3 break-keep">
+            상조회사 폐업 걱정 NO! <span className="text-[#D4AF37]">100% 안심 효원상조</span>
+          </h3>
+          <p className="text-white/70 text-base max-w-2xl mx-auto break-keep">
+            최근 늘어나는 상조회사 폐업 소식에 불안하셨나요? 효원상조는 탄탄한 재무 건전성과 공정거래위원회가 공인한 안심 서비스로 완벽히 보호받습니다.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-5 relative z-10 w-full max-w-5xl mx-auto">
+          {/* Card 1 */}
+          <div className="bg-white/5 border border-white/10 rounded-[28px] p-6 flex items-center justify-between gap-8 backdrop-blur-xl hover:border-white/20 transition-all duration-300">
+            <div className="flex items-center gap-5 w-[310px] shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] shrink-0">
+                <ShieldCheck className="w-7 h-7" />
+              </div>
+              <div>
+                <span className="text-[#D4AF37] text-xs font-bold block mb-1">선수금 기준 업계 탑클래스</span>
+                <h4 className="text-xl font-black text-white leading-tight">공정위 등록 12위 우량사</h4>
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white/90 text-[15px] font-medium leading-relaxed break-keep">
+                효원상조는 공정거래위원회에 등록된 상조업체 중 선수금 기준 <span className="text-[#D4AF37] font-bold">12위(약 1,200억 원)</span>에 속하는 탄탄하고 건실한 상조회사입니다. 철저한 재무 건전성으로 어떠한 시장 변화에도 소중한 고객의 자산을 안전하게 지킵니다.
+              </p>
+            </div>
+            <a 
+              href="https://www.mysangjo.or.kr/web/community/status.do" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex items-center justify-center gap-2 bg-[#D4AF37] hover:bg-[#b08e27] text-black py-3.5 px-5 rounded-2xl text-sm font-black transition-all duration-300 pointer-events-auto shrink-0 shadow-lg shadow-[#D4AF37]/10 hover:shadow-[#D4AF37]/30"
+            >
+              현황 조회 <ExternalLink className="w-4 h-4 text-black" />
+            </a>
+          </div>
+
+          {/* Card 2 */}
+          <div className="bg-white/5 border border-white/10 rounded-[28px] p-6 flex items-center justify-between gap-8 backdrop-blur-xl hover:border-white/20 transition-all duration-300">
+            <div className="flex items-center gap-5 w-[310px] shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-[#00C853]/10 flex items-center justify-center text-[#00C853] shrink-0">
+                <Check className="w-7 h-7" />
+              </div>
+              <div>
+                <span className="text-[#00C853] text-xs font-bold block mb-1">공정위 지정 안심 제도</span>
+                <h4 className="text-xl font-black text-white leading-tight">‘내상조 그대로’ 공식 참여사</h4>
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white/90 text-[15px] font-medium leading-relaxed break-keep">
+                폐업한 상조 회원에게 기존 납입금의 50% 금액으로 온전한 서비스를 보장합니다. 전체 상조사 중 공정위의 엄격한 기준으로 선정된 <span className="text-white font-bold">단 16개사만 참여</span>하고 있어, 참여 자체가 압도적인 기업 안정성을 증명합니다.
+              </p>
+            </div>
+            <a 
+              href="https://www.mysangjo.or.kr/web/service/introduce.do" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex items-center justify-center gap-2 bg-[#00C853] hover:bg-[#00a844] text-white py-3.5 px-5 rounded-2xl text-sm font-black transition-all duration-300 pointer-events-auto shrink-0 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/30"
+            >
+              서비스 안내 <ExternalLink className="w-4 h-4" />
+            </a>
+          </div>
         </div>
       </div>
     )
