@@ -171,7 +171,7 @@ const SLIDES = [
         </div>
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778509099/IMG_3521-1_k6wd0u.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png" 
             className="h-[85%] w-auto object-contain object-bottom mt-[-10%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
         </div>
@@ -215,7 +215,7 @@ const SLIDES = [
             className="relative w-[450px] h-[280px] rounded-[24px] overflow-hidden shadow-[0_40px_80px_rgba(0,0,0,0.6)]"
           >
             <img 
-              src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778509874/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_3_l0uzfy.png" 
+              src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674657/5._%EC%8A%AC%EB%A6%BD%EC%95%A4%EB%B9%84_owqjvp.png" 
               className="w-full h-full object-cover"
             />
             <motion.div 
@@ -245,10 +245,10 @@ const SLIDES = [
         </div>
         <div className="grid grid-cols-2 gap-8">
           {[
-            { tag: "혜택 1", title: "가입 축하 사은품 증정", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/3._%ED%94%84%EB%A6%AC%EB%AA%A8_mmmjvf.png", color: "text-[#D4AF37]" },
-            { tag: "혜택 2", title: "특별 보너스 제품 증정", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480574/%ED%8F%AC%EC%9D%B8%ED%8A%B8_tj8ujg.png", color: "text-[#FFAB00]" },
-            { tag: "혜택 3", title: "100% 환급 보장", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480399/5%EB%A7%8C%EC%9B%90_2_dnu8n6.png", color: "text-[#00C853]" },
-            { tag: "혜택 4", title: "라이프 서비스 전환", img: "https://images.unsplash.com/photo-1548574505-5e239809ee19?w=300&q=80&fit=crop", color: "text-[#E91E63]" }
+            { tag: "혜택 1", title: "가입 축하 사은품 증정", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674657/5._%EC%8A%AC%EB%A6%BD%EC%95%A4%EB%B9%84_owqjvp.png", color: "text-[#D4AF37]" },
+            { tag: "혜택 2", title: "특별 보너스 제품 증정", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674702/DSfs_cnjzei.png", color: "text-[#FFAB00]" },
+            { tag: "혜택 3", title: "100% 환급 보장", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674767/5%EB%A7%8C%EC%9B%90_u0iplm.png", color: "text-[#00C853]" },
+            { tag: "혜택 4", title: "라이프 서비스 전환", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674775/1ec789bfcdceb_rccp2d.png", color: "text-[#E91E63]" }
           ].map((item, i) => (
             <div key={i} className="bg-white/5 border border-white/10 rounded-[32px] p-8 flex items-center gap-8 shadow-xl">
               <div className="w-24 h-24 rounded-full bg-white overflow-hidden shadow-2xl shrink-0">
@@ -278,9 +278,9 @@ const SLIDES = [
         </div>
         <div className="grid grid-cols-4 gap-6">
           {[
-            { title: "안심 케어", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480713/photo01_qowgk1.jpg", desc: "갑작스러운 상황에도 가족의 곁을 지킵니다." },
+            { title: "안심 케어", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674803/fileView_2_rjy4wd.jpg", desc: "갑작스러운 상황에도 가족의 곁을 지킵니다." },
             { title: "카드한도 무관", img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&q=80&fit=crop", desc: "한도 걱정 없이 신용만으로 간편 가입" },
-            { title: "유연한 활용", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480897/%EC%BD%94%EC%8A%A4%ED%83%80_nbsz5n.png", desc: "장례는 기본, 크루즈와 가전 혜택까지" },
+            { title: "유연한 활용", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674852/shutterstock_1225821256_r2rqdf.jpg", desc: "장례는 기본, 크루즈와 가전 혜택까지" },
             { title: "전액 환급", img: "https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=400&q=80&fit=crop", desc: "만기 시 100% 돌려받는 스마트한 저축" }
           ].map((item, i) => (
             <div key={i} className="flex flex-col">
@@ -318,7 +318,7 @@ const SLIDES = [
           <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-[0_30px_60px_rgba(0,0,0,0.06)] flex flex-col items-start text-left w-[360px] transition-all hover:shadow-2xl hover:-translate-y-1">
             <div className="w-full aspect-square bg-[#F9FAFB] rounded-[24px] overflow-hidden mb-5 relative group">
               <img 
-                src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/3._%ED%94%84%EB%A6%AC%EB%AA%A8_mmmjvf.png" 
+                src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674657/5._%EC%8A%AC%EB%A6%BD%EC%95%A4%EB%B9%84_owqjvp.png" 
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
               />
               <div className="absolute top-3 left-3 px-3 py-1 bg-black/60 text-white text-[10px] font-black rounded-lg">
@@ -327,16 +327,16 @@ const SLIDES = [
             </div>
             
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-[#D4AF37] font-black text-sm">프리모</span>
+              <span className="text-[#D4AF37] font-black text-sm">슬립앤비</span>
               <span className="px-2 py-0.5 bg-[#F2F4F6] text-[#8B95A1] text-[10px] font-bold rounded-md">가구</span>
             </div>
             
-            <p className="text-[11px] font-bold text-[#ADB5BD] mb-2 tracking-tight">PR330-1_K/Q</p>
+            <p className="text-[11px] font-bold text-[#ADB5BD] mb-2 tracking-tight">SNB330-2_Q</p>
             
             <p className="text-[16px] font-black text-[#191F28] leading-snug break-keep">
-              프리모 캐나다 독립<br />
+              슬립앤비 캐나다 독립<br />
               포켓스프링 허리에 좋은<br />
-              침대 매트리스 K/Q
+              침대 매트리스 Q
             </p>
           </div>
         </div>
@@ -359,12 +359,12 @@ const SLIDES = [
         </div>
         <div className="grid grid-cols-3 gap-6">
           {[
-            { title: '장례', desc: '품격 있는 의전', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482388/fileView_peyuol.jpg' },
-            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482393/photo_best02_product09_ratqci.jpg' },
-            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482785/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_w9mkhs.png' },
-            { title: '웨딩', desc: '아름다운 시작', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482894/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_1_eohmjh.png' },
-            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483177/A_modern_Korean_family_celebrating_a_70th_birthday-1778483158578_ka1tmy.png' },
-            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483181/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_2_wrklcr.png' },
+            { title: '장례', desc: '품격 있는 의전', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674935/3edba92e79423_jwnpip.png' },
+            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674938/f57dcce933490_vlbul4.png' },
+            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/1ebbbfdbe6b9f_vccju1.png' },
+            { title: '웨딩', desc: '아름다운 시작', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674938/9cb896b8ac3c3_xkcwpx.png' },
+            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/af9663c5799c5_loxood.png' },
+            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/49b67816b20d5_ep0ejw.png' },
           ].map((item, i) => (
             <div key={i} className="relative aspect-video rounded-[32px] overflow-hidden group shadow-lg">
               <img src={item.img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -443,7 +443,7 @@ const SLIDES = [
         <div className="relative">
           <div className="absolute -inset-10 bg-[#D4AF37] opacity-5 blur-[100px] rounded-full"></div>
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476138/IMG_3660_l4vlag.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675786/IMG_4054-1_hdili0.png" 
             className="relative z-10 w-full h-auto object-contain transform hover:scale-105 transition duration-700"
           />
         </div>

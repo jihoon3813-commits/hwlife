@@ -290,7 +290,7 @@ const SLIDES = [
         </div>
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476137/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C_mw4c0e.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674553/IMG_3574_%EC%8B%A0%ED%95%9C%EC%B9%B4%EB%93%9C_rus6ls.png" 
             className="h-[85%] w-auto object-contain object-bottom mt-[-10%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
         </div>
@@ -374,10 +374,10 @@ const SLIDES = [
         </div>
         <div className="grid grid-cols-2 gap-8">
           {[
-            { tag: "혜택 1", title: "고급 리빙제품 증정", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/3._%ED%94%84%EB%A6%AC%EB%AA%A8_mmmjvf.png", color: "text-[#3182F6]" },
-            { tag: "혜택 2", title: "특별 보너스 증정", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480574/%ED%8F%AC%EC%9D%B8%ED%8A%B8_tj8ujg.png", color: "text-[#FFAB00]" },
-            { tag: "혜택 3", title: "100% 환급 보장", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480399/5%EB%A7%8C%EC%9B%90_2_dnu8n6.png", color: "text-[#00C853]" },
-            { tag: "혜택 4", title: "크루즈 전환 가능", img: "https://images.unsplash.com/photo-1548574505-5e239809ee19?w=300&q=80&fit=crop", color: "text-[#E91E63]" }
+            { tag: "혜택 1", title: "고급 리빙제품 증정", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674657/5._%EC%8A%AC%EB%A6%BD%EC%95%A4%EB%B9%84_owqjvp.png", color: "text-[#3182F6]" },
+            { tag: "혜택 2", title: "특별 보너스 증정", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674702/DSfs_cnjzei.png", color: "text-[#FFAB00]" },
+            { tag: "혜택 3", title: "100% 환급 보장", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674767/5%EB%A7%8C%EC%9B%90_u0iplm.png", color: "text-[#00C853]" },
+            { tag: "혜택 4", title: "크루즈 전환 가능", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674775/1ec789bfcdceb_rccp2d.png", color: "text-[#E91E63]" }
           ].map((item, i) => (
             <div key={i} className="bg-white/5 border border-white/10 rounded-[32px] p-8 flex items-center gap-8">
               <div className="w-24 h-24 rounded-full bg-white overflow-hidden shadow-2xl shrink-0">
@@ -407,9 +407,9 @@ const SLIDES = [
         </div>
         <div className="grid grid-cols-4 gap-6">
           {[
-            { title: "안심 케어", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480713/photo01_qowgk1.jpg", desc: "가족의 슬픔과 짐을 덜어드립니다." },
+            { title: "안심 케어", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674803/fileView_2_rjy4wd.jpg", desc: "가족의 슬픔과 짐을 덜어드립니다." },
             { title: "합리적 혜택", img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&q=80&fit=crop", desc: "부담 없는 금액으로 누리는 혜택" },
-            { title: "유연한 전환", img: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778480897/%EC%BD%94%EC%8A%A4%ED%83%80_nbsz5n.png", desc: "만기 시 전액 환급 또는 크루즈" },
+            { title: "유연한 전환", img: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674852/shutterstock_1225821256_r2rqdf.jpg", desc: "만기 시 전액 환급 또는 크루즈" },
             { title: "스마트 선택", img: "https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=400&q=80&fit=crop", desc: "실속까지 챙기는 똑똑한 선택" }
           ].map((item, i) => (
             <div key={i} className="flex flex-col">
@@ -503,14 +503,14 @@ const SLIDES = [
                    category: '헬스케어', 
                    model: 'HBSAZ-001', 
                    name: '바로큐 온열 복부마사지기\n음파진동 안마기', 
-                   img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/1._%EB%B0%94%EB%A1%9C%ED%81%90_qehlsv.png' 
+                   img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1782096596/1._%EB%B0%94%EB%A1%9C%ED%81%90_pbugos.png' 
                  },
                  { 
                    brand: '마하나임', 
                    category: '헬스케어', 
                    model: 'MH-101', 
                    name: '마하나임 건식 족욕기', 
-                   img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/2._%EB%A7%88%ED%95%98%EB%82%98%EC%9E%84_%EA%B1%B4%EC%8B%9D%EC%A1%B1%EC%9A%95%EA%B8%B0_udjx9h.png' 
+                   img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1782096596/2._%EB%A7%88%ED%95%98%EB%82%98%EC%9E%84_%EA%B1%B4%EC%8B%9D%EC%A1%B1%EC%9A%95%EA%B8%B0_cblcxc.png' 
                  }
                ].map((p, i) => (
                  <div key={i} className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100 flex flex-col items-start text-left transition-all hover:shadow-xl hover:-translate-y-1">
@@ -536,7 +536,7 @@ const SLIDES = [
             </div>
           </div>
 
-          {/* 2구좌 제품군 */}
+          {/* 2구좌 프리미엄 */}
           <div className="bg-[#191F28] rounded-[40px] p-8 border border-white/5">
             <div className="flex items-center gap-3 mb-8">
               <div className="px-4 py-1.5 bg-white text-[#191F28] text-sm font-black rounded-full">2구좌 프리미엄</div>
@@ -548,28 +548,28 @@ const SLIDES = [
                    category: '에어컨/에어케어', 
                    model: 'AS156HWWC', 
                    name: 'LG 퓨리케어 360\n공기청정기 Hit(16평형)', 
-                   img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/large03_drecnx.jpg' 
+                   img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1782096596/large03_lzc2mq.jpg' 
                  },
                  { 
-                   brand: '프리모', 
+                   brand: '슬립앤비', 
                    category: '가구', 
-                   model: 'PR330-1_K/Q', 
-                   name: '프리모 캐나다 독립\n포켓스프링 허리에 좋은\n침대 매트리스 K/Q', 
-                   img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/3._%ED%94%84%EB%A6%AC%EB%AA%A8_mmmjvf.png' 
+                   model: 'SNB330-2_Q', 
+                   name: '슬립앤비 캐나다 독립\n포켓스프링 허리에 좋은\n침대 매트리스 Q', 
+                   img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1782096597/5._%EC%8A%AC%EB%A6%BD%EC%95%A4%EB%B9%84_evz62q.png' 
                  },
                  { 
                    brand: '바로큐+마하나임', 
                    category: '가구', 
                    model: 'HBSAZ-001+MH-101', 
                    name: '바로큐 온열 복부마사지기\n음파진동 안마기 +\n마하나임 건식 족욕기', 
-                   img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778475650/4._%EB%B0%94%EB%A1%9C%ED%81%90_%EB%A7%88%ED%95%98%EB%82%98%EC%9E%84_kczcbe.png' 
+                   img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1782096596/4._%EB%B0%94%EB%A1%9C%ED%81%90_%EB%A7%88%ED%95%98%EB%82%98%EC%9E%84_xxag2v.png' 
                  },
                  { 
                    brand: '블리스', 
                    category: '스포츠/취미', 
                    model: 'BLISS_Gold', 
                    name: '블리스 골드 파크골프채 풀\n세트 (감나무 파크골프\n클럽케이스 포함)', 
-                   img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778821382/%EB%B8%94%EB%A6%AC%EC%8A%A4%EA%B3%A8%EB%93%9C_ijyxan.jpg' 
+                   img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1782096596/%EB%B8%94%EB%A6%AC%EC%8A%A4%EA%B3%A8%EB%93%9C_wbbkta.jpg' 
                  }
                ].map((p, i) => (
                  <div key={i} className="bg-white p-6 rounded-[32px] shadow-sm border border-white/10 flex flex-col items-start text-left transition-all hover:shadow-xl hover:-translate-y-1">
@@ -610,12 +610,12 @@ const SLIDES = [
         </div>
         <div className="grid grid-cols-3 gap-6">
           {[
-            { title: '장례', desc: '품격 있는 의전', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482388/fileView_peyuol.jpg' },
-            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482393/photo_best02_product09_ratqci.jpg' },
-            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482785/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_w9mkhs.png' },
-            { title: '웨딩', desc: '아름다운 시작', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778482894/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_1_eohmjh.png' },
-            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483177/A_modern_Korean_family_celebrating_a_70th_birthday-1778483158578_ka1tmy.png' },
-            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778483181/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%90%EC%9D%B8_2_wrklcr.png' },
+            { title: '장례', desc: '품격 있는 의전', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674935/3edba92e79423_jwnpip.png' },
+            { title: '크루즈', desc: '럭셔리 해상 여행', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674938/f57dcce933490_vlbul4.png' },
+            { title: '해외여행', desc: '꿈꾸던 세계 여행', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/1ebbbfdbe6b9f_vccju1.png' },
+            { title: '웨딩', desc: '아름다운 시작', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674938/9cb896b8ac3c3_xkcwpx.png' },
+            { title: '칠·팔순', desc: '가족의 행복한 연회', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/af9663c5799c5_loxood.png' },
+            { title: '어학연수', desc: '글로벌 인재 육성', img: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674937/49b67816b20d5_ep0ejw.png' },
           ].map((item, i) => (
             <div key={i} className="relative aspect-video rounded-[32px] overflow-hidden group shadow-lg">
               <img src={item.img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -694,7 +694,7 @@ const SLIDES = [
         <div className="relative">
           <div className="absolute -inset-10 bg-[#006E4E] opacity-5 blur-[100px] rounded-full"></div>
           <img 
-            src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778476138/IMG_3660_l4vlag.png" 
+            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781675786/IMG_4054-1_hdili0.png" 
             className="relative z-10 w-full h-auto object-contain transform hover:scale-105 transition duration-700"
           />
         </div>
