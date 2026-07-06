@@ -145,7 +145,8 @@ export const update = mutation({
       v.object({
         date: v.string(),
         status: v.string(),
-        memo: v.string()
+        memo: v.string(),
+        writer: v.optional(v.string())
       })
     )),
     productName: v.optional(v.string()),

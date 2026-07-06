@@ -338,10 +338,28 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       const updates: any = { ...validUpdates, status };
       
       if (memo.trim()) {
+        let writerName = '관리자';
+        try {
+          const savedProxy = sessionStorage.getItem('admin_proxy_user');
+          if (savedProxy && savedProxy !== 'null') {
+            const user = JSON.parse(savedProxy);
+            writerName = user.channelName || user.accountId || '관리자';
+          } else {
+            const saved = localStorage.getItem('admin_user');
+            if (saved && saved !== 'null') {
+              const user = JSON.parse(saved);
+              writerName = user.channelName || user.accountId || '관리자';
+            }
+          }
+        } catch (e) {
+          console.error('Failed to get current user info:', e);
+        }
+
         const newHistory = {
           date: new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
           status,
-          memo: memo.trim()
+          memo: memo.trim(),
+          writer: writerName
         };
         updates.memoHistory = [...(selectedCustomer.memoHistory || []), newHistory];
       }
@@ -1070,10 +1088,17 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                     </h5>
                     <div className="space-y-3 bg-[#F9FAFB] p-4 rounded-[12px] max-h-[150px] overflow-y-auto">
                       {selectedCustomer.memoHistory.map((history: any, idx: number) => (
-                        <div key={idx} className="flex gap-3 text-[13px]">
-                          <span className="text-[#8B95A1] shrink-0 font-medium">{history.date}</span>
-                          <span className="font-bold text-[#3182F6] shrink-0 w-[60px]">{history.status}</span>
-                          <span className="text-[#4E5968]">{history.memo}</span>
+                        <div key={idx} className="flex gap-3 text-[13px] items-start justify-between">
+                          <div className="flex gap-3 flex-1 min-w-0 items-start">
+                            <span className="text-[#8B95A1] shrink-0 font-medium">{history.date}</span>
+                            <span className="font-bold text-[#3182F6] shrink-0 w-[60px]">{history.status}</span>
+                            <span className="text-[#4E5968] break-all">{history.memo}</span>
+                          </div>
+                          {history.writer && (
+                            <span className="text-[#8B95A1] shrink-0 text-[11px] bg-[#E5E8EB]/50 px-1.5 py-0.5 rounded font-medium">
+                              {history.writer}
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>

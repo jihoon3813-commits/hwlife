@@ -92,7 +92,8 @@ export default defineSchema({
       v.object({
         date: v.string(),
         status: v.string(),
-        memo: v.string()
+        memo: v.string(),
+        writer: v.optional(v.string())
       })
     )),
     channelId: v.optional(v.string()),
