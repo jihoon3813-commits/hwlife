@@ -3,6 +3,62 @@ import { X, Search, Filter, History, RefreshCw, Trash2, Save, Plus, Smartphone, 
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
+const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
+  const now = new Date();
+  const kstTime = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  const year = kstTime.getUTCFullYear();
+  const month = kstTime.getUTCMonth();
+  const date = kstTime.getUTCDate();
+
+  const getKstMs = (y: number, m: number, d: number, hr = 0, min = 0, sec = 0, ms = 0) => {
+    return Date.UTC(y, m, d, hr, min, sec, ms) - 9 * 60 * 60 * 1000;
+  };
+
+  const todayStart = getKstMs(year, month, date, 0, 0, 0, 0);
+  const todayEnd = getKstMs(year, month, date, 23, 59, 59, 999);
+
+  switch (filter) {
+    case 'today':
+      return { start: todayStart, end: todayEnd };
+    case 'yesterday': {
+      const yesterdayStart = getKstMs(year, month, date - 1, 0, 0, 0, 0);
+      const yesterdayEnd = getKstMs(year, month, date - 1, 23, 59, 59, 999);
+      return { start: yesterdayStart, end: yesterdayEnd };
+    }
+    case '1week': {
+      const oneWeekStart = getKstMs(year, month, date - 7 + 1, 0, 0, 0, 0);
+      return { start: oneWeekStart, end: todayEnd };
+    }
+    case 'thisMonth': {
+      const thisMonthStart = getKstMs(year, month, 1, 0, 0, 0, 0);
+      return { start: thisMonthStart, end: todayEnd };
+    }
+    case 'lastMonth': {
+      const lastMonthStart = getKstMs(year, month - 1, 1, 0, 0, 0, 0);
+      const lastMonthEnd = getKstMs(year, month, 0, 23, 59, 59, 999);
+      return { start: lastMonthStart, end: lastMonthEnd };
+    }
+    case '3months': {
+      const start = getKstMs(year, month - 3, date, 0, 0, 0, 0);
+      return { start, end: todayEnd };
+    }
+    case '6months': {
+      const start = getKstMs(year, month - 6, date, 0, 0, 0, 0);
+      return { start, end: todayEnd };
+    }
+    case 'custom': {
+      if (!customStart || !customEnd) return { start: 0, end: Infinity };
+      const [sYear, sMonth, sDate] = customStart.split('-').map(Number);
+      const [eYear, eMonth, eDate] = customEnd.split('-').map(Number);
+      const start = getKstMs(sYear, sMonth - 1, sDate, 0, 0, 0, 0);
+      const end = getKstMs(eYear, eMonth - 1, eDate, 23, 59, 59, 999);
+      return { start, end };
+    }
+    default:
+      return { start: 0, end: Infinity };
+  }
+};
+
 export default function CustomerManagement({ channelId }: { channelId?: string }) {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [memo, setMemo] = useState('');
@@ -14,6 +70,17 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   // Local state for editing details
   const [editData, setEditData] = useState<any>({});
   const [selectedChannelId, setSelectedChannelId] = useState<string>('all');
+
+  // Date filter state
+  const getKstTodayStr = () => {
+    const d = new Date();
+    const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+    return kst.toISOString().split('T')[0];
+  };
+
+  const [dateFilter, setDateFilter] = useState<string>('all');
+  const [startDate, setStartDate] = useState<string>(getKstTodayStr());
+  const [endDate, setEndDate] = useState<string>(getKstTodayStr());
 
   // Direct Registration State
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -427,8 +494,14 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       if (inquiryCid !== targetCid) return false;
     }
 
+    // 2. Date Filter
+    if (dateFilter !== 'all') {
+      const range = getFilterDateRange(dateFilter, startDate, endDate);
+      const time = inq.createdAt;
+      if (time < range.start || time > range.end) return false;
+    }
     
-    // 2. Search Query Filter
+    // 3. Search Query Filter
     const search = searchQuery.toLowerCase();
     return (
       (inq.name || '').toLowerCase().includes(search) || 
@@ -530,10 +603,59 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
         </div>
       </div>
 
+      {/* 기간 필터링 바 */}
+      <div className="bg-white p-4 rounded-[16px] border border-[#E5E8EB] mb-6 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
+        <div className="flex items-center gap-2 w-full overflow-x-auto no-scrollbar py-1">
+          <span className="text-[13px] font-bold text-[#4E5968] shrink-0 mr-2">등록기간</span>
+          {[
+            { label: '전체', value: 'all' },
+            { label: '당일', value: 'today' },
+            { label: '전일', value: 'yesterday' },
+            { label: '1주일', value: '1week' },
+            { label: '당월', value: 'thisMonth' },
+            { label: '전월', value: 'lastMonth' },
+            { label: '3개월', value: '3months' },
+            { label: '6개월', value: '6months' },
+            { label: '기간선택', value: 'custom' },
+          ].map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setDateFilter(opt.value)}
+              className={`px-3 py-1.5 rounded-[8px] text-[13px] font-bold transition-all shrink-0 ${
+                dateFilter === opt.value
+                  ? 'bg-[#3182F6] text-white shadow-sm'
+                  : 'bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {dateFilter === 'custom' && (
+          <div className="flex items-center gap-2 w-full md:w-auto shrink-0 justify-end">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="bg-white border border-[#E5E8EB] px-3 py-1.5 rounded-[8px] text-[13px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
+            />
+            <span className="text-[#8B95A1] text-[13px]">~</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="bg-white border border-[#E5E8EB] px-3 py-1.5 rounded-[8px] text-[13px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
+            />
+          </div>
+        )}
+      </div>
+
       <div className="bg-white rounded-[16px] shadow-sm border border-[#E5E8EB] overflow-x-auto custom-scrollbar">
         <table className="w-full text-left min-w-max">
           <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB] whitespace-nowrap">
             <tr>
+              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968] w-16 text-center">순번</th>
               <th className="px-6 py-4 w-12">
                 <input 
                   type="checkbox" 
@@ -555,12 +677,12 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
           <tbody className="divide-y divide-[#E5E8EB]">
             {filteredInquiries.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-6 py-20 text-center text-[#8B95A1] text-[14px]">
+                <td colSpan={10} className="px-6 py-20 text-center text-[#8B95A1] text-[14px]">
                   등록된 고객이 없습니다.
                 </td>
               </tr>
             ) : (
-              filteredInquiries.map(customer => {
+              filteredInquiries.map((customer, index) => {
                 // 신청상품 & 결합제품 노출 로직
                 let displayPlan = customer.productName;
                 let displayAppliance = customer.appliance || '-';
@@ -614,6 +736,9 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                     className={`hover:bg-[#F9FAFB] cursor-pointer transition-colors ${selectedIds.includes(customer._id) ? 'bg-[#F2F8FF]' : ''}`}
                     onClick={() => setSelectedCustomer(customer)}
                   >
+                    <td className="px-6 py-4 text-[13px] text-[#4E5968] font-medium text-center whitespace-nowrap">
+                      {filteredInquiries.length - index}
+                    </td>
                     <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                       <input 
                         type="checkbox" 
