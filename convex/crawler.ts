@@ -1,9 +1,6 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 
-import { action } from "./_generated/server";
-import { v } from "convex/values";
-
 const categories = [
   'air-purifier', 'air-purifiers',
   'dehumidifiers', 'dehumidifier',
@@ -29,8 +26,27 @@ const categories = [
 
 function cleanModelCode(raw: string): string {
   let cleaned = raw.trim();
-  cleaned = cleaned.split('.')[0];
+  cleaned = cleaned.split('.')[0].split('-')[0];
   return cleaned;
+}
+
+function generate80PercentVariations(modelCode: string): string[] {
+  const rawModel = modelCode.trim();
+  const clean = cleanModelCode(rawModel);
+  const lower = clean.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const set = new Set<string>();
+
+  set.add(rawModel.toLowerCase());
+  set.add(clean.toLowerCase());
+  set.add(lower);
+
+  // Generate prefix variations down to 70% length (enables >= 80% partial/prefix matches)
+  const minLen = Math.max(4, Math.floor(lower.length * 0.7));
+  for (let len = lower.length; len >= minLen; len--) {
+    set.add(lower.slice(0, len));
+  }
+
+  return Array.from(set);
 }
 
 function isValidProductRefUrl(refUrl?: string, modelCode?: string): boolean {
@@ -75,18 +91,7 @@ async function resolveProductUrl(modelCode: string, refUrl?: string): Promise<st
     return refUrl!;
   }
 
-  const codeBase = cleanCode.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-  const variations = Array.from(new Set([
-    cleanCode.toLowerCase(),
-    codeBase,
-    rawModel.toLowerCase(),
-    rawModel.toLowerCase().replace(/\./g, '')
-  ]));
-
-  if (codeBase.length > 5 && (codeBase.endsWith('a') || codeBase.endsWith('b') || codeBase.endsWith('c'))) {
-    variations.push(codeBase.slice(0, -1));
-  }
+  const variations = generate80PercentVariations(rawModel);
 
   // 1. Fast parallel probe across categories (10 at a time)
   for (const code of variations) {
