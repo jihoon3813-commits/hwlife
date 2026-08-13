@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square, Link, X, Star, Zap, Sparkles } from 'lucide-react';
+import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square, Link, X, Star, Zap, Sparkles, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import * as XLSX from 'xlsx';
@@ -8,6 +8,15 @@ interface Plan {
   mainCount: number;
   isMainActive: boolean;
   accountCount?: string;
+}
+
+interface SmartRegisterResult {
+  model: string;
+  success: boolean;
+  name?: string;
+  thumbnail?: string;
+  specCount?: number;
+  reason?: string;
 }
 
 function PreviewImage({ src, className }: { src: string, className?: string }) {
@@ -77,6 +86,13 @@ export default function ProductManagement() {
   const [isSmartModalOpen, setIsSmartModalOpen] = useState(false);
   const [directModelsText, setDirectModelsText] = useState('');
   const [isDirectRegistering, setIsDirectRegistering] = useState(false);
+  const [smartResultModal, setSmartResultModal] = useState<{
+    isOpen: boolean;
+    total: number;
+    successCount: number;
+    failCount: number;
+    results: SmartRegisterResult[];
+  } | null>(null);
 
   const handleDirectSmartRegister = async () => {
     const rawInput = directModelsText.trim();
@@ -100,6 +116,7 @@ export default function ProductManagement() {
 
     let successCount = 0;
     let failCount = 0;
+    const smartResults: SmartRegisterResult[] = [];
 
     const currentPlan = plans.find(p => p.id === selectedPlanId) || selectedPlan;
     const planPrice = currentPlan?.basePrice ? String(currentPlan.basePrice).replace(/\D/g, '') : "59800";
@@ -115,6 +132,16 @@ export default function ProductManagement() {
           model: rawModel,
           price: '0'
         });
+
+        if (!scraped.success && !scraped.thumbnail && (!scraped.specifications || scraped.specifications.length === 0)) {
+          failCount++;
+          smartResults.push({
+            model: rawModel,
+            success: false,
+            reason: 'LG 공식 사이트에서 해당 모델 페이지를 찾지 못했거나 정보를 가져오지 못함 (404 미등록 모델)'
+          });
+          continue;
+        }
 
         const existingProduct = allProducts?.find(
           p => p.planId === selectedPlanId && p.model?.trim().toLowerCase() === rawModel.toLowerCase()
@@ -162,10 +189,23 @@ export default function ProductManagement() {
             accountCount: planAccount
           });
         }
+
         successCount++;
+        smartResults.push({
+          model: rawModel,
+          success: true,
+          name: scrapedName,
+          thumbnail: scrapedThumb,
+          specCount: scraped.specifications?.length || 0
+        });
       } catch (err) {
         console.error(`Direct smart register error for ${rawModel}:`, err);
         failCount++;
+        smartResults.push({
+          model: rawModel,
+          success: false,
+          reason: '수집 처리 중 네트워크/서버 오류 발생'
+        });
       }
     }
 
@@ -174,7 +214,13 @@ export default function ProductManagement() {
     setIsSmartModalOpen(false);
     setDirectModelsText('');
 
-    alert(`⚡ 스마트 모델명 입력 등록이 완료되었습니다.\n(성공: ${successCount}건, 실패: ${failCount}건)`);
+    setSmartResultModal({
+      isOpen: true,
+      total: modelList.length,
+      successCount,
+      failCount,
+      results: smartResults
+    });
   };
 
   // When mounting or navigating to ProductManagement, select the top plan (plans[0]) and show list view
@@ -451,6 +497,7 @@ export default function ProductManagement() {
 
     let successCount = 0;
     let failCount = 0;
+    const smartResults: SmartRegisterResult[] = [];
 
     for (let i = 0; i < targets.length; i++) {
       const prod = targets[i];
@@ -480,17 +527,40 @@ export default function ProductManagement() {
             specifications: (scraped.specifications && scraped.specifications.length > 0) ? scraped.specifications : (prod.specifications || [])
           });
           successCount++;
+          smartResults.push({
+            model: prod.model,
+            success: true,
+            name: finalName,
+            thumbnail: finalThumb,
+            specCount: scraped.specifications?.length || 0
+          });
         } else {
           failCount++;
+          smartResults.push({
+            model: prod.model,
+            success: false,
+            reason: 'LG 공식 사이트에서 수집 가능한 상세 스펙 또는 썸네일 정보를 찾지 못함'
+          });
         }
       } catch (err) {
         console.error(err);
         failCount++;
+        smartResults.push({
+          model: prod.model,
+          success: false,
+          reason: '스마트 정보 동기화 중 오류 발생'
+        });
       }
     }
 
     setSmartProgress(null);
-    alert(`⚡ 스마트 정보 일괄 수집 완료!\n성공: ${successCount}개 / 실패: ${failCount}개`);
+    setSmartResultModal({
+      isOpen: true,
+      total: targets.length,
+      successCount,
+      failCount,
+      results: smartResults
+    });
   };
 
   const handleBatchCopy = async () => {
@@ -633,6 +703,7 @@ export default function ProductManagement() {
 
         let successCount = 0;
         let failCount = 0;
+        const smartResults: SmartRegisterResult[] = [];
 
         for (let i = 0; i < validRows.length; i++) {
           const row = validRows[i];
@@ -651,6 +722,16 @@ export default function ProductManagement() {
               price: rawPrice,
               refUrl
             });
+
+            if (!scraped.success && !scraped.thumbnail && (!scraped.specifications || scraped.specifications.length === 0)) {
+              failCount++;
+              smartResults.push({
+                model: rawModel,
+                success: false,
+                reason: 'LG 공식 사이트에서 해당 모델 페이지를 찾지 못했거나 정보를 가져오지 못함 (404 미등록 모델)'
+              });
+              continue;
+            }
 
             const currentPlan = plans.find(p => p.id === selectedPlanId) || selectedPlan;
             const planPrice = currentPlan?.basePrice ? String(currentPlan.basePrice).replace(/\D/g, '') : "59800";
@@ -709,14 +790,32 @@ export default function ProductManagement() {
             }
 
             successCount++;
+            smartResults.push({
+              model: rawModel,
+              success: true,
+              name: scrapedName,
+              thumbnail: scrapedThumb,
+              specCount: scraped.specifications?.length || 0
+            });
           } catch (err) {
             console.error(`Smart register error for ${rawModel}:`, err);
             failCount++;
+            smartResults.push({
+              model: rawModel,
+              success: false,
+              reason: '수집 처리 중 네트워크/서버 오류 발생'
+            });
           }
         }
 
         setSmartProgress(null);
-        alert(`⚡ 스마트 자동 등록이 완료되었습니다.\n(성공: ${successCount}건, 실패: ${failCount}건)`);
+        setSmartResultModal({
+          isOpen: true,
+          total: validRows.length,
+          successCount,
+          failCount,
+          results: smartResults
+        });
       } catch (err) {
         console.error("Smart excel process error:", err);
         setSmartProgress(null);
@@ -1839,6 +1938,117 @@ export default function ProductManagement() {
                     className="bg-white border border-[#E5E8EB] text-[#4E5968] hover:text-[#3182F6] hover:border-[#3182F6] py-3 rounded-[14px] text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                   >
                     <Upload className="w-4 h-4" /> 엑셀 파일 업로드
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 스마트 수집 등록 처리 결과 모달 (성공/실패 리스트 및 상세 사유 확인) */}
+          {smartResultModal?.isOpen && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-[1100] animate-fadeIn">
+              <div className="bg-white w-full max-w-2xl rounded-[28px] p-6 sm:p-8 shadow-2xl space-y-6 max-h-[85vh] flex flex-col">
+                {/* Header */}
+                <div className="flex justify-between items-center pb-4 border-b border-[#F2F4F6] shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-[14px] bg-[#E8F3FF] text-[#3182F6] flex items-center justify-center font-bold">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-[18px] text-[#191F28]">⚡ 스마트 수집 등록 결과</h3>
+                      <p className="text-[12px] text-[#8B95A1]">총 {smartResultModal.total}건 중 성공 {smartResultModal.successCount}건 / 실패 {smartResultModal.failCount}건</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setSmartResultModal(null)}
+                    className="p-2 hover:bg-[#F2F4F6] rounded-full text-[#8B95A1] transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5"/>
+                  </button>
+                </div>
+
+                {/* Summary Scoreboard */}
+                <div className="grid grid-cols-3 gap-3 shrink-0">
+                  <div className="bg-[#F8FAFC] border border-[#E5E8EB] p-4 rounded-[16px] text-center">
+                    <div className="text-[12px] font-bold text-[#8B95A1]">전체 시도</div>
+                    <div className="text-[20px] font-black text-[#191F28]">{smartResultModal.total}건</div>
+                  </div>
+                  <div className="bg-[#E8F3FF] border border-[#3182F6]/20 p-4 rounded-[16px] text-center">
+                    <div className="text-[12px] font-bold text-[#3182F6]">🟢 수집 성공</div>
+                    <div className="text-[20px] font-black text-[#3182F6]">{smartResultModal.successCount}건</div>
+                  </div>
+                  <div className="bg-[#FFF0F0] border border-[#FF4D4D]/20 p-4 rounded-[16px] text-center">
+                    <div className="text-[12px] font-bold text-[#E53E3E]">🔴 수집 실패</div>
+                    <div className="text-[20px] font-black text-[#E53E3E]">{smartResultModal.failCount}건</div>
+                  </div>
+                </div>
+
+                {/* Detailed Result List Container */}
+                <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+                  {/* Failed items section first */}
+                  {smartResultModal.failCount > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-[13px] font-extrabold text-[#E53E3E] bg-[#FFF0F0] px-3.5 py-2 rounded-[12px]">
+                        <AlertTriangle className="w-4 h-4 shrink-0" />
+                        <span>등록 실패한 모델 목록 ({smartResultModal.failCount}건)</span>
+                      </div>
+                      <div className="divide-y divide-[#F2F4F6] border border-[#FF4D4D]/30 rounded-[16px] overflow-hidden bg-[#FFF5F5]/30">
+                        {smartResultModal.results.filter(r => !r.success).map((r, idx) => (
+                          <div key={idx} className="p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-white">
+                            <div className="flex items-center gap-3">
+                              <span className="text-[11px] font-bold bg-[#FF4D4D] text-white px-2 py-0.5 rounded-full shrink-0">실패</span>
+                              <div>
+                                <div className="font-mono font-bold text-[14px] text-[#191F28]">{r.model}</div>
+                                <div className="text-[12px] text-[#E53E3E] font-medium">{r.reason || 'LG 공식 사이트에서 제품 페이지를 찾을 수 없음 (404 미등록 모델)'}</div>
+                              </div>
+                            </div>
+                            <div className="text-[11px] font-bold text-[#8B95A1] bg-[#F2F4F6] px-2.5 py-1 rounded-md shrink-0">
+                              모델명/철자 확인 필요
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Successful items section */}
+                  {smartResultModal.successCount > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-[13px] font-extrabold text-[#3182F6] bg-[#E8F3FF] px-3.5 py-2 rounded-[12px]">
+                        <CheckCircle className="w-4 h-4 shrink-0" />
+                        <span>등록 성공한 모델 목록 ({smartResultModal.successCount}건)</span>
+                      </div>
+                      <div className="divide-y divide-[#F2F4F6] border border-[#E5E8EB] rounded-[16px] overflow-hidden bg-white">
+                        {smartResultModal.results.filter(r => r.success).map((r, idx) => (
+                          <div key={idx} className="p-3 flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 overflow-hidden">
+                              {r.thumbnail ? (
+                                <img src={r.thumbnail} className="w-10 h-10 object-contain rounded-md border border-[#E5E8EB] shrink-0" alt="thumb" />
+                              ) : (
+                                <div className="w-10 h-10 bg-[#F8FAFC] rounded-md border border-[#E5E8EB] flex items-center justify-center shrink-0 text-[#8B95A1] text-[10px]">No Img</div>
+                              )}
+                              <div className="truncate">
+                                <div className="font-bold text-[13px] text-[#191F28] truncate">{r.name || r.model}</div>
+                                <div className="font-mono text-[11px] text-[#8B95A1]">{r.model}</div>
+                              </div>
+                            </div>
+                            <span className="text-[11px] font-bold bg-[#E8F3FF] text-[#3182F6] px-2.5 py-1 rounded-full shrink-0">
+                              스펙 {r.specCount || 0}개 수집
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="pt-3 border-t border-[#F2F4F6] shrink-0 flex justify-end">
+                  <button
+                    onClick={() => setSmartResultModal(null)}
+                    className="bg-[#3182F6] hover:bg-[#1B64DA] text-white font-bold px-6 py-3 rounded-[14px] text-[14px] shadow-md shadow-[#3182F6]/20 transition-all cursor-pointer"
+                  >
+                    확인 완료
                   </button>
                 </div>
               </div>
