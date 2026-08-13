@@ -271,31 +271,23 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
     const ogImageM = html.match(/property=["']og:image["']\s+content=["']([^"']+)["']/i) || html.match(/content=["']([^"']+)["']\s+property=["']og:image["']/i);
     const ogThumbnail = ogImageM ? ogImageM[1] : '';
 
-    // 3. Extract All Images (relative & absolute & static.lge.co.kr paths)
-    const relMatches = html.match(/["'](\/(kr|lg5-common)?\/images\/[^\s"'\\]+\.(jpg|png|webp|gif))["']/gi) || [];
-    const absMatches = html.match(/https:\/\/(www\.|static\.)?lge\.co\.kr\/(kr|lg5-common)?\/images\/[^\s"']+\.(jpg|png|webp|gif)/gi) || [];
+    // 3. Extract Official Product Gallery Thumbnails (LGE Official Top Gallery Area)
+    const galleryMatches: string[] = [];
 
-    const rawImgs = Array.from(new Set([
-      ...relMatches.map(s => s.replace(/["']/g, '')).map(s => s.startsWith('http') ? s : `https://www.lge.co.kr${s}`),
-      ...absMatches
-    ]));
+    // A. Search for gallery arrays in Next.js push payloads or scripts
+    const galleryArrayMatches = Array.from(html.matchAll(/"gallery(?:Images|List|Url|Path)?"\s*:\s*\[([\s\S]*?)\]/gi));
+    for (const m of galleryArrayMatches) {
+      const urls = m[1].match(/https?:\/\/[^\s"']+\.(jpg|png|webp|jpeg)/gi) || [];
+      urls.forEach(u => galleryMatches.push(u));
+    }
 
-    // A. 썸네일 리스트 (Thumbnails: Extract all gallery & USP product photos)
-    const productPhotoCandidates = rawImgs.filter(img => {
-      const lower = img.toLowerCase();
-      return !lower.includes('icon') && 
-             !lower.includes('logo') && 
-             !lower.includes('banner') &&
-             !lower.includes('badge') &&
-             !lower.includes('btn') &&
-             !lower.includes('/common/') &&
-             !lower.includes('small-') &&
-             !lower.includes('_mo.') &&
-             !lower.includes('_mo_') &&
-             !lower.includes('-mo.') &&
-             !lower.includes('mo_summary') &&
-             !/[-_]m\d+/i.test(lower);
-    });
+    // B. Search for /gallery/ in image URLs
+    const allGalleryImgs = html.match(/https?:\/\/(?:www\.|static\.)?lge\.co\.kr\/[^\s"'\\]*\/gallery\/[^\s"'\\]+\.(jpg|png|webp|gif)/gi) || [];
+    allGalleryImgs.forEach(u => galleryMatches.push(u));
+
+    // C. Search for _f01, _f02, _f03 product gallery cuts (e.g. AS185LGAA_f01_2g.jpg)
+    const fCuts = html.match(/https?:\/\/(?:www\.|static\.)?lge\.co\.kr\/[^\s"'\\]*_f\d+_[^\s"'\\]+\.(jpg|png|webp|gif)/gi) || [];
+    fCuts.forEach(u => galleryMatches.push(u));
 
     const uniqueGallery: string[] = [];
     const seenUrls = new Set<string>();
@@ -305,8 +297,15 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
       uniqueGallery.push(ogThumbnail);
     }
 
-    for (const img of productPhotoCandidates) {
-      if (!seenUrls.has(img)) {
+    for (const img of galleryMatches) {
+      const lower = img.toLowerCase();
+      if (
+        !seenUrls.has(img) &&
+        !lower.includes('small') &&
+        !lower.includes('-m0') &&
+        !/[-_]m\d+/i.test(lower) &&
+        !/[-_]mo[\._]/i.test(lower)
+      ) {
         seenUrls.add(img);
         uniqueGallery.push(img);
       }
