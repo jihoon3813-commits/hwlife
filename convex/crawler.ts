@@ -40,10 +40,22 @@ function generate80PercentVariations(modelCode: string): string[] {
   set.add(clean.toLowerCase());
   set.add(lower);
 
+  // LGE TV & Appliance installation & color suffixes (-wall, -stand, etc.)
+  const suffixes = ['', '-wall', '-stand', '-w', '-a', '-gng', '-akor1', '0na-wall', '0na-stand'];
+
+  for (const suf of suffixes) {
+    set.add(`${rawModel.toLowerCase()}${suf}`);
+    set.add(`${clean.toLowerCase()}${suf}`);
+    set.add(`${lower}${suf}`);
+  }
+
   // Generate prefix variations down to 70% length (enables >= 80% partial/prefix matches)
   const minLen = Math.max(4, Math.floor(lower.length * 0.7));
   for (let len = lower.length; len >= minLen; len--) {
-    set.add(lower.slice(0, len));
+    const prefix = lower.slice(0, len);
+    for (const suf of suffixes) {
+      set.add(`${prefix}${suf}`);
+    }
   }
 
   return Array.from(set);
