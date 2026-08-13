@@ -864,7 +864,12 @@ export default function ProductManagement() {
       )}
 
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <h2 className="text-[20px] lg:text-[24px] font-bold text-[#191F28]">제품관리</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-[20px] lg:text-[24px] font-bold text-[#191F28]">제품관리</h2>
+          <span className="text-[13px] font-extrabold bg-[#E8F3FF] text-[#3182F6] px-3 py-1 rounded-full border border-[#3182F6]/20">
+            총 등록 제품 <strong className="text-[14px] font-black">{allProducts?.length || 0}</strong>개
+          </span>
+        </div>
         <div className="text-[13px] text-[#8B95A1] lg:block hidden">드래그로 순서 변경, 일괄 복사/삭제가 가능합니다.</div>
       </div>
 
@@ -913,9 +918,16 @@ export default function ProductManagement() {
                     <Edit className="w-3 h-3" />
                   </button>
                 </div>
-                <div className={`text-[11px] ${selectedPlanId === plan.id ? 'text-white/70' : 'text-[#8B95A1]'}`}>
-                  {formatNumber(plan.basePrice)}원
-                  {plan.accountCount && ` · ${plan.accountCount}`}
+                <div className="flex justify-between items-center text-[11px]">
+                  <span className={selectedPlanId === plan.id ? 'text-white/70' : 'text-[#8B95A1]'}>
+                    {formatNumber(plan.basePrice)}원
+                    {plan.accountCount && ` · ${plan.accountCount}`}
+                  </span>
+                  <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-full ${
+                    selectedPlanId === plan.id ? 'bg-white/20 text-white' : 'bg-[#E8F3FF] text-[#3182F6]'
+                  }`}>
+                    {allProducts?.filter(p => p.planId === plan.id).length || 0}개
+                  </span>
                 </div>
               </div>
             ))}
@@ -928,7 +940,12 @@ export default function ProductManagement() {
             <>
               <div className="p-4 lg:p-6 border-b border-[#F2F4F6] bg-[#F9FAFB] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="w-full sm:w-auto">
-                  <h3 className="font-bold text-[16px] lg:text-[18px] mb-2">{selectedPlan.name} 리스트</h3>
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <h3 className="font-bold text-[16px] lg:text-[18px]">{selectedPlan.name} 리스트</h3>
+                    <span className="text-[12px] font-extrabold bg-[#E8F3FF] text-[#3182F6] px-2.5 py-0.5 rounded-full border border-[#3182F6]/20">
+                      등록 {filteredProducts.length}개
+                    </span>
+                  </div>
                   <div className="flex gap-2">
                     <button onClick={() => toggleSort('brand')} className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${sortConfig.key === 'brand' ? 'bg-[#3182F6] text-white border-[#3182F6]' : 'bg-white text-[#4E5968] border-[#E5E8EB]'}`}>
                       브랜드 {sortConfig.key === 'brand' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
