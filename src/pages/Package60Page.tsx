@@ -563,7 +563,7 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                               )}
                             </div>
                             <h3 className="font-extrabold text-[18px] text-[#191F28] group-hover:text-[#3182F6] transition-colors line-clamp-1">
-                              {heroItem.name} + 효원상조 60회
+                              {heroItem.name}
                             </h3>
                             <div className="pt-2 border-t border-[#F2F4F6] flex justify-between items-baseline">
                               <span className="text-[13px] text-[#4E5968] font-bold">월 납입금</span>
@@ -866,10 +866,10 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                         className="cursor-pointer group/title"
                       >
                         <h3 className="font-extrabold text-[16px] text-[#191F28] group-hover/title:text-[#3182F6] transition-colors line-clamp-1 leading-snug">
-                          {p.name} + 효원상조 60회
+                          {p.name}
                         </h3>
                         <p className="text-[12px] font-bold text-[#8B95A1] mt-0.5">
-                          {p.brand} {p.model} + 효원상조
+                          {p.brand} {p.model}
                         </p>
                       </div>
 
