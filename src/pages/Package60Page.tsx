@@ -68,7 +68,7 @@ function AutoSwipingCardThumbnail({
     <div 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative w-full aspect-square bg-[#F8FAFC] border-b border-[#E5E8EB] overflow-hidden group/thumb transition-colors select-none"
+      className="relative w-full aspect-square bg-[#F8FAFC] border-b border-[#E5E8EB] overflow-hidden group/thumb transition-colors select-none p-3 sm:p-4 flex items-center justify-center"
     >
       {/* Top Badges Overlayed (z-30 so image layer never covers it) */}
       <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-30 pointer-events-none">
@@ -87,7 +87,7 @@ function AutoSwipingCardThumbnail({
         </div>
       </div>
 
-      {/* Main Draggable Image Container (100% Full Bleed Fill) */}
+      {/* Main Draggable Image Container (20% Reduced Thumbnail Size) */}
       <motion.div
         key={currentIdx}
         initial={{ opacity: 0.85, x: 15 }}
@@ -108,12 +108,12 @@ function AutoSwipingCardThumbnail({
             setCurrentIdx((prev) => (prev - 1 + imageList.length) % imageList.length);
           }
         }}
-        className="relative z-10 w-full h-full cursor-grab active:cursor-grabbing p-0 overflow-hidden"
+        className="relative z-10 w-full h-full cursor-grab active:cursor-grabbing p-1 overflow-hidden flex items-center justify-center"
       >
         <img 
           src={mainImg} 
           alt={productName} 
-          className="w-full h-full object-cover object-center pointer-events-none scale-[1.03] group-hover/thumb:scale-110 transition-transform duration-300 ease-out"
+          className="w-full h-full object-contain object-center pointer-events-none scale-[0.80] group-hover/thumb:scale-[0.88] transition-transform duration-300 ease-out"
         />
       </motion.div>
 
@@ -534,11 +534,11 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                           }}
                           className="cursor-pointer group"
                         >
-                          <div className="relative aspect-4/3 rounded-sm overflow-hidden bg-[#F8FAFC] border border-[#E2E8F0] mb-4 flex items-center justify-center">
+                          <div className="relative aspect-4/3 rounded-sm overflow-hidden bg-[#F8FAFC] border border-[#E2E8F0] mb-4 flex items-center justify-center p-4 sm:p-5">
                             <img 
                               src={heroImg}
                               alt={heroItem.name}
-                              className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-contain object-center transform scale-[0.82] group-hover:scale-90 transition-transform duration-300"
                             />
                             <div className="absolute top-3 left-3 bg-[#191F28]/90 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-sm flex items-center gap-1.5 shadow-sm">
                               <Sparkles className="w-3.5 h-3.5 text-[#3182F6] fill-current" />
@@ -817,7 +817,7 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-9 lg:gap-10">
             {filteredProducts.map((p) => {
               const imageList = getProductImageList(p);
               const giftBadgeText = p.giftText ? `사은품 : ${p.giftText}` : '사은품 : 가전소유+상조회비 60회 포함';
@@ -836,8 +836,8 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                       tagColor={currentPkg.tagColor}
                     />
 
-                    {/* Content Section */}
-                    <div className="p-4 space-y-3">
+                    {/* Content Section (Widened Padding) */}
+                    <div className="p-5 space-y-4">
                       
                       {/* Gift Badge */}
                       <div className="inline-flex items-center gap-1.5 bg-rose-50 border border-rose-200 text-rose-600 px-2.5 py-1 rounded-xs text-[12px] font-extrabold">
