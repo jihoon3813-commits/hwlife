@@ -44,11 +44,13 @@ function AutoSwipingCardThumbnail({
   productName,
   accountCount,
   tagColor,
+  onClick,
 }: {
   imageList: string[];
   productName: string;
   accountCount: string;
   tagColor: string;
+  onClick?: () => void;
 }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -68,7 +70,8 @@ function AutoSwipingCardThumbnail({
     <div 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative w-full aspect-square bg-[#F8FAFC] border-b border-[#E5E8EB] overflow-hidden group/thumb transition-colors select-none p-3 sm:p-4 flex items-center justify-center"
+      onClick={onClick}
+      className="relative w-full aspect-[4/3] bg-white border-b border-[#E5E8EB] overflow-hidden group/thumb transition-colors select-none p-0 flex items-center justify-center cursor-pointer"
     >
       {/* Top Badges Overlayed (z-30 so image layer never covers it) */}
       <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-30 pointer-events-none">
@@ -87,7 +90,7 @@ function AutoSwipingCardThumbnail({
         </div>
       </div>
 
-      {/* Main Draggable Image Container (20% Reduced Thumbnail Size) */}
+      {/* Main Draggable Image Container (30% Smaller Image with Tightly Fitted Container) */}
       <motion.div
         key={currentIdx}
         initial={{ opacity: 0.85, x: 15 }}
@@ -108,12 +111,12 @@ function AutoSwipingCardThumbnail({
             setCurrentIdx((prev) => (prev - 1 + imageList.length) % imageList.length);
           }
         }}
-        className="relative z-10 w-full h-full cursor-grab active:cursor-grabbing p-1 overflow-hidden flex items-center justify-center"
+        className="relative z-10 w-full h-full cursor-pointer p-0 overflow-hidden flex items-center justify-center"
       >
         <img 
           src={mainImg} 
           alt={productName} 
-          className="w-full h-full object-contain object-center pointer-events-none scale-[0.80] group-hover/thumb:scale-[0.88] transition-transform duration-300 ease-out"
+          className="w-full h-full object-contain object-center pointer-events-none scale-[0.70] group-hover/thumb:scale-[0.77] transition-transform duration-300 ease-out cursor-pointer"
         />
       </motion.div>
 
@@ -835,10 +838,15 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                       productName={p.name}
                       accountCount={currentPkg.accountCount}
                       tagColor={currentPkg.tagColor}
+                      onClick={() => {
+                        setSelectedSpecProduct(p);
+                        setSelectedSpecImageIdx(0);
+                        setIsSpecModalOpen(true);
+                      }}
                     />
 
-                    {/* Content Section (Widened Padding) */}
-                    <div className="p-5 space-y-4">
+                    {/* Content Section (Shaded Background bg-[#F8FAFC]) */}
+                    <div className="p-5 space-y-4 bg-[#F8FAFC]">
                       
                       {/* Gift Badge (Only rendered if giftText exists) */}
                       {p.giftText && (
@@ -849,8 +857,15 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                       )}
 
                       {/* Product Name & Model */}
-                      <div>
-                        <h3 className="font-extrabold text-[16px] text-[#191F28] line-clamp-1 leading-snug">
+                      <div 
+                        onClick={() => {
+                          setSelectedSpecProduct(p);
+                          setSelectedSpecImageIdx(0);
+                          setIsSpecModalOpen(true);
+                        }}
+                        className="cursor-pointer group/title"
+                      >
+                        <h3 className="font-extrabold text-[16px] text-[#191F28] group-hover/title:text-[#3182F6] transition-colors line-clamp-1 leading-snug">
                           {p.name} + 효원상조 60회
                         </h3>
                         <p className="text-[12px] font-bold text-[#8B95A1] mt-0.5">
@@ -858,8 +873,8 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                         </p>
                       </div>
 
-                      {/* Price Details Block */}
-                      <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-sm p-3 space-y-1.5">
+                      {/* Price Details Block (White box inside shaded area) */}
+                      <div className="bg-white border border-[#E2E8F0] shadow-2xs rounded-sm p-3.5 space-y-2">
                         <div className="flex justify-between items-baseline">
                           <span className="text-[12px] text-[#64748B] font-bold">월 납입금</span>
                           <div className="text-right">
@@ -869,11 +884,11 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                         </div>
 
                         <div className="pt-2 border-t border-[#E2E8F0] grid grid-cols-2 gap-2 text-[12px]">
-                          <div className="bg-white border border-[#E2E8F0] p-1.5 rounded-xs text-center">
+                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-1.5 rounded-xs text-center">
                             <span className="text-[#64748B] block text-[10px]">가전 렌탈료</span>
                             <strong className="text-[#1E293B] font-extrabold">{currentPkg.rentalPrice}원</strong>
                           </div>
-                          <div className="bg-white border border-[#E2E8F0] p-1.5 rounded-xs text-center">
+                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-1.5 rounded-xs text-center">
                             <span className="text-[#64748B] block text-[10px]">상조 회비</span>
                             <strong className="text-[#1E293B] font-extrabold">{currentPkg.sangjoPrice}원</strong>
                           </div>
@@ -903,28 +918,28 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                     </div>
                   </div>
 
-                  {/* Card Footer Action Buttons */}
-                  <div className="p-4 pt-0 space-y-1.5">
+                  {/* Card Footer Action Buttons (Shaded Background bg-[#F8FAFC]) */}
+                  <div className="p-5 pt-0 space-y-2 bg-[#F8FAFC]">
                     <button
                       onClick={() => {
                         setSelectedSpecProduct(p);
                         setSelectedSpecImageIdx(0);
                         setIsSpecModalOpen(true);
                       }}
-                      className="w-full bg-[#E8F3FF] hover:bg-[#D4E8FF] text-[#1B64DA] border border-[#B0D0FF] text-[13px] font-extrabold py-2 rounded-sm transition-all flex items-center justify-center gap-1.5 shadow-2xs group-hover:bg-[#D4E8FF]"
+                      className="w-full bg-[#E8F3FF] hover:bg-[#D4E8FF] text-[#1B64DA] border border-[#B0D0FF] text-[13px] font-extrabold py-2 rounded-sm transition-all flex items-center justify-center gap-1.5 shadow-2xs group-hover:bg-[#D4E8FF] cursor-pointer"
                     >
                       <FileText className="w-4 h-4 text-[#3182F6]" />
                       가전제품 스펙 상세보기
                     </button>
                     <button
                       onClick={() => setIsSangjoModalOpen(true)}
-                      className="w-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#334155] text-[12px] font-bold py-2 rounded-sm transition-colors flex items-center justify-center gap-1"
+                      className="w-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#334155] text-[12px] font-bold py-2 rounded-sm transition-colors flex items-center justify-center gap-1 cursor-pointer"
                     >
                       상조 서비스 더 자세히 알기
                     </button>
                     <button
                       onClick={() => scrollToInquiry(p)}
-                      className="w-full bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[14px] font-bold py-2.5 rounded-sm shadow-xs transition-all flex items-center justify-center gap-2 group-hover:bg-[#1B64DA]"
+                      className="w-full bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[14px] font-bold py-2.5 rounded-sm shadow-xs transition-all flex items-center justify-center gap-2 group-hover:bg-[#1B64DA] cursor-pointer"
                     >
                       가전상조 60패키지 상담 신청 <ChevronRight className="w-4 h-4" />
                     </button>

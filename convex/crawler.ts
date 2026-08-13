@@ -271,53 +271,43 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
     const ogImageM = html.match(/property=["']og:image["']\s+content=["']([^"']+)["']/i) || html.match(/content=["']([^"']+)["']\s+property=["']og:image["']/i);
     const ogThumbnail = ogImageM ? ogImageM[1] : '';
 
-    // 3. Extract All Images (relative & absolute paths)
+    // 3. Extract All Images (relative & absolute & static.lge.co.kr paths)
     const relMatches = html.match(/["'](\/(kr|lg5-common)?\/images\/[^\s"'\\]+\.(jpg|png|webp|gif))["']/gi) || [];
-    const absMatches = html.match(/https:\/\/www\.lge\.co\.kr\/(kr|lg5-common)?\/images\/[^\s"']+\.(jpg|png|webp|gif)/gi) || [];
+    const absMatches = html.match(/https:\/\/(www\.|static\.)?lge\.co\.kr\/(kr|lg5-common)?\/images\/[^\s"']+\.(jpg|png|webp|gif)/gi) || [];
 
     const rawImgs = Array.from(new Set([
       ...relMatches.map(s => s.replace(/["']/g, '')).map(s => s.startsWith('http') ? s : `https://www.lge.co.kr${s}`),
       ...absMatches
     ]));
 
-    // A. 썸네일 리스트 (Thumbnails)
-    const galleryImgs = rawImgs.filter(img => 
-      img.includes('/gallery/') &&
-      !img.includes('small') &&
-      !img.includes('-m0')
-    );
-
-    const pcOnlyGallery = galleryImgs.filter(img => {
+    // A. 썸네일 리스트 (Thumbnails: Extract all gallery & USP product photos)
+    const productPhotoCandidates = rawImgs.filter(img => {
       const lower = img.toLowerCase();
-      return !/[-_]m\d+/i.test(lower) && 
-             !/[-_]mo[\._]/i.test(lower) &&
-             !/[-_]mo_/i.test(lower);
+      return !lower.includes('icon') && 
+             !lower.includes('logo') && 
+             !lower.includes('banner') &&
+             !lower.includes('badge') &&
+             !lower.includes('btn') &&
+             !lower.includes('/common/') &&
+             !lower.includes('small-') &&
+             !lower.includes('_mo.') &&
+             !lower.includes('_mo_') &&
+             !lower.includes('-mo.') &&
+             !lower.includes('mo_summary') &&
+             !/[-_]m\d+/i.test(lower);
     });
 
-    const candidates = pcOnlyGallery.length > 0 ? pcOnlyGallery : galleryImgs;
-
     const uniqueGallery: string[] = [];
-    const seenKeys = new Set<string>();
+    const seenUrls = new Set<string>();
 
-    for (const img of candidates) {
-      if (img.includes('medium') && candidates.some(c => c.includes(img.replace('medium', 'large')))) {
-        continue;
-      }
+    if (ogThumbnail && !seenUrls.has(ogThumbnail)) {
+      seenUrls.add(ogThumbnail);
+      uniqueGallery.push(ogThumbnail);
+    }
 
-      const filename = img.split('/').pop() || '';
-      let cleanKey = filename
-        .replace(/^(small|medium|large)[-_]?/gi, '')
-        .replace(/[-_]m(\d+)/gi, '$1')
-        .replace(/[-_]mo[\._]/gi, '.')
-        .replace(/\.(jpg|png|webp|gif)$/i, '')
-        .toLowerCase();
-
-      if (cleanKey.includes('interior') || cleanKey.includes('scene') || cleanKey.includes('gallery_2000x2402')) {
-        cleanKey = 'interior_scene_primary';
-      }
-
-      if (!seenKeys.has(cleanKey)) {
-        seenKeys.add(cleanKey);
+    for (const img of productPhotoCandidates) {
+      if (!seenUrls.has(img)) {
+        seenUrls.add(img);
         uniqueGallery.push(img);
       }
     }
@@ -325,9 +315,30 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
     const mainThumbnail = uniqueGallery.length > 0 ? uniqueGallery[0] : ogThumbnail;
     const finalDetailImages: string[] = [];
 
-    // 4. Extract Full Expanded Product Specifications
+    // 4. Extract Full Expanded Product Specifications (Multi-Pattern Extractor)
     let specifications: Array<{ category?: string; name: string; value: string }> = [];
 
+    // A. Extract from Next.js self.__next_f.push payloads (LGE App Router)
+    const nextPushes = html.match(/self\.__next_f\.push\([\s\S]*?\);/g) || [];
+    for (const push of nextPushes) {
+      if (push.includes('spec') || push.includes('규격') || push.includes('크기') || push.includes('색상') || push.includes('면적') || push.includes('용량')) {
+        const clean = push.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        const specPairs = Array.from(clean.matchAll(/"(?:specName|title|name)"\s*:\s*"([^"]+)"\s*,\s*"(?:specValue|value|val)"\s*:\s*"([^"]+)"/g));
+        for (const m of specPairs) {
+          let k = m[1].replace(/<[^>]+>/g, '').trim();
+          let v = m[2].replace(/<[^>]+>/g, '').trim();
+          if (v.includes('\\u003c') || v.includes('<table') || v.includes('<a href')) continue;
+
+          if (k && v && k.length > 1 && k.length < 60 && v.length > 0 && v.length < 300 && !k.includes('도착 예정') && !k.includes('설치유의사항')) {
+            if (!specifications.some(s => s.name === k)) {
+              specifications.push({ category: '상세 사양', name: k, value: v });
+            }
+          }
+        }
+      }
+    }
+
+    // B. Summary <li> list items
     const summaryMatches = Array.from(html.matchAll(/<li>\s*([^:]+)\s*:\s*([^<]+)<\/li>/gi));
     for (const m of summaryMatches) {
       const k = m[1].replace(/<[^>]+>/g, '').trim();
@@ -339,34 +350,56 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
       }
     }
 
-    const specSectionMatches = Array.from(html.matchAll(/<div[^>]*class=["'][^"']*(spec-info-title|tit)[^"']*["'][^>]*>\s*([\s\S]*?)\s*<\/div>\s*<div[^>]*class=["'][^"']*spec-info-list[^"']*["'][^>]*>([\s\S]*?)<\/div>/gi));
+    // C. <dl><dt>...</dt><dd>...</dd></dl> spec pairs
+    const allDlMatches = Array.from(html.matchAll(/<dl[^>]*>([\s\S]*?)<\/dl>/gi));
+    for (const dl of allDlMatches) {
+      const dlContent = dl[1];
+      const dtMatch = dlContent.match(/<dt[^>]*>([\s\S]*?)<\/dt>/i);
+      const ddMatch = dlContent.match(/<dd[^>]*>([\s\S]*?)<\/dd>/i);
 
-    for (const match of specSectionMatches) {
-      const categoryRaw = match[2].replace(/<[^>]+>/g, '').trim();
-      const category = categoryRaw || '상세 사양';
-      const listHtml = match[3];
+      if (dtMatch && ddMatch) {
+        const dtHtmlClean = dtMatch[1].replace(/data-[a-z0-9_-]+=(["'])[\s\S]*?\1/gi, '');
+        const ddHtmlClean = ddMatch[1].replace(/data-[a-z0-9_-]+=(["'])[\s\S]*?\1/gi, '');
 
-      const dlMatches = Array.from(listHtml.matchAll(/<dl[^>]*>([\s\S]*?)<\/dl>/gi));
-      for (const dl of dlMatches) {
-        const dlContent = dl[1];
-        const dtMatch = dlContent.match(/<dt[^>]*>([\s\S]*?)<\/dt>/i);
-        const ddMatch = dlContent.match(/<dd[^>]*>([\s\S]*?)<\/dd>/i);
+        let name = dtHtmlClean.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        let value = ddHtmlClean.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-        if (dtMatch && ddMatch) {
-          const dtHtmlClean = dtMatch[1].replace(/data-[a-z0-9_-]+=(["'])[\s\S]*?\1/gi, '');
-          const ddHtmlClean = ddMatch[1].replace(/data-[a-z0-9_-]+=(["'])[\s\S]*?\1/gi, '');
+        value = value.replace(/본 이미지는 사이즈에 대한 이해를 돕기 위한 것으로[\s\S]*/g, '').trim();
+        value = value.replace(/\*\s*소비자의 이해를 돕기 위해[\s\S]*/g, '').trim();
 
-          let name = dtHtmlClean.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-          let value = ddHtmlClean.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-
-          value = value.replace(/본 이미지는 사이즈에 대한 이해를 돕기 위한 것으로[\s\S]*/g, '').trim();
-          value = value.replace(/\*\s*소비자의 이해를 돕기 위해[\s\S]*/g, '').trim();
-
-          if (name && value && name.length < 50 && value.length < 300) {
-            if (!specifications.some(s => s.name === name)) {
-              specifications.push({ category, name, value });
-            }
+        if (
+          name && value && 
+          name.length > 1 && name.length < 60 && 
+          value.length > 0 && value.length < 300 &&
+          !name.includes('도착 예정') &&
+          !name.includes('설치유의사항') &&
+          !name.includes('상세 내용 열기') &&
+          !name.includes('이용자') &&
+          !name.includes('권리') &&
+          !name.includes('크롬')
+        ) {
+          if (!specifications.some(s => s.name === name)) {
+            specifications.push({ category: '상세 사양', name, value });
           }
+        }
+      }
+    }
+
+    // D. <th>/<td> spec table pairs
+    const thtdMatches = Array.from(html.matchAll(/<th[^>]*>([\s\S]*?)<\/th>\s*<td[^>]*>([\s\S]*?)<\/td>/gi));
+    for (const match of thtdMatches) {
+      let name = match[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      let value = match[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      if (
+        name && value && 
+        name.length > 1 && name.length < 60 && 
+        value.length > 0 && value.length < 300 &&
+        !name.includes('도착 예정') &&
+        !name.includes('설치유의사항') &&
+        !name.includes('이용자')
+      ) {
+        if (!specifications.some(s => s.name === name)) {
+          specifications.push({ category: '상세 사양', name, value });
         }
       }
     }
