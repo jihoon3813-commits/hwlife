@@ -851,12 +851,22 @@ export default function ProductManagement() {
 
         let successCount = 0;
         let failCount = 0;
+        const excelResults: SmartRegisterResult[] = [];
         
         for (let i = 0; i < rows.length; i++) {
           setUploadProgress(prev => ({ ...prev, current: i + 1 }));
           const row = rows[i];
+          const modelName = String(row[4] || row[3] || `엑셀 ${i + 2}행`).trim();
           try {
-            if (!row || !row[3]) continue; 
+            if (!row || !row[3]) {
+              failCount++;
+              excelResults.push({
+                model: modelName,
+                success: false,
+                reason: `엑셀 ${i + 2}행에 필수 항목(제품명)이 누락되었습니다.`
+              });
+              continue; 
+            }
 
             let planId = 1;
             const planVal = String(row[0] || '').trim();
@@ -874,7 +884,7 @@ export default function ProductManagement() {
             const price = String(row[5] || '0').replace(/\D/g, '');
             const discountPrice = String(row[6] || '0').replace(/\D/g, '');
             const tag = String(row[7] || '').trim();
-            const accountCount = planVal; // Mapping '구좌' column value to accountCount
+            const accountCount = planVal;
             
             const comparisons = [];
             for (let j = 0; j < 10; j++) {
@@ -915,17 +925,36 @@ export default function ProductManagement() {
               detailImages: detailUrls
             } as any);
             successCount++;
+            excelResults.push({
+              model: model || name,
+              success: true,
+              name,
+              thumbnail: thumbnailUrl
+            });
           } catch (rowErr) {
             console.error(`Row ${i + 2} processing error:`, rowErr, row);
             failCount++;
+            excelResults.push({
+              model: modelName,
+              success: false,
+              reason: `엑셀 ${i + 2}행 데이터 처리 및 저장 실패`
+            });
           }
         }
-        alert(`일괄 등록 완료\n성공: ${successCount}건\n실패: ${failCount}건`);
+
+        setIsUploading(false);
+        setSmartResultModal({
+          isOpen: true,
+          total: rows.length,
+          successCount,
+          failCount,
+          results: excelResults
+        });
       } catch (err) {
         console.error("Excel upload general error:", err);
+        setIsUploading(false);
         alert("엑셀 파일 처리 중 오류가 발생했습니다. 양식을 다시 확인해 주세요.");
       } finally {
-        setIsUploading(false);
         if (e.target) e.target.value = '';
       }
     };
@@ -1988,9 +2017,34 @@ export default function ProductManagement() {
                   {/* Failed items section first */}
                   {smartResultModal.failCount > 0 && (
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-[13px] font-extrabold text-[#E53E3E] bg-[#FFF0F0] px-3.5 py-2 rounded-[12px]">
-                        <AlertTriangle className="w-4 h-4 shrink-0" />
-                        <span>등록 실패한 모델 목록 ({smartResultModal.failCount}건)</span>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[13px] font-extrabold text-[#E53E3E] bg-[#FFF0F0] px-3.5 py-2 rounded-[12px] border border-[#FF4D4D]/20">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 shrink-0" />
+                          <span>등록 실패한 모델 목록 ({smartResultModal.failCount}건)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              const failedStr = smartResultModal.results.filter(r => !r.success).map(r => r.model).join('\n');
+                              navigator.clipboard.writeText(failedStr);
+                              alert(`실패한 ${smartResultModal.failCount}개 모델명이 클립보드에 복사되었습니다!`);
+                            }}
+                            className="bg-white hover:bg-rose-100 text-[#E53E3E] border border-rose-300 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            <Copy className="w-3 h-3" /> 실패 모델명 복사
+                          </button>
+                          <button
+                            onClick={() => {
+                              const failedStr = smartResultModal.results.filter(r => !r.success).map(r => r.model).join('\n');
+                              setDirectModelsText(failedStr);
+                              setSmartResultModal(null);
+                              setIsSmartModalOpen(true);
+                            }}
+                            className="bg-[#E53E3E] hover:bg-rose-700 text-white px-2.5 py-1 rounded-md text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            <Zap className="w-3 h-3" /> 실패 모델 재시도
+                          </button>
+                        </div>
                       </div>
                       <div className="divide-y divide-[#F2F4F6] border border-[#FF4D4D]/30 rounded-[16px] overflow-hidden bg-[#FFF5F5]/30">
                         {smartResultModal.results.filter(r => !r.success).map((r, idx) => (
