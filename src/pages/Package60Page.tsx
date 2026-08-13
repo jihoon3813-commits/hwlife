@@ -552,10 +552,12 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                           <div className="space-y-3">
                             <div className="flex justify-between items-center gap-2">
                               <span className="text-[12px] font-bold text-[#8B95A1]">{heroItem.brand} {heroItem.model || ''}</span>
-                              <span className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 text-rose-600 px-2 py-0.5 rounded-xs text-[11px] font-extrabold truncate max-w-[200px]">
-                                <Gift className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                                {heroItem.giftText ? `사은품: ${heroItem.giftText}` : '사은품: 가전소유+렌탈료 100%환급'}
-                              </span>
+                              {heroItem.giftText && (
+                                <span className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 text-rose-600 px-2 py-0.5 rounded-xs text-[11px] font-extrabold truncate max-w-[200px]">
+                                  <Gift className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                                  사은품: {heroItem.giftText}
+                                </span>
+                              )}
                             </div>
                             <h3 className="font-extrabold text-[18px] text-[#191F28] group-hover:text-[#3182F6] transition-colors line-clamp-1">
                               {heroItem.name} + 효원상조 60회
@@ -820,7 +822,6 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-9 lg:gap-10">
             {filteredProducts.map((p) => {
               const imageList = getProductImageList(p);
-              const giftBadgeText = p.giftText ? `사은품 : ${p.giftText}` : '사은품 : 가전소유+상조회비 60회 포함';
 
               return (
                 <div 
@@ -839,11 +840,13 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                     {/* Content Section (Widened Padding) */}
                     <div className="p-5 space-y-4">
                       
-                      {/* Gift Badge */}
-                      <div className="inline-flex items-center gap-1.5 bg-rose-50 border border-rose-200 text-rose-600 px-2.5 py-1 rounded-xs text-[12px] font-extrabold">
-                        <Gift className="w-3.5 h-3.5 text-rose-500" />
-                        {giftBadgeText}
-                      </div>
+                      {/* Gift Badge (Only rendered if giftText exists) */}
+                      {p.giftText && (
+                        <div className="inline-flex items-center gap-1.5 bg-rose-50 border border-rose-200 text-rose-600 px-2.5 py-1 rounded-xs text-[12px] font-extrabold">
+                          <Gift className="w-3.5 h-3.5 text-rose-500" />
+                          사은품 : {p.giftText}
+                        </div>
+                      )}
 
                       {/* Product Name & Model */}
                       <div>
@@ -1141,10 +1144,12 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                       </div>
                     </div>
 
-                    <div className="bg-rose-50 border border-rose-200 text-rose-700 p-2.5 rounded-sm text-[12px] font-bold flex items-center gap-1.5">
-                      <Gift className="w-4 h-4 text-rose-500 shrink-0" />
-                      <span>{selectedSpecProduct.giftText ? `사은품 : ${selectedSpecProduct.giftText}` : '사은품 : 가전소유+상조회비 60회 포함'}</span>
-                    </div>
+                    {selectedSpecProduct.giftText && (
+                      <div className="bg-rose-50 border border-rose-200 text-rose-700 p-2.5 rounded-sm text-[12px] font-bold flex items-center gap-1.5">
+                        <Gift className="w-4 h-4 text-rose-500 shrink-0" />
+                        <span>사은품 : {selectedSpecProduct.giftText}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
