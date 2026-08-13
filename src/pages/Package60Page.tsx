@@ -71,7 +71,7 @@ function AutoSwipingCardThumbnail({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
-      className="relative w-full aspect-[4/3] bg-white border-b border-[#E5E8EB] overflow-hidden group/thumb transition-colors select-none p-0 flex items-center justify-center cursor-pointer"
+      className="relative w-full aspect-square bg-[#F8FAFC] border-b border-[#E5E8EB] overflow-hidden group/thumb transition-colors select-none p-0 flex items-center justify-center cursor-pointer"
     >
       {/* Top Badges Overlayed (z-30 so image layer never covers it) */}
       <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-30 pointer-events-none">
@@ -90,7 +90,7 @@ function AutoSwipingCardThumbnail({
         </div>
       </div>
 
-      {/* Main Draggable Image Container (30% Smaller Image with Tightly Fitted Container) */}
+      {/* Main Draggable Image Container (100% Edge-to-Edge Full Width Fill) */}
       <motion.div
         key={currentIdx}
         initial={{ opacity: 0.85, x: 15 }}
@@ -116,7 +116,7 @@ function AutoSwipingCardThumbnail({
         <img 
           src={mainImg} 
           alt={productName} 
-          className="w-full h-full object-contain object-center pointer-events-none scale-[0.70] group-hover/thumb:scale-[0.77] transition-transform duration-300 ease-out cursor-pointer"
+          className="w-full h-full object-cover object-center pointer-events-none group-hover/thumb:scale-105 transition-transform duration-300 ease-out cursor-pointer"
         />
       </motion.div>
 
