@@ -23,11 +23,38 @@ const categories = [
   'care-accessories'
 ];
 
+function isValidProductRefUrl(refUrl?: string, modelCode?: string): boolean {
+  if (!refUrl || typeof refUrl !== 'string') return false;
+  if (!refUrl.includes('lge.co.kr')) return false;
+  const lower = refUrl.toLowerCase();
+  
+  if (
+    lower.endsWith('/home') ||
+    lower.endsWith('/main') ||
+    lower.includes('/care-solutions') ||
+    lower.includes('/category') ||
+    lower.includes('/search') ||
+    lower.includes('/business') ||
+    lower.includes('/event') ||
+    lower.includes('/support') ||
+    lower.includes('/bestshop') ||
+    lower.includes('/story') ||
+    lower.includes('/company')
+  ) {
+    return false;
+  }
+
+  const parts = refUrl.split('lge.co.kr/')[1]?.split('?')[0]?.split('/').filter(Boolean);
+  if (!parts || parts.length < 2) return false;
+
+  return true;
+}
+
 async function resolveProductUrl(modelCode: string, refUrl?: string): Promise<string | null> {
   const cleanCode = modelCode.trim();
   
-  if (refUrl && refUrl.includes('lge.co.kr') && !refUrl.endsWith('/home') && refUrl.length > 30) {
-    return refUrl;
+  if (isValidProductRefUrl(refUrl, cleanCode)) {
+    return refUrl!;
   }
 
   // 1. Direct GET probe with category list & variations
@@ -79,17 +106,7 @@ async function resolveProductUrl(modelCode: string, refUrl?: string): Promise<st
         const html = await res.text();
         const matches = html.match(/https?:\/\/(www\.)?lge\.co\.kr\/[a-zA-Z0-9_\-]+\/[a-zA-Z0-9_\-]+/gi);
         if (matches) {
-          const valid = Array.from(new Set(matches)).filter(u => 
-            !u.includes('/search') && 
-            !u.includes('/business') && 
-            !u.includes('/event') && 
-            !u.includes('/support') &&
-            !u.includes('/bestshop') &&
-            !u.includes('/story') &&
-            !u.includes('/category') &&
-            !u.includes('/company') &&
-            !u.includes('/care-solutions')
-          );
+          const valid = Array.from(new Set(matches)).filter(u => isValidProductRefUrl(u, cleanCode));
           if (valid.length > 0) return valid[0];
         }
       }
@@ -107,17 +124,7 @@ async function resolveProductUrl(modelCode: string, refUrl?: string): Promise<st
         const html = await res.text();
         const matches = html.match(/https?:\/\/(www\.)?lge\.co\.kr\/[a-zA-Z0-9_\-]+\/[a-zA-Z0-9_\-]+/gi);
         if (matches) {
-          const valid = Array.from(new Set(matches)).filter(u => 
-            !u.includes('/search') && 
-            !u.includes('/business') && 
-            !u.includes('/event') && 
-            !u.includes('/support') &&
-            !u.includes('/bestshop') &&
-            !u.includes('/story') &&
-            !u.includes('/category') &&
-            !u.includes('/company') &&
-            !u.includes('/care-solutions')
-          );
+          const valid = Array.from(new Set(matches)).filter(u => isValidProductRefUrl(u, cleanCode));
           if (valid.length > 0) return valid[0];
         }
       }
