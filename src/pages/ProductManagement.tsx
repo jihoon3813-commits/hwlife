@@ -361,14 +361,19 @@ export default function ProductManagement() {
         });
 
         if (scraped.success || scraped.thumbnail || (scraped.specifications && scraped.specifications.length > 0)) {
+          const isRealName = scraped.name && scraped.name !== `LG ${prod.model}`;
+          const finalName = isRealName ? scraped.name : prod.name;
+          const finalThumb = scraped.thumbnail || prod.image || undefined;
+          const finalThumbs = (scraped.thumbnails && scraped.thumbnails.length > 0) ? scraped.thumbnails : (scraped.thumbnail ? [scraped.thumbnail] : (prod.images || []));
+
           await updateProduct({
             id: prod._id,
-            name: scraped.name && !scraped.name.startsWith('LG ') ? scraped.name : (prod.name || scraped.name),
+            name: finalName,
             brand: scraped.brand || prod.brand || 'LG전자',
             category: scraped.category || prod.category || '가전',
-            image: scraped.thumbnail || prod.image || undefined,
-            images: scraped.thumbnails && scraped.thumbnails.length > 0 ? scraped.thumbnails : (prod.images || []),
-            specifications: scraped.specifications && scraped.specifications.length > 0 ? scraped.specifications : (prod.specifications || [])
+            image: finalThumb,
+            images: finalThumbs,
+            specifications: (scraped.specifications && scraped.specifications.length > 0) ? scraped.specifications : (prod.specifications || [])
           });
           successCount++;
         } else {
@@ -529,28 +534,56 @@ export default function ProductManagement() {
             const planBenefitPrice = currentPlan?.benefitPrice ? String(currentPlan.benefitPrice).replace(/\D/g, '') : "34800";
             const planAccount = currentPlan?.accountCount || (selectedPlanId + "구좌");
 
-            await createProduct({
-              planId: selectedPlanId,
-              brand: scraped.brand || 'LG전자',
-              category: scraped.category || '가전',
-              model: scraped.model || rawModel,
-              name: scraped.name || rawModel,
-              price: planPrice,
-              discountPrice: planBenefitPrice,
-              image: scraped.thumbnail || undefined,
-              images: scraped.thumbnails && scraped.thumbnails.length > 0 ? scraped.thumbnails : (scraped.thumbnail ? [scraped.thumbnail] : []),
-              detailImage: scraped.detailImages?.[0] || undefined,
-              detailImages: scraped.detailImages || [],
-              specifications: scraped.specifications || [],
-              isSmartRegistered: true,
-              isVisible: true,
-              showOnMain: false,
-              landingPages: ['/package60'],
-              comparisons: [],
-              accountCount: planAccount,
-              supplyPrice: rawPrice,
-              giftText: rawGift || undefined
-            });
+            const existingProduct = allProducts?.find(
+              p => p.planId === selectedPlanId && p.model?.trim().toLowerCase() === rawModel.toLowerCase()
+            );
+
+            const scrapedName = (scraped.name && scraped.name !== `LG ${rawModel}`) ? scraped.name : rawModel;
+            const scrapedThumb = scraped.thumbnail || undefined;
+            const scrapedThumbs = scraped.thumbnails && scraped.thumbnails.length > 0 ? scraped.thumbnails : (scraped.thumbnail ? [scraped.thumbnail] : []);
+
+            if (existingProduct) {
+              await updateProduct({
+                id: existingProduct._id,
+                brand: scraped.brand || existingProduct.brand || 'LG전자',
+                category: scraped.category || existingProduct.category || '가전',
+                model: scraped.model || rawModel,
+                name: scrapedName !== rawModel ? scrapedName : (existingProduct.name || rawModel),
+                image: scrapedThumb || existingProduct.image || undefined,
+                images: scrapedThumbs.length > 0 ? scrapedThumbs : (existingProduct.images || []),
+                detailImage: scraped.detailImages?.[0] || existingProduct.detailImage || undefined,
+                detailImages: scraped.detailImages || existingProduct.detailImages || [],
+                specifications: scraped.specifications && scraped.specifications.length > 0 ? scraped.specifications : (existingProduct.specifications || []),
+                isSmartRegistered: true,
+                isVisible: true,
+                accountCount: planAccount,
+                supplyPrice: rawPrice || existingProduct.supplyPrice || undefined,
+                giftText: rawGift || existingProduct.giftText || undefined
+              });
+            } else {
+              await createProduct({
+                planId: selectedPlanId,
+                brand: scraped.brand || 'LG전자',
+                category: scraped.category || '가전',
+                model: scraped.model || rawModel,
+                name: scrapedName,
+                price: planPrice,
+                discountPrice: planBenefitPrice,
+                image: scrapedThumb,
+                images: scrapedThumbs,
+                detailImage: scraped.detailImages?.[0] || undefined,
+                detailImages: scraped.detailImages || [],
+                specifications: scraped.specifications || [],
+                isSmartRegistered: true,
+                isVisible: true,
+                showOnMain: false,
+                landingPages: ['/package60'],
+                comparisons: [],
+                accountCount: planAccount,
+                supplyPrice: rawPrice,
+                giftText: rawGift || undefined
+              });
+            }
 
             successCount++;
           } catch (err) {
