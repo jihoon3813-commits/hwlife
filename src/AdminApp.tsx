@@ -107,7 +107,7 @@ export default function AdminApp() {
       case 'consent':
         return <ConsentManagement channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
       case 'products':
-        return <ProductManagement />;
+        return <ProductManagement key="products" />;
       case 'channels':
         return <ChannelManagement 
             currentChannelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined}

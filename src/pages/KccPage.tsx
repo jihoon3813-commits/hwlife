@@ -8,6 +8,8 @@ import {
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import SEO from '../components/SEO';
+import { formatPhoneNumber } from '../utils/phone';
+import PrivacyModal from '../components/PrivacyModal';
 
 export default function KccPage({ channelSubdomain }: { channelSubdomain?: string }) {
   const allProducts = useQuery(api.products.getVisibleProducts) || [];
@@ -151,18 +153,7 @@ export default function KccPage({ channelSubdomain }: { channelSubdomain?: strin
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
-    let formattedValue = '';
-    
-    if (value.length <= 3) {
-      formattedValue = value;
-    } else if (value.length <= 7) {
-      formattedValue = `${value.slice(0, 3)}-${value.slice(3)}`;
-    } else {
-      formattedValue = `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7, 11)}`;
-    }
-    
-    setPhone(formattedValue);
+    setPhone(formatPhoneNumber(e.target.value));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -241,19 +232,8 @@ export default function KccPage({ channelSubdomain }: { channelSubdomain?: strin
 
       {/* Section 1: Hero Banner */}
       <section className="relative w-full min-h-[660px] sm:min-h-[740px] flex flex-col justify-between pt-12 pb-16 px-4 overflow-hidden">
-        {/* Background Layer with modern interior */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="/assets/living/kcc_hero_bg.png" 
-            alt="Modern Interior Room" 
-            className="w-full h-full object-cover"
-          />
-          {/* Sleek Gradient Overlay - darker on the left for maximum text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#031533] via-[#031533]/90 to-[#031533]/20"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#031533] via-transparent to-transparent"></div>
-          {/* Subtle Grid Pattern */}
-          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '20px 20px' }}></div>
-        </div>
+        {/* Background Layer (Solid Blue #3182F6) */}
+        <div className="absolute inset-0 z-0 bg-[#3182F6]"></div>
 
         {/* Model Image Cutout - shifted to the far right edge to clear text workspace */}
         <motion.div 
@@ -1119,72 +1099,10 @@ export default function KccPage({ channelSubdomain }: { channelSubdomain?: strin
       </div>
 
       {/* Privacy Policy Modal */}
-      <AnimatePresence>
-        {isPrivacyModalOpen && (
-          <div className="fixed inset-0 z-[130] flex items-center justify-center p-5">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsPrivacyModalOpen(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.93, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.93, y: 15 }}
-              className="relative w-full max-w-[420px] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[75vh] z-20"
-            >
-              <div className="p-5 border-b border-[#F2F4F6] flex items-center justify-between">
-                <h3 className="text-[16px] font-black text-[#191F28]">개인정보 수집 및 이용 동의</h3>
-                <button 
-                  onClick={() => setIsPrivacyModalOpen(false)}
-                  className="w-8 h-8 flex items-center justify-center bg-[#F9FAFB] rounded-full hover:bg-[#F2F4F6] transition-colors"
-                >
-                  <X className="w-4 h-4 text-[#8B95A1]" />
-                </button>
-              </div>
-              <div className="p-5 overflow-y-auto text-[12px] text-[#4E5968] font-medium leading-relaxed break-keep">
-                <p className="mb-4 font-bold text-[#191F28]">
-                  (주)효원상조와 (주)라이프앤조이는 귀하의 제휴상담 신청과 관련하여 다음과 같이 개인정보를 수집·이용하고자 합니다.
-                </p>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-bold text-[#191F28] mb-1.5 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-[#3182F6] rounded-full"></span>
-                      1. 수집 항목 및 목적
-                    </h4>
-                    <ul className="space-y-1.5 pl-3">
-                      <li>• 수집 항목: 이름, 연락처(휴대폰 번호), 희망 가전제품, 제휴 채널 정보</li>
-                      <li>• 수집 및 이용 목적: B2B 결합상품 안내(상조 및 가전 결합) 및 해피콜, 맞춤 상담 진행</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-[#191F28] mb-1.5 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-[#3182F6] rounded-full"></span>
-                      2. 보유 및 이용 기간
-                    </h4>
-                    <p className="pl-3">
-                      상담이 완료되고 가입 처리가 끝나는 시점 또는 고객이 파기 요청 시 즉시 파기합니다. (최대 1년 보관)
-                    </p>
-                  </div>
-                  <div className="p-3 bg-[#F9FAFB] border border-[#F2F4F6] rounded-xl text-[11px]">
-                    귀하는 본 동의를 거부할 권리가 있으나, 거부 시 본 제휴 혜택 상담 서비스 이용이 제한될 수 있습니다.
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 bg-[#F9FAFB] border-t border-[#F2F4F6]">
-                <button 
-                  onClick={() => setIsPrivacyModalOpen(false)}
-                  className="w-full py-3 bg-[#3182F6] text-white font-bold rounded-xl hover:bg-[#1B64DA] transition-all text-[13px]"
-                >
-                  동의하고 닫기
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <PrivacyModal 
+        isOpen={isPrivacyModalOpen} 
+        onClose={() => setIsPrivacyModalOpen(false)} 
+      />
 
       {/* --- Full Screen Immersive Product Viewer --- */}
       <AnimatePresence mode="wait">
@@ -1528,7 +1446,9 @@ export default function KccPage({ channelSubdomain }: { channelSubdomain?: strin
                     <label htmlFor="modal-phone" className="block text-[11px] font-bold text-[#4E5968] mb-1">연락처</label>
                     <input 
                       id="modal-phone"
-                      type="text" 
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*" 
                       placeholder="휴대폰 번호를 입력해주세요"
                       value={phone}
                       onChange={handlePhoneChange}

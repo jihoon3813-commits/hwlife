@@ -5,15 +5,29 @@ interface SEOProps {
   description: string;
   image: string;
   url?: string;
+  favicon?: string;
 }
 
-export default function SEO({ title, description, image, url }: SEOProps) {
+const DEFAULT_FAVICON = "https://res.cloudinary.com/lyjyvy54/image/upload/v1786435194/%ED%8C%8C%EB%B9%84%EC%BD%98%EC%9A%A9_e3yju3.png";
+
+export default function SEO({ title, description, image, url, favicon = DEFAULT_FAVICON }: SEOProps) {
   useEffect(() => {
     // Update basic tags
     document.title = title;
     
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) metaDescription.setAttribute('content', description);
+
+    // Update Favicon links dynamically
+    ['icon', 'shortcut icon', 'apple-touch-icon'].forEach((relType) => {
+      let link = document.querySelector(`link[rel="${relType}"]`) as HTMLLinkElement;
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = relType;
+        document.head.appendChild(link);
+      }
+      link.href = favicon;
+    });
 
     // Update Open Graph tags
     const ogTitle = document.querySelector('meta[property="og:title"]');
@@ -42,7 +56,7 @@ export default function SEO({ title, description, image, url }: SEOProps) {
     const itemPropImage = document.querySelector('meta[itemprop="image"]');
     if (itemPropImage) itemPropImage.setAttribute('content', image);
 
-  }, [title, description, image, url]);
+  }, [title, description, image, url, favicon]);
 
   return null;
 }

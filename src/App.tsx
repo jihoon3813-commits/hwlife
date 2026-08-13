@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
+import { formatPhoneNumber } from "./utils/phone";
+import PrivacyModal from "./components/PrivacyModal";
 
 export default function App() {
   const landingInfo = useQuery(api.landings.getByPath, { path: "/" });
@@ -227,28 +229,37 @@ export default function App() {
 
   return (
     <div className="w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] mx-auto bg-[#F2F4F6] min-h-screen relative font-sans text-[#191F28] overflow-x-hidden sm:shadow-[0_0_40px_rgba(0,0,0,0.05)] sm:border-x sm:border-[#E5E8EB]">
-      {/* Header */}
-      <header className="sticky top-0 w-full bg-white/90 backdrop-blur-md z-40 px-5 flex justify-between items-center h-[60px]">
-        <div className="flex items-center gap-2">
-          <img 
-            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781672825/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_ns9erj.png" 
-            alt="효원상조 로고" 
-            className="h-[24px] w-auto object-contain"
-          />
-          {channelId === 'soomgo' && (
-            <>
-              <span className="text-[#D1D6DB] text-[14px]">|</span>
-              <img 
-                src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674812/soomgo_logo_v1_xyzhk9.png" 
-                alt="숨고" 
-                className="h-[20px] w-auto object-contain"
-              />
-            </>
-          )}
+      {/* Header (Unfixed non-sticky header, Logo Image | Title Text horizontally balanced) */}
+      <header className="w-full bg-white z-40 px-4 flex justify-center items-center h-[64px] border-b border-[#E5E8EB]">
+        <div className="flex items-center justify-center gap-2.5 text-center">
+          {/* Left: Partner & Hyowon Logo Images */}
+          <div className="flex items-center justify-center gap-1.5 shrink-0">
+            <img 
+              src="https://res.cloudinary.com/lyjyvy54/image/upload/v1786429410/2024-07-18_14_21_49_%EB%88%84%EB%81%BC_ozsj2h.png" 
+              alt="파트너 로고" 
+              className="h-5 w-auto object-contain"
+            />
+            <span className="text-[10px] font-extrabold text-[#94A3B8]">x</span>
+            <img 
+              src="https://res.cloudinary.com/lyjyvy54/image/upload/v1786415950/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_opfls9.png" 
+              alt="효원상조 로고" 
+              className="h-4.5 w-auto object-contain"
+            />
+          </div>
+
+          {/* Vertical Divider Line */}
+          <div className="h-4.5 w-[1px] bg-[#D1D6DB] shrink-0"></div>
+
+          {/* Right: Title Text with Blue Gradient on 가전&상조 */}
+          <div className="text-[17px] sm:text-[19px] font-black leading-none tracking-tight flex items-center justify-center shrink-0">
+            <span className="bg-gradient-to-r from-[#3182F6] via-[#2563EB] to-[#1D4ED8] bg-clip-text text-transparent font-black">
+              가전&상조
+            </span>
+            <span className="text-[#191F28] font-black ml-1">
+              60패키지
+            </span>
+          </div>
         </div>
-        <a href="tel:1588-0883" className="text-[13px] font-semibold text-[#4E5968] bg-[#F2F4F6] px-3 py-1.5 rounded-full hover:bg-[#E5E8EB] transition-colors">
-          상담 1588-0883
-        </a>
       </header>
 
       {/* 1. Hero Section (Toss Style Focus on Typography) */}
@@ -586,8 +597,19 @@ export default function App() {
                 layoutId={`product-${(item as any)._id || (item as any).id}`}
                 className="bg-white rounded-[28px] border border-[#E5E8EB] overflow-hidden active:scale-95 transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1 flex flex-col h-full"
               >
-                <div className="relative h-[125px] bg-white shrink-0">
-                  <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-2" />
+                <div className="relative h-[140px] bg-[#F8FAFC] shrink-0 overflow-hidden flex items-center justify-center">
+                  <img 
+                    src={(item.images && item.images.length > 0) ? item.images[0] : item.image} 
+                    alt="" 
+                    className="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-35 pointer-events-none" 
+                    aria-hidden="true"
+                  />
+                  <img 
+                    src={(item.images && item.images.length > 0) ? item.images[0] : item.image} 
+                    alt={item.name} 
+                    className="relative z-10 max-w-full max-h-full object-contain p-2 drop-shadow-sm" 
+                    style={{ objectFit: 'contain' }}
+                  />
                   {item.tag && (
                     <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold rounded-lg uppercase tracking-wider">
                       {item.tag}
@@ -806,8 +828,19 @@ export default function App() {
                       openProductDetail(item);
                     }}
                   >
-                    <div className="relative aspect-square bg-white">
-                      <img src={(item.images && item.images.length > 0) ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-contain p-4" />
+                    <div className="relative aspect-square bg-[#F8FAFC] overflow-hidden flex items-center justify-center">
+                      <img 
+                        src={(item.images && item.images.length > 0) ? item.images[0] : item.image} 
+                        alt="" 
+                        className="absolute inset-0 w-full h-full object-cover blur-xl scale-125 opacity-35 pointer-events-none" 
+                        aria-hidden="true"
+                      />
+                      <img 
+                        src={(item.images && item.images.length > 0) ? item.images[0] : item.image} 
+                        alt={item.name} 
+                        className="relative z-10 max-w-full max-h-full object-contain p-3 drop-shadow-sm" 
+                        style={{ objectFit: 'contain' }}
+                      />
                       {item.tag && (
                         <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold rounded-md">
                           {item.tag}
@@ -1365,7 +1398,9 @@ export default function App() {
             <div>
               <label className="block text-[13px] font-bold text-[#A3B1C6] mb-2 px-1">연락처</label>
               <input 
-                type="tel" 
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*" 
                 required
                 value={phone}
                 onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
@@ -1894,7 +1929,9 @@ export default function App() {
                   <div>
                     <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">연락처</label>
                     <input 
-                      type="tel" 
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*" 
                       required
                       value={phone}
                       onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
@@ -1971,61 +2008,10 @@ export default function App() {
       </AnimatePresence>
 
       {/* Privacy Policy Modal */}
-      <AnimatePresence>
-        {isPrivacyModalOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-[24px] w-full max-w-[400px] max-h-[80vh] overflow-hidden shadow-2xl relative flex flex-col"
-            >
-              <div className="p-6 border-b border-[#F2F4F6] flex justify-between items-center shrink-0">
-                <h3 className="font-bold text-[17px]">개인정보 수집 및 이용 동의</h3>
-                <button onClick={() => setIsPrivacyModalOpen(false)} className="p-1 hover:bg-[#F2F4F6] rounded-full transition-colors">
-                  <X className="w-5 h-5 text-[#8B95A1]" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-6 text-[13px] text-[#4E5968] leading-[1.6] break-keep no-scrollbar">
-                <p className="mb-4">(주)효원상조와 (주)라이프앤조이는 귀하의 상담 신청과 관련하여 다음과 같이 개인정보를 수집·이용 및 제공하고자 합니다.</p>
-                
-                <h4 className="font-bold text-[#191F28] mb-2">1. 개인정보의 수집·이용에 관한 사항</h4>
-                <div className="space-y-1 mb-4">
-                  <p><span className="font-semibold">• 수집 항목:</span> 이름, 연락처(휴대폰 번호), 문의 사항</p>
-                  <p><span className="font-semibold">• 수집 및 이용 목적:</span></p>
-                  <ul className="pl-4 space-y-0.5">
-                    <li>- 상담 신청에 따른 본인 확인 및 원활한 의사소통 경로 확보</li>
-                    <li>- 상품 안내(상조 및 가전결합 상품) 및 가입 상담</li>
-                    <li>- 계약 진행 및 서비스 제공을 위한 기초 자료 활용</li>
-                  </ul>
-                  <p><span className="font-semibold">• 보유 및 이용 기간:</span> 상담 완료 및 목적 달성 시까지 (단, 관련 법령에 따라 보존이 필요한 경우 해당 기간까지 보관)</p>
-                </div>
-
-                <h4 className="font-bold text-[#191F28] mb-2">2. 개인정보의 제3자 제공에 관한 사항</h4>
-                <p className="mb-2">본 상담 서비스 제공을 위해 아래와 같이 개인정보를 제공합니다.</p>
-                <div className="space-y-1 mb-4">
-                  <p><span className="font-semibold">• 제공받는 자:</span> (주)효원상조, (주)라이프앤조이</p>
-                  <p><span className="font-semibold">• 제공 목적:</span> 상품 안내, 해피콜, 계약 체결 및 관리</p>
-                  <p><span className="font-semibold">• 제공 항목:</span> 이름, 연락처, 상담 내용</p>
-                  <p><span className="font-semibold">• 보유 및 이용 기간:</span> 제공 목적 달성 시까지</p>
-                </div>
-
-                <p className="font-bold text-[#191F28] mb-1">※ 동의 거부 권리 안내</p>
-                <p>귀하는 개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있습니다. 다만, 동의를 거부하실 경우 상담 신청 및 상품 안내 서비스 이용이 제한될 수 있습니다.</p>
-              </div>
-              <div className="p-4 border-t border-[#F2F4F6] shrink-0">
-                <button 
-                  onClick={() => setIsPrivacyModalOpen(false)}
-                  className="w-full bg-[#191F28] text-white font-bold py-3.5 rounded-[14px] text-[15px]"
-                >
-                  확인
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <PrivacyModal 
+        isOpen={isPrivacyModalOpen} 
+        onClose={() => setIsPrivacyModalOpen(false)} 
+      />
     </div>
   );
 }

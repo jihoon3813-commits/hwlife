@@ -127,6 +127,17 @@ export const updateDefaultThumbnails = mutation({
         isActive: true,
       });
     }
+
+    // Ensure Package60 exists
+    if (!paths.includes("/package60")) {
+      await ctx.db.insert("landings", {
+        name: "가전상조 60패키지 (쇼핑몰)",
+        path: "/package60",
+        description: "가전 & 효원상조 60회 결합 프리미엄 쇼핑몰 랜딩페이지",
+        thumbnail: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=500",
+        isActive: true,
+      });
+    }
   },
 });
 

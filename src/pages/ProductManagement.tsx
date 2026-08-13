@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square, Link, X, Star } from 'lucide-react';
-import { useQuery, useMutation } from 'convex/react';
+import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square, Link, X, Star, Zap, Sparkles } from 'lucide-react';
+import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import * as XLSX from 'xlsx';
 
@@ -51,32 +51,56 @@ export default function ProductManagement() {
   const createProduct = useMutation(api.products.create);
   const deleteProductMutation = useMutation(api.products.remove);
 
-  const [selectedPlanId, setSelectedPlanId] = useState<number>(1);
+  const [selectedPlanId, setSelectedPlanId] = useState<number | undefined>(undefined);
   const [viewMode, setViewMode] = useState<'list' | 'edit_plan' | 'edit_product'>('list');
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const excelInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
-  const [sortConfig, setSortConfig] = useState<{ key: 'brand' | 'category' | null, direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState<{ key: 'brand' | 'category' | 'supplyPrice' | 'price' | null, direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
 
   const thumbInputRef = useRef<HTMLInputElement>(null);
   const detailInputRef = useRef<HTMLInputElement>(null);
+  const smartExcelInputRef = useRef<HTMLInputElement>(null);
+  const mainContainerRef = useRef<HTMLDivElement>(null);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
 
-  const selectedPlan = plans.find(p => p.id === selectedPlanId);
+  const scrapeProductInfoAction = useAction(api.crawler.scrapeProductInfo);
+  const [smartProgress, setSmartProgress] = useState<{ current: number; total: number; currentModel: string } | null>(null);
+
+  const selectedPlan = plans.find(p => p.id === selectedPlanId) || plans[0];
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
 
-  // Ensure a plan is selected if the current one is invalid
+  // When mounting or navigating to ProductManagement, select the top plan (plans[0]) and show list view
   React.useEffect(() => {
-    if (plans.length > 0 && !selectedPlan) {
+    if (plans.length > 0 && isInitialMount.current) {
       setSelectedPlanId(plans[0].id);
+      setViewMode('list');
+      setEditingProduct(null);
+      isInitialMount.current = false;
     }
-  }, [plans, selectedPlan]);
+  }, [plans]);
+
+  // Scroll to top on plan selection or view change
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+    if (mainContainerRef.current) mainContainerRef.current.scrollTop = 0;
+    if (tableContainerRef.current) tableContainerRef.current.scrollTop = 0;
+  }, [selectedPlanId, viewMode]);
+
+  const activePlanId = selectedPlanId ?? plans[0]?.id;
 
   const filteredProducts = (allProducts || [])
-    .filter(p => p.planId === selectedPlanId)
+    .filter(p => p.planId === activePlanId)
     .sort((a, b) => {
       if (!sortConfig.key) return 0;
+      if (sortConfig.key === 'supplyPrice' || sortConfig.key === 'price') {
+        const aNum = parseInt(String((a as any)[sortConfig.key] || '0').replace(/\D/g, ''), 10);
+        const bNum = parseInt(String((b as any)[sortConfig.key] || '0').replace(/\D/g, ''), 10);
+        return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
+      }
       const aVal = (a as any)[sortConfig.key] || "";
       const bVal = (b as any)[sortConfig.key] || "";
       if (sortConfig.direction === 'asc') return aVal.localeCompare(bVal);
@@ -177,7 +201,7 @@ export default function ProductManagement() {
     setViewMode('edit_product');
   };
 
-  const toggleSort = (key: 'brand' | 'category') => {
+  const toggleSort = (key: 'brand' | 'category' | 'supplyPrice' | 'price') => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -199,6 +223,18 @@ export default function ProductManagement() {
       }
     }
     await updateProduct({ id: id as any, showOnMain: !isCurrentlyMain });
+  };
+
+  const toggleHeroExposure = async (id: string, current: boolean | undefined) => {
+    const isCurrentlyHero = !!current;
+    if (!isCurrentlyHero) {
+      const heroCount = allProducts.filter(p => !!p.showOnHero).length;
+      if (heroCount >= 4) {
+        alert('히어로 노출은 최대 4개까지만 가능합니다.');
+        return;
+      }
+    }
+    await updateProduct({ id: id as any, showOnHero: !isCurrentlyHero });
   };
 
   const deleteProduct = async (id: string) => {
@@ -224,6 +260,26 @@ export default function ProductManagement() {
         await deleteProductMutation({ id: id as any });
       }
       setSelectedIds([]);
+    }
+  };
+
+  const handleBatchSetRepresentativeIndex = async (targetIdx: number) => {
+    if (selectedIds.length === 0) {
+      alert("선택된 제품이 없습니다.");
+      return;
+    }
+    let updatedCount = 0;
+    for (const id of selectedIds) {
+      const prod = allProducts?.find(p => p._id === id);
+      if (prod && prod.images && prod.images[targetIdx]) {
+        await updateProduct({ id: id as any, image: prod.images[targetIdx] });
+        updatedCount++;
+      }
+    }
+    if (updatedCount > 0) {
+      alert(`선택한 ${updatedCount}개 제품의 대표 썸네일이 ${targetIdx + 1}번 이미지로 설정되었습니다.`);
+    } else {
+      alert(`선택한 제품들 중 ${targetIdx + 1}번째 썸네일 이미지가 존재하는 제품이 없습니다.`);
     }
   };
 
@@ -301,6 +357,126 @@ export default function ProductManagement() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "제품등록양식");
     XLSX.writeFile(wb, "제품등록양식.xlsx");
+  };
+
+  const downloadSmartTemplate = () => {
+    const data = [
+      ['모델명', '공급가', '사은품', '참고 URL'],
+      ['H875GBB012', '1,910,000', '현금 30만원', 'https://www.lge.co.kr/home'],
+      ['M876GBB28-B + H875GBB012', '3,750,000', '신세계 상품권 40만원', 'https://www.lge.co.kr/home']
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "스마트등록양식");
+    XLSX.writeFile(wb, "스마트등록_양식.xlsx");
+  };
+
+  const handleSmartExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const data = evt.target?.result;
+        const wb = XLSX.read(data, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const excelData = XLSX.utils.sheet_to_json(ws, { header: 1 }) as any[][];
+
+        if (!excelData || excelData.length <= 1) {
+          alert("등록할 데이터가 없습니다.");
+          return;
+        }
+
+        const headers = (excelData[0] || []).map(h => String(h || '').trim());
+        let modelIdx = headers.findIndex(h => h.includes('모델'));
+        let priceIdx = headers.findIndex(h => h.includes('공급') || h.includes('가격') || h.includes('금액'));
+        let giftIdx = headers.findIndex(h => h.includes('사은품') || h.includes('혜택') || h.includes('지원'));
+        let urlIdx = headers.findIndex(h => h.includes('URL') || h.includes('url') || h.includes('링크'));
+
+        if (modelIdx === -1) modelIdx = 0;
+        if (priceIdx === -1) priceIdx = 1;
+        if (giftIdx === -1) giftIdx = (headers.length >= 3 && !String(headers[2] || '').toLowerCase().includes('http')) ? 2 : -1;
+        if (urlIdx === -1) urlIdx = giftIdx === 2 ? 3 : (headers.length >= 3 ? 2 : -1);
+
+        const rows = excelData.slice(1);
+        const validRows = rows.filter(r => r && r[modelIdx]);
+
+        if (validRows.length === 0) {
+          alert("엑셀 파일에 유효한 모델명이 작성된 행이 없습니다.");
+          return;
+        }
+
+        setSmartProgress({ current: 0, total: validRows.length, currentModel: '시작 중...' });
+
+        let successCount = 0;
+        let failCount = 0;
+
+        for (let i = 0; i < validRows.length; i++) {
+          const row = validRows[i];
+          const rawModel = String(row[modelIdx] || '').trim();
+          const rawPrice = String(row[priceIdx] || '0').replace(/\D/g, '');
+          const rawGift = giftIdx !== -1 ? String(row[giftIdx] || '').trim() : '';
+          const refUrl = urlIdx !== -1 ? String(row[urlIdx] || '').trim() : '';
+
+          if (!rawModel) continue;
+
+          setSmartProgress({ current: i + 1, total: validRows.length, currentModel: rawModel });
+
+          try {
+            const scraped = await scrapeProductInfoAction({
+              model: rawModel,
+              price: rawPrice,
+              refUrl
+            });
+
+            const currentPlan = plans.find(p => p.id === selectedPlanId) || selectedPlan;
+            const planPrice = currentPlan?.basePrice ? String(currentPlan.basePrice).replace(/\D/g, '') : "59800";
+            const planBenefitPrice = currentPlan?.benefitPrice ? String(currentPlan.benefitPrice).replace(/\D/g, '') : "34800";
+            const planAccount = currentPlan?.accountCount || (selectedPlanId + "구좌");
+
+            await createProduct({
+              planId: selectedPlanId,
+              brand: scraped.brand || 'LG전자',
+              category: scraped.category || '가전',
+              model: scraped.model || rawModel,
+              name: scraped.name || rawModel,
+              price: planPrice,
+              discountPrice: planBenefitPrice,
+              image: scraped.thumbnail || undefined,
+              images: scraped.thumbnails && scraped.thumbnails.length > 0 ? scraped.thumbnails : (scraped.thumbnail ? [scraped.thumbnail] : []),
+              detailImage: scraped.detailImages?.[0] || undefined,
+              detailImages: scraped.detailImages || [],
+              specifications: scraped.specifications || [],
+              isSmartRegistered: true,
+              isVisible: true,
+              showOnMain: false,
+              landingPages: ['/package60'],
+              comparisons: [],
+              accountCount: planAccount,
+              supplyPrice: rawPrice,
+              giftText: rawGift || undefined
+            });
+
+            successCount++;
+          } catch (err) {
+            console.error(`Smart register error for ${rawModel}:`, err);
+            failCount++;
+          }
+        }
+
+        setSmartProgress(null);
+        alert(`⚡ 스마트 자동 등록이 완료되었습니다.\n(성공: ${successCount}건, 실패: ${failCount}건)`);
+      } catch (err) {
+        console.error("Smart excel process error:", err);
+        setSmartProgress(null);
+        alert("엑셀 파일 처리 중 오류가 발생했습니다.");
+      } finally {
+        if (e.target) e.target.value = '';
+      }
+    };
+    reader.readAsBinaryString(file);
   };
 
   const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -409,7 +585,7 @@ export default function ProductManagement() {
   };
 
   return (
-    <div className="p-8 h-full flex flex-col no-scrollbar overflow-y-auto relative">
+    <div ref={mainContainerRef} className="p-8 h-full flex flex-col no-scrollbar overflow-y-auto relative">
       {/* Upload Loading Overlay */}
       {isUploading && (
         <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center">
@@ -425,6 +601,34 @@ export default function ProductManagement() {
             </div>
             <div className="mt-3 text-[13px] font-bold text-[#4E5968]">
               {uploadProgress.current} / {uploadProgress.total}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Smart Registration Progress Overlay */}
+      {smartProgress && (
+        <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white p-8 rounded-[32px] shadow-2xl flex flex-col items-center max-w-[360px] w-full mx-4 text-center border border-[#E5E8EB]">
+            <div className="relative mb-5">
+              <div className="w-16 h-16 border-4 border-[#3182F6] border-t-transparent rounded-full animate-spin"></div>
+              <Sparkles className="w-7 h-7 text-[#3182F6] absolute inset-0 m-auto animate-pulse" />
+            </div>
+            <h3 className="font-bold text-[19px] text-[#191F28] mb-1">⚡ 스마트 자동 등록 중...</h3>
+            <p className="text-[#3182F6] font-bold text-[14px] mb-2 truncate max-w-full px-2">
+              {smartProgress.currentModel}
+            </p>
+            <p className="text-[#8B95A1] text-[13px] mb-6 leading-relaxed">
+              참고 URL에서 썸네일, 제품명, 카테고리,<br />상세페이지 정보를 수집하여 매칭 중입니다.
+            </p>
+            <div className="w-full bg-[#F2F4F6] h-3 rounded-full overflow-hidden mb-2">
+              <div 
+                className="bg-gradient-to-r from-[#3182F6] to-[#1B64DA] h-full transition-all duration-300"
+                style={{ width: `${(smartProgress.current / smartProgress.total) * 100}%` }}
+              ></div>
+            </div>
+            <div className="text-[13px] font-bold text-[#4E5968]">
+              {smartProgress.current} / {smartProgress.total} 건 진행 중
             </div>
           </div>
         </div>
@@ -503,9 +707,19 @@ export default function ProductManagement() {
                     <button onClick={() => toggleSort('category')} className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${sortConfig.key === 'category' ? 'bg-[#3182F6] text-white border-[#3182F6]' : 'bg-white text-[#4E5968] border-[#E5E8EB]'}`}>
                       카테고리 {sortConfig.key === 'category' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </button>
+                    <button onClick={() => toggleSort('supplyPrice')} className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${sortConfig.key === 'supplyPrice' ? 'bg-[#3182F6] text-white border-[#3182F6]' : 'bg-white text-[#4E5968] border-[#E5E8EB]'}`}>
+                      공급가 {sortConfig.key === 'supplyPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                    </button>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                  <input 
+                    type="file" 
+                    ref={smartExcelInputRef} 
+                    className="hidden" 
+                    accept=".xlsx, .xls" 
+                    onChange={handleSmartExcelUpload} 
+                  />
                   <input 
                     type="file" 
                     ref={excelInputRef} 
@@ -513,6 +727,18 @@ export default function ProductManagement() {
                     accept=".xlsx, .xls" 
                     onChange={handleExcelUpload} 
                   />
+                  <button 
+                    onClick={downloadSmartTemplate}
+                    className="flex-1 sm:flex-none bg-[#F2F8FF] border border-[#3182F6]/30 text-[#3182F6] px-3 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-[#E5F0FF] transition-all"
+                  >
+                    <Zap className="w-4 h-4" /> 스마트양식
+                  </button>
+                  <button 
+                    onClick={() => smartExcelInputRef.current?.click()}
+                    className="flex-1 sm:flex-none bg-gradient-to-r from-[#3182F6] to-[#1B64DA] text-white px-3.5 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-md shadow-[#3182F6]/20"
+                  >
+                    <Sparkles className="w-4 h-4" /> 스마트 등록
+                  </button>
                   <button 
                     onClick={downloadTemplate}
                     className="flex-1 sm:flex-none bg-white border border-[#E5E8EB] text-[#4E5968] px-3 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-2"
@@ -538,17 +764,34 @@ export default function ProductManagement() {
                     <span className="text-[#3182F6]">{selectedIds.length}</span>개 선택됨
                   </div>
                   <div className="h-4 w-[1px] bg-[#D1D6DB]"></div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center">
                     <button onClick={handleBatchCopy} className="p-1.5 hover:bg-white rounded-md text-[#3182F6] transition-colors" title="선택 복사"><Copy className="w-4 h-4"/></button>
                     <button onClick={() => handleBatchToggleVisibility(true)} className="p-1.5 hover:bg-white rounded-md text-[#1B64DA] transition-colors" title="선택 노출"><Eye className="w-4 h-4"/></button>
                     <button onClick={() => handleBatchToggleVisibility(false)} className="p-1.5 hover:bg-white rounded-md text-[#8B95A1] transition-colors" title="선택 숨김"><EyeOff className="w-4 h-4"/></button>
                     <button onClick={handleBatchDelete} className="p-1.5 hover:bg-white rounded-md text-red-500 transition-colors" title="선택 삭제"><Trash2 className="w-4 h-4"/></button>
+
+                    <div className="h-4 w-[1px] bg-[#D1D6DB] mx-1"></div>
+                    <span className="text-[11px] font-bold text-[#4E5968]">대표 썸네일:</span>
+                    <select 
+                      onChange={(e) => {
+                        if (e.target.value !== "") {
+                          handleBatchSetRepresentativeIndex(parseInt(e.target.value, 10));
+                          e.target.value = "";
+                        }
+                      }}
+                      className="text-[11px] font-bold bg-white border border-[#D1D6DB] rounded-[6px] px-2 py-1 text-[#3182F6] focus:outline-none cursor-pointer"
+                    >
+                      <option value="">순번 선택 ▾</option>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                        <option key={n} value={n - 1}>{n}번 이미지로 설정</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
-                <div className="text-[12px] text-[#8B95A1]">목록에서 개별 관리도 가능합니다.</div>
+            <div className="text-[12px] text-[#8B95A1]">목록에서 개별 관리도 가능합니다.</div>
               </div>
 
-              <div className="flex-1 overflow-auto no-scrollbar hide-scrollbar">
+              <div ref={tableContainerRef} className="flex-1 overflow-auto no-scrollbar hide-scrollbar">
                 <table className="w-full text-left border-collapse min-w-[1000px]">
                   <thead className="sticky top-0 bg-[#F9FAFB] border-b border-[#E5E8EB] z-10">
                     <tr>
@@ -560,18 +803,20 @@ export default function ProductManagement() {
                       <th className="px-4 py-4 w-10"></th>
                       <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">이미지</th>
                       <th className="px-4 py-4 w-24 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">브랜드</th>
-                      <th className="px-4 py-4 w-32 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">카테고리</th>
+                      <th className="px-4 py-4 w-28 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">카테고리</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">제품명 / 모델명</th>
+                      <th className="px-4 py-4 w-32 text-[13px] font-bold text-[#4E5968] text-right whitespace-nowrap">공급가</th>
                       <th className="px-4 py-4 w-32 text-[13px] font-bold text-[#4E5968] text-right whitespace-nowrap">월납입금</th>
                       <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">노출</th>
                       <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">메인</th>
+                      <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">히어로</th>
                       <th className="px-4 py-4 w-28 text-[13px] font-bold text-[#4E5968] text-right whitespace-nowrap">개별관리</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#F2F4F6]">
                     {filteredProducts.length === 0 ? (
                       <tr>
-                        <td colSpan={10} className="px-4 py-20 text-center text-[#8B95A1] text-[14px]">
+                        <td colSpan={12} className="px-4 py-20 text-center text-[#8B95A1] text-[14px]">
                           등록된 제품이 없습니다. '등록' 버튼을 눌러 제품을 추가해 주세요.
                         </td>
                       </tr>
@@ -592,13 +837,37 @@ export default function ProductManagement() {
                           </td>
                           <td className="px-2 py-4 text-[#D1D6DB] group-hover:text-[#3182F6]"><MoveVertical className="w-5 h-5" /></td>
                           <td className="px-2 py-4">
-                            <div className="w-12 h-12 bg-white border border-[#F2F4F6] rounded-lg overflow-hidden flex items-center justify-center">
-                              {(p.images && p.images.length > 0) ? (
-                                <img src={p.images[0]} className="w-full h-full object-contain" alt="thumb" />
-                              ) : p.image ? (
-                                <img src={p.image} className="w-full h-full object-contain" alt="thumb" />
-                              ) : (
-                                <ImageIcon className="w-5 h-5 text-[#D1D6DB]" />
+                            <div className="flex flex-col items-center gap-1.5">
+                              <div className="w-12 h-12 bg-white border border-[#F2F4F6] rounded-lg overflow-hidden flex items-center justify-center shadow-xs">
+                                {(p.image || (p.images && p.images.length > 0)) ? (
+                                  <img src={p.image || p.images[0]} className="w-full h-full object-contain" alt="thumb" />
+                                ) : (
+                                  <ImageIcon className="w-5 h-5 text-[#D1D6DB]" />
+                                )}
+                              </div>
+                              {p.images && p.images.length > 0 && (
+                                <select
+                                  value={(() => {
+                                    const idx = p.images.indexOf(p.image);
+                                    return idx >= 0 ? idx : 0;
+                                  })()}
+                                  onChange={(e) => {
+                                    const selectedIdx = parseInt(e.target.value, 10);
+                                    const newRep = p.images[selectedIdx];
+                                    if (newRep) {
+                                      updateProduct({ id: p._id, image: newRep });
+                                    }
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-[10px] font-bold bg-[#F2F4F6] border border-[#D1D6DB] rounded px-1 py-0.5 w-16 text-center text-[#191F28] focus:outline-none hover:border-[#3182F6] cursor-pointer"
+                                  title="대표 썸네일 순번 선택"
+                                >
+                                  {p.images.map((_: string, imgIdx: number) => (
+                                    <option key={imgIdx} value={imgIdx}>
+                                      {imgIdx + 1}번 썸네일
+                                    </option>
+                                  ))}
+                                </select>
                               )}
                             </div>
                           </td>
@@ -606,21 +875,27 @@ export default function ProductManagement() {
                           <td className="px-4 py-4 text-[13px] text-[#8B95A1] font-medium">{p.category}</td>
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-2 mb-1">
-                              {selectedPlan?.accountCount && <span className="text-[10px] font-bold bg-[#191F28] text-white px-1.5 py-0.5 rounded">{selectedPlan.accountCount}</span>}
+                              {(selectedPlan?.accountCount || p.accountCount) && <span className="text-[10px] font-bold bg-[#191F28] text-white px-1.5 py-0.5 rounded">{selectedPlan?.accountCount || p.accountCount}</span>}
                               {p.tag && <span className="text-[10px] font-bold bg-[#3182F6] text-white px-1.5 py-0.5 rounded">{p.tag}</span>}
                               <div className="text-[14px] font-bold text-[#191F28]">{p.name}</div>
                             </div>
                             <div className="text-[12px] text-[#A3B1C6]">{p.model}</div>
                           </td>
-                          <td className="px-4 py-4 text-[14px] font-bold text-right text-[#3182F6]">{formatNumber(p.price)}원</td>
+                          <td className="px-4 py-4 text-[14px] font-bold text-right text-[#191F28]">{p.supplyPrice ? formatNumber(p.supplyPrice) + '원' : '-'}</td>
+                          <td className="px-4 py-4 text-[14px] font-bold text-right text-[#3182F6]">{formatNumber(selectedPlan?.basePrice || p.price)}원</td>
                           <td className="px-4 py-4 text-center">
                             <button onClick={(e) => { e.stopPropagation(); toggleVisibility(p._id, p.isVisible); }} className={`p-1.5 rounded-full transition-colors ${p.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-400'}`}>
                               {p.isVisible ? <Eye className="w-4 h-4"/> : <EyeOff className="w-4 h-4"/>}
                             </button>
                           </td>
                           <td className="px-4 py-4 text-center">
-                            <button onClick={(e) => { e.stopPropagation(); toggleMainExposure(p._id, p.showOnMain); }} className={`p-1.5 rounded-full transition-colors ${p.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-400'}`}>
+                            <button onClick={(e) => { e.stopPropagation(); toggleMainExposure(p._id, p.showOnMain); }} className={`p-1.5 rounded-full transition-colors ${p.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-400'}`} title="메인 노출 (최대 8개)">
                               {p.showOnMain ? <Star className="w-4 h-4 fill-current"/> : <Star className="w-4 h-4"/>}
+                            </button>
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <button onClick={(e) => { e.stopPropagation(); toggleHeroExposure(p._id, p.showOnHero); }} className={`p-1.5 rounded-full transition-colors ${p.showOnHero ? 'bg-[#E8F3FF] text-[#3182F6]' : 'bg-gray-100 text-gray-400'}`} title="히어로 노출 (최대 4개)">
+                              {p.showOnHero ? <Sparkles className="w-4 h-4 fill-current"/> : <Sparkles className="w-4 h-4"/>}
                             </button>
                           </td>
                           <td className="px-4 py-4 text-right">
@@ -696,6 +971,23 @@ export default function ProductManagement() {
                      {editingProduct.showOnMain ? <><Star className="w-4 h-4 fill-current"/> 메인</> : <><Star className="w-4 h-4"/> 메인</>}
                    </button>
                    <button 
+                    onClick={() => { 
+                      const nextState = !editingProduct.showOnHero;
+                      if (nextState) {
+                        const heroCount = allProducts.filter(p => !!p.showOnHero).length;
+                        if (heroCount >= 4) {
+                          alert('히어로 노출은 최대 4개까지만 가능합니다.');
+                          return;
+                        }
+                      }
+                      toggleHeroExposure(editingProduct._id, editingProduct.showOnHero); 
+                      setEditingProduct({...editingProduct, showOnHero: nextState}); 
+                    }}
+                    className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2.5 rounded-[10px] text-[12px] font-bold transition-all ${editingProduct.showOnHero ? 'bg-[#E8F3FF] text-[#3182F6]' : 'bg-gray-100 text-gray-500'}`}
+                   >
+                     {editingProduct.showOnHero ? <><Sparkles className="w-4 h-4 fill-current"/> 히어로</> : <><Sparkles className="w-4 h-4"/> 히어로</>}
+                   </button>
+                   <button 
                     onClick={() => { deleteProduct(editingProduct._id); setViewMode('list'); }}
                     className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2.5 bg-red-50 text-red-500 rounded-[10px] text-[12px] font-bold"
                    >
@@ -728,6 +1020,14 @@ export default function ProductManagement() {
                       <input type="text" value={editingProduct.model} onChange={(e) => setEditingProduct({...editingProduct, model: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none" />
                     </div>
                     <div>
+                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">공급가</label>
+                      <input type="text" value={formatNumber(editingProduct.supplyPrice || '')} onChange={(e) => setEditingProduct({...editingProduct, supplyPrice: e.target.value.replace(/\D/g, '')})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#191F28] text-right" placeholder="0" />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">사은품 내역</label>
+                      <input type="text" value={editingProduct.giftText || ''} onChange={(e) => setEditingProduct({...editingProduct, giftText: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#191F28]" placeholder="예: 현금 30만원 지원, 상품권 등" />
+                    </div>
+                    <div>
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">월 납입금</label>
                       <input type="text" value={formatNumber(editingProduct.price)} onChange={(e) => setEditingProduct({...editingProduct, price: e.target.value.replace(/\D/g, '')})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#3182F6] text-right" />
                     </div>
@@ -741,82 +1041,195 @@ export default function ProductManagement() {
                     </div>
                   </div>
 
-                  {/* 타사 비교 정보 편집 */}
+                  {/* 제품 스펙 정보 설정 (표 형태) */}
                   <div className="pt-8 border-t border-[#F2F4F6]">
-                    <div className="flex justify-between items-center mb-6">
-                      <h3 className="font-bold text-[18px]">타사 비교 정보 설정</h3>
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <h3 className="font-bold text-[18px] text-[#191F28] flex items-center gap-2">
+                          <Zap className="w-5 h-5 text-[#3182F6]" /> 제품 스펙 정보 (표 형태)
+                        </h3>
+                        <p className="text-[12px] text-[#8B95A1] mt-0.5">스마트 등록 시 자동 수집된 상세 스펙 정보 표입니다.</p>
+                      </div>
                       <button 
                         onClick={() => {
-                          const defaultPartner = competitors[0] || { name: '타사', months: 60, type: '타사' };
-                          const newComp = {
-                            company: defaultPartner.name,
-                            target: '',
-                            price: '0',
-                            period: (defaultPartner.months || 60) + '개월',
-                            isOurs: defaultPartner.type === '자사',
-                            benefit: ''
-                          };
-                          setEditingProduct({
-                            ...editingProduct,
-                            comparisons: [...(editingProduct.comparisons || []), newComp]
-                          });
+                          const updated = [...(editingProduct.specifications || []), { category: '주요스펙', name: '', value: '' }];
+                          setEditingProduct({ ...editingProduct, specifications: updated });
                         }}
-                        className="bg-[#3182F6] text-white px-4 py-2 rounded-[10px] text-[13px] font-bold flex items-center gap-1 shadow-sm"
+                        className="bg-[#3182F6] text-white px-3.5 py-2 rounded-[10px] text-[12px] font-bold flex items-center gap-1 shadow-sm"
                       >
-                        <Plus className="w-4 h-4"/> 비교 대상 추가
+                        <Plus className="w-4 h-4"/> 스펙 항목 추가
                       </button>
                     </div>
-                    
-                    <div className="space-y-4">
-                      {editingProduct.comparisons?.map((comp: any, idx: number) => (
-                        <div key={idx} className="flex items-center gap-4 bg-[#F9FAFB] p-5 rounded-[20px] border border-[#E5E8EB]">
-                          <div className="w-[180px]">
-                            <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">비교 업체</label>
-                            <select 
-                              value={comp.company} 
-                              onChange={(e) => {
-                                const partner = competitors.find(c => c.name === e.target.value);
-                                const updated = [...editingProduct.comparisons];
-                                updated[idx] = { 
-                                  ...updated[idx], 
-                                  company: e.target.value,
-                                  isOurs: partner?.type === '자사',
-                                  period: (partner?.months || 60) + '개월'
-                                };
-                                setEditingProduct({ ...editingProduct, comparisons: updated });
-                              }}
-                              className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none"
-                            >
-                              {competitors.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
-                            </select>
-                          </div>
-                          <div className="w-[140px]">
-                            <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">월 납입금</label>
-                            <input 
-                              type="text" 
-                              value={formatNumber(comp.price)} 
-                              onChange={(e) => {
-                                const updated = [...editingProduct.comparisons];
-                                updated[idx] = { ...updated[idx], price: e.target.value.replace(/\D/g, '') };
-                                setEditingProduct({ ...editingProduct, comparisons: updated });
-                              }}
-                              className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none text-right" 
-                            />
-                          </div>
-                          <button 
-                            onClick={() => {
-                              const updated = [...editingProduct.comparisons];
-                              updated.splice(idx, 1);
-                              setEditingProduct({ ...editingProduct, comparisons: updated });
-                            }}
-                            className="text-red-500 hover:bg-red-50 p-2.5 rounded-[10px] mt-4"
-                          >
-                            <Trash2 className="w-5 h-5"/>
-                          </button>
+
+                    {(!editingProduct.specifications || editingProduct.specifications.length === 0) ? (
+                      <div className="bg-[#F9FAFB] p-6 rounded-[20px] border border-[#E5E8EB] text-center text-[#8B95A1] text-[13px]">
+                        등록된 상세 스펙 정보가 없습니다. [스펙 항목 추가] 버튼을 눌러 스펙 항목을 작성해 주세요.
+                      </div>
+                    ) : (
+                      <div className="bg-[#F9FAFB] rounded-[20px] border border-[#E5E8EB] overflow-hidden shadow-sm">
+                        <div className="max-h-[420px] overflow-y-auto hide-scrollbar">
+                          <table className="w-full text-left border-collapse">
+                            <thead className="bg-[#F2F4F6] sticky top-0 border-b border-[#E5E8EB] z-10">
+                              <tr>
+                                <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968] w-[140px]">분류 (카테고리)</th>
+                                <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968] w-[200px]">스펙 항목명</th>
+                                <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968]">상세값</th>
+                                <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968] w-12 text-center">삭제</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[#E5E8EB] bg-white">
+                              {editingProduct.specifications.map((spec: any, sIdx: number) => (
+                                <tr key={sIdx} className="hover:bg-[#F9FAFB] transition-colors">
+                                  <td className="px-3 py-2">
+                                    <input 
+                                      type="text"
+                                      value={spec.category || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editingProduct.specifications];
+                                        updated[sIdx] = { ...updated[sIdx], category: e.target.value };
+                                        setEditingProduct({ ...editingProduct, specifications: updated });
+                                      }}
+                                      className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#3182F6]"
+                                      placeholder="예: 크기, 용량"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    <input 
+                                      type="text"
+                                      value={spec.name || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editingProduct.specifications];
+                                        updated[sIdx] = { ...updated[sIdx], name: e.target.value };
+                                        setEditingProduct({ ...editingProduct, specifications: updated });
+                                      }}
+                                      className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+                                      placeholder="예: 전체 용량"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    <input 
+                                      type="text"
+                                      value={spec.value || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editingProduct.specifications];
+                                        updated[sIdx] = { ...updated[sIdx], value: e.target.value };
+                                        setEditingProduct({ ...editingProduct, specifications: updated });
+                                      }}
+                                      className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] text-[#4E5968]"
+                                      placeholder="예: 870L"
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2 text-center">
+                                    <button 
+                                      onClick={() => {
+                                        const updated = [...editingProduct.specifications];
+                                        updated.splice(sIdx, 1);
+                                        setEditingProduct({ ...editingProduct, specifications: updated });
+                                      }}
+                                      className="text-red-500 hover:bg-red-50 p-1.5 rounded-[6px] transition-colors"
+                                      title="스펙 항목 삭제"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
                   </div>
+
+                  {/* 타사 비교 정보 편집 (스마트 등록이 아니거나 수동 설정 시) */}
+                  {(!editingProduct.isSmartRegistered || editingProduct.showCompetitors) && (
+                    <div className="pt-8 border-t border-[#F2F4F6]">
+                      <div className="flex justify-between items-center mb-6">
+                        <h3 className="font-bold text-[18px]">타사 비교 정보 설정</h3>
+                        <button 
+                          onClick={() => {
+                            const defaultPartner = competitors[0] || { name: '타사', months: 60, type: '타사' };
+                            const newComp = {
+                              company: defaultPartner.name,
+                              target: '',
+                              price: '0',
+                              period: (defaultPartner.months || 60) + '개월',
+                              isOurs: defaultPartner.type === '자사',
+                              benefit: ''
+                            };
+                            setEditingProduct({
+                              ...editingProduct,
+                              comparisons: [...(editingProduct.comparisons || []), newComp]
+                            });
+                          }}
+                          className="bg-[#3182F6] text-white px-4 py-2 rounded-[10px] text-[13px] font-bold flex items-center gap-1 shadow-sm"
+                        >
+                          <Plus className="w-4 h-4"/> 비교 대상 추가
+                        </button>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {editingProduct.comparisons?.map((comp: any, idx: number) => (
+                          <div key={idx} className="flex items-center gap-4 bg-[#F9FAFB] p-5 rounded-[20px] border border-[#E5E8EB]">
+                            <div className="w-[180px]">
+                              <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">비교 업체</label>
+                              <select 
+                                value={comp.company} 
+                                onChange={(e) => {
+                                  const partner = competitors.find(c => c.name === e.target.value);
+                                  const updated = [...editingProduct.comparisons];
+                                  updated[idx] = { 
+                                    ...updated[idx], 
+                                    company: e.target.value,
+                                    isOurs: partner?.type === '자사',
+                                    period: (partner?.months || 60) + '개월'
+                                  };
+                                  setEditingProduct({ ...editingProduct, comparisons: updated });
+                                }}
+                                className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none"
+                              >
+                                {competitors.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
+                              </select>
+                            </div>
+                            <div className="w-[140px]">
+                              <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">월 납입금</label>
+                              <input 
+                                type="text" 
+                                value={formatNumber(comp.price)} 
+                                onChange={(e) => {
+                                  const updated = [...editingProduct.comparisons];
+                                  updated[idx] = { ...updated[idx], price: e.target.value.replace(/\D/g, '') };
+                                  setEditingProduct({ ...editingProduct, comparisons: updated });
+                                }}
+                                className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none text-right" 
+                              />
+                            </div>
+                            <button 
+                              onClick={() => {
+                                const updated = [...editingProduct.comparisons];
+                                updated.splice(idx, 1);
+                                setEditingProduct({ ...editingProduct, comparisons: updated });
+                              }}
+                              className="text-red-500 hover:bg-red-50 p-2.5 rounded-[10px] mt-4"
+                            >
+                              <Trash2 className="w-5 h-5"/>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {editingProduct.isSmartRegistered && !editingProduct.showCompetitors && (
+                    <div className="pt-4 text-center">
+                      <button 
+                        onClick={() => setEditingProduct({ ...editingProduct, showCompetitors: true })}
+                        className="text-[12px] font-bold text-[#8B95A1] hover:text-[#3182F6] underline"
+                      >
+                        + 타사 비교 정보 설정 펼치기
+                      </button>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 gap-8 pt-8">
                     {/* Thumbnail Images */}
@@ -839,18 +1252,28 @@ export default function ProductManagement() {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                         {(editingProduct.images || []).map((img: string, idx: number) => (
-                          <div key={idx} className="aspect-square bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] overflow-hidden relative group">
-                            <PreviewImage src={img} className="w-full h-full object-cover" />
-                            <button 
-                              onClick={() => removeImage('images', idx)}
-                              className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                         {(editingProduct.images || []).map((img: string, idx: number) => {
+                          const isRepresentative = (editingProduct.image ? editingProduct.image === img : idx === 0);
+                          return (
+                            <div 
+                              key={idx} 
+                              onClick={() => setEditingProduct({ ...editingProduct, image: img })}
+                              className={`aspect-square bg-[#F9FAFB] border rounded-[16px] overflow-hidden relative group cursor-pointer transition-all ${isRepresentative ? 'border-2 border-[#3182F6] shadow-sm' : 'border-[#E5E8EB] hover:border-[#3182F6]'}`}
                             >
-                              <X className="w-3 h-3"/>
-                            </button>
-                            {idx === 0 && <div className="absolute bottom-0 left-0 right-0 bg-[#3182F6]/80 text-white text-[10px] text-center py-0.5 font-bold">대표</div>}
-                          </div>
-                        ))}
+                              <PreviewImage src={img} className="w-full h-full object-cover" />
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); removeImage('images', idx); }}
+                                className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                title="이미지 삭제"
+                              >
+                                <X className="w-3 h-3"/>
+                              </button>
+                              <div className={`absolute bottom-0 left-0 right-0 text-[10px] text-center py-0.5 font-bold ${isRepresentative ? 'bg-[#3182F6] text-white' : 'bg-black/40 text-white/90 group-hover:bg-[#3182F6]/80'}`}>
+                                {idx + 1}번 {isRepresentative ? '(대표)' : '지정'}
+                              </div>
+                            </div>
+                          );
+                        })}
                         <div 
                           onClick={() => thumbInputRef.current?.click()}
                           className="aspect-square bg-[#F9FAFB] border-2 border-dashed border-[#E5E8EB] rounded-[16px] flex flex-col items-center justify-center cursor-pointer hover:border-[#3182F6] hover:bg-[#F2F4F6] transition-all group"

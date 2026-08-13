@@ -11,10 +11,18 @@ import LecturePage from '../pages/LecturePage';
 import LectureLivingPage from '../pages/LectureLivingPage';
 import LectureSpecialPage from '../pages/LectureSpecialPage';
 import KccPage from '../pages/KccPage';
+import Package60Page from '../pages/Package60Page';
 
 export default function LandingRouter() {
   const path = window.location.pathname.toLowerCase();
   
+  // /package60 경로 → 가전상조 60패키지 쇼핑몰 랜딩페이지
+  if (path === '/package60' || path.startsWith('/package60/')) {
+    const parts = path.split('/').filter(Boolean);
+    const sub = parts.length >= 2 ? parts[1] : undefined;
+    return <Package60Page channelSubdomain={sub} />;
+  }
+
   // /kcc 경로 → B2B 제휴 랜딩페이지
   if (path === '/kcc' || path.startsWith('/kcc/')) {
     return <KccPage channelSubdomain="kcc" />;
@@ -37,11 +45,7 @@ export default function LandingRouter() {
   const isConsentPath = path.startsWith('/consent');
   
   // Parse segments
-  // /living/bestone -> template: /living, subdomain: bestone
-  // /special/bestone -> template: /special, subdomain: bestone
-  // /living -> template: /living, subdomain: null
-  // /bestone -> template: null, subdomain: bestone
-  
+  const isPackage60Path = path.startsWith('/package60');
   const isLiving2Path = path.startsWith('/living2');
   const isLivingPath = !isLiving2Path && path.startsWith('/living');
   const isSpecial2Path = path.startsWith('/special2');
@@ -49,7 +53,7 @@ export default function LandingRouter() {
   const searchParams = new URLSearchParams(window.location.search);
   const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
   
-  const subdomainFromPath = (isLivingPath || isLiving2Path || isSpecialPath || isSpecial2Path)
+  const subdomainFromPath = (isLivingPath || isLiving2Path || isSpecialPath || isSpecial2Path || isPackage60Path)
     ? (segments.length >= 2 ? segments[1] : (queryChannel || null)) 
     : (segments.length >= 1 && !isConsentPath ? segments[0] : (queryChannel || null));
 
@@ -68,7 +72,6 @@ export default function LandingRouter() {
   // Loading state
   const isSearchingChannel = subdomainFromPath && channelBySubdomain === undefined;
 
-
   if (isSearchingChannel) {
     return (
       <div className="h-screen flex items-center justify-center bg-[#F2F4F6]">
@@ -78,6 +81,9 @@ export default function LandingRouter() {
   }
 
   // Routing
+  if (isPackage60Path) {
+    return <Package60Page channelSubdomain={channel?.subdomain} />;
+  }
   if (isLiving2Path) {
     return <LivingPage2 channelSubdomain={channel?.subdomain} />;
   }
@@ -97,6 +103,9 @@ export default function LandingRouter() {
     const assignedPaths = channel.landingPages || (channel.landingPage ? [channel.landingPage] : []);
     const primaryPath = assignedPaths[0] || '/';
     
+    if (primaryPath === '/package60') {
+      return <Package60Page channelSubdomain={channel.subdomain} />;
+    }
     if (primaryPath === '/living') {
       return <LivingPage channelSubdomain={channel.subdomain} />;
     }

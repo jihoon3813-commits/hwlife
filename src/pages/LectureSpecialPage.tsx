@@ -395,7 +395,7 @@ const SLIDES = [
             <div className="w-full aspect-square bg-[#F9FAFB] rounded-[24px] overflow-hidden mb-5 relative group">
               <img 
                 src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674657/5._%EC%8A%AC%EB%A6%BD%EC%95%A4%EB%B9%84_owqjvp.png" 
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-110" 
               />
               <div className="absolute top-3 left-3 px-3 py-1 bg-black/60 text-white text-[10px] font-black rounded-lg">
                 2구좌

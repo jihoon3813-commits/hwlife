@@ -80,6 +80,7 @@ export const create = mutation({
     detailImages: v.optional(v.array(v.string())),
     isVisible: v.boolean(),
     showOnMain: v.optional(v.boolean()),
+    showOnHero: v.optional(v.boolean()),
     landingPages: v.optional(v.array(v.string())),
     accountCount: v.optional(v.string()),
     comparisons: v.array(
@@ -92,6 +93,18 @@ export const create = mutation({
         benefit: v.optional(v.string()),
       })
     ),
+    specifications: v.optional(
+      v.array(
+        v.object({
+          category: v.optional(v.string()),
+          name: v.string(),
+          value: v.string(),
+        })
+      )
+    ),
+    isSmartRegistered: v.optional(v.boolean()),
+    supplyPrice: v.optional(v.string()),
+    giftText: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("products", args);
@@ -117,6 +130,7 @@ export const update = mutation({
     detailImages: v.optional(v.array(v.string())),
     isVisible: v.optional(v.boolean()),
     showOnMain: v.optional(v.boolean()),
+    showOnHero: v.optional(v.boolean()),
     landingPages: v.optional(v.array(v.string())),
     accountCount: v.optional(v.string()),
     comparisons: v.optional(
@@ -131,6 +145,18 @@ export const update = mutation({
         })
       )
     ),
+    specifications: v.optional(
+      v.array(
+        v.object({
+          category: v.optional(v.string()),
+          name: v.string(),
+          value: v.string(),
+        })
+      )
+    ),
+    isSmartRegistered: v.optional(v.boolean()),
+    supplyPrice: v.optional(v.string()),
+    giftText: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { id, ...fields } = args;

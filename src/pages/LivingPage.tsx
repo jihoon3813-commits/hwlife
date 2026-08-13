@@ -9,6 +9,8 @@ import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useEffect } from 'react';
 import SEO from '../components/SEO';
+import FuneralDetailModal from '../components/FuneralDetailModal';
+import { formatPhoneNumber } from '../utils/phone';
 
 
 export default function LivingPage({ channelSubdomain }: { channelSubdomain?: string }) {
@@ -27,6 +29,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isSangjoModalOpen, setIsSangjoModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
@@ -95,18 +98,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
-    let formattedValue = '';
-    
-    if (value.length <= 3) {
-      formattedValue = value;
-    } else if (value.length <= 7) {
-      formattedValue = `${value.slice(0, 3)}-${value.slice(3)}`;
-    } else {
-      formattedValue = `${value.slice(0, 3)}-${value.slice(3, 7)}-${value.slice(7, 11)}`;
-    }
-    
-    setPhoneNumber(formattedValue);
+    setPhoneNumber(formatPhoneNumber(e.target.value));
   };
 
   const toggleAccordion = (id: string) => {
@@ -217,17 +209,8 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
 
       {/* Section 1: 메인 히어로 (Hero) */}
       <section className="relative w-full h-[65vh] sm:h-[85vh] min-h-[450px] sm:min-h-[600px] flex flex-col justify-end pb-8 sm:pb-12 px-6 overflow-hidden">
-        {/* 배경 레이어 */}
-        <div className="absolute inset-0">
-          <img 
-            src="https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674828/hero_bg_pattern_zq1wqa.jpg" 
-            alt="비즈니스 배경" 
-            className="w-full h-full object-cover opacity-30"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0A1128] via-[#0A1128]/90 to-[#1B305B]/80"></div>
-          {/* 포인트 그리드 패턴 */}
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
-        </div>
+        {/* 배경 레이어 (단색 파란색 #3182F6) */}
+        <div className="absolute inset-0 bg-[#3182F6]"></div>
 
         {/* 모델 레이어 (앞에 배치) */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -237,12 +220,9 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
             className="h-[75%] w-auto object-contain object-bottom mt-[-10%] sm:mt-[-45%] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1)_85%,rgba(0,0,0,0)_100%)]"
           />
         </div>
-
-
-
         
         {/* 하단 페이드 그라데이션 */}
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0A1128] to-transparent z-10"></div>
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#3182F6] to-transparent z-10"></div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }} 
@@ -250,16 +230,16 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           transition={{ duration: 0.7, delay: 0.2 }}
           className="relative z-10 text-white"
         >
-          <div className="inline-block px-3 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[11px] font-bold text-white mb-1 sm:mb-4">
+          <div className="inline-block px-3.5 py-1.5 bg-white text-[#191F28] rounded-full text-[11px] font-extrabold shadow-md border border-white mb-1 sm:mb-4">
             효원상조 x 신한카드 x PREMIUM
           </div>
           
           <h2 className="text-[32px] sm:text-[38px] font-black leading-[1.2] mb-1 sm:mb-5 tracking-tight break-keep">
             해피효원라이프<br/>
-            <span className="text-[#3182F6]">리빙144 출시</span>
+            <span className="text-yellow-300">리빙144 출시</span>
           </h2>
 
-          <p className="text-white/80 text-[14px] sm:text-[16px] leading-[1.6] mb-3 sm:mb-8 break-keep font-medium">
+          <p className="text-white/90 text-[14px] sm:text-[16px] leading-[1.6] mb-3 sm:mb-8 break-keep font-medium">
             복잡한 가입 조건 없이<br/>
             신한카드만 있으면 누구나<br/>
             <span className="text-white font-bold">특별한 리빙 제품과 보너스 혜택까지!</span>
@@ -270,9 +250,9 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
               setSelectedProduct(null);
               setIsContactModalOpen(true);
             }}
-            className="w-full flex items-center justify-center gap-2 bg-[#3182F6] py-3.5 sm:py-4 rounded-[20px] text-[16px] font-bold text-white shadow-[0_8px_20px_rgba(49,130,246,0.4)] hover:bg-[#1B64DA] transition-all active:scale-95"
+            className="w-full flex items-center justify-center gap-2 bg-[#191F28] hover:bg-black text-white py-4 rounded-[20px] text-[16px] font-black shadow-[0_10px_30px_rgba(0,0,0,0.35)] border border-white/20 transition-all active:scale-95 cursor-pointer"
           >
-            단독 혜택받고 무료상담 신청 <ArrowRight className="w-5 h-5" />
+            단독 혜택받고 무료상담 신청 <ArrowRight className="w-5 h-5 text-yellow-300" />
           </button>
         </motion.div>
       </section>
@@ -993,7 +973,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
                 <img 
                   src={(item.images && item.images.length > 0) ? item.images[0] : item.image} 
                   alt={item.name} 
-                  className="w-full h-full object-cover" 
+                  className="w-full h-full object-contain p-2" 
                 />
                 {item.tag && (
                   <div className="absolute top-1 left-1 sm:top-4 sm:left-4 px-1.5 py-0.5 sm:px-3 sm:py-1.5 bg-black/60 backdrop-blur-md text-white text-[8px] sm:text-[11px] font-bold rounded-md uppercase tracking-wider">
@@ -1102,6 +1082,12 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           <p className="text-[#8B95A1] text-[15px] leading-relaxed break-keep">
             인력지원부터 물품까지, 마지막 가시는 길<br />부족함 없이 정성으로 모십니다.
           </p>
+          <button
+            onClick={() => setIsSangjoModalOpen(true)}
+            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-[#E8F3FF] hover:bg-[#D4E8FF] text-[#3182F6] font-extrabold text-[13px] rounded-full transition-colors cursor-pointer"
+          >
+            장례 서비스 및 결합 혜택 자세히 보기 <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
 
         <div className="space-y-4 sm:space-y-6">
@@ -1459,87 +1445,10 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
       </footer>
 
       {/* 개인정보 처리방침 모달 */}
-      <AnimatePresence>
-        {isPrivacyModalOpen && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsPrivacyModalOpen(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-[500px] bg-white rounded-[20px] sm:rounded-[32px] overflow-hidden shadow-2xl flex flex-col max-h-[80vh]"
-            >
-              <div className="p-6 border-b border-[#F2F4F6] flex items-center justify-between">
-                <h3 className="text-[18px] font-black text-[#191F28]">개인정보 수집 및 이용 동의</h3>
-                <button 
-                  onClick={() => setIsPrivacyModalOpen(false)}
-                  className="w-10 h-10 flex items-center justify-center bg-[#F9FAFB] rounded-full hover:bg-[#F2F4F6] transition-colors"
-                >
-                  <X className="w-5 h-5 text-[#8B95A1]" />
-                </button>
-              </div>
-              <div className="p-6 overflow-y-auto text-[14px] text-[#4E5968] font-medium leading-relaxed break-keep scrollbar-hide">
-                <p className="mb-6 font-bold text-[#191F28]">
-                  (주)효원상조와 (주)라이프앤조이는 귀하의 상담 신청과 관련하여 다음과 같이 개인정보를 수집·이용 및 제공하고자 합니다.
-                </p>
-
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="font-black text-[#191F28] mb-2 flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-[#3182F6] rounded-full"></div>
-                      1. 개인정보의 수집·이용에 관한 사항
-                    </h4>
-                    <ul className="space-y-2 pl-3.5">
-                      <li>• <span className="font-bold">수집 항목:</span> 이름, 연락처(휴대폰 번호), 문의 사항</li>
-                      <li>• <span className="font-bold">수집 및 이용 목적:</span>
-                        <ul className="pl-3 mt-1 space-y-1 text-[13px] opacity-80">
-                          <li>- 상담 신청에 따른 본인 확인 및 원활한 의사소통 경로 확보</li>
-                          <li>- 상품 안내(상조 및 가전결합 상품) 및 가입 상담</li>
-                          <li>- 계약 진행 및 서비스 제공을 위한 기초 자료 활용</li>
-                        </ul>
-                      </li>
-                      <li>• <span className="font-bold">보유 및 이용 기간:</span> 상담 완료 및 목적 달성 시까지 (단, 관련 법령에 따라 보존이 필요한 경우 해당 기간까지 보관)</li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="font-black text-[#191F28] mb-2 flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-[#3182F6] rounded-full"></div>
-                      2. 개인정보의 제3자 제공에 관한 사항
-                    </h4>
-                    <p className="mb-2 pl-3.5">본 상담 서비스 제공을 위해 아래와 같이 개인정보를 제공합니다.</p>
-                    <ul className="space-y-2 pl-3.5">
-                      <li>• <span className="font-bold">제공받는 자:</span> (주)효원상조, (주)라이프앤조이</li>
-                      <li>• <span className="font-bold">제공 목적:</span> 상품 안내, 해피콜, 계약 체결 및 관리</li>
-                      <li>• <span className="font-bold">제공 항목:</span> 이름, 연락처, 상담 내용</li>
-                      <li>• <span className="font-bold">보유 및 이용 기간:</span> 제공 목적 달성 시까지</li>
-                    </ul>
-                  </div>
-
-                  <div className="p-4 bg-[#F9FAFB] rounded-2xl border border-[#F2F4F6]">
-                    <p className="font-bold text-[#191F28] mb-1">※ 동의 거부 권리 안내</p>
-                    <p className="text-[13px] opacity-80">귀하는 개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있습니다. 다만, 동의를 거부하실 경우 상담 신청 및 상품 안내 서비스 이용이 제한될 수 있습니다.</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-6 bg-[#F9FAFB] border-t border-[#F2F4F6]">
-                <button 
-                  onClick={() => setIsPrivacyModalOpen(false)}
-                  className="w-full py-4 bg-[#3182F6] text-white font-bold rounded-2xl hover:bg-[#1B64DA] transition-all"
-                >
-                  확인했습니다
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <PrivacyModal 
+        isOpen={isPrivacyModalOpen} 
+        onClose={() => setIsPrivacyModalOpen(false)} 
+      />
 
       {/* 플로팅 상담 신청 바 (Sticky Bottom Bar) */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] sm:max-w-[480px] md:max-w-[540px] z-[45] px-4 pb-4 pointer-events-none">
@@ -1642,6 +1551,13 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
           </div>
         )}
       </AnimatePresence>
+
+      {/* Funeral Service Detail Modal */}
+      <FuneralDetailModal
+        isOpen={isSangjoModalOpen}
+        onClose={() => setIsSangjoModalOpen(false)}
+        onConsultationClick={() => setIsContactModalOpen(true)}
+      />
     </div>
   );
 }
