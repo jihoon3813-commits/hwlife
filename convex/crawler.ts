@@ -1,27 +1,37 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 
+import { action } from "./_generated/server";
+import { v } from "convex/values";
+
 const categories = [
-  'air-purifier',
-  'dehumidifiers',
-  'washing-machines',
-  'washers',
-  'refrigerators',
-  'kimchi-refrigerators',
+  'air-purifier', 'air-purifiers',
+  'dehumidifiers', 'dehumidifier',
+  'washing-machines', 'washers', 'washing-machine',
+  'refrigerators', 'refrigerator',
+  'kimchi-refrigerators', 'kimchi-refrigerator',
   'convertible-refrigerators',
-  'dryers',
-  'wash-tower',
-  'styler',
-  'dishwashers',
-  'ovens',
-  'water-purifiers',
-  'cleaners',
-  'air-conditioners',
-  'tvs',
-  'monitors',
-  'laptops',
-  'care-accessories'
+  'dryers', 'dryer',
+  'wash-tower', 'washtower', 'wash-tower-set',
+  'styler', 'lg-styler', 'style-care',
+  'dishwashers', 'dishwasher',
+  'ovens', 'cooking-appliances', 'electric-ranges',
+  'water-purifiers', 'water-purifier', 'water-care',
+  'cleaners', 'vacuum-cleaners', 'robot-cleaners',
+  'air-conditioners', 'air-conditioner', 'system-air-conditioners',
+  'tvs', 'tv', 'oled-tvs', 'qned-tvs', 'stanbyme',
+  'monitors', 'monitor', 'gaming-monitors',
+  'laptops', 'notebook', 'notebooks', 'gram',
+  'projectors', 'cinebeam',
+  'audio', 'soundbars', 'speakers',
+  'care-accessories', 'accessories'
 ];
+
+function cleanModelCode(raw: string): string {
+  let cleaned = raw.trim();
+  cleaned = cleaned.split('.')[0];
+  return cleaned;
+}
 
 function isValidProductRefUrl(refUrl?: string, modelCode?: string): boolean {
   if (!refUrl || typeof refUrl !== 'string') return false;
@@ -39,67 +49,86 @@ function isValidProductRefUrl(refUrl?: string, modelCode?: string): boolean {
     lower.includes('/support') ||
     lower.includes('/bestshop') ||
     lower.includes('/story') ||
-    lower.includes('/company')
+    lower.includes('/company') ||
+    lower.includes('/upload') ||
+    lower.includes('/ebook') ||
+    lower.includes('/cart') ||
+    lower.includes('/my-page')
   ) {
     return false;
   }
 
-  const parts = refUrl.split('lge.co.kr/')[1]?.split('?')[0]?.split('/').filter(Boolean);
-  if (!parts || parts.length < 2) return false;
+  const afterDomain = lower.split('lge.co.kr/')[1]?.split('?')[0];
+  if (!afterDomain || afterDomain.startsWith('kr/')) return false;
+
+  const parts = afterDomain.split('/').filter(Boolean);
+  if (parts.length < 2) return false;
 
   return true;
 }
 
 async function resolveProductUrl(modelCode: string, refUrl?: string): Promise<string | null> {
-  const cleanCode = modelCode.trim();
+  const rawModel = modelCode.trim();
+  const cleanCode = cleanModelCode(rawModel);
   
   if (isValidProductRefUrl(refUrl, cleanCode)) {
     return refUrl!;
   }
 
-  // 1. Direct GET probe with category list & variations
-  const codeBase = cleanCode.split('.')[0].toLowerCase();
-  const variations = [codeBase, cleanCode.toLowerCase().replace(/\./g, '')];
+  const codeBase = cleanCode.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-  if (codeBase.length > 5) {
-    if (codeBase.endsWith('a') || codeBase.endsWith('b') || codeBase.endsWith('c')) {
-      variations.push(codeBase.slice(0, -1));
-    }
+  const variations = Array.from(new Set([
+    cleanCode.toLowerCase(),
+    codeBase,
+    rawModel.toLowerCase(),
+    rawModel.toLowerCase().replace(/\./g, '')
+  ]));
+
+  if (codeBase.length > 5 && (codeBase.endsWith('a') || codeBase.endsWith('b') || codeBase.endsWith('c'))) {
+    variations.push(codeBase.slice(0, -1));
   }
 
+  // 1. Fast parallel probe across categories (10 at a time)
   for (const code of variations) {
-    for (const cat of categories) {
-      const candidateUrl = `https://www.lge.co.kr/${cat}/${code}`;
-      try {
-        const res = await fetch(candidateUrl, {
-          method: 'GET',
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+    for (let i = 0; i < categories.length; i += 10) {
+      const batch = categories.slice(i, i + 10);
+      const results = await Promise.all(batch.map(async (cat) => {
+        const candidateUrl = `https://www.lge.co.kr/${cat}/${code}`;
+        try {
+          const res = await fetch(candidateUrl, {
+            method: 'GET',
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+              'Accept-Language': 'ko-KR,ko;q=0.9'
+            }
+          });
+          if (res.status === 200) {
+            const text = await res.text();
+            if (text.includes('digitalData') || text.includes('og:title') || text.includes('gallery') || text.includes('productInfo')) {
+              return candidateUrl;
+            }
           }
-        });
-        if (res.status === 200) {
-          const text = await res.text();
-          if (text.includes('digitalData') || text.includes('og:title') || text.includes('gallery') || text.includes('productInfo')) {
-            return candidateUrl;
-          }
-        }
-      } catch (e) {}
+        } catch (e) {}
+        return null;
+      }));
+
+      const found = results.find(Boolean);
+      if (found) return found;
     }
   }
 
-  // 2. Search fallback via Naver & Daum for site:lge.co.kr {modelCode}
+  // 2. Search fallback via Naver & Daum site search
   const searchQueries = [
     `site:lge.co.kr ${cleanCode}`,
     `site:lge.co.kr ${codeBase}`
   ];
 
   for (const q of searchQueries) {
-    // Try Naver
     try {
       const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(q)}`;
       const res = await fetch(naverUrl, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
       });
       if (res.ok) {
@@ -112,12 +141,11 @@ async function resolveProductUrl(modelCode: string, refUrl?: string): Promise<st
       }
     } catch(e) {}
 
-    // Try Daum
     try {
       const daumUrl = `https://search.daum.net/search?w=tot&q=${encodeURIComponent(q)}`;
       const res = await fetch(daumUrl, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
       });
       if (res.ok) {
@@ -134,20 +162,65 @@ async function resolveProductUrl(modelCode: string, refUrl?: string): Promise<st
   return null;
 }
 
+async function scrapeSearchFallback(modelCode: string) {
+  const cleanCode = cleanModelCode(modelCode);
+  const query = `LG전자 ${cleanCode}`;
+
+  try {
+    const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(query)}`;
+    const res = await fetch(naverUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept-Language': 'ko-KR,ko;q=0.9'
+      }
+    });
+    if (res.ok) {
+      const html = await res.text();
+      let name = '';
+      let img = '';
+
+      const imgMatch = html.match(/https:\/\/search\.pstatic\.net\/[^"'\s\>\&]+\.(jpg|png|webp|jpeg)/i);
+      if (imgMatch) img = imgMatch[0];
+
+      const titleMatch = html.match(/LG\s*[^<\r\n"']*(?:오브제|퓨리케어|트롬|휘센|디오스|통돌이|그램|울트라|올레드|스탠바이미|스타일러|코드제로|워시타워)[^<\r\n"']*/i);
+      if (titleMatch) {
+        name = titleMatch[0].replace(/<[^>]+>/g, '').replace(/&lt;[^&]+&gt;/g, '').trim();
+      }
+
+      if (name || img) {
+        return {
+          success: true,
+          model: modelCode,
+          name: name || `LG ${modelCode}`,
+          brand: 'LG전자',
+          category: '가전',
+          thumbnail: img,
+          thumbnails: img ? [img] : [],
+          detailImages: [],
+          specifications: []
+        };
+      }
+    }
+  } catch(e) {}
+
+  return {
+    success: false,
+    model: modelCode,
+    name: `LG ${modelCode}`,
+    brand: 'LG전자',
+    category: '가전',
+    thumbnail: '',
+    thumbnails: [],
+    detailImages: [],
+    specifications: [],
+    error: 'Product search fallback failed'
+  };
+}
+
 async function scrapeSingleModel(modelCode: string, refUrl?: string) {
   const url = await resolveProductUrl(modelCode, refUrl);
   if (!url) {
-    return {
-      success: false,
-      model: modelCode,
-      name: `LG ${modelCode}`,
-      brand: 'LG전자',
-      category: '가전',
-      thumbnail: '',
-      detailImages: [],
-      specifications: [],
-      error: 'Product page not found'
-    };
+    return await scrapeSearchFallback(modelCode);
   }
 
   try {
