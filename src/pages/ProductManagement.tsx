@@ -73,6 +73,109 @@ export default function ProductManagement() {
   const selectedPlan = plans.find(p => p.id === selectedPlanId) || plans[0];
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
 
+  const [isSmartModalOpen, setIsSmartModalOpen] = useState(false);
+  const [directModelsText, setDirectModelsText] = useState('');
+  const [isDirectRegistering, setIsDirectRegistering] = useState(false);
+
+  const handleDirectSmartRegister = async () => {
+    const rawInput = directModelsText.trim();
+    if (!rawInput) {
+      alert("등록할 모델명을 입력해 주세요.");
+      return;
+    }
+
+    const modelList = rawInput
+      .split(/[\n,;]/)
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    if (modelList.length === 0) {
+      alert("유효한 모델명이 입력되지 않았습니다.");
+      return;
+    }
+
+    setIsDirectRegistering(true);
+    setSmartProgress({ current: 0, total: modelList.length, currentModel: '시작 중...' });
+
+    let successCount = 0;
+    let failCount = 0;
+
+    const currentPlan = plans.find(p => p.id === selectedPlanId) || selectedPlan;
+    const planPrice = currentPlan?.basePrice ? String(currentPlan.basePrice).replace(/\D/g, '') : "59800";
+    const planBenefitPrice = currentPlan?.benefitPrice ? String(currentPlan.benefitPrice).replace(/\D/g, '') : "34800";
+    const planAccount = currentPlan?.accountCount || (selectedPlanId + "구좌");
+
+    for (let i = 0; i < modelList.length; i++) {
+      const rawModel = modelList[i];
+      setSmartProgress({ current: i + 1, total: modelList.length, currentModel: rawModel });
+
+      try {
+        const scraped = await scrapeProductInfoAction({
+          model: rawModel,
+          price: '0'
+        });
+
+        const existingProduct = allProducts?.find(
+          p => p.planId === selectedPlanId && p.model?.trim().toLowerCase() === rawModel.toLowerCase()
+        );
+
+        const scrapedName = (scraped.name && scraped.name !== `LG ${rawModel}`) ? scraped.name : rawModel;
+        const scrapedThumb = scraped.thumbnail || undefined;
+        const scrapedThumbs = scraped.thumbnails && scraped.thumbnails.length > 0 ? scraped.thumbnails : (scraped.thumbnail ? [scraped.thumbnail] : []);
+
+        if (existingProduct) {
+          await updateProduct({
+            id: existingProduct._id,
+            brand: scraped.brand || existingProduct.brand || 'LG전자',
+            category: scraped.category || existingProduct.category || '가전',
+            model: scraped.model || rawModel,
+            name: scrapedName !== rawModel ? scrapedName : (existingProduct.name || rawModel),
+            image: scrapedThumb || existingProduct.image || undefined,
+            images: scrapedThumbs.length > 0 ? scrapedThumbs : (existingProduct.images || []),
+            detailImage: scraped.detailImages?.[0] || existingProduct.detailImage || undefined,
+            detailImages: scraped.detailImages || existingProduct.detailImages || [],
+            specifications: scraped.specifications && scraped.specifications.length > 0 ? scraped.specifications : (existingProduct.specifications || []),
+            isSmartRegistered: true,
+            isVisible: true,
+            accountCount: planAccount
+          });
+        } else {
+          await createProduct({
+            planId: selectedPlanId,
+            brand: scraped.brand || 'LG전자',
+            category: scraped.category || '가전',
+            model: scraped.model || rawModel,
+            name: scrapedName,
+            price: planPrice,
+            discountPrice: planBenefitPrice,
+            image: scrapedThumb,
+            images: scrapedThumbs,
+            detailImage: scraped.detailImages?.[0] || undefined,
+            detailImages: scraped.detailImages || [],
+            specifications: scraped.specifications || [],
+            isSmartRegistered: true,
+            isVisible: true,
+            showOnMain: false,
+            landingPages: ['/package60'],
+            comparisons: [],
+            accountCount: planAccount
+          });
+        }
+        successCount++;
+      } catch (err) {
+        console.error(`Direct smart register error for ${rawModel}:`, err);
+        failCount++;
+      }
+    }
+
+    setSmartProgress(null);
+    setIsDirectRegistering(false);
+    setIsSmartModalOpen(false);
+    setDirectModelsText('');
+
+    alert(`⚡ 스마트 모델명 입력 등록이 완료되었습니다.\n(성공: ${successCount}건, 실패: ${failCount}건)`);
+  };
+
   // When mounting or navigating to ProductManagement, select the top plan (plans[0]) and show list view
   React.useEffect(() => {
     if (plans.length > 0 && isInitialMount.current) {
@@ -860,8 +963,8 @@ export default function ProductManagement() {
                     <Zap className="w-4 h-4" /> 스마트양식
                   </button>
                   <button 
-                    onClick={() => smartExcelInputRef.current?.click()}
-                    className="flex-1 sm:flex-none bg-gradient-to-r from-[#3182F6] to-[#1B64DA] text-white px-3.5 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-md shadow-[#3182F6]/20"
+                    onClick={() => setIsSmartModalOpen(true)}
+                    className="flex-1 sm:flex-none bg-gradient-to-r from-[#3182F6] to-[#1B64DA] text-white px-3.5 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-md shadow-[#3182F6]/20 cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4" /> 스마트 등록
                   </button>
@@ -1632,6 +1735,78 @@ export default function ProductManagement() {
             multiple
             onChange={handleDetailImageUpload} 
           />
+          {/* 스마트 등록 선택 모달 (개별 모델명 직접 입력 또는 엑셀 업로드) */}
+          {isSmartModalOpen && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
+              <div className="bg-white w-full max-w-lg rounded-[28px] p-6 sm:p-8 shadow-2xl space-y-6">
+                <div className="flex justify-between items-center pb-4 border-b border-[#F2F4F6]">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-[14px] bg-[#E8F3FF] text-[#3182F6] flex items-center justify-center">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-[18px] text-[#191F28]">스마트 제품 수집 등록</h3>
+                      <p className="text-[12px] text-[#8B95A1]">개별 모델명 직접 입력 또는 엑셀 파일로 수집합니다.</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setIsSmartModalOpen(false)}
+                    className="p-2 hover:bg-[#F2F4F6] rounded-full text-[#8B95A1] transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5"/>
+                  </button>
+                </div>
+
+                {/* 1. 개별 모델명 직접 입력 영역 */}
+                <div className="space-y-3">
+                  <label className="block text-[13px] font-bold text-[#4E5968] flex justify-between items-center">
+                    <span>⚡ 개별 모델명 직접 입력</span>
+                    <span className="text-[11px] font-normal text-[#8B95A1]">여러 개 입력 시 쉼표(,)나 줄바꿈 구분</span>
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={directModelsText}
+                    onChange={(e) => setDirectModelsText(e.target.value)}
+                    placeholder="예시:&#10;AS195DWWA&#10;AS186LSAA, T18MX7, M344MB14&#10;FX23VVE + RD20WVE"
+                    className="w-full bg-[#F9FAFB] border border-[#E5E8EB] focus:border-[#3182F6] p-4 rounded-[16px] text-[14px] font-mono focus:outline-none resize-none"
+                  />
+                  <button
+                    onClick={handleDirectSmartRegister}
+                    disabled={isDirectRegistering || !directModelsText.trim()}
+                    className="w-full bg-gradient-to-r from-[#3182F6] to-[#1B64DA] disabled:opacity-50 text-white font-bold py-3.5 rounded-[16px] text-[14px] flex items-center justify-center gap-2 shadow-md shadow-[#3182F6]/20 transition-all cursor-pointer"
+                  >
+                    <Zap className="w-4 h-4" />
+                    {isDirectRegistering ? '스마트 수집 등록 중...' : '입력한 모델명으로 스마트 등록 시작'}
+                  </button>
+                </div>
+
+                <div className="relative flex py-1 items-center">
+                  <div className="flex-grow border-t border-[#E5E8EB]"></div>
+                  <span className="flex-shrink mx-4 text-[12px] font-bold text-[#8B95A1]">또는</span>
+                  <div className="flex-grow border-t border-[#E5E8EB]"></div>
+                </div>
+
+                {/* 2. 엑셀 파일 업로드 & 양식 다운로드 */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button 
+                    onClick={downloadSmartTemplate}
+                    className="bg-[#F2F8FF] border border-[#3182F6]/30 text-[#3182F6] py-3 rounded-[14px] text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-[#E5F0FF] transition-all cursor-pointer"
+                  >
+                    <Zap className="w-4 h-4" /> 스마트 엑셀 양식
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setIsSmartModalOpen(false);
+                      smartExcelInputRef.current?.click();
+                    }}
+                    className="bg-white border border-[#E5E8EB] text-[#4E5968] hover:text-[#3182F6] hover:border-[#3182F6] py-3 rounded-[14px] text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <Upload className="w-4 h-4" /> 엑셀 파일 업로드
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
