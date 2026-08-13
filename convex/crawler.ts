@@ -283,42 +283,43 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
     const ogImageM = html.match(/property=["']og:image["']\s+content=["']([^"']+)["']/i) || html.match(/content=["']([^"']+)["']\s+property=["']og:image["']/i);
     const ogThumbnail = ogImageM ? ogImageM[1] : '';
 
-    // 3. Extract Official Product Gallery Thumbnails (LGE Official Top Gallery Area)
-    const galleryMatches: string[] = [];
-
-    // A. Search for gallery arrays in Next.js push payloads or scripts
-    const galleryArrayMatches = Array.from(html.matchAll(/"gallery(?:Images|List|Url|Path)?"\s*:\s*\[([\s\S]*?)\]/gi));
-    for (const m of galleryArrayMatches) {
-      const urls = m[1].match(/https?:\/\/[^\s"']+\.(jpg|png|webp|jpeg)/gi) || [];
-      urls.forEach(u => galleryMatches.push(u));
-    }
-
-    // B. Search for /gallery/ in image URLs
+    // 3. Extract Official Product Gallery Thumbnails (LGE Official Top Gallery Area ONLY)
     const allGalleryImgs = html.match(/https?:\/\/(?:www\.|static\.)?lge\.co\.kr\/[^\s"'\\]*\/gallery\/[^\s"'\\]+\.(jpg|png|webp|gif)/gi) || [];
-    allGalleryImgs.forEach(u => galleryMatches.push(u));
-
-    // C. Search for _f01, _f02, _f03 product gallery cuts (e.g. AS185LGAA_f01_2g.jpg)
-    const fCuts = html.match(/https?:\/\/(?:www\.|static\.)?lge\.co\.kr\/[^\s"'\\]*_f\d+_[^\s"'\\]+\.(jpg|png|webp|gif)/gi) || [];
-    fCuts.forEach(u => galleryMatches.push(u));
 
     const uniqueGallery: string[] = [];
-    const seenUrls = new Set<string>();
+    const seenKeys = new Set<string>();
 
-    if (ogThumbnail && !seenUrls.has(ogThumbnail)) {
-      seenUrls.add(ogThumbnail);
+    if (ogThumbnail && !ogThumbnail.includes('/usp/')) {
+      seenKeys.add(ogThumbnail);
       uniqueGallery.push(ogThumbnail);
     }
 
-    for (const img of galleryMatches) {
+    for (const img of allGalleryImgs) {
       const lower = img.toLowerCase();
+      
+      // Exclude USP detail page feature images, small thumbnails, mobile versions
       if (
-        !seenUrls.has(img) &&
-        !lower.includes('small') &&
-        !lower.includes('-m0') &&
-        !/[-_]m\d+/i.test(lower) &&
-        !/[-_]mo[\._]/i.test(lower)
+        lower.includes('/usp/') ||
+        lower.includes('small') ||
+        lower.includes('-m0') ||
+        lower.includes('_mo.') ||
+        lower.includes('-mo.') ||
+        /[-_]m\d+/i.test(lower)
       ) {
-        seenUrls.add(img);
+        continue;
+      }
+
+      // Deduplicate key filenames
+      const filename = img.split('/').pop() || '';
+      let cleanKey = filename
+        .replace(/^(small|medium|large)[-_]?/gi, '')
+        .replace(/[-_]m(\d+)/gi, '$1')
+        .replace(/\.(jpg|png|webp|gif)$/i, '')
+        .toLowerCase();
+
+      if (!seenKeys.has(cleanKey) && !seenKeys.has(img)) {
+        seenKeys.add(cleanKey);
+        seenKeys.add(img);
         uniqueGallery.push(img);
       }
     }

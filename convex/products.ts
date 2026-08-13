@@ -6,6 +6,7 @@ export const getAllProducts = query({
   args: {},
   handler: async (ctx) => {
     const products = await ctx.db.query("products").collect();
+    products.sort((a, b) => (a.order ?? 99999) - (b.order ?? 99999));
     return await Promise.all(
       products.map(async (p) => {
         const resolveUrl = async (url: string | undefined) => {
@@ -37,6 +38,8 @@ export const getVisibleProducts = query({
       .query("products")
       .filter((q) => q.eq(q.field("isVisible"), true))
       .collect();
+
+    products.sort((a, b) => (a.order ?? 99999) - (b.order ?? 99999));
 
     return await Promise.all(
       products.map(async (p) => {
@@ -105,6 +108,7 @@ export const create = mutation({
     isSmartRegistered: v.optional(v.boolean()),
     supplyPrice: v.optional(v.string()),
     giftText: v.optional(v.string()),
+    order: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("products", args);
@@ -157,10 +161,27 @@ export const update = mutation({
     isSmartRegistered: v.optional(v.boolean()),
     supplyPrice: v.optional(v.string()),
     giftText: v.optional(v.string()),
+    order: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const { id, ...fields } = args;
     await ctx.db.patch(id, fields);
+  },
+});
+
+export const updateProductOrder = mutation({
+  args: {
+    orders: v.array(
+      v.object({
+        id: v.id("products"),
+        order: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    for (const item of args.orders) {
+      await ctx.db.patch(item.id, { order: item.order });
+    }
   },
 });
 

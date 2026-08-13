@@ -50,6 +50,7 @@ export default function ProductManagement() {
   const updateProduct = useMutation(api.products.update);
   const createProduct = useMutation(api.products.create);
   const deleteProductMutation = useMutation(api.products.remove);
+  const updateProductOrder = useMutation(api.products.updateProductOrder);
 
   const [selectedPlanId, setSelectedPlanId] = useState<number | undefined>(undefined);
   const [viewMode, setViewMode] = useState<'list' | 'edit_plan' | 'edit_product'>('list');
@@ -511,8 +512,27 @@ export default function ProductManagement() {
     }, 0);
   };
   const onDragOver = (e: React.DragEvent) => e.preventDefault();
-  const onDrop = (index: number) => {
-    // 순서 변경 로직은 order 필드가 스키마에 추가되면 구현 가능
+  const onDrop = async (dropIndex: number) => {
+    if (draggedItemIndex === null || draggedItemIndex === dropIndex) {
+      setDraggedItemIndex(null);
+      return;
+    }
+
+    const newList = [...filteredProducts];
+    const [movedItem] = newList.splice(draggedItemIndex, 1);
+    newList.splice(dropIndex, 0, movedItem);
+
+    const orders = newList.map((item, index) => ({
+      id: item._id,
+      order: index,
+    }));
+
+    try {
+      await updateProductOrder({ orders });
+    } catch (e) {
+      console.error('Failed to update product order:', e);
+    }
+
     setDraggedItemIndex(null);
   };
 

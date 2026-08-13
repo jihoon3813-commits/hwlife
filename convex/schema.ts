@@ -67,6 +67,7 @@ export default defineSchema({
     isSmartRegistered: v.optional(v.boolean()),
     supplyPrice: v.optional(v.string()),
     giftText: v.optional(v.string()),
+    order: v.optional(v.number()),
   }),
   inquiries: defineTable({
     name: v.string(),
