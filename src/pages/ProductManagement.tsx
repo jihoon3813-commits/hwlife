@@ -291,6 +291,99 @@ export default function ProductManagement() {
     setSelectedIds([]);
   };
 
+  const [isSingleFetching, setIsSingleFetching] = useState(false);
+
+  const handleSingleSmartFetch = async () => {
+    if (!editingProduct?.model?.trim()) {
+      alert("스마트 수집할 모델명을 입력해 주세요.");
+      return;
+    }
+    setIsSingleFetching(true);
+    try {
+      const scraped = await scrapeProductInfoAction({
+        model: editingProduct.model.trim(),
+        price: String(editingProduct.price || '0').replace(/\D/g, '')
+      });
+
+      if (!scraped.success && !scraped.thumbnail && (!scraped.specifications || scraped.specifications.length === 0)) {
+        alert(`모델명 [${editingProduct.model}]의 스마트 정보 수집에 실패했거나 제품 페이지를 찾을 수 없습니다.`);
+        return;
+      }
+
+      setEditingProduct((prev: any) => ({
+        ...prev,
+        name: scraped.name || prev.name,
+        brand: scraped.brand || prev.brand || 'LG전자',
+        category: scraped.category || prev.category || '가전',
+        image: scraped.thumbnail || prev.image,
+        images: scraped.thumbnails && scraped.thumbnails.length > 0 ? scraped.thumbnails : (scraped.thumbnail ? [scraped.thumbnail] : prev.images),
+        specifications: scraped.specifications && scraped.specifications.length > 0 ? scraped.specifications : prev.specifications
+      }));
+
+      alert(`⚡ 모델명 [${editingProduct.model}]의 스마트 정보(제품명: ${scraped.name}, 썸네일 ${scraped.thumbnails?.length || 0}개, 스펙 ${scraped.specifications?.length || 0}개)를 성공적으로 수집했습니다!`);
+    } catch (err: any) {
+      console.error(err);
+      alert("스마트 정보 수집 중 오류가 발생했습니다.");
+    } finally {
+      setIsSingleFetching(false);
+    }
+  };
+
+  const handleBatchSmartFetch = async () => {
+    const targets = selectedIds.length > 0
+      ? filteredProducts.filter(p => selectedIds.includes(p._id))
+      : filteredProducts;
+
+    if (targets.length === 0) {
+      alert("동기화할 제품이 없습니다.");
+      return;
+    }
+
+    if (!window.confirm(`${targets.length}개 제품의 모델명을 기준으로 스마트 정보(제품명, 이미지, 스펙)를 일괄 자동 수집하시겠습니까?`)) {
+      return;
+    }
+
+    setSmartProgress({ current: 0, total: targets.length, currentModel: '시작 중...' });
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let i = 0; i < targets.length; i++) {
+      const prod = targets[i];
+      if (!prod.model) continue;
+
+      setSmartProgress({ current: i + 1, total: targets.length, currentModel: `${prod.name || ''} (${prod.model})` });
+
+      try {
+        const scraped = await scrapeProductInfoAction({
+          model: prod.model,
+          price: String(prod.price || '0').replace(/\D/g, '')
+        });
+
+        if (scraped.success || scraped.thumbnail || (scraped.specifications && scraped.specifications.length > 0)) {
+          await updateProduct({
+            id: prod._id,
+            name: scraped.name && !scraped.name.startsWith('LG ') ? scraped.name : (prod.name || scraped.name),
+            brand: scraped.brand || prod.brand || 'LG전자',
+            category: scraped.category || prod.category || '가전',
+            image: scraped.thumbnail || prod.image || undefined,
+            images: scraped.thumbnails && scraped.thumbnails.length > 0 ? scraped.thumbnails : (prod.images || []),
+            specifications: scraped.specifications && scraped.specifications.length > 0 ? scraped.specifications : (prod.specifications || [])
+          });
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (err) {
+        console.error(err);
+        failCount++;
+      }
+    }
+
+    setSmartProgress(null);
+    alert(`⚡ 스마트 정보 일괄 수집 완료!\n성공: ${successCount}개 / 실패: ${failCount}개`);
+  };
+
   const handleBatchCopy = async () => {
     if (selectedIds.length === 0) return;
     for (const id of selectedIds) {
@@ -786,6 +879,14 @@ export default function ProductManagement() {
                         <option key={n} value={n - 1}>{n}번 이미지로 설정</option>
                       ))}
                     </select>
+                    <div className="h-4 w-[1px] bg-[#D1D6DB] mx-1"></div>
+                    <button 
+                      onClick={handleBatchSmartFetch}
+                      className="px-3 py-1 bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[11px] font-extrabold rounded-[6px] transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                      title="선택 항목 또는 전체 항목의 스마트 정보(이미지, 스펙)를 모델명으로 일괄 수집합니다"
+                    >
+                      <Zap className="w-3.5 h-3.5" /> 스마트 정보 일괄 수집
+                    </button>
                   </div>
                 </div>
             <div className="text-[12px] text-[#8B95A1]">목록에서 개별 관리도 가능합니다.</div>
@@ -1016,8 +1117,20 @@ export default function ProductManagement() {
                       <input type="text" value={editingProduct.name} onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold" />
                     </div>
                     <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">모델명</label>
-                      <input type="text" value={editingProduct.model} onChange={(e) => setEditingProduct({...editingProduct, model: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none" />
+                      <div className="flex justify-between items-center mb-2 px-1">
+                        <label className="block text-[13px] font-bold text-[#4E5968]">모델명</label>
+                        <button
+                          type="button"
+                          onClick={handleSingleSmartFetch}
+                          disabled={isSingleFetching}
+                          className="text-[11px] font-extrabold text-[#3182F6] hover:text-[#1B64DA] bg-[#E8F3FF] hover:bg-[#D4E8FF] px-2.5 py-1 rounded-[6px] transition-colors flex items-center gap-1 cursor-pointer"
+                          title="입력한 모델명으로 LG전자 공식 웹사이트에서 이미지, 제품명, 스펙 정보를 가져옵니다"
+                        >
+                          <Zap className="w-3 h-3" />
+                          {isSingleFetching ? '수집 중...' : '스마트 수집'}
+                        </button>
+                      </div>
+                      <input type="text" value={editingProduct.model} onChange={(e) => setEditingProduct({...editingProduct, model: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none" placeholder="예: AS195DWWA" />
                     </div>
                     <div>
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">공급가</label>

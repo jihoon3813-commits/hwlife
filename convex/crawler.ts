@@ -2,10 +2,13 @@ import { action } from "./_generated/server";
 import { v } from "convex/values";
 
 const categories = [
+  'air-purifier',
+  'dehumidifiers',
+  'washing-machines',
+  'washers',
   'refrigerators',
   'kimchi-refrigerators',
   'convertible-refrigerators',
-  'washers',
   'dryers',
   'wash-tower',
   'styler',
@@ -13,11 +16,11 @@ const categories = [
   'ovens',
   'water-purifiers',
   'cleaners',
-  'air-cleaners',
   'air-conditioners',
   'tvs',
   'monitors',
-  'laptops'
+  'laptops',
+  'care-accessories'
 ];
 
 async function resolveProductUrl(modelCode: string, refUrl?: string): Promise<string | null> {
@@ -27,50 +30,99 @@ async function resolveProductUrl(modelCode: string, refUrl?: string): Promise<st
     return refUrl;
   }
 
-  const variations: string[] = [];
-  const lower = cleanCode.toLowerCase();
-  variations.push(lower);
+  // 1. Direct GET probe with category list & variations
+  const codeBase = cleanCode.split('.')[0].toLowerCase();
+  const variations = [codeBase, cleanCode.toLowerCase().replace(/\./g, '')];
 
-  if (/-[a-z]$/i.test(cleanCode)) {
-    const base = lower.replace(/-[a-z]$/i, '');
-    variations.push(base + '2');
-    variations.push(base + '1');
-    variations.push(base + '3');
-    variations.push(base);
-  } else if (!/\d$/.test(cleanCode)) {
-    variations.push(lower + '2');
-    variations.push(lower + '1');
+  if (codeBase.length > 5) {
+    if (codeBase.endsWith('a') || codeBase.endsWith('b') || codeBase.endsWith('c')) {
+      variations.push(codeBase.slice(0, -1));
+    }
   }
 
   for (const code of variations) {
     for (const cat of categories) {
       const candidateUrl = `https://www.lge.co.kr/${cat}/${code}`;
       try {
-        const res = await fetch(candidateUrl, { method: 'HEAD', headers: { 'User-Agent': 'Mozilla/5.0' } });
+        const res = await fetch(candidateUrl, {
+          method: 'GET',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+          }
+        });
         if (res.status === 200) {
-          return candidateUrl;
+          const text = await res.text();
+          if (text.includes('digitalData') || text.includes('og:title') || text.includes('gallery') || text.includes('productInfo')) {
+            return candidateUrl;
+          }
         }
       } catch (e) {}
     }
   }
 
-  try {
-    const query = `site:lge.co.kr ${cleanCode}`;
-    const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
-    const res = await fetch(ddgUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-    if (res.ok) {
-      const html = await res.text();
-      const matches = html.match(/uddg=https%3A%2F%2Fwww\.lge\.co\.kr%2F([a-zA-Z0-9_-]+)%2F([a-zA-Z0-9_-]+)/gi);
-      if (matches) {
-        for (const m of matches) {
-          const url = decodeURIComponent(m.replace('uddg=', ''));
-          if (!url.includes('/search') && !url.includes('/bestshop') && !url.includes('/event')) {
-            return url;
-          }
+  // 2. Search fallback via Naver & Daum for site:lge.co.kr {modelCode}
+  const searchQueries = [
+    `site:lge.co.kr ${cleanCode}`,
+    `site:lge.co.kr ${codeBase}`
+  ];
+
+  for (const q of searchQueries) {
+    // Try Naver
+    try {
+      const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(q)}`;
+      const res = await fetch(naverUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+        }
+      });
+      if (res.ok) {
+        const html = await res.text();
+        const matches = html.match(/https?:\/\/(www\.)?lge\.co\.kr\/[a-zA-Z0-9_\-]+\/[a-zA-Z0-9_\-]+/gi);
+        if (matches) {
+          const valid = Array.from(new Set(matches)).filter(u => 
+            !u.includes('/search') && 
+            !u.includes('/business') && 
+            !u.includes('/event') && 
+            !u.includes('/support') &&
+            !u.includes('/bestshop') &&
+            !u.includes('/story') &&
+            !u.includes('/category') &&
+            !u.includes('/company') &&
+            !u.includes('/care-solutions')
+          );
+          if (valid.length > 0) return valid[0];
         }
       }
-    }
-  } catch (e) {}
+    } catch(e) {}
+
+    // Try Daum
+    try {
+      const daumUrl = `https://search.daum.net/search?w=tot&q=${encodeURIComponent(q)}`;
+      const res = await fetch(daumUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+        }
+      });
+      if (res.ok) {
+        const html = await res.text();
+        const matches = html.match(/https?:\/\/(www\.)?lge\.co\.kr\/[a-zA-Z0-9_\-]+\/[a-zA-Z0-9_\-]+/gi);
+        if (matches) {
+          const valid = Array.from(new Set(matches)).filter(u => 
+            !u.includes('/search') && 
+            !u.includes('/business') && 
+            !u.includes('/event') && 
+            !u.includes('/support') &&
+            !u.includes('/bestshop') &&
+            !u.includes('/story') &&
+            !u.includes('/category') &&
+            !u.includes('/company') &&
+            !u.includes('/care-solutions')
+          );
+          if (valid.length > 0) return valid[0];
+        }
+      }
+    } catch(e) {}
+  }
 
   return null;
 }
@@ -94,7 +146,7 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
   try {
     const res = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
         'Accept-Language': 'ko-KR,ko;q=0.9'
       }
     });
@@ -143,14 +195,13 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
       ...absMatches
     ]));
 
-    // A. 썸네일 리스트 (Thumbnails): 중복 이미지 원천 차단 (모바일 크롭 -m/_mo 제외, 앵글 키 정규화, 인테리어/연출 컷 중복 제거)
+    // A. 썸네일 리스트 (Thumbnails)
     const galleryImgs = rawImgs.filter(img => 
       img.includes('/gallery/') &&
       !img.includes('small') &&
       !img.includes('-m0')
     );
 
-    // 모바일 크롭 버전(-m1, _mo, -mo, _MO_) 제외하고 PC 원본 이미지 우선 선택
     const pcOnlyGallery = galleryImgs.filter(img => {
       const lower = img.toLowerCase();
       return !/[-_]m\d+/i.test(lower) && 
@@ -164,7 +215,6 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
     const seenKeys = new Set<string>();
 
     for (const img of candidates) {
-      // medium 보다 large 해상도 우선
       if (img.includes('medium') && candidates.some(c => c.includes(img.replace('medium', 'large')))) {
         continue;
       }
@@ -177,7 +227,6 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
         .replace(/\.(jpg|png|webp|gif)$/i, '')
         .toLowerCase();
 
-      // 인테리어 / 룸 연출 컷 관련 썸네일 중복 방지 (interior, scene 등)
       if (cleanKey.includes('interior') || cleanKey.includes('scene') || cleanKey.includes('gallery_2000x2402')) {
         cleanKey = 'interior_scene_primary';
       }
@@ -189,14 +238,11 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
     }
 
     const mainThumbnail = uniqueGallery.length > 0 ? uniqueGallery[0] : ogThumbnail;
-
-    // B. 상세 이미지 리스트 (Detail Images): 사용자 직접 등록 요구사항에 따라 크롤링 시 비워둠
     const finalDetailImages: string[] = [];
 
-    // 4. Extract Full Expanded Product Specifications (제품 스펙 더보기 영역) directly from Page HTML
+    // 4. Extract Full Expanded Product Specifications
     let specifications: Array<{ category?: string; name: string; value: string }> = [];
 
-    // A. Parse summary list specs (e.g. <li> 전체 용량 (L) : 870 </li>)
     const summaryMatches = Array.from(html.matchAll(/<li>\s*([^:]+)\s*:\s*([^<]+)<\/li>/gi));
     for (const m of summaryMatches) {
       const k = m[1].replace(/<[^>]+>/g, '').trim();
@@ -208,7 +254,6 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
       }
     }
 
-    // B. Parse full expanded spec sections & dl/dt/dd pairs (제품 스펙 더보기 영역)
     const specSectionMatches = Array.from(html.matchAll(/<div[^>]*class=["'][^"']*(spec-info-title|tit)[^"']*["'][^>]*>\s*([\s\S]*?)\s*<\/div>\s*<div[^>]*class=["'][^"']*spec-info-list[^"']*["'][^>]*>([\s\S]*?)<\/div>/gi));
 
     for (const match of specSectionMatches) {
@@ -223,14 +268,12 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
         const ddMatch = dlContent.match(/<dd[^>]*>([\s\S]*?)<\/dd>/i);
 
         if (dtMatch && ddMatch) {
-          // Strip data-* attributes first so data-spec-description tooltips are NOT parsed
           const dtHtmlClean = dtMatch[1].replace(/data-[a-z0-9_-]+=(["'])[\s\S]*?\1/gi, '');
           const ddHtmlClean = ddMatch[1].replace(/data-[a-z0-9_-]+=(["'])[\s\S]*?\1/gi, '');
 
           let name = dtHtmlClean.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
           let value = ddHtmlClean.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-          // Filter out noise explanations
           value = value.replace(/본 이미지는 사이즈에 대한 이해를 돕기 위한 것으로[\s\S]*/g, '').trim();
           value = value.replace(/\*\s*소비자의 이해를 돕기 위해[\s\S]*/g, '').trim();
 
@@ -290,7 +333,7 @@ export const scrapeProductInfo = action({
       };
     }
 
-    // Dual product handling: Scrape info for both models
+    // Dual product handling
     const results = [];
     for (const m of modelParts) {
       results.push(await scrapeSingleModel(m, args.refUrl));
@@ -314,7 +357,6 @@ export const scrapeProductInfo = action({
       name: combinedName,
       brand: combinedBrand,
       category: combinedCategory,
-      // Special Rule: 2가지 제품 결합 시 썸네일은 가져오지 않음 (사용자가 직접 입력)
       thumbnail: '',
       thumbnails: [],
       detailImages: combinedDetailImages,
