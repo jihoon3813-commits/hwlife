@@ -537,11 +537,11 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                           }}
                           className="cursor-pointer group"
                         >
-                          <div className="relative aspect-4/3 rounded-sm overflow-hidden bg-[#F8FAFC] border border-[#E2E8F0] mb-4 flex items-center justify-center p-4 sm:p-5">
+                          <div className="relative aspect-square rounded-sm overflow-hidden bg-[#F8FAFC] border border-[#E2E8F0] mb-4 flex items-center justify-center p-1 sm:p-2">
                             <img 
                               src={heroImg}
                               alt={heroItem.name}
-                              className="w-full h-full object-contain object-center transform scale-[0.82] group-hover:scale-90 transition-transform duration-300"
+                              className="w-full h-full object-contain object-center transform group-hover:scale-105 transition-transform duration-300"
                             />
                             <div className="absolute top-3 left-3 bg-[#191F28]/90 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-sm flex items-center gap-1.5 shadow-sm">
                               <Sparkles className="w-3.5 h-3.5 text-[#3182F6] fill-current" />
@@ -649,7 +649,7 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
                 </div>
               ) : (
                 <div className="relative w-full max-w-md bg-white rounded-md p-6 shadow-xl border border-[#E5E8EB] transform transition-transform hover:scale-[1.01]">
-                  <div className="relative aspect-4/3 rounded-sm overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 mb-4 flex items-center justify-center">
+                  <div className="relative aspect-square rounded-sm overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 mb-4 flex items-center justify-center">
                     <img 
                       src="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png"
                       alt="가전상조 60패키지"
