@@ -137,7 +137,7 @@ async function resolveProductUrl(modelCode: string, refUrl?: string): Promise<st
   // 2. Search fallback via Naver & Daum site search
   const searchQueries = [
     `site:lge.co.kr ${cleanCode}`,
-    `site:lge.co.kr ${codeBase}`
+    `site:lge.co.kr ${rawModel}`
   ];
 
   for (const q of searchQueries) {

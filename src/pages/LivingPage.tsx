@@ -10,6 +10,7 @@ import { api } from '../../convex/_generated/api';
 import { useEffect } from 'react';
 import SEO from '../components/SEO';
 import FuneralDetailModal from '../components/FuneralDetailModal';
+import PrivacyModal from '../components/PrivacyModal';
 import { formatPhoneNumber } from '../utils/phone';
 
 

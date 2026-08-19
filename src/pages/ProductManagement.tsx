@@ -3,6 +3,7 @@ import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, 
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import * as XLSX from 'xlsx';
+import JSZip from 'jszip';
 
 interface Plan {
   mainCount: number;
@@ -78,6 +79,7 @@ export default function ProductManagement() {
   const isInitialMount = useRef(true);
 
   const scrapeProductInfoAction = useAction(api.crawler.scrapeProductInfo);
+  const fetchImageBase64Action = useAction(api.images.fetchImageBase64);
   const [smartProgress, setSmartProgress] = useState<{ current: number; total: number; currentModel: string } | null>(null);
 
   const selectedPlan = plans.find(p => p.id === selectedPlanId) || plans[0];
@@ -92,6 +94,12 @@ export default function ProductManagement() {
     successCount: number;
     failCount: number;
     results: SmartRegisterResult[];
+  } | null>(null);
+
+  const [downloadProgress, setDownloadProgress] = useState<{
+    current: number;
+    total: number;
+    message: string;
   } | null>(null);
 
   const handleDirectSmartRegister = async () => {
@@ -662,6 +670,231 @@ export default function ProductManagement() {
     XLSX.writeFile(wb, "스마트등록_양식.xlsx");
   };
 
+  const handleDownloadSelectedProducts = async () => {
+    if (selectedIds.length === 0) {
+      alert("다운로드할 제품을 먼저 선택해 주세요.");
+      return;
+    }
+
+    const orderedSelectedProducts = [
+      ...filteredProducts.filter(p => selectedIds.includes(p._id)),
+      ...(allProducts || []).filter(p => selectedIds.includes(p._id) && !filteredProducts.some(fp => fp._id === p._id))
+    ];
+
+    if (orderedSelectedProducts.length === 0) {
+      alert("다운로드할 제품 데이터를 찾을 수 없습니다.");
+      return;
+    }
+
+    const sanitizeFileName = (str: string) => {
+      return (str || '')
+        .replace(/[\\/:*?"<>|\r\n\t]/g, '_')
+        .replace(/\s+/g, ' ')
+        .trim();
+    };
+
+    const getAccountText = (product: any) => {
+      if (product.accountCount && product.accountCount.trim()) return product.accountCount.trim();
+      const plan = plans.find(p => p.id === product.planId);
+      if (plan?.accountCount && plan.accountCount.trim()) return plan.accountCount.trim();
+      if (plan?.name && plan.name.trim()) return plan.name.trim();
+      return `${product.planId}구좌`;
+    };
+
+    setDownloadProgress({ 
+      current: 0, 
+      total: orderedSelectedProducts.length, 
+      message: "선택한 제품 정보 및 이미지 다운로드 준비 중..." 
+    });
+
+    try {
+      const zip = new JSZip();
+      const rows: any[][] = [];
+
+      for (let i = 0; i < orderedSelectedProducts.length; i++) {
+        const product = orderedSelectedProducts[i];
+        const no = i + 1;
+        const accountText = getAccountText(product);
+        const brand = product.brand || '';
+        const category = product.category || '';
+        const productName = product.name || '';
+        const model = product.model || '';
+
+        const rawImageUrl = product.image || (product.images && product.images[0]) || '';
+        let imageFileName = '(이미지 없음)';
+
+        if (rawImageUrl) {
+          try {
+            setDownloadProgress({
+              current: i + 1,
+              total: orderedSelectedProducts.length,
+              message: `썸네일 이미지 다운로드 중... (${i + 1}/${orderedSelectedProducts.length})`
+            });
+
+            // 1. Convex Action을 통해 서버 사이드 다운로드 (CORS 완벽 해결)
+            let base64Data: string | null = null;
+            let ext = '.jpg';
+
+            try {
+              const res = await fetchImageBase64Action({ url: rawImageUrl });
+              if (res.success && res.base64) {
+                base64Data = res.base64;
+                const contentType = res.contentType || '';
+                if (contentType.includes('png')) ext = '.png';
+                else if (contentType.includes('webp')) ext = '.webp';
+                else if (contentType.includes('gif')) ext = '.gif';
+                else if (contentType.includes('jpeg') || contentType.includes('jpg')) ext = '.jpg';
+                else {
+                  const match = rawImageUrl.split('?')[0].match(/\.(jpg|jpeg|png|webp|gif)$/i);
+                  if (match) ext = `.${match[1].toLowerCase()}`;
+                }
+              } else {
+                console.warn(`[1차 서버 액션 실패] ${productName}:`, res.error);
+              }
+            } catch (actionErr) {
+              console.warn(`[1차 서버 액션 에러] ${productName}:`, actionErr);
+            }
+
+            // 2. 만약 서버 액션 실패 시 브라우저 직접 fetch 시도
+            if (!base64Data) {
+              try {
+                const response = await fetch(rawImageUrl, { mode: 'cors' });
+                if (response.ok) {
+                  const blob = await response.blob();
+                  const contentType = response.headers.get('content-type') || '';
+                  if (contentType.includes('png')) ext = '.png';
+                  else if (contentType.includes('webp')) ext = '.webp';
+                  else if (contentType.includes('gif')) ext = '.gif';
+                  else if (contentType.includes('jpeg') || contentType.includes('jpg')) ext = '.jpg';
+                  else {
+                    const match = rawImageUrl.split('?')[0].match(/\.(jpg|jpeg|png|webp|gif)$/i);
+                    if (match) ext = `.${match[1].toLowerCase()}`;
+                  }
+                  const safeAccount = sanitizeFileName(accountText) || `${product.planId}구좌`;
+                  const safeName = sanitizeFileName(productName) || '제품명';
+                  const safeModel = sanitizeFileName(model) || '모델명';
+                  imageFileName = `${no}_${safeAccount}_${safeName}_${safeModel}${ext}`;
+                  zip.file(imageFileName, blob);
+                }
+              } catch (fetchErr) {
+                console.warn(`[2차 브라우저 fetch 실패] ${productName}:`, fetchErr);
+              }
+            }
+
+            // 3. 브라우저 Image/Canvas 렌더링 fallback 시도
+            if (!imageFileName || imageFileName === '(이미지 없음)' || imageFileName === '(다운로드 실패)') {
+              if (base64Data) {
+                const safeAccount = sanitizeFileName(accountText) || `${product.planId}구좌`;
+                const safeName = sanitizeFileName(productName) || '제품명';
+                const safeModel = sanitizeFileName(model) || '모델명';
+                imageFileName = `${no}_${safeAccount}_${safeName}_${safeModel}${ext}`;
+                zip.file(imageFileName, base64Data, { base64: true });
+              } else {
+                try {
+                  const canvasResult = await new Promise<{ base64: string; ext: string } | null>((resolve) => {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => {
+                      try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.naturalWidth || 400;
+                        canvas.height = img.naturalHeight || 400;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) return resolve(null);
+                        ctx.drawImage(img, 0, 0);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+                        resolve({ base64: dataUrl.split(',')[1], ext: '.jpg' });
+                      } catch (e) {
+                        resolve(null);
+                      }
+                    };
+                    img.onerror = () => resolve(null);
+                    img.src = rawImageUrl;
+                    // Timeout 3초
+                    setTimeout(() => resolve(null), 3000);
+                  });
+
+                  if (canvasResult) {
+                    const safeAccount = sanitizeFileName(accountText) || `${product.planId}구좌`;
+                    const safeName = sanitizeFileName(productName) || '제품명';
+                    const safeModel = sanitizeFileName(model) || '모델명';
+                    imageFileName = `${no}_${safeAccount}_${safeName}_${safeModel}${canvasResult.ext}`;
+                    zip.file(imageFileName, canvasResult.base64, { base64: true });
+                  } else {
+                    imageFileName = '(다운로드 실패)';
+                  }
+                } catch (e) {
+                  imageFileName = '(다운로드 실패)';
+                }
+              }
+            }
+          } catch (err) {
+            console.error(`썸네일 다운로드 최종 실패 (${productName}):`, err);
+            imageFileName = '(다운로드 실패)';
+          }
+        }
+
+        // 1. 제품리스트(엑셀) - 썸네일 / 구좌 / 브랜드 / 카테고리 / 제품명 / 모델명
+        rows.push([
+          imageFileName,
+          accountText,
+          brand,
+          category,
+          productName,
+          model
+        ]);
+      }
+
+      setDownloadProgress({
+        current: orderedSelectedProducts.length,
+        total: orderedSelectedProducts.length,
+        message: "엑셀 파일 및 압축 파일(ZIP) 생성 중..."
+      });
+
+      const headers = ['썸네일', '구좌', '브랜드', '카테고리', '제품명', '모델명'];
+      const wsData = [headers, ...rows];
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      ws['!cols'] = [
+        { wch: 35 },
+        { wch: 12 },
+        { wch: 15 },
+        { wch: 18 },
+        { wch: 35 },
+        { wch: 25 },
+      ];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "선택제품리스트");
+      const excelArrayBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+
+      zip.file(`제품리스트_${dateStr}.xlsx`, excelArrayBuffer);
+
+      const zipContent = await zip.generateAsync({ type: 'blob' }, (metadata) => {
+        setDownloadProgress({
+          current: orderedSelectedProducts.length,
+          total: orderedSelectedProducts.length,
+          message: `ZIP 압축 중... (${Math.round(metadata.percent)}%)`
+        });
+      });
+
+      const downloadUrl = URL.createObjectURL(zipContent);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `제품정보_선택_${dateStr}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(downloadUrl);
+    } catch (err: any) {
+      console.error("다운로드 에러:", err);
+      alert("다운로드 중 오류가 발생했습니다: " + (err?.message || ""));
+    } finally {
+      setDownloadProgress(null);
+    }
+  };
+
   const handleSmartExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1145,6 +1378,17 @@ export default function ProductManagement() {
                   >
                     <Upload className="w-4 h-4" /> 엑셀
                   </button>
+                  <button 
+                    onClick={handleDownloadSelectedProducts}
+                    className={`flex-1 sm:flex-none px-3.5 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      selectedIds.length > 0
+                        ? 'bg-[#10B981] hover:bg-[#059669] text-white shadow-md shadow-emerald-500/20'
+                        : 'bg-white border border-[#E5E8EB] text-[#4E5968] hover:bg-[#F2F4F6]'
+                    }`}
+                    title={selectedIds.length > 0 ? `선택한 ${selectedIds.length}개 제품 정보 및 썸네일 다운로드` : "선택한 제품 다운로드 (목록에서 체크박스 선택)"}
+                  >
+                    <Download className="w-4 h-4" /> 제품정보 다운로드 {selectedIds.length > 0 && `(${selectedIds.length})`}
+                  </button>
                   <button onClick={handleAddProduct} className="w-full sm:w-auto bg-[#3182F6] text-white px-5 py-3 rounded-[12px] font-bold text-[14px] flex items-center justify-center gap-2">
                     <Plus className="w-4 h-4" /> 등록
                   </button>
@@ -1163,6 +1407,19 @@ export default function ProductManagement() {
                     <button onClick={() => handleBatchToggleVisibility(true)} className="p-1.5 hover:bg-white rounded-md text-[#1B64DA] transition-colors" title="선택 노출"><Eye className="w-4 h-4"/></button>
                     <button onClick={() => handleBatchToggleVisibility(false)} className="p-1.5 hover:bg-white rounded-md text-[#8B95A1] transition-colors" title="선택 숨김"><EyeOff className="w-4 h-4"/></button>
                     <button onClick={handleBatchDelete} className="p-1.5 hover:bg-white rounded-md text-red-500 transition-colors" title="선택 삭제"><Trash2 className="w-4 h-4"/></button>
+                    <div className="h-4 w-[1px] bg-[#D1D6DB] mx-1"></div>
+                    <button 
+                      onClick={handleDownloadSelectedProducts}
+                      disabled={selectedIds.length === 0}
+                      className={`px-2.5 py-1 text-[11px] font-bold rounded-[6px] transition-colors flex items-center gap-1 cursor-pointer shadow-2xs ${
+                        selectedIds.length > 0 
+                          ? 'bg-[#10B981] hover:bg-[#059669] text-white border border-[#10B981]' 
+                          : 'bg-white border border-[#D1D6DB] text-[#8B95A1] opacity-60 cursor-not-allowed'
+                      }`}
+                      title="선택한 제품의 엑셀 리스트와 썸네일 이미지를 다운로드합니다"
+                    >
+                      <Download className="w-3.5 h-3.5" /> 선택 다운로드 ({selectedIds.length})
+                    </button>
 
                     <div className="h-4 w-[1px] bg-[#D1D6DB] mx-1"></div>
                     <span className="text-[11px] font-bold text-[#4E5968]">대표 썸네일:</span>
@@ -2104,6 +2361,33 @@ export default function ProductManagement() {
                   >
                     확인 완료
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Download Progress Modal */}
+          {downloadProgress && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+              <div className="bg-white rounded-[24px] p-6 max-w-sm w-full shadow-2xl flex flex-col items-center text-center space-y-4 border border-[#E5E8EB]">
+                <div className="w-14 h-14 rounded-full bg-[#EBF4FF] text-[#3182F6] flex items-center justify-center">
+                  <Download className="w-7 h-7 animate-bounce" />
+                </div>
+                <div>
+                  <h3 className="text-[17px] font-bold text-[#191F28]">제품 정보 다운로드 중</h3>
+                  <p className="text-[13px] text-[#4E5968] mt-1 break-keep">{downloadProgress.message}</p>
+                </div>
+                <div className="w-full bg-[#F2F4F6] rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="bg-[#3182F6] h-full transition-all duration-300 rounded-full"
+                    style={{ 
+                      width: `${downloadProgress.total > 0 ? Math.min(100, Math.round((downloadProgress.current / downloadProgress.total) * 100)) : 0}%` 
+                    }}
+                  />
+                </div>
+                <div className="flex justify-between w-full text-[12px] text-[#8B95A1] font-bold">
+                  <span>진행률</span>
+                  <span>{downloadProgress.current} / {downloadProgress.total}</span>
                 </div>
               </div>
             </div>

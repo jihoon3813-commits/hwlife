@@ -20,9 +20,11 @@ export const getAllProducts = query({
 
         const images = p.images ? await Promise.all(p.images.map(resolveUrl)) : [];
         const detailImages = p.detailImages ? await Promise.all(p.detailImages.map(resolveUrl)) : [];
+        const resolvedImage = await resolveUrl(p.image);
         
         return {
           ...p,
+          image: resolvedImage,
           images: images.filter((url): url is string => !!url),
           detailImages: detailImages.filter((url): url is string => !!url),
         };
@@ -54,9 +56,11 @@ export const getVisibleProducts = query({
 
         const images = p.images ? await Promise.all(p.images.map(resolveUrl)) : [];
         const detailImages = p.detailImages ? await Promise.all(p.detailImages.map(resolveUrl)) : [];
+        const resolvedImage = await resolveUrl(p.image);
         
         return {
           ...p,
+          image: resolvedImage,
           images: images.filter((url): url is string => !!url),
           detailImages: detailImages.filter((url): url is string => !!url),
         };
