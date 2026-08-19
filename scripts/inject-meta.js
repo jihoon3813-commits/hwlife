@@ -41,6 +41,18 @@ const pages = [
     title: 'KCC홈씨씨-LG전자-효원상조 제휴 결합상품',
     description: 'KCC홈씨씨-LG전자-효원상조 제휴 프로모션 안내\nLG가전 최대 30% 저렴하게, 320만원 혜택 지원까지!',
     image: 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1779251513/Edit_this_image_to_create_a_professional_KakaoTalk-1779251495541_e6e6hq.png'
+  },
+  {
+    name: 'package60',
+    title: '가전상조 60패키지 (쇼핑몰) - 프리미엄 가전 100% 소유 + 효원상조 혜택',
+    description: '월 29,900원부터! 60회 만기 시 가전 완납 소유 및 상조 만기 시 가전 렌탈료 100% 전액 환급 지원!',
+    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=500'
+  },
+  {
+    name: 'package_up',
+    title: '가전상조 60패키지 (UP가전) - 프리미엄 가전 100% 소유 + 효원상조 혜택',
+    description: '월 29,900원부터! 60회 만기 시 가전 완납 소유 및 상조 만기 시 가전 렌탈료 100% 전액 환급 지원!',
+    image: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620540/Professional_hero_section_image_featuring_a_confid-1778653149667_owqlgb.png'
   }
 ];
 

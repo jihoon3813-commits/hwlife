@@ -17,6 +17,7 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [hasChecked, setHasChecked] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'latest' | 'oldest' | 'name'>('latest');
   const [formData, setFormData] = useState({
     _id: '',
     name: '',
@@ -30,9 +31,22 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
   // Assigned landing paths for channel admin
   const assignedPaths = currentChannel?.landingPages || (currentChannel?.landingPage ? [currentChannel?.landingPage] : []);
   
-  const displayLandings = userType === 'admin' 
+  const rawLandings = userType === 'admin' 
     ? landings 
     : landings.filter(l => assignedPaths.includes(l.path) && l.isActive);
+
+  const displayLandings = [...rawLandings].sort((a, b) => {
+    if (sortOrder === 'latest') {
+      return (b._creationTime || 0) - (a._creationTime || 0);
+    }
+    if (sortOrder === 'oldest') {
+      return (a._creationTime || 0) - (b._creationTime || 0);
+    }
+    if (sortOrder === 'name') {
+      return (a.name || '').localeCompare(b.name || '');
+    }
+    return 0;
+  });
 
   // Seed and Update thumbnails if needed
   useEffect(() => {
@@ -114,24 +128,66 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
     <div className="p-4 sm:p-8 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-[24px] font-bold text-[#191F28] mb-1">
-            {userType === 'admin' ? '랜딩페이지 관리' : '내 랜딩페이지 내역'}
-          </h1>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-[24px] font-bold text-[#191F28]">
+              {userType === 'admin' ? '랜딩페이지 관리' : '내 랜딩페이지 내역'}
+            </h1>
+            <span className="text-[12px] font-extrabold bg-[#E8F3FF] text-[#3182F6] px-2.5 py-0.5 rounded-full border border-[#3182F6]/20">
+              총 {displayLandings.length}개
+            </span>
+          </div>
           <p className="text-[14px] text-[#8B95A1]">
             {userType === 'admin' 
               ? '채널에 적용할 수 있는 랜딩페이지 리스트입니다.' 
               : '귀하의 채널에 할당된 랜딩페이지 리스트와 전용 주소입니다.'}
           </p>
         </div>
-        {userType === 'admin' && (
-          <button 
-            onClick={openCreateModal}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#3182F6] text-white px-5 py-2.5 rounded-[12px] font-medium hover:bg-[#1B64DA] transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            신규 랜딩 등록
-          </button>
-        )}
+
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          {/* Sort Selection Buttons */}
+          <div className="flex items-center bg-white p-1 rounded-[12px] border border-[#E5E8EB] shadow-xs">
+            <button
+              onClick={() => setSortOrder('latest')}
+              className={`px-3.5 py-2 rounded-[8px] text-[13px] font-bold transition-all ${
+                sortOrder === 'latest'
+                  ? 'bg-[#3182F6] text-white shadow-xs'
+                  : 'text-[#4E5968] hover:text-[#191F28] hover:bg-[#F2F4F6]'
+              }`}
+            >
+              최신순
+            </button>
+            <button
+              onClick={() => setSortOrder('oldest')}
+              className={`px-3.5 py-2 rounded-[8px] text-[13px] font-bold transition-all ${
+                sortOrder === 'oldest'
+                  ? 'bg-[#3182F6] text-white shadow-xs'
+                  : 'text-[#4E5968] hover:text-[#191F28] hover:bg-[#F2F4F6]'
+              }`}
+            >
+              등록일순
+            </button>
+            <button
+              onClick={() => setSortOrder('name')}
+              className={`px-3.5 py-2 rounded-[8px] text-[13px] font-bold transition-all ${
+                sortOrder === 'name'
+                  ? 'bg-[#3182F6] text-white shadow-xs'
+                  : 'text-[#4E5968] hover:text-[#191F28] hover:bg-[#F2F4F6]'
+              }`}
+            >
+              이름순
+            </button>
+          </div>
+
+          {userType === 'admin' && (
+            <button 
+              onClick={openCreateModal}
+              className="flex items-center justify-center gap-2 bg-[#3182F6] text-white px-5 py-2.5 rounded-[12px] font-medium hover:bg-[#1B64DA] transition-colors shadow-sm"
+            >
+              <Plus className="w-5 h-5" />
+              신규 랜딩 등록
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -201,9 +257,16 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
                 </a>
                 
                 <div className="flex items-center justify-between pt-4 border-t border-[#F2F4F6]">
-                  <div className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-[#3182F6]" />
-                    <span className="text-[12px] font-bold text-[#8B95A1]">효원 공식 랜딩</span>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-[#3182F6]" />
+                      <span className="text-[12px] font-bold text-[#8B95A1]">효원 공식 랜딩</span>
+                    </div>
+                    {landing._creationTime && (
+                      <span className="text-[11px] font-medium text-[#8B95A1] bg-[#F2F4F6] px-2 py-0.5 rounded-full">
+                        {new Date(landing._creationTime).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' })} 등록
+                      </span>
+                    )}
                   </div>
                   {userType === 'admin' && (
                     <div className="flex gap-1">

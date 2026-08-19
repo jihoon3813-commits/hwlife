@@ -15,6 +15,7 @@ import FuneralDetailModal from '../components/FuneralDetailModal';
 
 interface Package60PageProps {
   channelSubdomain?: string;
+  landingPath?: string;
 }
 
 const getProductImageList = (p: any): string[] => {
@@ -38,7 +39,6 @@ const formatNumber = (val: string | number | undefined) => {
   return val.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-// Auto-swiping card thumbnail component (1.5s interval, pauses on hover, mouse drag support)
 function AutoSwipingCardThumbnail({
   imageList,
   productName,
@@ -55,7 +55,6 @@ function AutoSwipingCardThumbnail({
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Auto-swipe every 1.5s (1500ms), pauses when mouse is hovered!
   useEffect(() => {
     if (imageList.length <= 1 || isHovered) return;
     const interval = setInterval(() => {
@@ -73,7 +72,6 @@ function AutoSwipingCardThumbnail({
       onClick={onClick}
       className="relative w-full aspect-square bg-[#F8FAFC] border-b border-[#E5E8EB] overflow-hidden group/thumb transition-colors select-none p-0 flex items-center justify-center cursor-pointer"
     >
-      {/* Top Badges Overlayed (z-30 so image layer never covers it) */}
       <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-30 pointer-events-none">
         <span className="text-[11px] font-extrabold bg-[#191F28]/90 text-white px-2 py-0.5 rounded-xs tracking-wider shadow-xs backdrop-blur-xs">
           가전&상조 60패키지
@@ -90,7 +88,6 @@ function AutoSwipingCardThumbnail({
         </div>
       </div>
 
-      {/* Main Draggable Image Container (100% Edge-to-Edge Full Width Fill) */}
       <motion.div
         key={currentIdx}
         initial={{ opacity: 0.85, x: 15 }}
@@ -99,83 +96,40 @@ function AutoSwipingCardThumbnail({
         transition={{ duration: 0.3 }}
         drag={imageList.length > 1 ? "x" : false}
         dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.2}
-        onDragEnd={(_, { offset }) => {
+        onDragEnd={(_, info) => {
           if (imageList.length <= 1) return;
-          const threshold = 40;
-          if (offset.x < -threshold) {
-            // Drag Left -> Next
+          if (info.offset.x < -30) {
             setCurrentIdx((prev) => (prev + 1) % imageList.length);
-          } else if (offset.x > threshold) {
-            // Drag Right -> Prev
+          } else if (info.offset.x > 30) {
             setCurrentIdx((prev) => (prev - 1 + imageList.length) % imageList.length);
           }
         }}
-        className="relative z-10 w-full h-full cursor-pointer p-0 overflow-hidden flex items-center justify-center"
+        className="w-full h-full p-0 m-0"
       >
         <img 
           src={mainImg} 
-          alt={productName} 
-          className="w-full h-full object-cover object-center pointer-events-none group-hover/thumb:scale-105 transition-transform duration-300 ease-out cursor-pointer"
+          alt={productName}
+          className="w-full h-full object-cover object-center group-hover/thumb:scale-105 transition-transform duration-500 block"
+          loading="lazy"
         />
       </motion.div>
 
-      {/* Multi Image Navigation Controls in Registered Order */}
       {imageList.length > 1 && (
-        <>
-          {/* Prev Arrow */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setCurrentIdx((prev) => (prev - 1 + imageList.length) % imageList.length);
-            }}
-            className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/80 text-white p-1.5 rounded-full transition-all opacity-80 hover:opacity-100 z-30 cursor-pointer"
-            title="이전 이미지"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          {/* Next Arrow */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setCurrentIdx((prev) => (prev + 1) % imageList.length);
-            }}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/80 text-white p-1.5 rounded-full transition-all opacity-80 hover:opacity-100 z-30 cursor-pointer"
-            title="다음 이미지"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-
-          {/* Dots Row */}
-          <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-1.5 z-30 px-2 pointer-events-auto">
-            {imageList.map((_, imgIdx) => (
-              <button
-                key={imgIdx}
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCurrentIdx(imgIdx);
-                }}
-                onMouseEnter={() => {
-                  setCurrentIdx(imgIdx);
-                }}
-                className={`h-1.5 transition-all rounded-full cursor-pointer ${
-                  currentIdx === imgIdx ? 'w-5 bg-[#3182F6]' : 'w-1.5 bg-white/70 hover:bg-white'
-                }`}
-                title={`${imgIdx + 1}번 썸네일 보기`}
-              />
-            ))}
-          </div>
-        </>
+        <div className="absolute bottom-2 left-0 right-0 flex justify-center items-center gap-1 z-20 pointer-events-none">
+          {imageList.map((_, i) => (
+            <div 
+              key={i} 
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === currentIdx ? 'w-5 bg-[#3182F6]' : 'w-1.5 bg-black/20'
+              }`} 
+            />
+          ))}
+        </div>
       )}
     </div>
   );
 }
 
-// Fixed package pricing details as requested
 const PACKAGE_DATA: Record<string, {
   name: string;
   accountCount: string;
@@ -199,7 +153,7 @@ const PACKAGE_DATA: Record<string, {
     tagColor: 'bg-emerald-50 text-emerald-600 border-emerald-200'
   },
   '2구좌': {
-    name: '2구좌 패키지',
+    name: '2구좌 패키지 (인기)',
     accountCount: '2구좌',
     accountNum: 2,
     monthlyPrice: '59,800',
@@ -233,9 +187,10 @@ const PACKAGE_DATA: Record<string, {
   }
 };
 
-export default function Package60Page({ channelSubdomain }: Package60PageProps) {
+export default function Package60Page({ channelSubdomain, landingPath = '/package60' }: Package60PageProps) {
   const allProducts = useQuery(api.products.getVisibleProducts) || [];
   const settings = useQuery(api.settings.get);
+  const landingInfo = useQuery(api.landings.getByPath, { path: landingPath });
   const channel = useQuery(api.channels.getBySubdomain, 
     channelSubdomain ? { subdomain: channelSubdomain } : "skip"
   );
@@ -247,16 +202,11 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Active thumbnail image index map per product card
-  const [activeImageMap, setActiveImageMap] = useState<Record<string, number>>({});
-
-  // Form states
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [agreePrivacy, setAgreePrivacy] = useState(true);
   const [selectedProductForInquiry, setSelectedProductForInquiry] = useState<any | null>(null);
 
-  // Modal states
   const [isSangjoModalOpen, setIsSangjoModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
@@ -292,24 +242,21 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
   const formRef = useRef<HTMLDivElement>(null);
   const productSectionRef = useRef<HTMLDivElement>(null);
 
-  // Log visit on mount
   useEffect(() => {
     logVisit({
-      path: '/package60',
+      path: landingPath,
       ip: 'client',
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'browser'
     });
-  }, [logVisit]);
+  }, [logVisit, landingPath]);
 
-  // Filter products assigned to /package60
   const package60Products = useMemo(() => {
     return allProducts.filter(p => 
-      (p.landingPages && p.landingPages.includes('/package60')) ||
+      (p.landingPages && (p.landingPages.includes(landingPath) || p.landingPages.includes('/package60') || p.landingPages.includes('/package_up'))) ||
       p.isSmartRegistered === true
     );
-  }, [allProducts]);
+  }, [allProducts, landingPath]);
 
-  // Compute package tabs that actually have registered products in Admin
   const availablePackageTabs = useMemo(() => {
     const ALL_KEYS = ['1구좌', '2구좌', '3구좌', '4구좌'] as const;
     const available = ALL_KEYS.filter(pkgKey => {
@@ -322,36 +269,29 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
     return available;
   }, [package60Products]);
 
-  // Auto switch activePackageTab to the first available tab if current active tab has no registered products
   useEffect(() => {
     if (availablePackageTabs.length > 0 && !availablePackageTabs.includes(activePackageTab)) {
       setActivePackageTab(availablePackageTabs[0]);
     }
   }, [availablePackageTabs, activePackageTab]);
 
-  // Current package data
   const currentPkg = PACKAGE_DATA[activePackageTab] || PACKAGE_DATA['1구좌'];
 
-  // Filter products strictly registered for 가전&상조 60패키지
   const filteredProducts = allProducts.filter(p => {
-    // 1. Must be explicitly assigned to /package60 OR smart registered
     const isPackage60Product = 
-      (p.landingPages && p.landingPages.includes('/package60')) ||
+      (p.landingPages && (p.landingPages.includes(landingPath) || p.landingPages.includes('/package60') || p.landingPages.includes('/package_up'))) ||
       p.isSmartRegistered === true;
 
     if (!isPackage60Product) return false;
 
-    // 2. Match package account count (1구좌, 2구좌, 3구좌, 4구좌)
     const pAccount = p.accountCount || `${p.planId}구좌`;
     const matchesPackage = pAccount === activePackageTab || (p.planId === currentPkg.accountNum);
     if (!matchesPackage) return false;
 
-    // 3. Category match
     const matchesCategory = selectedCategory === '전체' || 
       (p.category && p.category.replace(/\s/g, '').includes(selectedCategory.replace(/\s/g, '')));
     if (!matchesCategory) return false;
 
-    // 4. Search query match
     const matchesSearch = !searchQuery.trim() || 
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
       p.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -360,7 +300,6 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
     return matchesSearch;
   });
 
-  // Unique categories list
   const categoryOptions = ['전체', '냉장고', '세탁기/건조기', 'TV', '에어컨', '청소기', '주방가전'];
 
   const scrollToInquiry = (prod?: any) => {
@@ -394,7 +333,7 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
         name,
         phone,
         productName: `[${activePackageTab}] ${prodName} (${prodModel})`,
-        message: `랜딩페이지: /package60 (${activePackageTab} 선택)\n채널: ${channel?.channelName || '본사'}`,
+        message: `랜딩페이지: ${landingInfo?.name || landingPath} (${activePackageTab} 선택)\n채널: ${channel?.channelName || '본사'}`,
         channelId: channel?.subdomain
       });
 
@@ -414,16 +353,14 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
   return (
     <div className="min-h-screen bg-[#F9FAFB] text-[#191F28] font-sans">
       <SEO 
-        title="가전상조 60패키지 - 프리미엄 가전 100% 소유 + 효원상조 혜택" 
-        description="월 29,900원부터! 60회 만기 시 가전 완납 소유 및 상조 만기 시 가전 렌탈료 100% 전액 환급 지원!" 
-        image="https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png"
+        title={landingInfo?.name ? `${landingInfo.name} - 프리미엄 가전 100% 소유 + 효원상조 혜택` : "가전상조 60패키지 - 프리미엄 가전 100% 소유 + 효원상조 혜택"}
+        description={landingInfo?.description || "월 29,900원부터! 60회 만기 시 가전 완납 소유 및 상조 만기 시 가전 렌탈료 100% 전액 환급 지원!"}
+        image={landingInfo?.thumbnail || "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png"}
       />
 
-      {/* Top Header (Unfixed non-sticky header, Logo Image | Title Text horizontally balanced) */}
       <header className="bg-white border-b border-[#E5E8EB] z-30 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-center relative">
           <div className="flex items-center justify-center gap-2.5 sm:gap-3.5 text-center">
-            {/* Left: Partner & Hyowon Logo Images */}
             <div className="flex items-center justify-center gap-1.5 shrink-0">
               <img 
                 src="https://res.cloudinary.com/lyjyvy54/image/upload/v1786429410/2024-07-18_14_21_49_%EB%88%84%EB%81%BC_ozsj2h.png" 
@@ -438,16 +375,14 @@ export default function Package60Page({ channelSubdomain }: Package60PageProps) 
               />
             </div>
 
-            {/* Vertical Divider Line */}
             <div className="h-5 sm:h-6 w-[1px] bg-[#D1D6DB] shrink-0"></div>
 
-            {/* Right: Title Text with Blue Gradient on 가전&상조 */}
             <div className="text-[17px] sm:text-[20px] font-black leading-none tracking-tight flex items-center justify-center shrink-0">
               <span className="bg-gradient-to-r from-[#3182F6] via-[#2563EB] to-[#1D4ED8] bg-clip-text text-transparent font-black">
                 가전&상조
               </span>
               <span className="text-[#191F28] font-black ml-1">
-                60패키지
+                {landingPath === '/package_up' ? '60패키지 (UP가전)' : '60패키지'}
               </span>
             </div>
           </div>

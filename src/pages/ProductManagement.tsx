@@ -69,7 +69,10 @@ export default function ProductManagement() {
   const excelInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
-  const [sortConfig, setSortConfig] = useState<{ key: 'brand' | 'category' | 'supplyPrice' | 'price' | null, direction: 'asc' | 'desc' }>({ key: null, direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState<{ 
+    key: 'createdAt' | 'brand' | 'category' | 'supplyPrice' | 'price' | 'order' | null; 
+    direction: 'asc' | 'desc'; 
+  }>({ key: 'createdAt', direction: 'desc' });
 
   const thumbInputRef = useRef<HTMLInputElement>(null);
   const detailInputRef = useRef<HTMLInputElement>(null);
@@ -254,6 +257,14 @@ export default function ProductManagement() {
     .filter(p => p.planId === activePlanId)
     .sort((a, b) => {
       if (!sortConfig.key) return 0;
+      if (sortConfig.key === 'createdAt') {
+        const aTime = a._creationTime || 0;
+        const bTime = b._creationTime || 0;
+        return sortConfig.direction === 'desc' ? bTime - aTime : aTime - bTime;
+      }
+      if (sortConfig.key === 'order') {
+        return (a.order ?? 99999) - (b.order ?? 99999);
+      }
       if (sortConfig.key === 'supplyPrice' || sortConfig.key === 'price') {
         const aNum = parseInt(String((a as any)[sortConfig.key] || '0').replace(/\D/g, ''), 10);
         const bNum = parseInt(String((b as any)[sortConfig.key] || '0').replace(/\D/g, ''), 10);
@@ -359,9 +370,11 @@ export default function ProductManagement() {
     setViewMode('edit_product');
   };
 
-  const toggleSort = (key: 'brand' | 'category' | 'supplyPrice' | 'price') => {
+  const toggleSort = (key: 'createdAt' | 'brand' | 'category' | 'supplyPrice' | 'price' | 'order') => {
     let direction: 'asc' | 'desc' = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+    if (key === 'createdAt') {
+      direction = (sortConfig.key === 'createdAt' && sortConfig.direction === 'desc') ? 'asc' : 'desc';
+    } else if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
     }
     setSortConfig({ key, direction });
@@ -1327,14 +1340,55 @@ export default function ProductManagement() {
                       등록 {filteredProducts.length}개
                     </span>
                   </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => toggleSort('brand')} className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${sortConfig.key === 'brand' ? 'bg-[#3182F6] text-white border-[#3182F6]' : 'bg-white text-[#4E5968] border-[#E5E8EB]'}`}>
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <button 
+                      onClick={() => setSortConfig({ key: 'createdAt', direction: 'desc' })} 
+                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
+                        sortConfig.key === 'createdAt' && sortConfig.direction === 'desc' 
+                          ? 'bg-[#3182F6] text-white border-[#3182F6] shadow-sm' 
+                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
+                      }`}
+                    >
+                      최신순
+                    </button>
+                    <button 
+                      onClick={() => setSortConfig({ key: 'createdAt', direction: 'asc' })} 
+                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
+                        sortConfig.key === 'createdAt' && sortConfig.direction === 'asc' 
+                          ? 'bg-[#3182F6] text-white border-[#3182F6] shadow-sm' 
+                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
+                      }`}
+                    >
+                      등록일순
+                    </button>
+                    <button 
+                      onClick={() => toggleSort('brand')} 
+                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
+                        sortConfig.key === 'brand' 
+                          ? 'bg-[#3182F6] text-white border-[#3182F6]' 
+                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
+                      }`}
+                    >
                       브랜드 {sortConfig.key === 'brand' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </button>
-                    <button onClick={() => toggleSort('category')} className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${sortConfig.key === 'category' ? 'bg-[#3182F6] text-white border-[#3182F6]' : 'bg-white text-[#4E5968] border-[#E5E8EB]'}`}>
+                    <button 
+                      onClick={() => toggleSort('category')} 
+                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
+                        sortConfig.key === 'category' 
+                          ? 'bg-[#3182F6] text-white border-[#3182F6]' 
+                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
+                      }`}
+                    >
                       카테고리 {sortConfig.key === 'category' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </button>
-                    <button onClick={() => toggleSort('supplyPrice')} className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${sortConfig.key === 'supplyPrice' ? 'bg-[#3182F6] text-white border-[#3182F6]' : 'bg-white text-[#4E5968] border-[#E5E8EB]'}`}>
+                    <button 
+                      onClick={() => toggleSort('supplyPrice')} 
+                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
+                        sortConfig.key === 'supplyPrice' 
+                          ? 'bg-[#3182F6] text-white border-[#3182F6]' 
+                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
+                      }`}
+                    >
                       공급가 {sortConfig.key === 'supplyPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </button>
                   </div>
@@ -1538,7 +1592,14 @@ export default function ProductManagement() {
                               {p.tag && <span className="text-[10px] font-bold bg-[#3182F6] text-white px-1.5 py-0.5 rounded">{p.tag}</span>}
                               <div className="text-[14px] font-bold text-[#191F28]">{p.name}</div>
                             </div>
-                            <div className="text-[12px] text-[#A3B1C6]">{p.model}</div>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <div className="text-[12px] text-[#A3B1C6]">{p.model}</div>
+                              {p._creationTime && (
+                                <span className="text-[10px] text-[#8B95A1] bg-[#F2F4F6] px-1.5 py-0.5 rounded font-medium">
+                                  {new Date(p._creationTime).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' })} 등록
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="px-4 py-4 text-[14px] font-bold text-right text-[#191F28]">{p.supplyPrice ? formatNumber(p.supplyPrice) + '원' : '-'}</td>
                           <td className="px-4 py-4 text-[14px] font-bold text-right text-[#3182F6]">{formatNumber(selectedPlan?.basePrice || p.price)}원</td>

@@ -20,7 +20,14 @@ export default function LandingRouter() {
   if (path === '/package60' || path.startsWith('/package60/')) {
     const parts = path.split('/').filter(Boolean);
     const sub = parts.length >= 2 ? parts[1] : undefined;
-    return <Package60Page channelSubdomain={sub} />;
+    return <Package60Page channelSubdomain={sub} landingPath="/package60" />;
+  }
+
+  // /package_up 경로 → 가전상조 60패키지 (UP가전) 쇼핑몰 랜딩페이지
+  if (path === '/package_up' || path.startsWith('/package_up/')) {
+    const parts = path.split('/').filter(Boolean);
+    const sub = parts.length >= 2 ? parts[1] : undefined;
+    return <Package60Page channelSubdomain={sub} landingPath="/package_up" />;
   }
 
   // /kcc 경로 → B2B 제휴 랜딩페이지
@@ -45,6 +52,7 @@ export default function LandingRouter() {
   const isConsentPath = path.startsWith('/consent');
   
   // Parse segments
+  const isPackageUpPath = path.startsWith('/package_up');
   const isPackage60Path = path.startsWith('/package60');
   const isLiving2Path = path.startsWith('/living2');
   const isLivingPath = !isLiving2Path && path.startsWith('/living');
@@ -53,7 +61,7 @@ export default function LandingRouter() {
   const searchParams = new URLSearchParams(window.location.search);
   const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
   
-  const subdomainFromPath = (isLivingPath || isLiving2Path || isSpecialPath || isSpecial2Path || isPackage60Path)
+  const subdomainFromPath = (isLivingPath || isLiving2Path || isSpecialPath || isSpecial2Path || isPackage60Path || isPackageUpPath)
     ? (segments.length >= 2 ? segments[1] : (queryChannel || null)) 
     : (segments.length >= 1 && !isConsentPath ? segments[0] : (queryChannel || null));
 
@@ -81,8 +89,11 @@ export default function LandingRouter() {
   }
 
   // Routing
+  if (isPackageUpPath) {
+    return <Package60Page channelSubdomain={channel?.subdomain} landingPath="/package_up" />;
+  }
   if (isPackage60Path) {
-    return <Package60Page channelSubdomain={channel?.subdomain} />;
+    return <Package60Page channelSubdomain={channel?.subdomain} landingPath="/package60" />;
   }
   if (isLiving2Path) {
     return <LivingPage2 channelSubdomain={channel?.subdomain} />;
@@ -103,8 +114,11 @@ export default function LandingRouter() {
     const assignedPaths = channel.landingPages || (channel.landingPage ? [channel.landingPage] : []);
     const primaryPath = assignedPaths[0] || '/';
     
+    if (primaryPath === '/package_up') {
+      return <Package60Page channelSubdomain={channel.subdomain} landingPath="/package_up" />;
+    }
     if (primaryPath === '/package60') {
-      return <Package60Page channelSubdomain={channel.subdomain} />;
+      return <Package60Page channelSubdomain={channel.subdomain} landingPath="/package60" />;
     }
     if (primaryPath === '/living') {
       return <LivingPage channelSubdomain={channel.subdomain} />;
