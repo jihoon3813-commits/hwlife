@@ -50,7 +50,6 @@ const CATEGORIES: CategoryItem[] = [
   { id: 'dehumidifier', name: '제습기', icon: '💦', group: 'air' },
   { id: 'tv', name: '올레드 TV', icon: '📺', badge: '인기', group: 'display' },
   { id: 'standby', name: '스탠바이미', icon: '📱', badge: '품절임박', group: 'display' },
-  { id: 'gram', name: '노트북/그램', icon: '💻', group: 'display' },
   { id: 'vacuum', name: '청소기', icon: '🧹', group: 'living' },
   { id: 'massage', name: '안마의자', icon: '💆', group: 'health' },
   { id: 'shoecare', name: '슈케어', icon: '👟', group: 'living' },
@@ -969,8 +968,8 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
             )}
           </div>
 
-          {/* Categories Grid */}
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11 gap-2 sm:gap-4">
+          {/* Categories Grid - 20 categories balanced into 2 rows of 10 in PC */}
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-4">
             {CATEGORIES.map((cat) => {
               const isSelected = selectedCategory === cat.id;
               return (

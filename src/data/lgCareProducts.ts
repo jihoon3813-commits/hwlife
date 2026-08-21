@@ -341,7 +341,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 60900,
+    "rentalPrice": 64900,
     "maxBenefitPrice": 22900,
     "topBadges": [
       "2026년출시",
@@ -407,10 +407,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 71900
+          "monthlyPrice": 75900,
+          "originalPrice": 75900
         },
         "72_12_006": {
-          "monthlyPrice": 60900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         }
       }
     },
@@ -428,7 +430,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 24900,
+    "rentalPrice": 25900,
     "maxBenefitPrice": 14245,
     "topBadges": [
       "무상철거및재설치",
@@ -494,10 +496,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         },
         "72_30_003": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         }
       }
     },
@@ -611,16 +615,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "60_12_006": {
-          "monthlyPrice": 57900
+          "monthlyPrice": 57900,
+          "originalPrice": 57900
         },
         "72_12_003": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         },
         "72_12_006": {
-          "monthlyPrice": 49900
+          "monthlyPrice": 49900,
+          "originalPrice": 49900
         }
       }
     },
@@ -805,10 +813,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_30_003": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         }
       }
     },
@@ -870,7 +880,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 31900,
+    "rentalPrice": 32900,
     "maxBenefitPrice": 18095,
     "topBadges": [
       "무상철거및재설치",
@@ -936,10 +946,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_30_003": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         }
       }
     },
@@ -995,7 +1007,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 47900,
+    "rentalPrice": 59900,
     "maxBenefitPrice": 5900,
     "topBadges": [
       "무상철거및재설치",
@@ -1061,10 +1073,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 57900
+          "monthlyPrice": 69900,
+          "originalPrice": 69900
         },
         "72_12_006": {
-          "monthlyPrice": 47900
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         }
       }
     },
@@ -1082,7 +1096,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 46900,
+    "rentalPrice": 59900,
     "maxBenefitPrice": 4900,
     "topBadges": [
       "무상철거및재설치",
@@ -1148,10 +1162,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 69900,
+          "originalPrice": 69900
         },
         "72_12_006": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         }
       }
     },
@@ -1169,7 +1185,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 32400,
+    "rentalPrice": 33900,
     "maxBenefitPrice": 18645,
     "topBadges": [
       "무상철거및재설치",
@@ -1235,10 +1251,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 37400
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         },
         "72_30_003": {
-          "monthlyPrice": 32400
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         }
       }
     },
@@ -1327,16 +1345,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_03_003": {
-          "monthlyPrice": 144900
+          "monthlyPrice": 144900,
+          "originalPrice": 144900
         },
         "60_03_006": {
-          "monthlyPrice": 145900
+          "monthlyPrice": 145900,
+          "originalPrice": 145900
         },
         "72_03_003": {
-          "monthlyPrice": 126900
+          "monthlyPrice": 126900,
+          "originalPrice": 126900
         },
         "72_03_006": {
-          "monthlyPrice": 127900
+          "monthlyPrice": 127900,
+          "originalPrice": 127900
         }
       }
     },
@@ -1464,10 +1486,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 94900
+          "monthlyPrice": 94900,
+          "originalPrice": 94900
         },
         "72_12_006": {
-          "monthlyPrice": 81900
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         }
       }
     },
@@ -1515,7 +1539,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 26900,
+    "rentalPrice": 30900,
     "maxBenefitPrice": 14795,
     "topBadges": [
       "무상철거및재설치",
@@ -1581,10 +1605,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "72_30_003": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         }
       }
     },
@@ -1668,10 +1694,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         },
         "72_30_003": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         }
       }
     },
@@ -1713,7 +1741,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 78900,
+    "rentalPrice": 84900,
     "maxBenefitPrice": 41900,
     "topBadges": [
       "무상철거및재설치",
@@ -1785,16 +1813,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 91900
+          "monthlyPrice": 97900,
+          "originalPrice": 97900
         },
         "60_12_006": {
-          "monthlyPrice": 92900
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         },
         "72_12_003": {
-          "monthlyPrice": 77900
+          "monthlyPrice": 83900,
+          "originalPrice": 83900
         },
         "72_12_006": {
-          "monthlyPrice": 78900
+          "monthlyPrice": 84900,
+          "originalPrice": 84900
         }
       }
     },
@@ -1836,7 +1868,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 44900,
+    "rentalPrice": 51900,
     "maxBenefitPrice": 2900,
     "topBadges": [
       "무상철거및재설치",
@@ -1902,10 +1934,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 52900
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         },
         "72_12_006": {
-          "monthlyPrice": 44900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         }
       }
     },
@@ -2012,10 +2046,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 90900
+          "monthlyPrice": 90900,
+          "originalPrice": 90900
         },
         "72_12_006": {
-          "monthlyPrice": 77900
+          "monthlyPrice": 77900,
+          "originalPrice": 77900
         }
       }
     },
@@ -2064,7 +2100,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 49900,
+    "rentalPrice": 56900,
     "maxBenefitPrice": 7900,
     "topBadges": [
       "무상철거및재설치",
@@ -2130,10 +2166,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 58900
+          "monthlyPrice": 65900,
+          "originalPrice": 65900
         },
         "72_12_006": {
-          "monthlyPrice": 49900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         }
       }
     },
@@ -2151,7 +2189,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 40900,
+    "rentalPrice": 44900,
     "maxBenefitPrice": 22495,
     "topBadges": [
       "무상철거및재설치",
@@ -2217,10 +2255,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 47900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         },
         "72_30_003": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         }
       }
     },
@@ -2255,7 +2295,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 50900,
+    "rentalPrice": 54900,
     "maxBenefitPrice": 8900,
     "topBadges": [
       "무상철거및재설치",
@@ -2321,10 +2361,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 59900
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         },
         "72_12_006": {
-          "monthlyPrice": 50900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         }
       }
     },
@@ -2342,7 +2384,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 47900,
+    "rentalPrice": 52900,
     "maxBenefitPrice": 5900,
     "topBadges": [
       "무상철거및재설치",
@@ -2408,10 +2450,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 60900,
+          "originalPrice": 60900
         },
         "72_30_003": {
-          "monthlyPrice": 47900
+          "monthlyPrice": 52900,
+          "originalPrice": 52900
         }
       }
     },
@@ -2453,7 +2497,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 45900,
+    "rentalPrice": 54900,
     "maxBenefitPrice": 3900,
     "topBadges": [
       "무상철거및재설치",
@@ -2519,10 +2563,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         },
         "72_12_006": {
-          "monthlyPrice": 45900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         }
       }
     },
@@ -2626,7 +2672,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 43900,
+    "rentalPrice": 46900,
     "maxBenefitPrice": 4900,
     "topBadges": [
       "무상철거및재설치",
@@ -2692,10 +2738,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 50900
+          "monthlyPrice": 53900,
+          "originalPrice": 53900
         },
         "72_30_003": {
-          "monthlyPrice": 43900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         }
       }
     },
@@ -2779,10 +2827,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 23900,
+          "originalPrice": 23900
         },
         "72_30_003": {
-          "monthlyPrice": 20900
+          "monthlyPrice": 20900,
+          "originalPrice": 20900
         }
       }
     },
@@ -2871,16 +2921,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 102900
+          "monthlyPrice": 102900,
+          "originalPrice": 102900
         },
         "60_12_006": {
-          "monthlyPrice": 103900
+          "monthlyPrice": 103900,
+          "originalPrice": 103900
         },
         "72_12_003": {
-          "monthlyPrice": 88900
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         },
         "72_12_006": {
-          "monthlyPrice": 89900
+          "monthlyPrice": 89900,
+          "originalPrice": 89900
         }
       }
     },
@@ -2987,10 +3041,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "72_30_003": {
-          "monthlyPrice": 22900
+          "monthlyPrice": 22900,
+          "originalPrice": 22900
         }
       }
     },
@@ -3008,7 +3064,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 19400,
+    "rentalPrice": 19900,
     "maxBenefitPrice": 10945,
     "topBadges": [
       "무상철거및재설치",
@@ -3074,10 +3130,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 21400
+          "monthlyPrice": 21900,
+          "originalPrice": 21900
         },
         "72_30_003": {
-          "monthlyPrice": 19400
+          "monthlyPrice": 19900,
+          "originalPrice": 19900
         }
       }
     },
@@ -3166,16 +3224,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 109900
+          "monthlyPrice": 109900,
+          "originalPrice": 109900
         },
         "60_12_006": {
-          "monthlyPrice": 110900
+          "monthlyPrice": 110900,
+          "originalPrice": 110900
         },
         "72_12_003": {
-          "monthlyPrice": 94900
+          "monthlyPrice": 94900,
+          "originalPrice": 94900
         },
         "72_12_006": {
-          "monthlyPrice": 95900
+          "monthlyPrice": 95900,
+          "originalPrice": 95900
         }
       }
     },
@@ -3275,10 +3337,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 19900
+          "monthlyPrice": 19900,
+          "originalPrice": 19900
         },
         "72_30_003": {
-          "monthlyPrice": 17900
+          "monthlyPrice": 17900,
+          "originalPrice": 17900
         }
       }
     },
@@ -3367,16 +3431,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 107900
+          "monthlyPrice": 107900,
+          "originalPrice": 107900
         },
         "60_12_006": {
-          "monthlyPrice": 108900
+          "monthlyPrice": 108900,
+          "originalPrice": 108900
         },
         "72_12_003": {
-          "monthlyPrice": 92900
+          "monthlyPrice": 92900,
+          "originalPrice": 92900
         },
         "72_12_006": {
-          "monthlyPrice": 93900
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         }
       }
     },
@@ -3417,7 +3485,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 60000,
+    "rentalPrice": 68900,
     "maxBenefitPrice": 17000,
     "topBadges": [
       "무상철거및재설치",
@@ -3488,16 +3556,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 69000
+          "monthlyPrice": 77900,
+          "originalPrice": 77900
         },
         "60_12_006": {
-          "monthlyPrice": 70000
+          "monthlyPrice": 78900,
+          "originalPrice": 78900
         },
         "72_12_003": {
-          "monthlyPrice": 59000
+          "monthlyPrice": 67900,
+          "originalPrice": 67900
         },
         "72_12_006": {
-          "monthlyPrice": 60000
+          "monthlyPrice": 68900,
+          "originalPrice": 68900
         }
       }
     },
@@ -3601,7 +3673,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 56000,
+    "rentalPrice": 64900,
     "maxBenefitPrice": 13000,
     "topBadges": [
       "무상철거및재설치",
@@ -3672,16 +3744,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 65000
+          "monthlyPrice": 73900,
+          "originalPrice": 73900
         },
         "60_12_006": {
-          "monthlyPrice": 66000
+          "monthlyPrice": 74900,
+          "originalPrice": 74900
         },
         "72_12_003": {
-          "monthlyPrice": 55000
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         },
         "72_12_006": {
-          "monthlyPrice": 56000
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         }
       }
     },
@@ -3716,7 +3792,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 72000,
+    "rentalPrice": 82900,
     "maxBenefitPrice": 29000,
     "topBadges": [
       "무상철거및재설치",
@@ -3787,16 +3863,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 83000
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         },
         "60_12_006": {
-          "monthlyPrice": 84000
+          "monthlyPrice": 94900,
+          "originalPrice": 94900
         },
         "72_12_003": {
-          "monthlyPrice": 71000
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         },
         "72_12_006": {
-          "monthlyPrice": 72000
+          "monthlyPrice": 82900,
+          "originalPrice": 82900
         }
       }
     },
@@ -4051,16 +4131,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 113900
+          "monthlyPrice": 113900,
+          "originalPrice": 113900
         },
         "60_12_006": {
-          "monthlyPrice": 114900
+          "monthlyPrice": 114900,
+          "originalPrice": 114900
         },
         "72_12_003": {
-          "monthlyPrice": 97900
+          "monthlyPrice": 97900,
+          "originalPrice": 97900
         },
         "72_12_006": {
-          "monthlyPrice": 98900
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         }
       }
     },
@@ -4164,16 +4248,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_03_003": {
-          "monthlyPrice": 72900
+          "monthlyPrice": 72900,
+          "originalPrice": 72900
         },
         "60_03_006": {
-          "monthlyPrice": 73900
+          "monthlyPrice": 73900,
+          "originalPrice": 73900
         },
         "72_03_003": {
-          "monthlyPrice": 64900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         },
         "72_03_006": {
-          "monthlyPrice": 65900
+          "monthlyPrice": 65900,
+          "originalPrice": 65900
         }
       }
     },
@@ -4191,7 +4279,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 46900,
+    "rentalPrice": 56900,
     "maxBenefitPrice": 3900,
     "topBadges": [
       "무상철거및재설치",
@@ -4261,16 +4349,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 53900
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         },
         "60_12_006": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         },
         "72_12_003": {
-          "monthlyPrice": 45900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         },
         "72_12_006": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         }
       }
     },
@@ -4359,16 +4451,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 85900
+          "monthlyPrice": 85900,
+          "originalPrice": 85900
         },
         "60_12_006": {
-          "monthlyPrice": 86900
+          "monthlyPrice": 86900,
+          "originalPrice": 86900
         },
         "72_12_003": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 74900,
+          "originalPrice": 74900
         },
         "72_12_006": {
-          "monthlyPrice": 75900
+          "monthlyPrice": 75900,
+          "originalPrice": 75900
         }
       }
     },
@@ -4456,16 +4552,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 63900
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         },
         "60_12_006": {
-          "monthlyPrice": 64900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         },
         "72_12_003": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         },
         "72_12_006": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         }
       }
     },
@@ -4864,16 +4964,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_03_003": {
-          "monthlyPrice": 109900
+          "monthlyPrice": 109900,
+          "originalPrice": 109900
         },
         "60_03_006": {
-          "monthlyPrice": 110900
+          "monthlyPrice": 110900,
+          "originalPrice": 110900
         },
         "72_03_003": {
-          "monthlyPrice": 96900
+          "monthlyPrice": 96900,
+          "originalPrice": 96900
         },
         "72_03_006": {
-          "monthlyPrice": 97900
+          "monthlyPrice": 97900,
+          "originalPrice": 97900
         }
       }
     },
@@ -5151,16 +5255,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 107900
+          "monthlyPrice": 107900,
+          "originalPrice": 107900
         },
         "60_12_006": {
-          "monthlyPrice": 108900
+          "monthlyPrice": 108900,
+          "originalPrice": 108900
         },
         "72_12_003": {
-          "monthlyPrice": 92900
+          "monthlyPrice": 92900,
+          "originalPrice": 92900
         },
         "72_12_006": {
-          "monthlyPrice": 93900
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         }
       }
     },
@@ -5271,16 +5379,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 109900
+          "monthlyPrice": 109900,
+          "originalPrice": 109900
         },
         "60_12_006": {
-          "monthlyPrice": 110900
+          "monthlyPrice": 110900,
+          "originalPrice": 110900
         },
         "72_12_003": {
-          "monthlyPrice": 94900
+          "monthlyPrice": 94900,
+          "originalPrice": 94900
         },
         "72_12_006": {
-          "monthlyPrice": 95900
+          "monthlyPrice": 95900,
+          "originalPrice": 95900
         }
       }
     },
@@ -5534,16 +5646,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_03_003": {
-          "monthlyPrice": 82900
+          "monthlyPrice": 82900,
+          "originalPrice": 82900
         },
         "60_03_006": {
-          "monthlyPrice": 83900
+          "monthlyPrice": 83900,
+          "originalPrice": 83900
         },
         "72_03_003": {
-          "monthlyPrice": 73900
+          "monthlyPrice": 73900,
+          "originalPrice": 73900
         },
         "72_03_006": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 74900,
+          "originalPrice": 74900
         }
       }
     },
@@ -5729,7 +5845,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 68900,
+    "rentalPrice": 74900,
     "maxBenefitPrice": 26900,
     "topBadges": [
       "무상철거및재설치",
@@ -5794,10 +5910,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 80900
+          "monthlyPrice": 86900,
+          "originalPrice": 86900
         },
         "72_12_006": {
-          "monthlyPrice": 68900
+          "monthlyPrice": 74900,
+          "originalPrice": 74900
         }
       }
     },
@@ -5886,16 +6004,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 100900
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         },
         "60_12_006": {
-          "monthlyPrice": 101900
+          "monthlyPrice": 101900,
+          "originalPrice": 101900
         },
         "72_12_003": {
-          "monthlyPrice": 87900
+          "monthlyPrice": 87900,
+          "originalPrice": 87900
         },
         "72_12_006": {
-          "monthlyPrice": 88900
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         }
       }
     },
@@ -5929,7 +6051,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 69900,
+    "rentalPrice": 76900,
     "maxBenefitPrice": 33900,
     "topBadges": [
       "무상철거및재설치",
@@ -6000,16 +6122,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 80900
+          "monthlyPrice": 87900,
+          "originalPrice": 87900
         },
         "60_12_006": {
-          "monthlyPrice": 81900
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         },
         "72_12_003": {
-          "monthlyPrice": 68900
+          "monthlyPrice": 75900,
+          "originalPrice": 75900
         },
         "72_12_006": {
-          "monthlyPrice": 69900
+          "monthlyPrice": 76900,
+          "originalPrice": 76900
         }
       }
     },
@@ -6098,16 +6224,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_03_003": {
-          "monthlyPrice": 97900
+          "monthlyPrice": 97900,
+          "originalPrice": 97900
         },
         "60_03_006": {
-          "monthlyPrice": 98900
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         },
         "72_03_003": {
-          "monthlyPrice": 86900
+          "monthlyPrice": 86900,
+          "originalPrice": 86900
         },
         "72_03_006": {
-          "monthlyPrice": 87900
+          "monthlyPrice": 87900,
+          "originalPrice": 87900
         }
       }
     },
@@ -6196,16 +6326,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 101900
+          "monthlyPrice": 101900,
+          "originalPrice": 101900
         },
         "60_12_006": {
-          "monthlyPrice": 102900
+          "monthlyPrice": 102900,
+          "originalPrice": 102900
         },
         "72_12_003": {
-          "monthlyPrice": 86900
+          "monthlyPrice": 86900,
+          "originalPrice": 86900
         },
         "72_12_006": {
-          "monthlyPrice": 87900
+          "monthlyPrice": 87900,
+          "originalPrice": 87900
         }
       }
     },
@@ -6223,7 +6357,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 62900,
+    "rentalPrice": 68900,
     "maxBenefitPrice": 20900,
     "topBadges": [
       "무상철거및재설치",
@@ -6289,10 +6423,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 73900
+          "monthlyPrice": 79900,
+          "originalPrice": 79900
         },
         "72_12_006": {
-          "monthlyPrice": 62900
+          "monthlyPrice": 68900,
+          "originalPrice": 68900
         }
       }
     },
@@ -6310,7 +6446,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 65900,
+    "rentalPrice": 71900,
     "maxBenefitPrice": 23900,
     "topBadges": [
       "무상철거및재설치",
@@ -6376,10 +6512,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 77900
+          "monthlyPrice": 83900,
+          "originalPrice": 83900
         },
         "72_12_006": {
-          "monthlyPrice": 65900
+          "monthlyPrice": 71900,
+          "originalPrice": 71900
         }
       }
     },
@@ -6468,16 +6606,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 93900
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         },
         "60_12_006": {
-          "monthlyPrice": 94900
+          "monthlyPrice": 94900,
+          "originalPrice": 94900
         },
         "72_12_003": {
-          "monthlyPrice": 80900
+          "monthlyPrice": 80900,
+          "originalPrice": 80900
         },
         "72_12_006": {
-          "monthlyPrice": 81900
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         }
       }
     },
@@ -6495,7 +6637,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 56900,
+    "rentalPrice": 61900,
     "maxBenefitPrice": 14900,
     "topBadges": [
       "무상철거및재설치",
@@ -6561,10 +6703,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 66900
+          "monthlyPrice": 71900,
+          "originalPrice": 71900
         },
         "72_12_006": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 61900,
+          "originalPrice": 61900
         }
       }
     },
@@ -6598,7 +6742,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 59900,
+    "rentalPrice": 64900,
     "maxBenefitPrice": 16900,
     "topBadges": [
       "무상철거및재설치",
@@ -6669,16 +6813,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 69900
+          "monthlyPrice": 74900,
+          "originalPrice": 74900
         },
         "60_12_006": {
-          "monthlyPrice": 70900
+          "monthlyPrice": 75900,
+          "originalPrice": 75900
         },
         "72_12_003": {
-          "monthlyPrice": 58900
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         },
         "72_12_006": {
-          "monthlyPrice": 59900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         }
       }
     },
@@ -6761,10 +6909,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 68900
+          "monthlyPrice": 68900,
+          "originalPrice": 68900
         },
         "72_30_003": {
-          "monthlyPrice": 58900
+          "monthlyPrice": 58900,
+          "originalPrice": 58900
         }
       }
     },
@@ -6906,10 +7056,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 61900
+          "monthlyPrice": 61900,
+          "originalPrice": 61900
         },
         "72_12_006": {
-          "monthlyPrice": 53900
+          "monthlyPrice": 53900,
+          "originalPrice": 53900
         }
       }
     },
@@ -6993,10 +7145,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 100900
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         },
         "72_12_006": {
-          "monthlyPrice": 85900
+          "monthlyPrice": 85900,
+          "originalPrice": 85900
         }
       }
     },
@@ -7097,10 +7251,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 94900
+          "monthlyPrice": 94900,
+          "originalPrice": 94900
         },
         "72_12_006": {
-          "monthlyPrice": 81900
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         }
       }
     },
@@ -7214,10 +7370,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 86900
+          "monthlyPrice": 86900,
+          "originalPrice": 86900
         },
         "72_12_006": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 74900,
+          "originalPrice": 74900
         }
       }
     },
@@ -7317,10 +7475,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 82900
+          "monthlyPrice": 82900,
+          "originalPrice": 82900
         },
         "72_12_006": {
-          "monthlyPrice": 71900
+          "monthlyPrice": 71900,
+          "originalPrice": 71900
         }
       }
     },
@@ -7420,10 +7580,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 74900,
+          "originalPrice": 74900
         },
         "72_12_006": {
-          "monthlyPrice": 64900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         }
       }
     },
@@ -7522,10 +7684,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 69900
+          "monthlyPrice": 69900,
+          "originalPrice": 69900
         },
         "72_30_003": {
-          "monthlyPrice": 59900
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         }
       }
     },
@@ -7614,16 +7778,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 85900
+          "monthlyPrice": 85900,
+          "originalPrice": 85900
         },
         "60_12_006": {
-          "monthlyPrice": 86900
+          "monthlyPrice": 86900,
+          "originalPrice": 86900
         },
         "72_12_003": {
-          "monthlyPrice": 73900
+          "monthlyPrice": 73900,
+          "originalPrice": 73900
         },
         "72_12_006": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 74900,
+          "originalPrice": 74900
         }
       }
     },
@@ -7706,10 +7874,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 76900
+          "monthlyPrice": 76900,
+          "originalPrice": 76900
         },
         "72_30_003": {
-          "monthlyPrice": 65900
+          "monthlyPrice": 65900,
+          "originalPrice": 65900
         }
       }
     },
@@ -7850,10 +8020,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 61900
+          "monthlyPrice": 61900,
+          "originalPrice": 61900
         },
         "72_30_003": {
-          "monthlyPrice": 52900
+          "monthlyPrice": 52900,
+          "originalPrice": 52900
         }
       }
     },
@@ -8015,7 +8187,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 35900,
+    "rentalPrice": 38900,
     "maxBenefitPrice": 19195,
     "topBadges": [
       "무상철거및재설치",
@@ -8087,16 +8259,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "60_12_006": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         },
         "72_12_003": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_12_006": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         }
       }
     },
@@ -8185,16 +8361,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 57900
+          "monthlyPrice": 57900,
+          "originalPrice": 57900
         },
         "60_12_006": {
-          "monthlyPrice": 58900
+          "monthlyPrice": 58900,
+          "originalPrice": 58900
         },
         "72_12_003": {
-          "monthlyPrice": 49900
+          "monthlyPrice": 49900,
+          "originalPrice": 49900
         },
         "72_12_006": {
-          "monthlyPrice": 50900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         }
       }
     },
@@ -8299,16 +8479,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 49900
+          "monthlyPrice": 49900,
+          "originalPrice": 49900
         },
         "60_12_006": {
-          "monthlyPrice": 50900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         },
         "72_12_003": {
-          "monthlyPrice": 43900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         },
         "72_12_006": {
-          "monthlyPrice": 44900
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         }
       }
     },
@@ -8342,7 +8526,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 37900,
+    "rentalPrice": 40900,
     "maxBenefitPrice": 20845,
     "topBadges": [
       "무상철거및재설치",
@@ -8407,10 +8591,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 44900
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         },
         "72_30_003": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         }
       }
     },
@@ -8428,7 +8614,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 36900,
+    "rentalPrice": 39900,
     "maxBenefitPrice": 19745,
     "topBadges": [
       "무상철거및재설치",
@@ -8499,16 +8685,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         },
         "60_12_006": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         },
         "72_12_003": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         },
         "72_12_006": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         }
       }
     },
@@ -8551,7 +8741,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 30900,
+    "rentalPrice": 33900,
     "maxBenefitPrice": 16995,
     "topBadges": [
       "무상철거및재설치",
@@ -8616,10 +8806,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         },
         "72_30_003": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         }
       }
     },
@@ -8637,7 +8829,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 38900,
+    "rentalPrice": 41900,
     "maxBenefitPrice": 20845,
     "topBadges": [
       "무상철거및재설치",
@@ -8708,16 +8900,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 43900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "60_12_006": {
-          "monthlyPrice": 44900
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         },
         "72_12_003": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "72_12_006": {
-          "monthlyPrice": 38900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         }
       }
     },
@@ -8735,7 +8931,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 41900,
+    "rentalPrice": 44900,
     "maxBenefitPrice": 22495,
     "topBadges": [
       "무상철거및재설치",
@@ -8806,16 +9002,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 47900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         },
         "60_12_006": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         },
         "72_12_003": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         },
         "72_12_006": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         }
       }
     },
@@ -8921,16 +9121,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "60_12_006": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_12_003": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_12_006": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         }
       }
     },
@@ -8965,7 +9169,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 43900,
+    "rentalPrice": 46900,
     "maxBenefitPrice": 900,
     "topBadges": [
       "무상철거및재설치",
@@ -9036,16 +9240,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 49900
+          "monthlyPrice": 52900,
+          "originalPrice": 52900
         },
         "60_12_006": {
-          "monthlyPrice": 50900
+          "monthlyPrice": 53900,
+          "originalPrice": 53900
         },
         "72_12_003": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         },
         "72_12_006": {
-          "monthlyPrice": 43900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         }
       }
     },
@@ -9063,7 +9271,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 35900,
+    "rentalPrice": 38900,
     "maxBenefitPrice": 19195,
     "topBadges": [
       "무상철거및재설치",
@@ -9134,16 +9342,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         },
         "60_12_006": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         },
         "72_12_003": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_12_006": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         }
       }
     },
@@ -9232,16 +9444,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "60_12_006": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "72_12_003": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_12_006": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         }
       }
     },
@@ -9330,16 +9546,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "60_12_006": {
-          "monthlyPrice": 43900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         },
         "72_12_003": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_12_006": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         }
       }
     },
@@ -9428,16 +9648,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         },
         "60_12_006": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_12_003": {
-          "monthlyPrice": 47900
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         },
         "72_12_006": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         }
       }
     },
@@ -9455,7 +9679,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 17400,
+    "rentalPrice": 17900,
     "maxBenefitPrice": 9845,
     "topBadges": [
       "무상철거및재설치",
@@ -9520,10 +9744,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 19400
+          "monthlyPrice": 19900,
+          "originalPrice": 19900
         },
         "72_30_003": {
-          "monthlyPrice": 17400
+          "monthlyPrice": 17900,
+          "originalPrice": 17900
         }
       }
     },
@@ -9606,10 +9832,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 21900
+          "monthlyPrice": 21900,
+          "originalPrice": 21900
         },
         "72_30_003": {
-          "monthlyPrice": 18900
+          "monthlyPrice": 18900,
+          "originalPrice": 18900
         }
       }
     },
@@ -9692,10 +9920,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 19900
+          "monthlyPrice": 19900,
+          "originalPrice": 19900
         },
         "72_30_003": {
-          "monthlyPrice": 17900
+          "monthlyPrice": 17900,
+          "originalPrice": 17900
         }
       }
     },
@@ -9727,7 +9957,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 19400,
+    "rentalPrice": 19900,
     "maxBenefitPrice": 10945,
     "topBadges": [
       "무상철거및재설치",
@@ -9792,10 +10022,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 21400
+          "monthlyPrice": 21900,
+          "originalPrice": 21900
         },
         "72_30_003": {
-          "monthlyPrice": 19400
+          "monthlyPrice": 19900,
+          "originalPrice": 19900
         }
       }
     },
@@ -9878,10 +10110,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 13900
+          "monthlyPrice": 13900,
+          "originalPrice": 13900
         },
         "72_30_003": {
-          "monthlyPrice": 12900
+          "monthlyPrice": 12900,
+          "originalPrice": 12900
         }
       }
     },
@@ -9980,10 +10214,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "72_30_003": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 23900,
+          "originalPrice": 23900
         }
       }
     },
@@ -10090,10 +10326,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 23900,
+          "originalPrice": 23900
         },
         "72_30_003": {
-          "monthlyPrice": 20900
+          "monthlyPrice": 20900,
+          "originalPrice": 20900
         }
       }
     },
@@ -10111,7 +10349,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 17900,
+    "rentalPrice": 18900,
     "maxBenefitPrice": 9845,
     "topBadges": [
       "무상철거및재설치",
@@ -10176,10 +10414,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 20900
+          "monthlyPrice": 21900,
+          "originalPrice": 21900
         },
         "72_30_003": {
-          "monthlyPrice": 17900
+          "monthlyPrice": 18900,
+          "originalPrice": 18900
         }
       }
     },
@@ -10262,10 +10502,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "72_30_003": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         }
       }
     },
@@ -10364,10 +10606,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 19900
+          "monthlyPrice": 19900,
+          "originalPrice": 19900
         },
         "72_30_003": {
-          "monthlyPrice": 17900
+          "monthlyPrice": 17900,
+          "originalPrice": 17900
         }
       }
     },
@@ -10385,7 +10629,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "프리미엄",
-    "rentalPrice": 12900,
+    "rentalPrice": 13900,
     "maxBenefitPrice": 7095,
     "topBadges": [
       "무상철거및재설치",
@@ -10450,10 +10694,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 13900
+          "monthlyPrice": 14900,
+          "originalPrice": 14900
         },
         "72_30_003": {
-          "monthlyPrice": 12900
+          "monthlyPrice": 13900,
+          "originalPrice": 13900
         }
       }
     },
@@ -10552,10 +10798,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "72_30_003": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 23900,
+          "originalPrice": 23900
         }
       }
     },
@@ -10638,10 +10886,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 10900
+          "monthlyPrice": 10900,
+          "originalPrice": 10900
         },
         "72_30_003": {
-          "monthlyPrice": 9900
+          "monthlyPrice": 9900,
+          "originalPrice": 9900
         }
       }
     },
@@ -10724,10 +10974,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 18900
+          "monthlyPrice": 18900,
+          "originalPrice": 18900
         },
         "72_30_003": {
-          "monthlyPrice": 16900
+          "monthlyPrice": 16900,
+          "originalPrice": 16900
         }
       }
     },
@@ -10834,10 +11086,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 45900
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         },
         "72_30_003": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         }
       }
     },
@@ -10958,10 +11212,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 18900
+          "monthlyPrice": 18900,
+          "originalPrice": 18900
         },
         "72_30_003": {
-          "monthlyPrice": 15900
+          "monthlyPrice": 15900,
+          "originalPrice": 15900
         }
       }
     },
@@ -10994,7 +11250,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 16900,
+    "rentalPrice": 33900,
     "maxBenefitPrice": 8470,
     "topBadges": [
       "무상철거및재설치",
@@ -11070,16 +11326,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 16900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "60_06": {
-          "monthlyPrice": 18400
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_00": {
-          "monthlyPrice": 15400
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "72_06": {
-          "monthlyPrice": 16900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         }
       }
     },
@@ -11118,7 +11378,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 25900,
+    "rentalPrice": 51900,
     "maxBenefitPrice": 13695,
     "topBadges": [
       "무상철거및재설치",
@@ -11194,16 +11454,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_06": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 53900,
+          "originalPrice": 53900
         },
         "60_04": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         },
         "72_06": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 49900,
+          "originalPrice": 49900
         },
         "72_04": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         }
       }
     },
@@ -11242,7 +11506,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 17400,
+    "rentalPrice": 34900,
     "maxBenefitPrice": 8745,
     "topBadges": [
       "무상철거및재설치",
@@ -11317,16 +11581,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 17400
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "60_06": {
-          "monthlyPrice": 18900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_00": {
-          "monthlyPrice": 15900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "72_06": {
-          "monthlyPrice": 17400
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         }
       }
     },
@@ -11344,7 +11612,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 17900,
+    "rentalPrice": 35900,
     "maxBenefitPrice": 9020,
     "topBadges": [
       "무상철거및재설치",
@@ -11420,16 +11688,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 17900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "60_06": {
-          "monthlyPrice": 19400
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         },
         "72_00": {
-          "monthlyPrice": 16400
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         },
         "72_06": {
-          "monthlyPrice": 17900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         }
       }
     },
@@ -11480,7 +11752,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 15400,
+    "rentalPrice": 30900,
     "maxBenefitPrice": 7645,
     "topBadges": [
       "무상철거및재설치",
@@ -11556,16 +11828,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 15400
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "60_06": {
-          "monthlyPrice": 16900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_00": {
-          "monthlyPrice": 13900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         },
         "72_06": {
-          "monthlyPrice": 15400
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         }
       }
     },
@@ -11583,7 +11859,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 26900,
+    "rentalPrice": 53900,
     "maxBenefitPrice": 14245,
     "topBadges": [
       "무상철거및재설치",
@@ -11658,16 +11934,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_06": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         },
         "60_04": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 57900,
+          "originalPrice": 57900
         },
         "72_06": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         },
         "72_04": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 53900,
+          "originalPrice": 53900
         }
       }
     },
@@ -11781,16 +12061,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "60_06": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_00": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_06": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         }
       }
     },
@@ -11808,7 +12092,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 18400,
+    "rentalPrice": 36900,
     "maxBenefitPrice": 9295,
     "topBadges": [
       "무상철거및재설치",
@@ -11883,16 +12167,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 18400
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "60_06": {
-          "monthlyPrice": 19900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "72_00": {
-          "monthlyPrice": 16900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_06": {
-          "monthlyPrice": 18400
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         }
       }
     },
@@ -11910,7 +12198,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 15900,
+    "rentalPrice": 31900,
     "maxBenefitPrice": 7920,
     "topBadges": [
       "무상철거및재설치",
@@ -11985,16 +12273,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 15900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "60_06": {
-          "monthlyPrice": 17400
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_00": {
-          "monthlyPrice": 14400
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         },
         "72_06": {
-          "monthlyPrice": 15900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         }
       }
     },
@@ -12027,7 +12319,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 23400,
+    "rentalPrice": 52900,
     "maxBenefitPrice": 12320,
     "topBadges": [
       "무상철거및재설치",
@@ -12102,16 +12394,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_06": {
-          "monthlyPrice": 24400
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "60_04": {
-          "monthlyPrice": 25400
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_06": {
-          "monthlyPrice": 22400
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         },
         "72_04": {
-          "monthlyPrice": 23400
+          "monthlyPrice": 52900,
+          "originalPrice": 52900
         }
       }
     },
@@ -12150,7 +12446,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 11400,
+    "rentalPrice": 22900,
     "maxBenefitPrice": 5445,
     "topBadges": [
       "무상철거및재설치",
@@ -12225,16 +12521,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 11400
+          "monthlyPrice": 22900,
+          "originalPrice": 22900
         },
         "60_06": {
-          "monthlyPrice": 12900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "72_00": {
-          "monthlyPrice": 9900
+          "monthlyPrice": 19900,
+          "originalPrice": 19900
         },
         "72_06": {
-          "monthlyPrice": 11400
+          "monthlyPrice": 22900,
+          "originalPrice": 22900
         }
       }
     },
@@ -12252,7 +12552,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 12900,
+    "rentalPrice": 25900,
     "maxBenefitPrice": 6270,
     "topBadges": [
       "무상철거및재설치",
@@ -12327,16 +12627,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 12900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "60_06": {
-          "monthlyPrice": 14400
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         },
         "72_00": {
-          "monthlyPrice": 11400
+          "monthlyPrice": 22900,
+          "originalPrice": 22900
         },
         "72_06": {
-          "monthlyPrice": 12900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         }
       }
     },
@@ -12429,16 +12733,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 21900
+          "monthlyPrice": 21900,
+          "originalPrice": 21900
         },
         "60_06": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         },
         "72_00": {
-          "monthlyPrice": 18900
+          "monthlyPrice": 18900,
+          "originalPrice": 18900
         },
         "72_06": {
-          "monthlyPrice": 21900
+          "monthlyPrice": 21900,
+          "originalPrice": 21900
         }
       }
     },
@@ -12546,16 +12854,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "60_06": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_00": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_06": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         }
       }
     },
@@ -12600,7 +12912,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 15900,
+    "rentalPrice": 31900,
     "maxBenefitPrice": 7920,
     "topBadges": [
       "무상철거및재설치",
@@ -12675,16 +12987,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 15900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "60_06": {
-          "monthlyPrice": 17400
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_00": {
-          "monthlyPrice": 14400
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         },
         "72_06": {
-          "monthlyPrice": 15900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         }
       }
     },
@@ -12717,7 +13033,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 15400,
+    "rentalPrice": 30900,
     "maxBenefitPrice": 7645,
     "topBadges": [
       "무상철거및재설치",
@@ -12792,16 +13108,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 15400
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "60_06": {
-          "monthlyPrice": 16900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_00": {
-          "monthlyPrice": 13900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         },
         "72_06": {
-          "monthlyPrice": 15400
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         }
       }
     },
@@ -12819,7 +13139,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 31400,
+    "rentalPrice": 34900,
     "maxBenefitPrice": 14300,
     "topBadges": [
       "무상철거및재설치",
@@ -12894,16 +13214,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_06": {
-          "monthlyPrice": 28700
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "60_03": {
-          "monthlyPrice": 34100
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_06": {
-          "monthlyPrice": 26000
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         },
         "72_03": {
-          "monthlyPrice": 31400
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         }
       }
     },
@@ -12996,16 +13320,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 32900
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         },
         "60_06": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "72_00": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         },
         "72_06": {
-          "monthlyPrice": 32900
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         }
       }
     },
@@ -13119,16 +13447,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "60_06": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "72_00": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_06": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         }
       }
     },
@@ -13217,10 +13549,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_06": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "72_06": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         }
       }
     },
@@ -13238,7 +13572,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 18900,
+    "rentalPrice": 37900,
     "maxBenefitPrice": 9570,
     "topBadges": [
       "무상철거및재설치",
@@ -13314,16 +13648,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 18900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "60_06": {
-          "monthlyPrice": 20400
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "72_00": {
-          "monthlyPrice": 17400
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_06": {
-          "monthlyPrice": 18900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         }
       }
     },
@@ -13432,16 +13770,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "60_06": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_00": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         },
         "72_06": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         }
       }
     },
@@ -13535,16 +13877,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "60_06": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "72_00": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_06": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         }
       }
     },
@@ -13658,16 +14004,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         },
         "60_06": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         },
         "72_00": {
-          "monthlyPrice": 21900
+          "monthlyPrice": 21900,
+          "originalPrice": 21900
         },
         "72_06": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         }
       }
     },
@@ -13775,16 +14125,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_06": {
-          "monthlyPrice": 44900
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         },
         "60_03": {
-          "monthlyPrice": 50900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         },
         "72_06": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_03": {
-          "monthlyPrice": 47900
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         }
       }
     },
@@ -13877,16 +14231,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         },
         "60_06": {
-          "monthlyPrice": 32900
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         },
         "72_00": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "72_06": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         }
       }
     },
@@ -13904,7 +14262,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 27900,
+    "rentalPrice": 55900,
     "maxBenefitPrice": 14795,
     "topBadges": [
       "무상철거및재설치",
@@ -13980,16 +14338,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_06": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 57900,
+          "originalPrice": 57900
         },
         "60_04": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         },
         "72_06": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 53900,
+          "originalPrice": 53900
         },
         "72_04": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         }
       }
     },
@@ -14103,16 +14465,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "60_06": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_00": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "72_06": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         }
       }
     },
@@ -14130,7 +14496,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 17900,
+    "rentalPrice": 35900,
     "maxBenefitPrice": 9020,
     "topBadges": [
       "무상철거및재설치",
@@ -14205,16 +14571,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 17900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "60_06": {
-          "monthlyPrice": 19400
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         },
         "72_00": {
-          "monthlyPrice": 16400
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         },
         "72_06": {
-          "monthlyPrice": 17900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         }
       }
     },
@@ -14265,7 +14635,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 16900,
+    "rentalPrice": 33900,
     "maxBenefitPrice": 8470,
     "topBadges": [
       "무상철거및재설치",
@@ -14340,16 +14710,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 16900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "60_06": {
-          "monthlyPrice": 18400
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_00": {
-          "monthlyPrice": 15400
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "72_06": {
-          "monthlyPrice": 16900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         }
       }
     },
@@ -14388,7 +14762,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 25900,
+    "rentalPrice": 51900,
     "maxBenefitPrice": 13695,
     "topBadges": [
       "무상철거및재설치",
@@ -14463,16 +14837,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_06": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 53900,
+          "originalPrice": 53900
         },
         "60_04": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         },
         "72_06": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 49900,
+          "originalPrice": 49900
         },
         "72_04": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         }
       }
     },
@@ -14511,7 +14889,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 43900,
+    "rentalPrice": 56900,
     "maxBenefitPrice": 1900,
     "topBadges": [
       "무상철거및재설치",
@@ -14577,10 +14955,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 52900
+          "monthlyPrice": 65900,
+          "originalPrice": 65900
         },
         "72_12_006": {
-          "monthlyPrice": 43900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         }
       }
     },
@@ -14629,7 +15009,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 50400,
+    "rentalPrice": 51900,
     "maxBenefitPrice": 9900,
     "topBadges": [
       "무상철거및재설치",
@@ -14693,10 +15073,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 59400
+          "monthlyPrice": 60900,
+          "originalPrice": 60900
         },
         "72_30_003": {
-          "monthlyPrice": 50400
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         }
       }
     },
@@ -14773,7 +15155,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 36900,
+    "rentalPrice": 39900,
     "maxBenefitPrice": 20295,
     "topBadges": [
       "무상철거및재설치",
@@ -14837,10 +15219,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 43900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "72_30_003": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         }
       }
     },
@@ -14889,7 +15273,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 54900,
+    "rentalPrice": 59900,
     "maxBenefitPrice": 12900,
     "topBadges": [
       "무상철거및재설치",
@@ -14955,10 +15339,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 64900
+          "monthlyPrice": 69900,
+          "originalPrice": 69900
         },
         "72_12_006": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         }
       }
     },
@@ -15006,7 +15392,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 55900,
+    "rentalPrice": 60900,
     "maxBenefitPrice": 13900,
     "topBadges": [
       "무상철거및재설치",
@@ -15072,10 +15458,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 64900
+          "monthlyPrice": 69900,
+          "originalPrice": 69900
         },
         "72_12_006": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 60900,
+          "originalPrice": 60900
         }
       }
     },
@@ -15187,10 +15575,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 64900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         },
         "72_30_003": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         }
       }
     },
@@ -15330,10 +15720,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 64900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         },
         "72_30_003": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         }
       }
     },
@@ -15473,10 +15865,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 60900
+          "monthlyPrice": 60900,
+          "originalPrice": 60900
         },
         "72_30_003": {
-          "monthlyPrice": 51900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         }
       }
     },
@@ -15558,10 +15952,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_30_003": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         }
       }
     },
@@ -15637,7 +16033,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 49900,
+    "rentalPrice": 54900,
     "maxBenefitPrice": 7900,
     "topBadges": [
       "무상철거및재설치",
@@ -15701,10 +16097,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 58900
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         },
         "72_30_003": {
-          "monthlyPrice": 49900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         }
       }
     },
@@ -15794,7 +16192,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 49900,
+    "rentalPrice": 54900,
     "maxBenefitPrice": 7900,
     "topBadges": [
       "무상철거및재설치",
@@ -15858,10 +16256,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 58900
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         },
         "72_30_003": {
-          "monthlyPrice": 49900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         }
       }
     },
@@ -15951,7 +16351,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 46900,
+    "rentalPrice": 50900,
     "maxBenefitPrice": 4900,
     "topBadges": [
       "무상철거및재설치",
@@ -16015,10 +16415,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         },
         "72_30_003": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         }
       }
     },
@@ -16052,7 +16454,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 46900,
+    "rentalPrice": 50900,
     "maxBenefitPrice": 4900,
     "topBadges": [
       "무상철거및재설치",
@@ -16116,10 +16518,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         },
         "72_30_003": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         }
       }
     },
@@ -16209,7 +16613,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 43900,
+    "rentalPrice": 47900,
     "maxBenefitPrice": 1900,
     "topBadges": [
       "무상철거및재설치",
@@ -16273,10 +16677,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 51900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         },
         "72_30_003": {
-          "monthlyPrice": 43900
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         }
       }
     },
@@ -16430,10 +16836,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "72_30_003": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         }
       }
     },
@@ -16594,10 +17002,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "72_30_003": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         }
       }
     },
@@ -16758,10 +17168,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 50900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         },
         "72_30_003": {
-          "monthlyPrice": 43900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         }
       }
     },
@@ -16843,10 +17255,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 50900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         },
         "72_30_003": {
-          "monthlyPrice": 43900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         }
       }
     },
@@ -17007,10 +17421,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "72_30_003": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         }
       }
     },
@@ -17107,7 +17523,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 37900,
+    "rentalPrice": 40900,
     "maxBenefitPrice": 20845,
     "topBadges": [
       "무상철거및재설치",
@@ -17171,10 +17587,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 44900
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         },
         "72_30_003": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         }
       }
     },
@@ -17272,10 +17690,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 32900
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         },
         "72_30_003": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         }
       }
     },
@@ -17363,16 +17783,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 91900
+          "monthlyPrice": 91900,
+          "originalPrice": 91900
         },
         "60_12_006": {
-          "monthlyPrice": 92900
+          "monthlyPrice": 92900,
+          "originalPrice": 92900
         },
         "72_12_003": {
-          "monthlyPrice": 78900
+          "monthlyPrice": 78900,
+          "originalPrice": 78900
         },
         "72_12_006": {
-          "monthlyPrice": 79900
+          "monthlyPrice": 79900,
+          "originalPrice": 79900
         }
       }
     },
@@ -17504,16 +17928,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 85900
+          "monthlyPrice": 85900,
+          "originalPrice": 85900
         },
         "60_12_006": {
-          "monthlyPrice": 86900
+          "monthlyPrice": 86900,
+          "originalPrice": 86900
         },
         "72_12_003": {
-          "monthlyPrice": 73900
+          "monthlyPrice": 73900,
+          "originalPrice": 73900
         },
         "72_12_006": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 74900,
+          "originalPrice": 74900
         }
       }
     },
@@ -17646,16 +18074,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 80900
+          "monthlyPrice": 80900,
+          "originalPrice": 80900
         },
         "60_12_006": {
-          "monthlyPrice": 81900
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         },
         "72_12_003": {
-          "monthlyPrice": 69900
+          "monthlyPrice": 69900,
+          "originalPrice": 69900
         },
         "72_12_006": {
-          "monthlyPrice": 70900
+          "monthlyPrice": 70900,
+          "originalPrice": 70900
         }
       }
     },
@@ -17717,7 +18149,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 70900,
+    "rentalPrice": 76900,
     "maxBenefitPrice": 27900,
     "topBadges": [
       "무상철거및재설치",
@@ -17787,16 +18219,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 82900
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         },
         "60_12_006": {
-          "monthlyPrice": 83900
+          "monthlyPrice": 89900,
+          "originalPrice": 89900
         },
         "72_12_003": {
-          "monthlyPrice": 69900
+          "monthlyPrice": 75900,
+          "originalPrice": 75900
         },
         "72_12_006": {
-          "monthlyPrice": 70900
+          "monthlyPrice": 76900,
+          "originalPrice": 76900
         }
       }
     },
@@ -17837,7 +18273,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 66900,
+    "rentalPrice": 71900,
     "maxBenefitPrice": 23900,
     "topBadges": [
       "무상철거및재설치",
@@ -17907,16 +18343,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 77900
+          "monthlyPrice": 82900,
+          "originalPrice": 82900
         },
         "60_12_006": {
-          "monthlyPrice": 78900
+          "monthlyPrice": 83900,
+          "originalPrice": 83900
         },
         "72_12_003": {
-          "monthlyPrice": 65900
+          "monthlyPrice": 70900,
+          "originalPrice": 70900
         },
         "72_12_006": {
-          "monthlyPrice": 66900
+          "monthlyPrice": 71900,
+          "originalPrice": 71900
         }
       }
     },
@@ -17957,7 +18397,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 62900,
+    "rentalPrice": 67900,
     "maxBenefitPrice": 19900,
     "topBadges": [
       "무상철거및재설치",
@@ -18027,16 +18467,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 72900
+          "monthlyPrice": 77900,
+          "originalPrice": 77900
         },
         "60_12_006": {
-          "monthlyPrice": 73900
+          "monthlyPrice": 78900,
+          "originalPrice": 78900
         },
         "72_12_003": {
-          "monthlyPrice": 61900
+          "monthlyPrice": 66900,
+          "originalPrice": 66900
         },
         "72_12_006": {
-          "monthlyPrice": 62900
+          "monthlyPrice": 67900,
+          "originalPrice": 67900
         }
       }
     },
@@ -18147,16 +18591,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 76900
+          "monthlyPrice": 76900,
+          "originalPrice": 76900
         },
         "60_12_006": {
-          "monthlyPrice": 77900
+          "monthlyPrice": 77900,
+          "originalPrice": 77900
         },
         "72_12_003": {
-          "monthlyPrice": 65900
+          "monthlyPrice": 65900,
+          "originalPrice": 65900
         },
         "72_12_006": {
-          "monthlyPrice": 66900
+          "monthlyPrice": 66900,
+          "originalPrice": 66900
         }
       }
     },
@@ -18267,16 +18715,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 65900
+          "monthlyPrice": 65900,
+          "originalPrice": 65900
         },
         "60_12_006": {
-          "monthlyPrice": 66900
+          "monthlyPrice": 66900,
+          "originalPrice": 66900
         },
         "72_12_003": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_12_006": {
-          "monthlyPrice": 57900
+          "monthlyPrice": 57900,
+          "originalPrice": 57900
         }
       }
     },
@@ -18381,10 +18833,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_30_003": {
-          "monthlyPrice": 76900
+          "monthlyPrice": 76900,
+          "originalPrice": 76900
         },
         "72_30_003": {
-          "monthlyPrice": 65900
+          "monthlyPrice": 65900,
+          "originalPrice": 65900
         }
       }
     },
@@ -18446,7 +18900,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 46500,
+    "rentalPrice": 47900,
     "maxBenefitPrice": 3900,
     "topBadges": [
       "무상철거및재설치",
@@ -18515,16 +18969,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 51500
+          "monthlyPrice": 52900,
+          "originalPrice": 52900
         },
         "60_06_003": {
-          "monthlyPrice": 53500
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "72_12_003": {
-          "monthlyPrice": 44500
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         },
         "72_06_003": {
-          "monthlyPrice": 46500
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         }
       }
     },
@@ -18557,7 +19015,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 36000,
+    "rentalPrice": 44900,
     "maxBenefitPrice": 18700,
     "topBadges": [
       "무상철거및재설치",
@@ -18626,16 +19084,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 40000
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         },
         "60_06_003": {
-          "monthlyPrice": 42000
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         },
         "72_12_003": {
-          "monthlyPrice": 34000
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_06_003": {
-          "monthlyPrice": 36000
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         }
       }
     },
@@ -18653,7 +19115,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 34900,
+    "rentalPrice": 38900,
     "maxBenefitPrice": 18095,
     "topBadges": [
       "무상철거및재설치",
@@ -18722,16 +19184,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 38900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "60_06_003": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         },
         "72_12_003": {
-          "monthlyPrice": 32900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_06_003": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         }
       }
     },
@@ -18749,7 +19215,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 38600,
+    "rentalPrice": 43900,
     "maxBenefitPrice": 20130,
     "topBadges": [
       "무상철거및재설치",
@@ -18818,16 +19284,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 46200,
+          "originalPrice": 46200
         },
         "60_06_003": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 48200,
+          "originalPrice": 48200
         },
         "72_12_003": {
-          "monthlyPrice": 36600
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_06_003": {
-          "monthlyPrice": 38600
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         }
       }
     },
@@ -18845,7 +19315,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 46500,
+    "rentalPrice": 47900,
     "maxBenefitPrice": 3900,
     "topBadges": [
       "무상철거및재설치",
@@ -18914,16 +19384,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 51500
+          "monthlyPrice": 52900,
+          "originalPrice": 52900
         },
         "60_06_003": {
-          "monthlyPrice": 53500
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "72_12_003": {
-          "monthlyPrice": 44500
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         },
         "72_06_003": {
-          "monthlyPrice": 46500
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         }
       }
     },
@@ -18956,7 +19430,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 40900,
+    "rentalPrice": 45900,
     "maxBenefitPrice": 21395,
     "topBadges": [
       "무상철거및재설치",
@@ -19025,16 +19499,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 44900
+          "monthlyPrice": 49900,
+          "originalPrice": 49900
         },
         "60_06_003": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         },
         "72_12_003": {
-          "monthlyPrice": 38900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         },
         "72_06_003": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         }
       }
     },
@@ -19121,16 +19599,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 52900
+          "monthlyPrice": 52900,
+          "originalPrice": 52900
         },
         "60_06_003": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "72_12_003": {
-          "monthlyPrice": 45900
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         },
         "72_06_003": {
-          "monthlyPrice": 47900
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         }
       }
     },
@@ -19148,7 +19630,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 41400,
+    "rentalPrice": 41900,
     "maxBenefitPrice": 21945,
     "topBadges": [
       "무상철거및재설치",
@@ -19217,16 +19699,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 45400
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         },
         "60_06_003": {
-          "monthlyPrice": 47400
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         },
         "72_12_003": {
-          "monthlyPrice": 39400
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "72_06_003": {
-          "monthlyPrice": 41400
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         }
       }
     },
@@ -19244,7 +19730,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 30400,
+    "rentalPrice": 32900,
     "maxBenefitPrice": 15620,
     "topBadges": [
       "무상철거및재설치",
@@ -19313,16 +19799,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 33400
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "60_06_003": {
-          "monthlyPrice": 35400
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_12_003": {
-          "monthlyPrice": 28400
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "72_06_003": {
-          "monthlyPrice": 30400
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         }
       }
     },
@@ -19409,16 +19899,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "60_06_003": {
-          "monthlyPrice": 44900
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         },
         "72_12_003": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_06_003": {
-          "monthlyPrice": 38900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         }
       }
     },
@@ -19436,7 +19930,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 41000,
+    "rentalPrice": 44900,
     "maxBenefitPrice": 21450,
     "topBadges": [
       "무상철거및재설치",
@@ -19505,16 +19999,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 45000
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         },
         "60_06_003": {
-          "monthlyPrice": 47000
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         },
         "72_12_003": {
-          "monthlyPrice": 39000
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_06_003": {
-          "monthlyPrice": 41000
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         }
       }
     },
@@ -19532,7 +20030,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 40700,
+    "rentalPrice": 43900,
     "maxBenefitPrice": 21285,
     "topBadges": [
       "무상철거및재설치",
@@ -19601,16 +20099,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 43000
+          "monthlyPrice": 46200,
+          "originalPrice": 46200
         },
         "60_06_003": {
-          "monthlyPrice": 45000
+          "monthlyPrice": 48200,
+          "originalPrice": 48200
         },
         "72_12_003": {
-          "monthlyPrice": 38700
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_06_003": {
-          "monthlyPrice": 40700
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         }
       }
     },
@@ -19697,16 +20199,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 27200
+          "monthlyPrice": 27200,
+          "originalPrice": 27200
         },
         "60_06_003": {
-          "monthlyPrice": 29200
+          "monthlyPrice": 29200,
+          "originalPrice": 29200
         },
         "72_12_003": {
-          "monthlyPrice": 24000
+          "monthlyPrice": 24000,
+          "originalPrice": 24000
         },
         "72_06_003": {
-          "monthlyPrice": 26000
+          "monthlyPrice": 26000,
+          "originalPrice": 26000
         }
       }
     },
@@ -19724,7 +20230,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 33900,
+    "rentalPrice": 35900,
     "maxBenefitPrice": 17545,
     "topBadges": [
       "무상철거및재설치",
@@ -19793,16 +20299,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         },
         "60_06_003": {
-          "monthlyPrice": 38900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "72_12_003": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_06_003": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         }
       }
     },
@@ -19889,16 +20399,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 44000
+          "monthlyPrice": 44000,
+          "originalPrice": 44000
         },
         "60_06_003": {
-          "monthlyPrice": 45000
+          "monthlyPrice": 45000,
+          "originalPrice": 45000
         },
         "72_12_003": {
-          "monthlyPrice": 38400
+          "monthlyPrice": 38400,
+          "originalPrice": 38400
         },
         "72_06_003": {
-          "monthlyPrice": 39400
+          "monthlyPrice": 39400,
+          "originalPrice": 39400
         }
       }
     },
@@ -19985,16 +20499,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "60_06_003": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         },
         "72_12_003": {
-          "monthlyPrice": 22900
+          "monthlyPrice": 22900,
+          "originalPrice": 22900
         },
         "72_06_003": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         }
       }
     },
@@ -20081,16 +20599,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 38900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         },
         "60_06_003": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "72_12_003": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_06_003": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         }
       }
     },
@@ -20177,16 +20699,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 51900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         },
         "60_06_003": {
-          "monthlyPrice": 53900
+          "monthlyPrice": 53900,
+          "originalPrice": 53900
         },
         "72_12_003": {
-          "monthlyPrice": 45900
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         },
         "72_06_003": {
-          "monthlyPrice": 47900
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         }
       }
     },
@@ -20273,16 +20799,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "60_06_003": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_12_003": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "72_06_003": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         }
       }
     },
@@ -20300,7 +20830,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "kitchen",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 47400,
+    "rentalPrice": 47900,
     "maxBenefitPrice": 3900,
     "topBadges": [
       "무상철거및재설치",
@@ -20370,16 +20900,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 52400
+          "monthlyPrice": 52900,
+          "originalPrice": 52900
         },
         "60_06_003": {
-          "monthlyPrice": 54400
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "72_12_003": {
-          "monthlyPrice": 45400
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         },
         "72_06_003": {
-          "monthlyPrice": 47400
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         }
       }
     },
@@ -26715,7 +27249,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 64900,
+    "rentalPrice": 91900,
     "maxBenefitPrice": 19900,
     "topBadges": [
       "무상철거및재설치",
@@ -26784,16 +27318,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 101900,
+          "originalPrice": 101900
         },
         "60_06_007": {
-          "monthlyPrice": 77900
+          "monthlyPrice": 104900,
+          "originalPrice": 104900
         },
         "72_12_007": {
-          "monthlyPrice": 61900
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         },
         "72_06_007": {
-          "monthlyPrice": 64900
+          "monthlyPrice": 91900,
+          "originalPrice": 91900
         }
       }
     },
@@ -26811,7 +27349,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 59900,
+    "rentalPrice": 84900,
     "maxBenefitPrice": 14900,
     "topBadges": [
       "무상철거및재설치",
@@ -26881,16 +27419,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 68900
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         },
         "60_06_007": {
-          "monthlyPrice": 71900
+          "monthlyPrice": 96900,
+          "originalPrice": 96900
         },
         "72_12_007": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         },
         "72_06_007": {
-          "monthlyPrice": 59900
+          "monthlyPrice": 84900,
+          "originalPrice": 84900
         }
       }
     },
@@ -26908,7 +27450,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 98500,
+    "rentalPrice": 99900,
     "maxBenefitPrice": 57900,
     "topBadges": [
       "무상철거및재설치",
@@ -26974,10 +27516,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 114500
+          "monthlyPrice": 115900,
+          "originalPrice": 115900
         },
         "72_12_007": {
-          "monthlyPrice": 98500
+          "monthlyPrice": 99900,
+          "originalPrice": 99900
         }
       }
     },
@@ -27064,16 +27608,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 113900
+          "monthlyPrice": 113900,
+          "originalPrice": 113900
         },
         "60_06_007": {
-          "monthlyPrice": 116900
+          "monthlyPrice": 116900,
+          "originalPrice": 116900
         },
         "72_12_007": {
-          "monthlyPrice": 97900
+          "monthlyPrice": 97900,
+          "originalPrice": 97900
         },
         "72_06_007": {
-          "monthlyPrice": 100900
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         }
       }
     },
@@ -27178,10 +27726,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 115900
+          "monthlyPrice": 115900,
+          "originalPrice": 115900
         },
         "72_12_007": {
-          "monthlyPrice": 99900
+          "monthlyPrice": 99900,
+          "originalPrice": 99900
         }
       }
     },
@@ -27269,16 +27819,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 80900
+          "monthlyPrice": 80900,
+          "originalPrice": 80900
         },
         "60_06_007": {
-          "monthlyPrice": 83900
+          "monthlyPrice": 83900,
+          "originalPrice": 83900
         },
         "72_12_007": {
-          "monthlyPrice": 70900
+          "monthlyPrice": 70900,
+          "originalPrice": 70900
         },
         "72_06_007": {
-          "monthlyPrice": 73900
+          "monthlyPrice": 73900,
+          "originalPrice": 73900
         }
       }
     },
@@ -27366,16 +27920,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 73900
+          "monthlyPrice": 73900,
+          "originalPrice": 73900
         },
         "60_06_007": {
-          "monthlyPrice": 76900
+          "monthlyPrice": 76900,
+          "originalPrice": 76900
         },
         "72_12_007": {
-          "monthlyPrice": 63900
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         },
         "72_06_007": {
-          "monthlyPrice": 66900
+          "monthlyPrice": 66900,
+          "originalPrice": 66900
         }
       }
     },
@@ -27393,7 +27951,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 51900,
+    "rentalPrice": 55900,
     "maxBenefitPrice": 6900,
     "topBadges": [
       "무상철거및재설치",
@@ -27463,16 +28021,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         },
         "60_06_011": {
-          "monthlyPrice": 58900
+          "monthlyPrice": 62900,
+          "originalPrice": 62900
         },
         "72_12_011": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 52900,
+          "originalPrice": 52900
         },
         "72_06_011": {
-          "monthlyPrice": 51900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         }
       }
     },
@@ -27490,7 +28052,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 85900,
+    "rentalPrice": 92900,
     "maxBenefitPrice": 40900,
     "topBadges": [
       "무상철거및재설치",
@@ -27559,16 +28121,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 96900
+          "monthlyPrice": 103900,
+          "originalPrice": 103900
         },
         "60_06_007": {
-          "monthlyPrice": 99900
+          "monthlyPrice": 106900,
+          "originalPrice": 106900
         },
         "72_12_007": {
-          "monthlyPrice": 82900
+          "monthlyPrice": 89900,
+          "originalPrice": 89900
         },
         "72_06_007": {
-          "monthlyPrice": 85900
+          "monthlyPrice": 92900,
+          "originalPrice": 92900
         }
       }
     },
@@ -27652,10 +28218,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 115900
+          "monthlyPrice": 115900,
+          "originalPrice": 115900
         },
         "72_12_007": {
-          "monthlyPrice": 99900
+          "monthlyPrice": 99900,
+          "originalPrice": 99900
         }
       }
     },
@@ -27673,7 +28241,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 75900,
+    "rentalPrice": 81900,
     "maxBenefitPrice": 30900,
     "topBadges": [
       "무상철거및재설치",
@@ -27742,16 +28310,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 84900
+          "monthlyPrice": 90900,
+          "originalPrice": 90900
         },
         "60_06_007": {
-          "monthlyPrice": 87900
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         },
         "72_12_007": {
-          "monthlyPrice": 72900
+          "monthlyPrice": 78900,
+          "originalPrice": 78900
         },
         "72_06_007": {
-          "monthlyPrice": 75900
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         }
       }
     },
@@ -27769,7 +28341,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 82900,
+    "rentalPrice": 88900,
     "maxBenefitPrice": 37900,
     "topBadges": [
       "무상철거및재설치",
@@ -27838,16 +28410,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 92900
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         },
         "60_06_007": {
-          "monthlyPrice": 95900
+          "monthlyPrice": 101900,
+          "originalPrice": 101900
         },
         "72_12_007": {
-          "monthlyPrice": 79900
+          "monthlyPrice": 85900,
+          "originalPrice": 85900
         },
         "72_06_007": {
-          "monthlyPrice": 82900
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         }
       }
     },
@@ -27934,16 +28510,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 104900
+          "monthlyPrice": 104900,
+          "originalPrice": 104900
         },
         "60_06_007": {
-          "monthlyPrice": 107900
+          "monthlyPrice": 107900,
+          "originalPrice": 107900
         },
         "72_12_007": {
-          "monthlyPrice": 90900
+          "monthlyPrice": 90900,
+          "originalPrice": 90900
         },
         "72_06_007": {
-          "monthlyPrice": 93900
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         }
       }
     },
@@ -27961,7 +28541,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 93900,
+    "rentalPrice": 100900,
     "maxBenefitPrice": 55900,
     "topBadges": [
       "무상철거및재설치",
@@ -28030,16 +28610,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 106900
+          "monthlyPrice": 113900,
+          "originalPrice": 113900
         },
         "60_06_007": {
-          "monthlyPrice": 109900
+          "monthlyPrice": 116900,
+          "originalPrice": 116900
         },
         "72_12_007": {
-          "monthlyPrice": 90900
+          "monthlyPrice": 97900,
+          "originalPrice": 97900
         },
         "72_06_007": {
-          "monthlyPrice": 93900
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         }
       }
     },
@@ -28141,16 +28725,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 113900
+          "monthlyPrice": 113900,
+          "originalPrice": 113900
         },
         "60_06_007": {
-          "monthlyPrice": 116900
+          "monthlyPrice": 116900,
+          "originalPrice": 116900
         },
         "72_12_007": {
-          "monthlyPrice": 97900
+          "monthlyPrice": 97900,
+          "originalPrice": 97900
         },
         "72_06_007": {
-          "monthlyPrice": 100900
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         }
       }
     },
@@ -28252,16 +28840,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 103900
+          "monthlyPrice": 103900,
+          "originalPrice": 103900
         },
         "60_06_007": {
-          "monthlyPrice": 106900
+          "monthlyPrice": 106900,
+          "originalPrice": 106900
         },
         "72_12_007": {
-          "monthlyPrice": 89900
+          "monthlyPrice": 89900,
+          "originalPrice": 89900
         },
         "72_06_007": {
-          "monthlyPrice": 92900
+          "monthlyPrice": 92900,
+          "originalPrice": 92900
         }
       }
     },
@@ -28349,16 +28941,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 64900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         },
         "60_06_011": {
-          "monthlyPrice": 67900
+          "monthlyPrice": 67900,
+          "originalPrice": 67900
         },
         "72_12_011": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         },
         "72_06_011": {
-          "monthlyPrice": 58900
+          "monthlyPrice": 58900,
+          "originalPrice": 58900
         }
       }
     },
@@ -28376,7 +28972,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 54900,
+    "rentalPrice": 58900,
     "maxBenefitPrice": 9900,
     "topBadges": [
       "무상철거및재설치",
@@ -28446,16 +29042,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 60900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         },
         "60_06_011": {
-          "monthlyPrice": 63900
+          "monthlyPrice": 67900,
+          "originalPrice": 67900
         },
         "72_12_011": {
-          "monthlyPrice": 51900
+          "monthlyPrice": 55900,
+          "originalPrice": 55900
         },
         "72_06_011": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 58900,
+          "originalPrice": 58900
         }
       }
     },
@@ -28473,7 +29073,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 75900,
+    "rentalPrice": 81900,
     "maxBenefitPrice": 30900,
     "topBadges": [
       "무상철거및재설치",
@@ -28543,16 +29143,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 84900
+          "monthlyPrice": 90900,
+          "originalPrice": 90900
         },
         "60_06_007": {
-          "monthlyPrice": 87900
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         },
         "72_12_007": {
-          "monthlyPrice": 72900
+          "monthlyPrice": 78900,
+          "originalPrice": 78900
         },
         "72_06_007": {
-          "monthlyPrice": 75900
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         }
       }
     },
@@ -28640,16 +29244,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 77900
+          "monthlyPrice": 77900,
+          "originalPrice": 77900
         },
         "60_06_007": {
-          "monthlyPrice": 80900
+          "monthlyPrice": 80900,
+          "originalPrice": 80900
         },
         "72_12_007": {
-          "monthlyPrice": 67900
+          "monthlyPrice": 67900,
+          "originalPrice": 67900
         },
         "72_06_007": {
-          "monthlyPrice": 70900
+          "monthlyPrice": 70900,
+          "originalPrice": 70900
         }
       }
     },
@@ -28737,16 +29345,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 74900,
+          "originalPrice": 74900
         },
         "60_06_007": {
-          "monthlyPrice": 77900
+          "monthlyPrice": 77900,
+          "originalPrice": 77900
         },
         "72_12_007": {
-          "monthlyPrice": 64900
+          "monthlyPrice": 64900,
+          "originalPrice": 64900
         },
         "72_06_007": {
-          "monthlyPrice": 67900
+          "monthlyPrice": 67900,
+          "originalPrice": 67900
         }
       }
     },
@@ -28834,16 +29446,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 88900
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         },
         "60_06_007": {
-          "monthlyPrice": 91900
+          "monthlyPrice": 91900,
+          "originalPrice": 91900
         },
         "72_12_007": {
-          "monthlyPrice": 76900
+          "monthlyPrice": 76900,
+          "originalPrice": 76900
         },
         "72_06_007": {
-          "monthlyPrice": 79900
+          "monthlyPrice": 79900,
+          "originalPrice": 79900
         }
       }
     },
@@ -28931,16 +29547,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 73900
+          "monthlyPrice": 73900,
+          "originalPrice": 73900
         },
         "60_06_007": {
-          "monthlyPrice": 76900
+          "monthlyPrice": 76900,
+          "originalPrice": 76900
         },
         "72_12_007": {
-          "monthlyPrice": 63900
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         },
         "72_06_007": {
-          "monthlyPrice": 66900
+          "monthlyPrice": 66900,
+          "originalPrice": 66900
         }
       }
     },
@@ -29024,10 +29644,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 117900
+          "monthlyPrice": 117900,
+          "originalPrice": 117900
         },
         "72_12_007": {
-          "monthlyPrice": 101900
+          "monthlyPrice": 101900,
+          "originalPrice": 101900
         }
       }
     },
@@ -29111,10 +29733,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 115900
+          "monthlyPrice": 115900,
+          "originalPrice": 115900
         },
         "72_12_007": {
-          "monthlyPrice": 99900
+          "monthlyPrice": 99900,
+          "originalPrice": 99900
         }
       }
     },
@@ -29198,10 +29822,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 117900
+          "monthlyPrice": 117900,
+          "originalPrice": 117900
         },
         "72_12_007": {
-          "monthlyPrice": 101900
+          "monthlyPrice": 101900,
+          "originalPrice": 101900
         }
       }
     },
@@ -29219,7 +29845,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 74900,
+    "rentalPrice": 81900,
     "maxBenefitPrice": 29900,
     "topBadges": [
       "무상철거및재설치",
@@ -29289,16 +29915,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 83900
+          "monthlyPrice": 90900,
+          "originalPrice": 90900
         },
         "60_06_007": {
-          "monthlyPrice": 86900
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         },
         "72_12_007": {
-          "monthlyPrice": 71900
+          "monthlyPrice": 78900,
+          "originalPrice": 78900
         },
         "72_06_007": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         }
       }
     },
@@ -29316,7 +29946,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "BEST",
-    "rentalPrice": 75900,
+    "rentalPrice": 82900,
     "maxBenefitPrice": 30900,
     "topBadges": [
       "무상철거및재설치",
@@ -29386,16 +30016,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 84900
+          "monthlyPrice": 91900,
+          "originalPrice": 91900
         },
         "60_06_007": {
-          "monthlyPrice": 87900
+          "monthlyPrice": 94900,
+          "originalPrice": 94900
         },
         "72_12_007": {
-          "monthlyPrice": 72900
+          "monthlyPrice": 79900,
+          "originalPrice": 79900
         },
         "72_06_007": {
-          "monthlyPrice": 75900
+          "monthlyPrice": 82900,
+          "originalPrice": 82900
         }
       }
     },
@@ -29580,16 +30214,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 66900
+          "monthlyPrice": 66900,
+          "originalPrice": 66900
         },
         "60_06_011": {
-          "monthlyPrice": 69900
+          "monthlyPrice": 69900,
+          "originalPrice": 69900
         },
         "72_12_011": {
-          "monthlyPrice": 57900
+          "monthlyPrice": 57900,
+          "originalPrice": 57900
         },
         "72_06_011": {
-          "monthlyPrice": 60900
+          "monthlyPrice": 60900,
+          "originalPrice": 60900
         }
       }
     },
@@ -29607,7 +30245,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 109700,
+    "rentalPrice": 113900,
     "maxBenefitPrice": 67700,
     "topBadges": [
       "무상철거및재설치",
@@ -29673,10 +30311,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 130400
+          "monthlyPrice": 134600,
+          "originalPrice": 134600
         },
         "72_12_007": {
-          "monthlyPrice": 109700
+          "monthlyPrice": 113900,
+          "originalPrice": 113900
         }
       }
     },
@@ -29760,10 +30400,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 116900
+          "monthlyPrice": 116900,
+          "originalPrice": 116900
         },
         "72_12_007": {
-          "monthlyPrice": 100900
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         }
       }
     },
@@ -29781,7 +30423,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 83700,
+    "rentalPrice": 89900,
     "maxBenefitPrice": 44900,
     "topBadges": [
       "무상철거및재설치",
@@ -29851,16 +30493,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 94700
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         },
         "60_06_007": {
-          "monthlyPrice": 97700
+          "monthlyPrice": 103900,
+          "originalPrice": 103900
         },
         "72_12_007": {
-          "monthlyPrice": 80700
+          "monthlyPrice": 86900,
+          "originalPrice": 86900
         },
         "72_06_007": {
-          "monthlyPrice": 83700
+          "monthlyPrice": 89900,
+          "originalPrice": 89900
         }
       }
     },
@@ -29893,7 +30539,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 74900,
+    "rentalPrice": 88900,
     "maxBenefitPrice": 29900,
     "topBadges": [
       "무상철거및재설치",
@@ -29963,16 +30609,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 84900
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         },
         "60_06_007": {
-          "monthlyPrice": 87900
+          "monthlyPrice": 101900,
+          "originalPrice": 101900
         },
         "72_12_007": {
-          "monthlyPrice": 71900
+          "monthlyPrice": 85900,
+          "originalPrice": 85900
         },
         "72_06_007": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         }
       }
     },
@@ -29990,7 +30640,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 65900,
+    "rentalPrice": 79900,
     "maxBenefitPrice": 20900,
     "topBadges": [
       "무상철거및재설치",
@@ -30060,16 +30710,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 74900
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         },
         "60_06_007": {
-          "monthlyPrice": 77900
+          "monthlyPrice": 91900,
+          "originalPrice": 91900
         },
         "72_12_007": {
-          "monthlyPrice": 62900
+          "monthlyPrice": 76900,
+          "originalPrice": 76900
         },
         "72_06_007": {
-          "monthlyPrice": 65900
+          "monthlyPrice": 79900,
+          "originalPrice": 79900
         }
       }
     },
@@ -30087,7 +30741,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 82700,
+    "rentalPrice": 85900,
     "maxBenefitPrice": 40900,
     "topBadges": [
       "무상철거및재설치",
@@ -30157,16 +30811,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 92700
+          "monthlyPrice": 95900,
+          "originalPrice": 95900
         },
         "60_06_007": {
-          "monthlyPrice": 95700
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         },
         "72_12_007": {
-          "monthlyPrice": 79700
+          "monthlyPrice": 82900,
+          "originalPrice": 82900
         },
         "72_06_007": {
-          "monthlyPrice": 82700
+          "monthlyPrice": 85900,
+          "originalPrice": 85900
         }
       }
     },
@@ -30184,7 +30842,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 78700,
+    "rentalPrice": 81900,
     "maxBenefitPrice": 40900,
     "topBadges": [
       "무상철거및재설치",
@@ -30254,16 +30912,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 88700
+          "monthlyPrice": 91900,
+          "originalPrice": 91900
         },
         "60_06_007": {
-          "monthlyPrice": 91700
+          "monthlyPrice": 94900,
+          "originalPrice": 94900
         },
         "72_12_007": {
-          "monthlyPrice": 75700
+          "monthlyPrice": 78900,
+          "originalPrice": 78900
         },
         "72_06_007": {
-          "monthlyPrice": 78700
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         }
       }
     },
@@ -30377,7 +31039,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 106800,
+    "rentalPrice": 111000,
     "maxBenefitPrice": 64800,
     "topBadges": [
       "무상철거및재설치",
@@ -30442,10 +31104,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 127600
+          "monthlyPrice": 131800,
+          "originalPrice": 131800
         },
         "72_12_007": {
-          "monthlyPrice": 106800
+          "monthlyPrice": 111000,
+          "originalPrice": 111000
         }
       }
     },
@@ -30528,10 +31192,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 114900
+          "monthlyPrice": 114900,
+          "originalPrice": 114900
         },
         "72_12_007": {
-          "monthlyPrice": 98900
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         }
       }
     },
@@ -30615,10 +31281,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 122100
+          "monthlyPrice": 122100,
+          "originalPrice": 122100
         },
         "72_12_007": {
-          "monthlyPrice": 103400
+          "monthlyPrice": 103400,
+          "originalPrice": 103400
         }
       }
     },
@@ -30636,7 +31304,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 90100,
+    "rentalPrice": 100500,
     "maxBenefitPrice": 50400,
     "topBadges": [
       "무상철거및재설치",
@@ -30705,16 +31373,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 104300
+          "monthlyPrice": 114700,
+          "originalPrice": 114700
         },
         "60_06_007": {
-          "monthlyPrice": 108200
+          "monthlyPrice": 118600,
+          "originalPrice": 118600
         },
         "72_12_007": {
-          "monthlyPrice": 86200
+          "monthlyPrice": 96600,
+          "originalPrice": 96600
         },
         "72_06_007": {
-          "monthlyPrice": 90100
+          "monthlyPrice": 100500,
+          "originalPrice": 100500
         }
       }
     },
@@ -30747,7 +31419,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 109700,
+    "rentalPrice": 113900,
     "maxBenefitPrice": 67700,
     "topBadges": [
       "무상철거및재설치",
@@ -30812,10 +31484,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 130400
+          "monthlyPrice": 134600,
+          "originalPrice": 134600
         },
         "72_12_007": {
-          "monthlyPrice": 109700
+          "monthlyPrice": 113900,
+          "originalPrice": 113900
         }
       }
     },
@@ -30898,10 +31572,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 116900
+          "monthlyPrice": 116900,
+          "originalPrice": 116900
         },
         "72_12_007": {
-          "monthlyPrice": 100900
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         }
       }
     },
@@ -30988,16 +31664,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 97900
+          "monthlyPrice": 97900,
+          "originalPrice": 97900
         },
         "60_06_007": {
-          "monthlyPrice": 100900
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         },
         "72_12_007": {
-          "monthlyPrice": 84900
+          "monthlyPrice": 84900,
+          "originalPrice": 84900
         },
         "72_06_007": {
-          "monthlyPrice": 87900
+          "monthlyPrice": 87900,
+          "originalPrice": 87900
         }
       }
     },
@@ -31111,7 +31791,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 87700,
+    "rentalPrice": 93900,
     "maxBenefitPrice": 50400,
     "topBadges": [
       "무상철거및재설치",
@@ -31180,16 +31860,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 98700
+          "monthlyPrice": 104900,
+          "originalPrice": 104900
         },
         "60_06_007": {
-          "monthlyPrice": 101700
+          "monthlyPrice": 107900,
+          "originalPrice": 107900
         },
         "72_12_007": {
-          "monthlyPrice": 84700
+          "monthlyPrice": 90900,
+          "originalPrice": 90900
         },
         "72_06_007": {
-          "monthlyPrice": 87700
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         }
       }
     },
@@ -31207,7 +31891,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 47900,
+    "rentalPrice": 51900,
     "maxBenefitPrice": 3900,
     "topBadges": [
       "무상철거및재설치",
@@ -31276,16 +31960,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 53900
+          "monthlyPrice": 57900,
+          "originalPrice": 57900
         },
         "60_06_011": {
-          "monthlyPrice": 55900
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         },
         "72_12_011": {
-          "monthlyPrice": 45900
+          "monthlyPrice": 49900,
+          "originalPrice": 49900
         },
         "72_06_011": {
-          "monthlyPrice": 47900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         }
       }
     },
@@ -31303,7 +31991,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 85400,
+    "rentalPrice": 92800,
     "maxBenefitPrice": 42800,
     "topBadges": [
       "무상철거및재설치",
@@ -31372,16 +32060,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 98600
+          "monthlyPrice": 106000,
+          "originalPrice": 106000
         },
         "60_06_007": {
-          "monthlyPrice": 102400
+          "monthlyPrice": 109800,
+          "originalPrice": 109800
         },
         "72_12_007": {
-          "monthlyPrice": 81600
+          "monthlyPrice": 89000,
+          "originalPrice": 89000
         },
         "72_06_007": {
-          "monthlyPrice": 85400
+          "monthlyPrice": 92800,
+          "originalPrice": 92800
         }
       }
     },
@@ -31399,7 +32091,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 86600,
+    "rentalPrice": 90800,
     "maxBenefitPrice": 40900,
     "topBadges": [
       "무상철거및재설치",
@@ -31468,16 +32160,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 98900
+          "monthlyPrice": 103100,
+          "originalPrice": 103100
         },
         "60_06_007": {
-          "monthlyPrice": 102600
+          "monthlyPrice": 106800,
+          "originalPrice": 106800
         },
         "72_12_007": {
-          "monthlyPrice": 82900
+          "monthlyPrice": 87100,
+          "originalPrice": 87100
         },
         "72_06_007": {
-          "monthlyPrice": 86600
+          "monthlyPrice": 90800,
+          "originalPrice": 90800
         }
       }
     },
@@ -31561,10 +32257,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_007": {
-          "monthlyPrice": 114900
+          "monthlyPrice": 114900,
+          "originalPrice": 114900
         },
         "72_12_007": {
-          "monthlyPrice": 98900
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         }
       }
     },
@@ -31582,7 +32280,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "HOT",
-    "rentalPrice": 59500,
+    "rentalPrice": 63500,
     "maxBenefitPrice": 15500,
     "topBadges": [
       "무상철거및재설치",
@@ -31651,16 +32349,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 69000
+          "monthlyPrice": 73000,
+          "originalPrice": 73000
         },
         "60_06_011": {
-          "monthlyPrice": 71000
+          "monthlyPrice": 75000,
+          "originalPrice": 75000
         },
         "72_12_011": {
-          "monthlyPrice": 57500
+          "monthlyPrice": 61500,
+          "originalPrice": 61500
         },
         "72_06_011": {
-          "monthlyPrice": 59500
+          "monthlyPrice": 63500,
+          "originalPrice": 63500
         }
       }
     },
@@ -31678,7 +32380,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 33900,
+    "rentalPrice": 43900,
     "maxBenefitPrice": 17545,
     "topBadges": [
       "무상철거및재설치",
@@ -31746,16 +32448,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 38900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         },
         "60_06_011": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         },
         "72_12_011": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_06_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         }
       }
     },
@@ -31773,7 +32479,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 23900,
+    "rentalPrice": 28900,
     "maxBenefitPrice": 12045,
     "topBadges": [
       "무상철거및재설치",
@@ -31841,16 +32547,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "60_06_011": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         },
         "72_12_011": {
-          "monthlyPrice": 21900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "72_06_011": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         }
       }
     },
@@ -31868,7 +32578,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 35900,
+    "rentalPrice": 38900,
     "maxBenefitPrice": 18645,
     "topBadges": [
       "무상철거및재설치",
@@ -31936,16 +32646,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "60_06_011": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         },
         "72_12_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_06_011": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         }
       }
     },
@@ -32031,16 +32745,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "60_06_011": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_12_011": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "72_06_011": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         }
       }
     },
@@ -32126,16 +32844,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "60_06_011": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_12_011": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "72_06_011": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         }
       }
     },
@@ -32221,16 +32943,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "60_06_011": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_12_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_06_011": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         }
       }
     },
@@ -32316,16 +33042,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "60_06_011": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_12_011": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "72_06_011": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         }
       }
     },
@@ -32411,16 +33141,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "60_06_011": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_12_011": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_06_011": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         }
       }
     },
@@ -32506,16 +33240,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "60_06_011": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_12_011": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "72_06_011": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         }
       }
     },
@@ -32533,7 +33271,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 33900,
+    "rentalPrice": 36900,
     "maxBenefitPrice": 17545,
     "topBadges": [
       "무상철거및재설치",
@@ -32601,16 +33339,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "60_06_011": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_12_011": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_06_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         }
       }
     },
@@ -32723,16 +33465,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "60_06_011": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_12_011": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "72_06_011": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         }
       }
     },
@@ -32750,7 +33496,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 33900,
+    "rentalPrice": 35900,
     "maxBenefitPrice": 17545,
     "topBadges": [
       "무상철거및재설치",
@@ -32818,16 +33564,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "60_06_011": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_12_011": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_06_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         }
       }
     },
@@ -32913,16 +33663,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "60_06_011": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_12_011": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "72_06_011": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         }
       }
     },
@@ -33008,16 +33762,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "60_06_011": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_12_011": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         },
         "72_06_011": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         }
       }
     },
@@ -33103,16 +33861,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 54900
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "60_06_011": {
-          "monthlyPrice": 56900
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_12_011": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "72_06_011": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         }
       }
     },
@@ -33198,16 +33960,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 46900,
+          "originalPrice": 46900
         },
         "60_06_011": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         },
         "72_12_011": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "72_06_011": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         }
       }
     },
@@ -33293,16 +34059,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "60_06_011": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_12_011": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_06_011": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         }
       }
     },
@@ -33320,7 +34090,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 35900,
+    "rentalPrice": 38900,
     "maxBenefitPrice": 18645,
     "topBadges": [
       "무상철거및재설치",
@@ -33388,16 +34158,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "60_06_011": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         },
         "72_12_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_06_011": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         }
       }
     },
@@ -33497,16 +34271,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "60_06_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_12_011": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         },
         "72_06_011": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         }
       }
     },
@@ -33524,7 +34302,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 33900,
+    "rentalPrice": 43900,
     "maxBenefitPrice": 17545,
     "topBadges": [
       "무상철거및재설치",
@@ -33592,16 +34370,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 38900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         },
         "60_06_011": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         },
         "72_12_011": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_06_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         }
       }
     },
@@ -33687,16 +34469,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "60_06_011": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_12_011": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "72_06_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         }
       }
     },
@@ -33802,16 +34588,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "60_06_011": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_12_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_06_011": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         }
       }
     },
@@ -33897,16 +34687,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "60_06_011": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_12_011": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "72_06_011": {
-          "monthlyPrice": 32900
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         }
       }
     },
@@ -33992,16 +34786,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "60_06_011": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_12_011": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "72_06_011": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         }
       }
     },
@@ -34019,7 +34817,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 30900,
+    "rentalPrice": 33900,
     "maxBenefitPrice": 15895,
     "topBadges": [
       "무상철거및재설치",
@@ -34087,16 +34885,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "60_06_011": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         },
         "72_12_011": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "72_06_011": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         }
       }
     },
@@ -34182,16 +34984,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "60_06_011": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_12_011": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_06_011": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         }
       }
     },
@@ -34224,7 +35030,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 33900,
+    "rentalPrice": 36900,
     "maxBenefitPrice": 17545,
     "topBadges": [
       "무상철거및재설치",
@@ -34293,16 +35099,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_011": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "60_06_011": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "72_12_011": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_06_011": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         }
       }
     },
@@ -37006,16 +37816,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 80900
+          "monthlyPrice": 80900,
+          "originalPrice": 80900
         },
         "60_12_007": {
-          "monthlyPrice": 69900
+          "monthlyPrice": 69900,
+          "originalPrice": 69900
         },
         "72_12_006": {
-          "monthlyPrice": 71900
+          "monthlyPrice": 71900,
+          "originalPrice": 71900
         },
         "72_12_007": {
-          "monthlyPrice": 60900
+          "monthlyPrice": 60900,
+          "originalPrice": 60900
         }
       }
     },
@@ -37192,16 +38006,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 111900
+          "monthlyPrice": 111900,
+          "originalPrice": 111900
         },
         "60_12_007": {
-          "monthlyPrice": 93900
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         },
         "72_12_006": {
-          "monthlyPrice": 98900
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         },
         "72_12_007": {
-          "monthlyPrice": 80900
+          "monthlyPrice": 80900,
+          "originalPrice": 80900
         }
       }
     },
@@ -37219,7 +38037,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 103000,
+    "rentalPrice": 104900,
     "maxBenefitPrice": 61500,
     "topBadges": [
       "무상철거및재설치",
@@ -37291,16 +38109,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 134000
+          "monthlyPrice": 135900,
+          "originalPrice": 135900
         },
         "60_12_007": {
-          "monthlyPrice": 118000
+          "monthlyPrice": 119900,
+          "originalPrice": 119900
         },
         "72_12_006": {
-          "monthlyPrice": 119000
+          "monthlyPrice": 120900,
+          "originalPrice": 120900
         },
         "72_12_007": {
-          "monthlyPrice": 103000
+          "monthlyPrice": 104900,
+          "originalPrice": 104900
         }
       }
     },
@@ -37318,7 +38140,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 124800,
+    "rentalPrice": 126900,
     "maxBenefitPrice": 83500,
     "topBadges": [
       "무상철거및재설치",
@@ -37390,16 +38212,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 157800
+          "monthlyPrice": 159900,
+          "originalPrice": 159900
         },
         "60_12_007": {
-          "monthlyPrice": 143800
+          "monthlyPrice": 145900,
+          "originalPrice": 145900
         },
         "72_12_006": {
-          "monthlyPrice": 138800
+          "monthlyPrice": 140900,
+          "originalPrice": 140900
         },
         "72_12_007": {
-          "monthlyPrice": 124800
+          "monthlyPrice": 126900,
+          "originalPrice": 126900
         }
       }
     },
@@ -37503,7 +38329,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 68600,
+    "rentalPrice": 80900,
     "maxBenefitPrice": 26600,
     "topBadges": [
       "무상철거및재설치",
@@ -37575,16 +38401,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 98600
+          "monthlyPrice": 110900,
+          "originalPrice": 110900
         },
         "60_12_007": {
-          "monthlyPrice": 80600
+          "monthlyPrice": 92900,
+          "originalPrice": 92900
         },
         "72_12_006": {
-          "monthlyPrice": 86600
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         },
         "72_12_007": {
-          "monthlyPrice": 68600
+          "monthlyPrice": 80900,
+          "originalPrice": 80900
         }
       }
     },
@@ -37602,7 +38432,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 102100,
+    "rentalPrice": 104900,
     "maxBenefitPrice": 61500,
     "topBadges": [
       "무상철거및재설치",
@@ -37674,16 +38504,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 133100
+          "monthlyPrice": 135900,
+          "originalPrice": 135900
         },
         "60_12_007": {
-          "monthlyPrice": 117100
+          "monthlyPrice": 119900,
+          "originalPrice": 119900
         },
         "72_12_006": {
-          "monthlyPrice": 118100
+          "monthlyPrice": 120900,
+          "originalPrice": 120900
         },
         "72_12_007": {
-          "monthlyPrice": 102100
+          "monthlyPrice": 104900,
+          "originalPrice": 104900
         }
       }
     },
@@ -37701,7 +38535,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 25200,
+    "rentalPrice": 27900,
     "maxBenefitPrice": 13860,
     "topBadges": [
       "무상철거및재설치",
@@ -37772,16 +38606,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 36200
+          "monthlyPrice": 38900,
+          "originalPrice": 38900
         },
         "60_12_007": {
-          "monthlyPrice": 28200
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "72_12_006": {
-          "monthlyPrice": 33200
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "72_12_007": {
-          "monthlyPrice": 25200
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         }
       }
     },
@@ -37799,7 +38637,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 56500,
+    "rentalPrice": 61900,
     "maxBenefitPrice": 14500,
     "topBadges": [
       "무상철거및재설치",
@@ -37871,16 +38709,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 83500
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         },
         "60_12_007": {
-          "monthlyPrice": 65500
+          "monthlyPrice": 70900,
+          "originalPrice": 70900
         },
         "72_12_006": {
-          "monthlyPrice": 74500
+          "monthlyPrice": 79900,
+          "originalPrice": 79900
         },
         "72_12_007": {
-          "monthlyPrice": 56500
+          "monthlyPrice": 61900,
+          "originalPrice": 61900
         }
       }
     },
@@ -37898,7 +38740,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 109200,
+    "rentalPrice": 109900,
     "maxBenefitPrice": 67200,
     "topBadges": [
       "무상철거및재설치",
@@ -37970,16 +38812,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 132200
+          "monthlyPrice": 132900,
+          "originalPrice": 132900
         },
         "60_12_007": {
-          "monthlyPrice": 125200
+          "monthlyPrice": 125900,
+          "originalPrice": 125900
         },
         "72_12_006": {
-          "monthlyPrice": 116200
+          "monthlyPrice": 116900,
+          "originalPrice": 116900
         },
         "72_12_007": {
-          "monthlyPrice": 109200
+          "monthlyPrice": 109900,
+          "originalPrice": 109900
         }
       }
     },
@@ -38154,16 +39000,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 89900
+          "monthlyPrice": 89900,
+          "originalPrice": 89900
         },
         "60_12_007": {
-          "monthlyPrice": 78900
+          "monthlyPrice": 78900,
+          "originalPrice": 78900
         },
         "72_12_006": {
-          "monthlyPrice": 79900
+          "monthlyPrice": 79900,
+          "originalPrice": 79900
         },
         "72_12_007": {
-          "monthlyPrice": 68900
+          "monthlyPrice": 68900,
+          "originalPrice": 68900
         }
       }
     },
@@ -38268,7 +39118,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 64000,
+    "rentalPrice": 70900,
     "maxBenefitPrice": 22000,
     "topBadges": [
       "무상철거및재설치",
@@ -38340,16 +39190,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 93000
+          "monthlyPrice": 99900,
+          "originalPrice": 99900
         },
         "60_12_007": {
-          "monthlyPrice": 75000
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         },
         "72_12_006": {
-          "monthlyPrice": 82000
+          "monthlyPrice": 88900,
+          "originalPrice": 88900
         },
         "72_12_007": {
-          "monthlyPrice": 64000
+          "monthlyPrice": 70900,
+          "originalPrice": 70900
         }
       }
     },
@@ -38367,7 +39221,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 77400,
+    "rentalPrice": 80900,
     "maxBenefitPrice": 37500,
     "topBadges": [
       "무상철거및재설치",
@@ -38439,16 +39293,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 107400
+          "monthlyPrice": 110900,
+          "originalPrice": 110900
         },
         "60_12_007": {
-          "monthlyPrice": 89400
+          "monthlyPrice": 92900,
+          "originalPrice": 92900
         },
         "72_12_006": {
-          "monthlyPrice": 95400
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         },
         "72_12_007": {
-          "monthlyPrice": 77400
+          "monthlyPrice": 80900,
+          "originalPrice": 80900
         }
       }
     },
@@ -38538,16 +39396,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 101900
+          "monthlyPrice": 101900,
+          "originalPrice": 101900
         },
         "60_12_007": {
-          "monthlyPrice": 83900
+          "monthlyPrice": 83900,
+          "originalPrice": 83900
         },
         "72_12_006": {
-          "monthlyPrice": 90900
+          "monthlyPrice": 90900,
+          "originalPrice": 90900
         },
         "72_12_007": {
-          "monthlyPrice": 72900
+          "monthlyPrice": 72900,
+          "originalPrice": 72900
         }
       }
     },
@@ -38565,7 +39427,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 73200,
+    "rentalPrice": 73900,
     "maxBenefitPrice": 31900,
     "topBadges": [
       "무상철거및재설치",
@@ -38637,16 +39499,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 102200
+          "monthlyPrice": 102900,
+          "originalPrice": 102900
         },
         "60_12_007": {
-          "monthlyPrice": 84200
+          "monthlyPrice": 84900,
+          "originalPrice": 84900
         },
         "72_12_006": {
-          "monthlyPrice": 91200
+          "monthlyPrice": 91900,
+          "originalPrice": 91900
         },
         "72_12_007": {
-          "monthlyPrice": 73200
+          "monthlyPrice": 73900,
+          "originalPrice": 73900
         }
       }
     },
@@ -38736,16 +39602,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 90900
+          "monthlyPrice": 90900,
+          "originalPrice": 90900
         },
         "60_12_007": {
-          "monthlyPrice": 72900
+          "monthlyPrice": 72900,
+          "originalPrice": 72900
         },
         "72_12_006": {
-          "monthlyPrice": 81900
+          "monthlyPrice": 81900,
+          "originalPrice": 81900
         },
         "72_12_007": {
-          "monthlyPrice": 63900
+          "monthlyPrice": 63900,
+          "originalPrice": 63900
         }
       }
     },
@@ -38937,7 +39807,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 139800,
+    "rentalPrice": 141900,
     "maxBenefitPrice": 98500,
     "topBadges": [
       "무상철거및재설치",
@@ -39009,16 +39879,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 174800
+          "monthlyPrice": 176900,
+          "originalPrice": 176900
         },
         "60_12_007": {
-          "monthlyPrice": 160800
+          "monthlyPrice": 162900,
+          "originalPrice": 162900
         },
         "72_12_006": {
-          "monthlyPrice": 153800
+          "monthlyPrice": 155900,
+          "originalPrice": 155900
         },
         "72_12_007": {
-          "monthlyPrice": 139800
+          "monthlyPrice": 141900,
+          "originalPrice": 141900
         }
       }
     },
@@ -39123,7 +39997,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 99500,
+    "rentalPrice": 100900,
     "maxBenefitPrice": 57500,
     "topBadges": [
       "무상철거및재설치",
@@ -39195,16 +40069,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 132500
+          "monthlyPrice": 133900,
+          "originalPrice": 133900
         },
         "60_12_007": {
-          "monthlyPrice": 115500
+          "monthlyPrice": 116900,
+          "originalPrice": 116900
         },
         "72_12_006": {
-          "monthlyPrice": 116500
+          "monthlyPrice": 117900,
+          "originalPrice": 117900
         },
         "72_12_007": {
-          "monthlyPrice": 99500
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         }
       }
     },
@@ -39291,16 +40169,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 111900
+          "monthlyPrice": 111900,
+          "originalPrice": 111900
         },
         "60_12_007": {
-          "monthlyPrice": 94900
+          "monthlyPrice": 94900,
+          "originalPrice": 94900
         },
         "72_12_006": {
-          "monthlyPrice": 100900
+          "monthlyPrice": 100900,
+          "originalPrice": 100900
         },
         "72_12_007": {
-          "monthlyPrice": 83900
+          "monthlyPrice": 83900,
+          "originalPrice": 83900
         }
       }
     },
@@ -39318,7 +40200,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 78100,
+    "rentalPrice": 80900,
     "maxBenefitPrice": 38900,
     "topBadges": [
       "무상철거및재설치",
@@ -39390,16 +40272,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 109100
+          "monthlyPrice": 111900,
+          "originalPrice": 111900
         },
         "60_12_007": {
-          "monthlyPrice": 91100
+          "monthlyPrice": 93900,
+          "originalPrice": 93900
         },
         "72_12_006": {
-          "monthlyPrice": 96100
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         },
         "72_12_007": {
-          "monthlyPrice": 78100
+          "monthlyPrice": 80900,
+          "originalPrice": 80900
         }
       }
     },
@@ -39590,7 +40476,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 47200,
+    "rentalPrice": 47900,
     "maxBenefitPrice": 5200,
     "topBadges": [
       "무상철거및재설치",
@@ -39662,16 +40548,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 65200
+          "monthlyPrice": 65900,
+          "originalPrice": 65900
         },
         "60_12_007": {
-          "monthlyPrice": 54200
+          "monthlyPrice": 54900,
+          "originalPrice": 54900
         },
         "72_12_006": {
-          "monthlyPrice": 58200
+          "monthlyPrice": 58900,
+          "originalPrice": 58900
         },
         "72_12_007": {
-          "monthlyPrice": 47200
+          "monthlyPrice": 47900,
+          "originalPrice": 47900
         }
       }
     },
@@ -39689,7 +40579,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 54500,
+    "rentalPrice": 59900,
     "maxBenefitPrice": 12500,
     "topBadges": [
       "무상철거및재설치",
@@ -39761,16 +40651,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 80500
+          "monthlyPrice": 85900,
+          "originalPrice": 85900
         },
         "60_12_007": {
-          "monthlyPrice": 62500
+          "monthlyPrice": 67900,
+          "originalPrice": 67900
         },
         "72_12_006": {
-          "monthlyPrice": 72500
+          "monthlyPrice": 77900,
+          "originalPrice": 77900
         },
         "72_12_007": {
-          "monthlyPrice": 54500
+          "monthlyPrice": 59900,
+          "originalPrice": 59900
         }
       }
     },
@@ -39788,7 +40682,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "필수",
-    "rentalPrice": 45200,
+    "rentalPrice": 45900,
     "maxBenefitPrice": 3200,
     "topBadges": [
       "무상철거및재설치",
@@ -39860,16 +40754,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 62200
+          "monthlyPrice": 62900,
+          "originalPrice": 62900
         },
         "60_12_007": {
-          "monthlyPrice": 51200
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         },
         "72_12_006": {
-          "monthlyPrice": 56200
+          "monthlyPrice": 56900,
+          "originalPrice": 56900
         },
         "72_12_007": {
-          "monthlyPrice": 45200
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         }
       }
     },
@@ -42803,7 +43701,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "여름필수",
-    "rentalPrice": 28900,
+    "rentalPrice": 30900,
     "maxBenefitPrice": 12045,
     "topBadges": [
       "무상철거및재설치",
@@ -42877,22 +43775,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "60_06_006": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         },
         "60_03_006": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_12_006": {
-          "monthlyPrice": 21900
+          "monthlyPrice": 23900,
+          "originalPrice": 23900
         },
         "72_06_006": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "72_03_006": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         }
       }
     },
@@ -42983,22 +43887,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "60_06_006": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         },
         "60_03_006": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_12_006": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 23900,
+          "originalPrice": 23900
         },
         "72_06_006": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "72_03_006": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         }
       }
     },
@@ -43016,7 +43926,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "여름필수",
-    "rentalPrice": 27900,
+    "rentalPrice": 28900,
     "maxBenefitPrice": 11495,
     "topBadges": [
       "무상철거및재설치",
@@ -43089,22 +43999,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         },
         "60_06_006": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "60_03_006": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "72_12_006": {
-          "monthlyPrice": 20900
+          "monthlyPrice": 21900,
+          "originalPrice": 21900
         },
         "72_06_006": {
-          "monthlyPrice": 22900
+          "monthlyPrice": 23900,
+          "originalPrice": 23900
         },
         "72_03_006": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         }
       }
     },
@@ -43122,7 +44038,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "여름필수",
-    "rentalPrice": 27900,
+    "rentalPrice": 29900,
     "maxBenefitPrice": 11495,
     "topBadges": [
       "무상철거및재설치",
@@ -43195,22 +44111,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "60_06_006": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         },
         "60_03_006": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         },
         "72_12_006": {
-          "monthlyPrice": 20900
+          "monthlyPrice": 22900,
+          "originalPrice": 22900
         },
         "72_06_006": {
-          "monthlyPrice": 22900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         },
         "72_03_006": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         }
       }
     },
@@ -43228,7 +44150,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "여름필수",
-    "rentalPrice": 29900,
+    "rentalPrice": 31900,
     "maxBenefitPrice": 12595,
     "topBadges": [
       "무상철거및재설치",
@@ -43301,22 +44223,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         },
         "60_06_006": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         },
         "60_03_006": {
-          "monthlyPrice": 32900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_12_006": {
-          "monthlyPrice": 22900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         },
         "72_06_006": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "72_03_006": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         }
       }
     },
@@ -43334,7 +44262,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "여름필수",
-    "rentalPrice": 30900,
+    "rentalPrice": 32900,
     "maxBenefitPrice": 13145,
     "topBadges": [
       "무상철거및재설치",
@@ -43407,22 +44335,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         },
         "60_06_006": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "60_03_006": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "72_12_006": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "72_06_006": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         },
         "72_03_006": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 32900,
+          "originalPrice": 32900
         }
       }
     },
@@ -43440,7 +44374,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "air",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "여름필수",
-    "rentalPrice": 26900,
+    "rentalPrice": 27900,
     "maxBenefitPrice": 11495,
     "topBadges": [
       "무상철거및재설치",
@@ -43513,22 +44447,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 21900
+          "monthlyPrice": 22900,
+          "originalPrice": 22900
         },
         "60_06_006": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         },
         "60_03_006": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         },
         "72_12_006": {
-          "monthlyPrice": 19900
+          "monthlyPrice": 20900,
+          "originalPrice": 20900
         },
         "72_06_006": {
-          "monthlyPrice": 21900
+          "monthlyPrice": 22900,
+          "originalPrice": 22900
         },
         "72_03_006": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         }
       }
     },
@@ -43715,22 +44655,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "60_06_006": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         },
         "60_03_006": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_12_006": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 23900,
+          "originalPrice": 23900
         },
         "72_06_006": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "72_03_006": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         }
       }
     },
@@ -43821,22 +44767,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_006": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         },
         "60_06_006": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "60_03_006": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         },
         "72_12_006": {
-          "monthlyPrice": 21900
+          "monthlyPrice": 21900,
+          "originalPrice": 21900
         },
         "72_06_006": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 23900,
+          "originalPrice": 23900
         },
         "72_03_006": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         }
       }
     },
@@ -46958,2702 +47910,6 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "color": "티탄 실버"
   },
   {
-    "id": "lg-gram-15u50u-growk",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "15U50U-GROWK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 33900,
-    "maxBenefitPrice": 18920,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "39.6cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "4.7",
-    "reviewCount": "(125)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 34400,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "1구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10740831/md10740831-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10740831/md10740831-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "15U50U-GROWK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 35900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 33900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-16zb90s-ga5wk",
-    "name": "LG 그램 Pro AI",
-    "model": "16ZB90S-GA5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 50900,
-    "maxBenefitPrice": 9200,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "5.0",
-    "reviewCount": "(412)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 51200,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10850826/md10850826-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10850826/md10850826-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16ZB90S-GA5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 55900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 50900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "매트 블랙"
-  },
-  {
-    "id": "lg-gram-16t95tp-ka5wk",
-    "name": "LG 그램",
-    "model": "16T95TP-KA5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 82900,
-    "maxBenefitPrice": 41200,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(230)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 83200,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10739829/md10739829-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10739829/md10739829-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16T95TP-KA5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 82900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-16t95tp-kd7bk",
-    "name": "LG 그램북 AI 2026",
-    "model": "16T95TP-KD7BK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 105900,
-    "maxBenefitPrice": 64200,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra 7"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(2150)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 106200,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10740837/md10740837-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10740837/md10740837-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16T95TP-KD7BK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 121900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 105900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "매트 블랙"
-  },
-  {
-    "id": "lg-gram-16z95u-gs5zk",
-    "name": "LG 그램 Pro AI",
-    "model": "16Z95U-GS5ZK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 71900,
-    "maxBenefitPrice": 29700,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "AMD 라이젠™ AI 5"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(3420)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 71700,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10743827/md10743827-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10743827/md10743827-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z95U-GS5ZK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 71900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-16z90u-ku7ek",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "16Z90U-KU7EK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 114900,
-    "maxBenefitPrice": 73400,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra X7"
-    ],
-    "rating": "5.0",
-    "reviewCount": "(125)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 115400,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10747826/md10747826-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10747826/md10747826-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90U-KU7EK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 131900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 114900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-17z90u-gs5zk",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "17Z90U-GS5ZK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 72900,
-    "maxBenefitPrice": 30800,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "43.1cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "4.8",
-    "reviewCount": "(1240)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 72800,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10762842/md10762842-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10762842/md10762842-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "17Z90U-GS5ZK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 72900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-15z95u-gs5wk",
-    "name": "LG 그램 AI 2026, Copilot+ PC",
-    "model": "15Z95U-GS5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 65900,
-    "maxBenefitPrice": 23900,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "39.6cm",
-      "AMD 라이젠™ AI 5"
-    ],
-    "rating": "4.8",
-    "reviewCount": "(2150)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 65900,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10744829/md10744829-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10744829/md10744829-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "15Z95U-GS5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 65900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-17z90u-gs5wk",
-    "name": "LG 그램 AI 2026, Copilot+ PC",
-    "model": "17Z90U-GS5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 78900,
-    "maxBenefitPrice": 36600,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "43.1cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "5.0",
-    "reviewCount": "(890)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 78600,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10762839/md10762839-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10762839/md10762839-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "17Z90U-GS5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 78900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-15z90u-gs5wk",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "15Z90U-GS5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 67900,
-    "maxBenefitPrice": 25700,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "39.6cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "4.7",
-    "reviewCount": "(580)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 67700,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10739826/md10739826-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10739826/md10739826-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "15Z90U-GS5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 67900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-16z90u-ku7hk",
-    "name": "LG 그램 Pro AI",
-    "model": "16Z90U-KU7HK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 148900,
-    "maxBenefitPrice": 106500,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra X7"
-    ],
-    "rating": "5.0",
-    "reviewCount": "(42)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 148500,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10747826/md10747826-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10747826/md10747826-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90U-KU7HK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 170900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 148900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-14z95u-gs5hk",
-    "name": "LG 그램 Pro 360 AI 2026",
-    "model": "14Z95U-GS5HK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 81900,
-    "maxBenefitPrice": 40000,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "35.5cm",
-      "AMD 라이젠™ AI 5"
-    ],
-    "rating": "4.8",
-    "reviewCount": "(890)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 82000,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10748842/md10748842-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10748842/md10748842-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "14Z95U-GS5HK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 81900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-15u50u-ga5vk",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "15U50U-GA5VK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 56900,
-    "maxBenefitPrice": 15000,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "39.6cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(42)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 57000,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10740831/md10740831-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10740831/md10740831-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "15U50U-GA5VK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 55900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 56900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-16z95u-gs5wk",
-    "name": "LG 그램 Pro AI",
-    "model": "16Z95U-GS5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 71900,
-    "maxBenefitPrice": 29700,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "AMD 라이젠™ AI 5"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(580)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 71700,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10744830/md10744830-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10744830/md10744830-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z95U-GS5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 71900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-15zb90s-ga5wk",
-    "name": "LG 그램",
-    "model": "15ZB90S-GA5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 47900,
-    "maxBenefitPrice": 6400,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "39.6cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(890)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 48400,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "1구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10288869/md10288869-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10288869/md10288869-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "15ZB90S-GA5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 55900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 47900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "매트 블랙"
-  },
-  {
-    "id": "lg-gram-15u50u-ga5hk",
-    "name": "LG 그램북 AI 2026",
-    "model": "15U50U-GA5HK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 54900,
-    "maxBenefitPrice": 13400,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "39.6cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(3420)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 55400,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10740831/md10740831-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10740831/md10740831-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "15U50U-GA5HK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 55900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 54900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-16z90u-ku7wk",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "16Z90U-KU7WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 110900,
-    "maxBenefitPrice": 69200,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra X7"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(68)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 111200,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10747826/md10747826-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10747826/md10747826-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90U-KU7WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 127900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 110900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-16z90tp-ka5wk",
-    "name": "LG 그램 Pro AI",
-    "model": "16Z90TP-KA5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 73900,
-    "maxBenefitPrice": 32100,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "5.0",
-    "reviewCount": "(3420)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 74100,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10521837/md10521837-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10521837/md10521837-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90TP-KA5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 73900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-17z90tr-ed7hk",
-    "name": "LG 그램 Pro AI",
-    "model": "17Z90TR-ED7HK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 162900,
-    "maxBenefitPrice": 120700,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "43.1cm",
-      "인텔® 코어™ Ultra 7"
-    ],
-    "rating": "4.8",
-    "reviewCount": "(1240)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 162700,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10651828/md10651828-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10651828/md10651828-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "17Z90TR-ED7HK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 186900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 162900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-14z95u-gs5wk",
-    "name": "LG 그램 AI 2026, Copilot+ PC",
-    "model": "14Z95U-GS5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 62900,
-    "maxBenefitPrice": 21000,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "35.5cm",
-      "AMD 라이젠™ AI 5"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(3420)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 63000,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10748845/md10748845-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10748845/md10748845-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "14Z95U-GS5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 62900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-16z90u-ku7bk",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "16Z90U-KU7BK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 104900,
-    "maxBenefitPrice": 63400,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra X7"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(412)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 105400,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10743827/md10743827-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10743827/md10743827-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90U-KU7BK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 120900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 104900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "매트 블랙"
-  },
-  {
-    "id": "lg-gram-14z90u-gs5wk",
-    "name": "LG 그램 AI 2026, Copilot+ PC",
-    "model": "14Z90U-GS5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 64900,
-    "maxBenefitPrice": 22700,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "35.5cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "5.0",
-    "reviewCount": "(890)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 64700,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10764838/md10764838-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10764838/md10764838-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "14Z90U-GS5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 64900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-16z90tr-ed7hk",
-    "name": "LG 그램 Pro AI",
-    "model": "16Z90TR-ED7HK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 159900,
-    "maxBenefitPrice": 117600,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra 7"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(42)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 159600,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10647830/md10647830-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10647830/md10647830-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90TR-ED7HK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 183900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 159900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-16t95tp-ka5hk",
-    "name": "LG 그램 Pro 360 AI 2026",
-    "model": "16T95TP-KA5HK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 100900,
-    "maxBenefitPrice": 59000,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "5.0",
-    "reviewCount": "(3420)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 101000,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10739829/md10739829-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10739829/md10739829-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16T95TP-KA5HK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 115900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 100900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-16z90u-gs5hk",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "16Z90U-GS5HK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 102900,
-    "maxBenefitPrice": 60600,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "40.6cm",
-      "인텔® 코어™ Ultra 5"
-    ],
-    "rating": "5.0",
-    "reviewCount": "(890)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 102600,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10748850/md10748850-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10748850/md10748850-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90U-GS5HK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 117900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 102900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-15z95u-gs5sk",
-    "name": "LG 그램 AI 2026, Copilot+ PC",
-    "model": "15Z95U-GS5SK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 83900,
-    "maxBenefitPrice": 41600,
-    "topBadges": [
-      "무상철거및재설치",
-      "2026년출시",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "Windows 11 Home"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(125)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 83600,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10744829/md10744829-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10744829/md10744829-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "15Z95U-GS5SK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 83900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-16z90u-gu70k",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "16Z90U-GU70K",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 110900,
-    "maxBenefitPrice": 68500,
-    "topBadges": [
-      "무상철거및재설치",
-      "2026년출시",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "Windows 11 Home"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(2150)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 8/22(토) 도착 예정",
-    "combinedDiscount": 110500,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10748850/md10748850-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10748850/md10748850-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90U-GU70K",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 127900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 110900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-16z90u-gs5zk",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "16Z90U-GS5ZK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 76900,
-    "maxBenefitPrice": 35100,
-    "topBadges": [
-      "무상철거및재설치",
-      "2026년출시",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "Windows 11 Home"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(1240)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 8/22(토) 도착 예정",
-    "combinedDiscount": 77100,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10763826/md10763826-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10763826/md10763826-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90U-GS5ZK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 76900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "티탄 실버"
-  },
-  {
-    "id": "lg-gram-16z90u-gs5wk",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "16Z90U-GS5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 76900,
-    "maxBenefitPrice": 35100,
-    "topBadges": [
-      "무상철거및재설치",
-      "2026년출시",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "Windows 11 Home"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(580)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 77100,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10748850/md10748850-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10748850/md10748850-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90U-GS5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 76900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-16z90u-ks5wk",
-    "name": "LG 그램 Pro AI 2026, Copilot+ PC",
-    "model": "16Z90U-KS5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 76900,
-    "maxBenefitPrice": 35400,
-    "topBadges": [
-      "무상철거및재설치",
-      "2026년출시",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "Windows 11 Home"
-    ],
-    "rating": "4.8",
-    "reviewCount": "(42)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 이번주 도착 예정",
-    "combinedDiscount": 77400,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10747826/md10747826-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10747826/md10747826-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90U-KS5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 76900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
-    "id": "lg-gram-16z90tl-gs5wk",
-    "name": "LG 그램 AI",
-    "model": "16Z90TL-GS5WK",
-    "category": "gram",
-    "categoryName": "그램/PC",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
-    "group": "display",
-    "tag": "LG 공식 가전구독 / 100% 무상 케어",
-    "badge": "추천",
-    "rentalPrice": 66900,
-    "maxBenefitPrice": 24800,
-    "topBadges": [
-      "무상철거및재설치",
-      "다품목할인"
-    ],
-    "stickers": [
-      "포인트 적립",
-      "사은품 증정"
-    ],
-    "keywdTags": [
-      "Windows 11 Home"
-    ],
-    "rating": "4.9",
-    "reviewCount": "(125)",
-    "featureSummary": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-    "deliveryText": "전문기사 설치 | 8/22(토) 도착 예정",
-    "combinedDiscount": 66800,
-    "finalPrice": 0,
-    "cardDiscountPrice": 0,
-    "accountCount": "2구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/notebook/md10539826/md10539826-450x450.jpg",
-    "images": [
-      "https://www.lge.co.kr/kr/images/notebook/md10539826/md10539826-450x450.jpg"
-    ],
-    "careCycle": "1회 / 12개월 전문가 방문 케어",
-    "careBenefits": [
-      "전문가 방문 분해 살균 세척",
-      "핵심 소모품 무상 교체",
-      "계약기간 100% 무상 A/S"
-    ],
-    "specs": {
-      "모델명": "16Z90TL-GS5WK",
-      "제조사": "LG전자",
-      "카테고리": "그램/PC",
-      "주요기능": "LG 본사 공인 전문 케어 매니저 정기 방문 살균 세척 및 무상 소모품 교체 지원",
-      "케어서비스": "LG 본사 공인 케어 매니저 정기 방문"
-    },
-    "subscriptionOptions": {
-      "contractTerms": [
-        {
-          "value": "60",
-          "label": "5년"
-        },
-        {
-          "value": "72",
-          "label": "6년"
-        }
-      ],
-      "careServiceCycles": [
-        {
-          "value": "72",
-          "label": "계약기간 내"
-        }
-      ],
-      "careServiceTypes": [
-        {
-          "value": "warranty",
-          "accentLabel": "안심보증",
-          "label": "LG전자 본사 엔지니어 100% 무상 수리 보증",
-          "description": "계약기간 내 제품 고장 시 LG전자 공식 서비스센터 출장비/부품비 전액 무상"
-        }
-      ],
-      "priceMap": {
-        "60_72_warranty": {
-          "monthlyPrice": 71900
-        },
-        "72_72_warranty": {
-          "monthlyPrice": 66900
-        }
-      }
-    },
-    "material": "LG 정품 바디",
-    "color": "스노우 화이트"
-  },
-  {
     "id": "lg-vacuum-a730wc",
     "name": "LG 코드제로 오브제컬렉션 A7 Core",
     "model": "A730WC",
@@ -49739,16 +47995,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         },
         "60_12_006": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         },
         "72_00_012": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         },
         "72_12_006": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         }
       }
     },
@@ -49841,16 +48101,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 23900
+          "monthlyPrice": 23900,
+          "originalPrice": 23900
         },
         "60_12_006": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         },
         "72_00_012": {
-          "monthlyPrice": 20900
+          "monthlyPrice": 20900,
+          "originalPrice": 20900
         },
         "72_12_006": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         }
       }
     },
@@ -50040,7 +48304,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 37900,
+    "rentalPrice": 43900,
     "maxBenefitPrice": 17545,
     "topBadges": [
       "무상철거및재설치",
@@ -50115,16 +48379,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "60_12_006": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         },
         "72_00_012": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_12_006": {
-          "monthlyPrice": 37900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         }
       }
     },
@@ -50218,16 +48486,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 45900
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         },
         "60_12_006": {
-          "monthlyPrice": 51900
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         },
         "72_00_012": {
-          "monthlyPrice": 39900
+          "monthlyPrice": 39900,
+          "originalPrice": 39900
         },
         "72_12_006": {
-          "monthlyPrice": 45900
+          "monthlyPrice": 45900,
+          "originalPrice": 45900
         }
       }
     },
@@ -50406,16 +48678,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 20900
+          "monthlyPrice": 20900,
+          "originalPrice": 20900
         },
         "60_12_006": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "72_00_012": {
-          "monthlyPrice": 18900
+          "monthlyPrice": 18900,
+          "originalPrice": 18900
         },
         "72_12_006": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         }
       }
     },
@@ -50508,16 +48784,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 18900
+          "monthlyPrice": 18900,
+          "originalPrice": 18900
         },
         "60_12_006": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         },
         "72_00_012": {
-          "monthlyPrice": 16900
+          "monthlyPrice": 16900,
+          "originalPrice": 16900
         },
         "72_12_006": {
-          "monthlyPrice": 22900
+          "monthlyPrice": 22900,
+          "originalPrice": 22900
         }
       }
     },
@@ -50610,16 +48890,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 20900
+          "monthlyPrice": 20900,
+          "originalPrice": 20900
         },
         "60_12_006": {
-          "monthlyPrice": 26900
+          "monthlyPrice": 26900,
+          "originalPrice": 26900
         },
         "72_00_012": {
-          "monthlyPrice": 18900
+          "monthlyPrice": 18900,
+          "originalPrice": 18900
         },
         "72_12_006": {
-          "monthlyPrice": 24900
+          "monthlyPrice": 24900,
+          "originalPrice": 24900
         }
       }
     },
@@ -50637,7 +48921,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 40900,
+    "rentalPrice": 43900,
     "maxBenefitPrice": 19195,
     "topBadges": [
       "무상철거및재설치",
@@ -50713,16 +48997,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         },
         "60_12_006": {
-          "monthlyPrice": 46900
+          "monthlyPrice": 49900,
+          "originalPrice": 49900
         },
         "72_00_012": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 37900,
+          "originalPrice": 37900
         },
         "72_12_006": {
-          "monthlyPrice": 40900
+          "monthlyPrice": 43900,
+          "originalPrice": 43900
         }
       }
     },
@@ -50901,16 +49189,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "60_12_006": {
-          "monthlyPrice": 41900
+          "monthlyPrice": 41900,
+          "originalPrice": 41900
         },
         "72_00_012": {
-          "monthlyPrice": 30900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "72_12_006": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         }
       }
     },
@@ -50928,7 +49220,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 33900,
+    "rentalPrice": 35900,
     "maxBenefitPrice": 15345,
     "topBadges": [
       "무상철거및재설치",
@@ -51003,16 +49295,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 32900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "60_12_006": {
-          "monthlyPrice": 38900
+          "monthlyPrice": 40900,
+          "originalPrice": 40900
         },
         "72_00_012": {
-          "monthlyPrice": 27900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         },
         "72_12_006": {
-          "monthlyPrice": 33900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         }
       }
     },
@@ -51105,16 +49401,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         },
         "60_12_006": {
-          "monthlyPrice": 48900
+          "monthlyPrice": 48900,
+          "originalPrice": 48900
         },
         "72_00_012": {
-          "monthlyPrice": 36900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_12_006": {
-          "monthlyPrice": 42900
+          "monthlyPrice": 42900,
+          "originalPrice": 42900
         }
       }
     },
@@ -51132,7 +49432,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 31900,
+    "rentalPrice": 33900,
     "maxBenefitPrice": 14245,
     "topBadges": [
       "무상철거및재설치",
@@ -51207,16 +49507,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 28900
+          "monthlyPrice": 30900,
+          "originalPrice": 30900
         },
         "60_12_006": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 36900,
+          "originalPrice": 36900
         },
         "72_00_012": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 27900,
+          "originalPrice": 27900
         },
         "72_12_006": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 33900,
+          "originalPrice": 33900
         }
       }
     },
@@ -51234,7 +49538,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "인기",
-    "rentalPrice": 27400,
+    "rentalPrice": 31900,
     "maxBenefitPrice": 12045,
     "topBadges": [
       "무상철거및재설치",
@@ -51309,16 +49613,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 24400
+          "monthlyPrice": 28900,
+          "originalPrice": 28900
         },
         "60_12_006": {
-          "monthlyPrice": 30400
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_00_012": {
-          "monthlyPrice": 21400
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "72_12_006": {
-          "monthlyPrice": 27400
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         }
       }
     },
@@ -51411,16 +49719,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00_012": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         },
         "60_12_006": {
-          "monthlyPrice": 35900
+          "monthlyPrice": 35900,
+          "originalPrice": 35900
         },
         "72_00_012": {
-          "monthlyPrice": 25900
+          "monthlyPrice": 25900,
+          "originalPrice": 25900
         },
         "72_12_006": {
-          "monthlyPrice": 31900
+          "monthlyPrice": 31900,
+          "originalPrice": 31900
         }
       }
     },
@@ -51674,10 +49986,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_36_003": {
-          "monthlyPrice": 60900
+          "monthlyPrice": 60900,
+          "originalPrice": 60900
         },
         "72_36_003": {
-          "monthlyPrice": 50900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         }
       }
     },
@@ -51760,10 +50074,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 68900
+          "monthlyPrice": 68900,
+          "originalPrice": 68900
         },
         "72_12_003": {
-          "monthlyPrice": 60900
+          "monthlyPrice": 60900,
+          "originalPrice": 60900
         }
       }
     },
@@ -51781,7 +50097,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "health",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "효도선물",
-    "rentalPrice": 49100,
+    "rentalPrice": 51900,
     "maxBenefitPrice": 7100,
     "topBadges": [
       "무상철거및재설치",
@@ -51846,10 +50162,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 55100
+          "monthlyPrice": 57900,
+          "originalPrice": 57900
         },
         "72_12_003": {
-          "monthlyPrice": 49100
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         }
       }
     },
@@ -51867,7 +50185,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "health",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "효도선물",
-    "rentalPrice": 65100,
+    "rentalPrice": 67900,
     "maxBenefitPrice": 23100,
     "topBadges": [
       "무상철거및재설치",
@@ -51932,10 +50250,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 73100
+          "monthlyPrice": 75900,
+          "originalPrice": 75900
         },
         "72_12_003": {
-          "monthlyPrice": 65100
+          "monthlyPrice": 67900,
+          "originalPrice": 67900
         }
       }
     },
@@ -51953,7 +50273,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "group": "health",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "효도선물",
-    "rentalPrice": 43500,
+    "rentalPrice": 44900,
     "maxBenefitPrice": 1500,
     "topBadges": [
       "무상철거및재설치",
@@ -52018,10 +50338,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_36_003": {
-          "monthlyPrice": 50500
+          "monthlyPrice": 51900,
+          "originalPrice": 51900
         },
         "72_36_003": {
-          "monthlyPrice": 43500
+          "monthlyPrice": 44900,
+          "originalPrice": 44900
         }
       }
     },
@@ -52104,10 +50426,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_36_003": {
-          "monthlyPrice": 60900
+          "monthlyPrice": 60900,
+          "originalPrice": 60900
         },
         "72_36_003": {
-          "monthlyPrice": 50900
+          "monthlyPrice": 50900,
+          "originalPrice": 50900
         }
       }
     },
@@ -52190,10 +50514,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 75900
+          "monthlyPrice": 75900,
+          "originalPrice": 75900
         },
         "72_12_003": {
-          "monthlyPrice": 67900
+          "monthlyPrice": 67900,
+          "originalPrice": 67900
         }
       }
     },
@@ -52276,10 +50602,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_12_003": {
-          "monthlyPrice": 112900
+          "monthlyPrice": 112900,
+          "originalPrice": 112900
         },
         "72_12_003": {
-          "monthlyPrice": 98900
+          "monthlyPrice": 98900,
+          "originalPrice": 98900
         }
       }
     },
@@ -52448,10 +50776,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_00": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         }
       }
     },
@@ -52534,10 +50864,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       ],
       "priceMap": {
         "60_00": {
-          "monthlyPrice": 34900
+          "monthlyPrice": 34900,
+          "originalPrice": 34900
         },
         "72_00": {
-          "monthlyPrice": 29900
+          "monthlyPrice": 29900,
+          "originalPrice": 29900
         }
       }
     },
