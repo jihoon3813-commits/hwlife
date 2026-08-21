@@ -138,6 +138,17 @@ export const updateDefaultThumbnails = mutation({
         isActive: true,
       });
     }
+
+    // Ensure LG Care Solutions exists
+    if (!paths.includes("/care")) {
+      await ctx.db.insert("landings", {
+        name: "LG가전 구독 할인 전용",
+        path: "/care",
+        description: "LG전자 가전 구독 & 케어솔루션 효원 결합 할인 전용 공식 랜딩페이지",
+        thumbnail: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=600",
+        isActive: true,
+      });
+    }
   },
 });
 

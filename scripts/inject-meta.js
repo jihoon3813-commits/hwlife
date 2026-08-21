@@ -53,6 +53,18 @@ const pages = [
     title: '가전상조 60패키지 (UP가전) - 프리미엄 가전 100% 소유 + 효원상조 혜택',
     description: '월 29,900원부터! 60회 만기 시 가전 완납 소유 및 상조 만기 시 가전 렌탈료 100% 전액 환급 지원!',
     image: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620540/Professional_hero_section_image_featuring_a_confid-1778653149667_owqlgb.png'
+  },
+  {
+    name: 'care',
+    title: '효원상조 X LG가전구독 | 매월 10% 추가할인 & 만기 100% 전액환급',
+    description: 'LG전자 공식 가전구독에 효원상조 혜택을 더하다! 매월 10% 추가할인 + 만기 100% 전액환급 & 만기축하금 지원. 본사 100% 무상 케어 서비스까지.',
+    image: 'https://res.cloudinary.com/lyjyvy54/image/upload/v1787294543/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._13_crzmtj.png'
+  },
+  {
+    name: 'lgsub',
+    title: '효원상조 X LG가전구독 | 매월 10% 추가할인 & 만기 100% 전액환급',
+    description: 'LG전자 공식 가전구독에 효원상조 혜택을 더하다! 매월 10% 추가할인 + 만기 100% 전액환급 & 만기축하금 지원. 본사 100% 무상 케어 서비스까지.',
+    image: 'https://res.cloudinary.com/lyjyvy54/image/upload/v1787294543/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._13_crzmtj.png'
   }
 ];
 
@@ -62,8 +74,11 @@ pages.forEach(page => {
   // Replace Title
   content = content.replace(/<title>.*?<\/title>/, `<title>${page.title}</title>`);
   
-  // Replace Meta Description
+  // Replace Meta Description & Keywords
   content = content.replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${page.description}" />`);
+  if (page.keywords) {
+    content = content.replace(/<meta name="keywords" content=".*?" \/>/, `<meta name="keywords" content="${page.keywords}" />`);
+  }
   
   // Replace OG Tags
   content = content.replace(/<meta property="og:title" content=".*?" \/>/, `<meta property="og:title" content="${page.title}" />`);

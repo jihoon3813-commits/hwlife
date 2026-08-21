@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Search, Filter, History, RefreshCw, Trash2, Save, Plus, Smartphone, Send, Loader2 } from 'lucide-react';
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
   const now = new Date();
@@ -175,12 +176,17 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
         }
       }
 
+      let initialAppliance = resolvedAppliance || selectedCustomer.appliance || '';
+      if (initialAppliance) {
+        initialAppliance = initialAppliance.replace(/\s*\[효원상조\s*\d+구좌\s*결합[^\]]*\]/g, '').trim();
+      }
+
       setEditData({
         ...selectedCustomer,
         newRegDate: selectedCustomer.newRegDate || new Date(selectedCustomer.createdAt + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
         productName: resolvedCategoryName || selectedCustomer.productName,
         account: resolvedAccount || selectedCustomer.account,
-        appliance: resolvedAppliance || selectedCustomer.appliance
+        appliance: initialAppliance
       });
       setStatus(selectedCustomer.status);
       setMemo('');
@@ -705,6 +711,11 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                 let displayPlan = customer.productName;
                 let displayAppliance = customer.appliance || '-';
 
+                // 결합제품에서 불필요한 상조 결합/구독료 텍스트 정리
+                if (displayAppliance !== '-') {
+                  displayAppliance = displayAppliance.replace(/\s*\[효원상조\s*\d+구좌\s*결합[^\]]*\]/g, '').trim();
+                }
+
                 // 결합제품명이 모델명으로만 되어있을 경우 제품명(모델명)으로 변환
                 if (displayAppliance !== '-' && allProducts) {
                   const matchedProduct = allProducts.find(p => p.model === displayAppliance);
@@ -713,27 +724,40 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                   }
                 }
 
-                // 1. Prioritize standardized names (Living 144 / Special 299)
-                const isStandardized = customer.productName?.startsWith('리빙144') || 
-                                     customer.productName?.startsWith('스페셜299');
-                
-                if (isStandardized) {
-                  displayPlan = customer.productName;
+                // LG 가전구독 랜딩 제출 건 처리
+                if (customer.source === 'lg_care') {
+                  const lgLanding = landings?.find(l => l.path === '/care');
+                  const baseLandingTitle = lgLanding?.name || 'LG전자 가전구독 X 효원라이프 144';
+                  
+                  // 만약 productName에 기존처럼 가전 모델명이 들어가 있던 경우 랜딩 제목으로 교정
+                  if (!customer.productName || customer.productName.startsWith('[')) {
+                    displayPlan = baseLandingTitle;
+                  } else {
+                    displayPlan = customer.productName;
+                  }
                 } else {
-                  // 2. Handle legacy/appliance-named inquiries
-                  const planByName = allPlans?.find(p => p.name === customer.productName);
-                  if (!planByName && allProducts && allPlans) {
-                    const matchedProduct = allProducts.find(p => 
-                      p.name === customer.productName || 
-                      `${p.brand} ${p.name}` === customer.productName ||
-                      (p.model && customer.appliance?.includes(p.model))
-                    );
-                    if (matchedProduct) {
-                      const plan = allPlans.find(pl => pl.numericId === matchedProduct.planId);
-                      if (plan) displayPlan = plan.name;
+                  // 1. Prioritize standardized names (Living 144 / Special 299)
+                  const isStandardized = customer.productName?.startsWith('리빙144') || 
+                                       customer.productName?.startsWith('스페셜299');
+                  
+                  if (isStandardized) {
+                    displayPlan = customer.productName;
+                  } else {
+                    // 2. Handle legacy/appliance-named inquiries
+                    const planByName = allPlans?.find(p => p.name === customer.productName);
+                    if (!planByName && allProducts && allPlans) {
+                      const matchedProduct = allProducts.find(p => 
+                        p.name === customer.productName || 
+                        `${p.brand} ${p.name}` === customer.productName ||
+                        (p.model && customer.appliance?.includes(p.model))
+                      );
+                      if (matchedProduct) {
+                        const plan = allPlans.find(pl => pl.numericId === matchedProduct.planId);
+                        if (plan) displayPlan = plan.name;
+                      }
+                    } else if (planByName) {
+                      displayPlan = planByName.name;
                     }
-                  } else if (planByName) {
-                    displayPlan = planByName.name;
                   }
                 }
 
@@ -1011,39 +1035,64 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                       <select 
                         value={editData.appliance || ''} 
                         onChange={e => {
-                          const model = e.target.value;
-                          const product = allProducts?.find(p => p.model === model);
+                          const val = e.target.value;
                           setEditData({
                             ...editData, 
-                            appliance: product ? `${product.name} (${product.model})` : model,
+                            appliance: val,
                           });
                         }}
                         className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
                       >
                         <option value="">가전 선택</option>
-                        {allProducts?.filter(p => {
-                          if (!p.model) return false;
-                          if (!editData.productName) return true;
-                          
-                          // 1. Try to find plan by exact name
-                          const plan = allPlans?.find(pl => pl.name === editData.productName);
-                          if (plan) return p.planId === plan.numericId;
 
-                          // 2. Handle standardized naming mapping
-                          if (editData.productName.includes('리빙144')) {
-                            const targetId = (editData.productName.includes('2구좌') || editData.productName.includes('더블')) ? 2 : 3;
-                            return p.planId === targetId;
-                          }
-                          if (editData.productName.includes('스페셜299')) {
-                            // BSON is ID 1, Point is ID 4
-                            const targetId = editData.productName.includes('BSON') ? 1 : 4;
-                            return p.planId === targetId;
-                          }
+                        {/* 1. 랜딩페이지에서 접수된 고객 결합가전명 (어드민 목록에 없는 경우 최우선 노출하여 자동 선택) */}
+                        {editData.appliance && 
+                         !allProducts?.some(p => `${p.name} (${p.model})` === editData.appliance || p.model === editData.appliance || `${p.brand} ${p.name} (${p.model})` === editData.appliance) &&
+                         !LG_OFFICIAL_PRODUCTS?.some(p => `[${p.categoryName}] ${p.name} (${p.model})` === editData.appliance || p.model === editData.appliance) && (
+                          <option value={editData.appliance}>
+                            {editData.appliance} (랜딩페이지 접수 가전)
+                          </option>
+                        )}
 
-                          return true;
-                        }).map(p => (
-                          <option key={p._id} value={`${p.name} (${p.model})`}>{p.brand} {p.name} ({p.model})</option>
-                        ))}
+                        {/* 2. LG 가전구독 상품 목록 (LG 가전구독 접수 건 또는 관련 카테고리 시) */}
+                        {(selectedCustomer?.source === 'lg_care' || editData.productName?.includes('LG') || editData.productName?.includes('가전구독')) && (
+                          <optgroup label="LG 공식 가전구독 라인업">
+                            {LG_OFFICIAL_PRODUCTS?.map(p => {
+                              const itemText = `[${p.categoryName}] ${p.name} (${p.model})`;
+                              return (
+                                <option key={p.id} value={itemText}>
+                                  {itemText}
+                                </option>
+                              );
+                            })}
+                          </optgroup>
+                        )}
+
+                        {/* 3. 어드민 등록 결합가전 상품 목록 */}
+                        <optgroup label="결합 가전 상품 목록">
+                          {allProducts?.filter(p => {
+                            if (!p.model) return false;
+                            if (!editData.productName) return true;
+                            
+                            // 1. Try to find plan by exact name
+                            const plan = allPlans?.find(pl => pl.name === editData.productName);
+                            if (plan) return p.planId === plan.numericId;
+
+                            // 2. Handle standardized naming mapping
+                            if (editData.productName.includes('리빙144')) {
+                              const targetId = (editData.productName.includes('2구좌') || editData.productName.includes('더블')) ? 2 : 3;
+                              return p.planId === targetId;
+                            }
+                            if (editData.productName.includes('스페셜299')) {
+                              const targetId = editData.productName.includes('BSON') ? 1 : 4;
+                              return p.planId === targetId;
+                            }
+
+                            return true;
+                          }).map(p => (
+                            <option key={p._id} value={`${p.name} (${p.model})`}>{p.brand} {p.name} ({p.model})</option>
+                          ))}
+                        </optgroup>
                       </select>
                     </div>
                   </div>

@@ -12,10 +12,21 @@ import LectureLivingPage from '../pages/LectureLivingPage';
 import LectureSpecialPage from '../pages/LectureSpecialPage';
 import KccPage from '../pages/KccPage';
 import Package60Page from '../pages/Package60Page';
+import LgCarePage from '../pages/LgCarePage';
 
 export default function LandingRouter() {
   const path = window.location.pathname.toLowerCase();
   
+  // /lgsub, /care, /care-solutions, /lg 경로 → LG가전 구독 할인 전용 랜딩페이지
+  if (path === '/lgsub' || path.startsWith('/lgsub/') ||
+      path === '/care' || path.startsWith('/care/') || 
+      path === '/care-solutions' || path.startsWith('/care-solutions/') ||
+      path === '/lg' || path.startsWith('/lg/')) {
+    const parts = path.split('/').filter(Boolean);
+    const sub = parts.length >= 2 ? parts[1] : undefined;
+    return <LgCarePage channelSubdomain={sub} landingPath={path} />;
+  }
+
   // /package60 경로 → 가전상조 60패키지 쇼핑몰 랜딩페이지
   if (path === '/package60' || path.startsWith('/package60/')) {
     const parts = path.split('/').filter(Boolean);
@@ -52,6 +63,7 @@ export default function LandingRouter() {
   const isConsentPath = path.startsWith('/consent');
   
   // Parse segments
+  const isCarePath = path.startsWith('/care') || path.startsWith('/care-solutions') || path.startsWith('/lg');
   const isPackageUpPath = path.startsWith('/package_up');
   const isPackage60Path = path.startsWith('/package60');
   const isLiving2Path = path.startsWith('/living2');
@@ -61,7 +73,7 @@ export default function LandingRouter() {
   const searchParams = new URLSearchParams(window.location.search);
   const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
   
-  const subdomainFromPath = (isLivingPath || isLiving2Path || isSpecialPath || isSpecial2Path || isPackage60Path || isPackageUpPath)
+  const subdomainFromPath = (isCarePath || isLivingPath || isLiving2Path || isSpecialPath || isSpecial2Path || isPackage60Path || isPackageUpPath)
     ? (segments.length >= 2 ? segments[1] : (queryChannel || null)) 
     : (segments.length >= 1 && !isConsentPath ? segments[0] : (queryChannel || null));
 
@@ -89,6 +101,9 @@ export default function LandingRouter() {
   }
 
   // Routing
+  if (isCarePath) {
+    return <LgCarePage channelSubdomain={channel?.subdomain} landingPath="/care" />;
+  }
   if (isPackageUpPath) {
     return <Package60Page channelSubdomain={channel?.subdomain} landingPath="/package_up" />;
   }
@@ -114,6 +129,9 @@ export default function LandingRouter() {
     const assignedPaths = channel.landingPages || (channel.landingPage ? [channel.landingPage] : []);
     const primaryPath = assignedPaths[0] || '/';
     
+    if (primaryPath === '/care' || primaryPath === '/care-solutions' || primaryPath === '/lg') {
+      return <LgCarePage channelSubdomain={channel.subdomain} landingPath="/care" />;
+    }
     if (primaryPath === '/package_up') {
       return <Package60Page channelSubdomain={channel.subdomain} landingPath="/package_up" />;
     }

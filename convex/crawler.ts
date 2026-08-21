@@ -416,6 +416,118 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
       }
     }
 
+    // 5. Extract Full Subscription Options Matrix (Contract terms, care cycles, service types, price map)
+    let subscriptionOptions: any = undefined;
+    try {
+      let contractTerms: Array<{ value: string; label: string; available?: boolean }> = [];
+      let careServiceCycles: Array<{ value: string; label: string; available?: boolean }> = [];
+      let careServiceTypes: Array<{ value: string; label: string; accentLabel?: string; description?: string; available?: boolean }> = [];
+      let priceMap: Record<string, any> = {};
+      let currentSelection: string | undefined = undefined;
+
+      // 1. contractTerms
+      const ctMatch = html.match(/"contractTerms"\s*:\s*(\[\s*\{[\s\S]*?\}\s*\])/);
+      if (ctMatch) {
+        try {
+          contractTerms = JSON.parse(ctMatch[1]);
+        } catch (e) {
+          const itemRegex = /\{"value":"(\d+)","label":"([^"]+)"(?:,"available":(true|false))?\}/g;
+          let im;
+          while ((im = itemRegex.exec(ctMatch[1])) !== null) {
+            contractTerms.push({ value: im[1], label: im[2], available: im[3] !== 'false' });
+          }
+        }
+      }
+
+      // 2. careServiceCycles
+      const ccMatch = html.match(/"careServiceCycles"\s*:\s*(\[\s*\{[\s\S]*?\}\s*\])/);
+      if (ccMatch) {
+        try {
+          careServiceCycles = JSON.parse(ccMatch[1]);
+        } catch (e) {
+          const itemRegex = /\{"value":"(\d+)","label":"([^"]+)"(?:,"available":(true|false))?\}/g;
+          let im;
+          while ((im = itemRegex.exec(ccMatch[1])) !== null) {
+            careServiceCycles.push({ value: im[1], label: im[2], available: im[3] !== 'false' });
+          }
+        }
+      }
+
+      // 3. careServiceTypes
+      const cstMatch = html.match(/"careServiceTypes"\s*:\s*(\[\s*\{[\s\S]*?\}\s*\])/);
+      if (cstMatch) {
+        try {
+          careServiceTypes = JSON.parse(cstMatch[1]);
+        } catch (e) {
+          const itemRegex = /\{"value":"([^"]+)","label":"([^"]+)"(?:,"available":(true|false))?(?:,"description":"([^"]*)")?(?:,"accentLabel":"([^"]*)")?\}/g;
+          let im;
+          while ((im = itemRegex.exec(cstMatch[1])) !== null) {
+            careServiceTypes.push({
+              value: im[1],
+              label: im[2],
+              available: im[3] !== 'false',
+              description: im[4] || undefined,
+              accentLabel: im[5] || undefined
+            });
+          }
+        }
+      }
+
+      // 4. priceMap
+      const priceMapMatch = html.match(/"priceMap"\s*:\s*(\{[\s\S]*?\})\s*,\s*"(?:partnerPriceMap|currentSelection|total)"/);
+      if (priceMapMatch) {
+        try {
+          const rawMap = JSON.parse(priceMapMatch[1].replace(/,\s*\}/g, '}'));
+          for (const [k, v] of Object.entries(rawMap)) {
+            if (v && typeof v === 'object') {
+              priceMap[k] = {
+                monthlyPrice: (v as any).monthlyPrice,
+                originalPrice: (v as any).originalPrice,
+                promoPrice: (v as any).promoPrice !== '$undefined' ? (v as any).promoPrice : undefined,
+                rtModelSeq: (v as any).rtModelSeq
+              };
+            }
+          }
+        } catch (e) {
+          const itemRegex = /"(\d+_\d+_[a-zA-Z0-9]+)"\s*:\s*\{[^{}]*"monthlyPrice"\s*:\s*(\d+)[^{}]*\}/g;
+          let im;
+          while ((im = itemRegex.exec(priceMapMatch[1])) !== null) {
+            priceMap[im[1]] = {
+              monthlyPrice: parseInt(im[2]),
+              originalPrice: parseInt(im[2])
+            };
+          }
+        }
+      } else {
+        const itemRegex = /"(\d+_\d+_[a-zA-Z0-9]+)"\s*:\s*\{[^{}]*"monthlyPrice"\s*:\s*(\d+)[^{}]*\}/g;
+        let im;
+        while ((im = itemRegex.exec(html)) !== null) {
+          priceMap[im[1]] = {
+            monthlyPrice: parseInt(im[2]),
+            originalPrice: parseInt(im[2])
+          };
+        }
+      }
+
+      // 5. currentSelection
+      const curMatch = html.match(/"currentSelection"\s*:\s*"([^"]+)"/) || html.match(/"initialSelection"\s*:\s*\{[^{}]*"key"\s*:\s*"([^"]+)"/);
+      if (curMatch) {
+        currentSelection = curMatch[1];
+      }
+
+      if (contractTerms.length > 0 || Object.keys(priceMap).length > 0) {
+        subscriptionOptions = {
+          contractTerms,
+          careServiceCycles,
+          careServiceTypes,
+          priceMap,
+          currentSelection
+        };
+      }
+    } catch (err) {
+      console.error('Subscription options extract error:', err);
+    }
+
     return {
       success: true,
       model: modelCode,
@@ -425,7 +537,8 @@ async function scrapeSingleModel(modelCode: string, refUrl?: string) {
       thumbnail: mainThumbnail,
       thumbnails: uniqueGallery,
       detailImages: finalDetailImages,
-      specifications
+      specifications,
+      subscriptionOptions
     };
   } catch (e: any) {
     return {

@@ -68,6 +68,35 @@ export default defineSchema({
     supplyPrice: v.optional(v.string()),
     giftText: v.optional(v.string()),
     order: v.optional(v.number()),
+    subscriptionOptions: v.optional(
+      v.object({
+        contractTerms: v.array(
+          v.object({
+            value: v.string(),
+            label: v.string(),
+            available: v.optional(v.boolean()),
+          })
+        ),
+        careServiceCycles: v.array(
+          v.object({
+            value: v.string(),
+            label: v.string(),
+            available: v.optional(v.boolean()),
+          })
+        ),
+        careServiceTypes: v.array(
+          v.object({
+            value: v.string(),
+            label: v.string(),
+            accentLabel: v.optional(v.string()),
+            description: v.optional(v.string()),
+            available: v.optional(v.boolean()),
+          })
+        ),
+        priceMap: v.any(), // Record of option key (e.g. "72_12_007") -> { monthlyPrice, originalPrice, etc. }
+        currentSelection: v.optional(v.string()),
+      })
+    ),
   }),
   inquiries: defineTable({
     name: v.string(),
