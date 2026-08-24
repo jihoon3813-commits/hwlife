@@ -126,6 +126,8 @@ function isValidProductRefUrl(refUrl?: string, modelCode?: string): boolean {
 }
 
 const CATEGORY_SLUG_MAP: Record<string, string[]> = {
+  '바스에어시스템': ['bath-air-system', 'product/care-solutions/bath-air-system'],
+  '바스에어': ['bath-air-system', 'product/care-solutions/bath-air-system'],
   '정수기': ['water-purifiers', 'water-purifier', 'water-care'],
   '공기청정기': ['air-purifier', 'air-purifiers'],
   '가습기': ['humidifier', 'air-purifiers'],

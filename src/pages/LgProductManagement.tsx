@@ -814,7 +814,8 @@ export default function LgProductManagement() {
         const cached = OFFICIAL_CATALOG_MAP.get(cleanKey) || OFFICIAL_CATALOG_MAP.get(exactKey);
 
         if (cached) {
-          const catMap = mapExcelCategoryToKey(item.category || cached.categoryName);
+          const effectiveCat = (uploadCategoryTarget && uploadCategoryTarget !== 'all') ? uploadCategoryTarget : (item.category || item.modelCode || cached.categoryName);
+          const catMap = mapExcelCategoryToKey(effectiveCat);
           const r5 = Number(item.defaultOption.p5Base) || Number(cached.rentalPrice) || 0;
           const d5 = Number(item.defaultOption.p5Discount) || (r5 > 0 ? Math.round(r5 * 0.9) : 0);
           const rate5 = Number(item.defaultOption.p5DiscountRate) || (r5 > 0 ? Math.round(((r5 - d5) / r5) * 100) : 10);
@@ -911,7 +912,8 @@ export default function LgProductManagement() {
               const res = batchResults[j];
               const src = chunk[j];
               if (res && res.success) {
-                const catMap = mapExcelCategoryToKey(res.category || src.category);
+                const effectiveCat = (uploadCategoryTarget && uploadCategoryTarget !== 'all') ? uploadCategoryTarget : (src.category || src.modelCode || res.category);
+                const catMap = mapExcelCategoryToKey(effectiveCat);
                 const careCycles = src.careOptions.map((o) => o.cycle);
                 const careTypes = Array.from(new Set(src.careOptions.map((o) => o.type)));
 
