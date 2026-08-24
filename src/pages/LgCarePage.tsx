@@ -56,7 +56,6 @@ const CATEGORIES: CategoryItem[] = [
   { id: 'vacuum', name: '청소기', icon: '🧹', group: 'living' },
   { id: 'massage', name: '안마의자', icon: '💆', group: 'health' },
   { id: 'shoecare', name: '슈케어', icon: '👟', group: 'living' },
-  { id: 'bathair', name: '바스에어시스템', icon: '🛁', badge: '신제품', group: 'air' },
 ];
 
 const LG_PRODUCTS: LgProduct[] = LG_OFFICIAL_PRODUCTS;
