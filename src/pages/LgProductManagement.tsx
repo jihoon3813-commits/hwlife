@@ -375,11 +375,25 @@ export default function LgProductManagement() {
     failedList: Array<{ model: string; reason: string; category?: string }>;
   } | null>(null);
 
+  // Helper to get resolved category key for any product record
+  const getProductCategoryKey = (p: any): string => {
+    if (p.categoryKey === 'bathair' || p.category === '바스에어시스템') return 'bathair';
+    const m = (p.model || '').toUpperCase().trim();
+    if (m.startsWith('MX0120') || m.startsWith('M-X0120') || m.includes('BASV') || m.includes('BASR') || m.includes('BASA')) {
+      return 'bathair';
+    }
+    if (p.categoryKey && p.categoryKey !== 'water' && p.categoryKey !== 'fridge') {
+      return p.categoryKey;
+    }
+    return mapExcelCategoryToKey(p.category || p.model).key;
+  };
+
   // Category counts
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { all: products.length };
     for (const p of products) {
-      counts[p.categoryKey] = (counts[p.categoryKey] || 0) + 1;
+      const key = getProductCategoryKey(p);
+      counts[key] = (counts[key] || 0) + 1;
     }
     return counts;
   }, [products]);
@@ -402,8 +416,11 @@ export default function LgProductManagement() {
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       // Category filter
-      if (selectedCategoryKey !== 'all' && p.categoryKey !== selectedCategoryKey) {
-        return false;
+      if (selectedCategoryKey !== 'all') {
+        const key = getProductCategoryKey(p);
+        if (key !== selectedCategoryKey) {
+          return false;
+        }
       }
       // Official Verification filter
       if (verificationFilter !== 'all') {

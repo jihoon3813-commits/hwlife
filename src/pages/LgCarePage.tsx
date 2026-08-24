@@ -585,12 +585,21 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
         const defaultType = String((lowestOptIdx >= 0 ? lowestOptIdx : 0) + 1).padStart(3, '0');
         const defaultTerm = lowestOpt.p6Base ? '72' : '60';
 
+        const cleanModelStr = (p.model || '').toUpperCase().trim();
+        let resolvedCategoryKey = p.categoryKey;
+        let resolvedCategoryName = p.category;
+
+        if (resolvedCategoryKey === 'bathair' || cleanModelStr.startsWith('MX0120') || cleanModelStr.startsWith('M-X0120') || cleanModelStr.includes('BASV') || cleanModelStr.includes('BASR') || cleanModelStr.includes('BASA')) {
+          resolvedCategoryKey = 'bathair';
+          resolvedCategoryName = '바스에어시스템';
+        }
+
         mergedList.push({
           id: p._id,
           name: p.name,
           model: p.model,
-          category: p.categoryKey,
-          categoryName: p.category,
+          category: resolvedCategoryKey,
+          categoryName: resolvedCategoryName,
           group: p.group || 'living',
           tag: 'LG 공식 가전구독 / 100% 무상 케어',
           badge: p.discountRate6Year ? `${p.discountRate6Year}% 할인` : '프리미엄',
