@@ -20,6 +20,9 @@ interface LgCarePageProps {
 }
 
 import { LG_OFFICIAL_PRODUCTS, CATEGORY_SUBTABS, LgProduct, SubscriptionOptions } from '../data/lgCareProducts';
+import { getProductCapacityInfo } from '../utils/productCapacity';
+import { matchesSubCategory } from '../utils/subCategoryMatcher';
+import { buildLgOfficialPdpUrl } from '../utils/lgeUrl';
 
 export { type LgProduct, type SubscriptionOptions };
 
@@ -53,6 +56,7 @@ const CATEGORIES: CategoryItem[] = [
   { id: 'vacuum', name: '청소기', icon: '🧹', group: 'living' },
   { id: 'massage', name: '안마의자', icon: '💆', group: 'health' },
   { id: 'shoecare', name: '슈케어', icon: '👟', group: 'living' },
+  { id: 'bathair', name: '바스에어시스템', icon: '🛁', badge: '신제품', group: 'air' },
 ];
 
 const LG_PRODUCTS: LgProduct[] = LG_OFFICIAL_PRODUCTS;
@@ -111,11 +115,33 @@ const FAQS = [
   }
 ];
 
+// 10% discount calculation with 10-won cut (100-won unit floor)
+function calc10PercentDiscount(price: number): number {
+  if (!price || price <= 0) return 0;
+  return Math.floor((price * 0.9) / 100) * 100;
+}
+
 export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: LgCarePageProps) {
   // Queries & Mutations
   const channel = useQuery(api.channels.getBySubdomain, channelSubdomain ? { subdomain: channelSubdomain } : "skip");
   const careLanding = useQuery(api.landings.getByPath, { path: landingPath || '/care' });
+  const dbLgProducts = useQuery(api.lgProducts.getVisible);
+  const dbCategories = useQuery(api.lgCategories.getOrdered);
   const createInquiry = useMutation(api.inquiries.create);
+
+  // Dynamic Categories from DB (reflecting admin drag & drop ordering)
+  const categories = useMemo<CategoryItem[]>(() => {
+    if (dbCategories && dbCategories.length > 0) {
+      return dbCategories.map(c => ({
+        id: c.key,
+        name: c.name,
+        icon: c.icon,
+        badge: c.badge,
+        group: (c.group as any) || 'living'
+      }));
+    }
+    return CATEGORIES;
+  }, [dbCategories]);
 
   // States
   const [activeTab, setActiveTab] = useState<string>('all');
@@ -126,6 +152,18 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
+  // Initialize default landing category from Admin setting
+  const [hasInitializedDefaultCategory, setHasInitializedDefaultCategory] = useState(false);
+  useEffect(() => {
+    if (!hasInitializedDefaultCategory && dbCategories && dbCategories.length > 0) {
+      const defaultCat = dbCategories.find((c: any) => c.isDefault);
+      if (defaultCat && defaultCat.key) {
+        setSelectedCategory(defaultCat.key);
+      }
+      setHasInitializedDefaultCategory(true);
+    }
+  }, [dbCategories, hasInitializedDefaultCategory]);
+
   // Pagination / Load More State (Default: 9 products per batch)
   const [visibleCount, setVisibleCount] = useState<number>(9);
 
@@ -134,8 +172,10 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
     setVisibleCount(9);
   }, [selectedCategory, selectedSubTab, searchTerm]);
 
-  // Detail Modal Tab: 'subscription' (구독탭) vs 'hyowon' (효원특가탭)
-  const [modalTab, setModalTab] = useState<'subscription' | 'hyowon'>('subscription');
+  // Detail Modal Tab: 'subscription' (공식구독탭) vs 'hyowon' (효원특가탭) vs 'card' (제휴카드할인탭)
+  const [modalTab, setModalTab] = useState<'subscription' | 'hyowon' | 'card'>('subscription');
+  const [selectedCardCompany, setSelectedCardCompany] = useState<string>('woori');
+  const [selectedCardSpend, setSelectedCardSpend] = useState<number>(1200000); // 30만 / 70만 / 120만
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [isConsultModalOpen, setIsConsultModalOpen] = useState(false);
 
@@ -144,40 +184,132 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
   const [selectedModalColor, setSelectedModalColor] = useState<string>('');
   const [tempSelectedColor, setTempSelectedColor] = useState<string>('');
 
-  // Always initialize options & open with 'subscription' tab when product detail modal is opened
-  useEffect(() => {
-    if (selectedProduct) {
-      setModalTab('subscription');
-
-      const defaultColor = selectedProduct.colors?.find(c => (c as any).isDefault)?.name || selectedProduct.colors?.[0]?.name || selectedProduct.color || '베이지/베이지';
-      setSelectedModalColor(defaultColor);
-      setTempSelectedColor(defaultColor);
-
-      const availableTerms = selectedProduct.subscriptionOptions?.contractTerms || [];
-      const bestTerm = availableTerms.find(t => t.value === '72') || availableTerms.find(t => t.value === '60') || availableTerms[0];
-      setSelectedTerm(bestTerm?.value || '72');
-
-      const availableCycles = selectedProduct.subscriptionOptions?.careServiceCycles || [];
-      setSelectedCycle(availableCycles[0]?.value || '12');
-
-      const availableTypes = selectedProduct.subscriptionOptions?.careServiceTypes || [];
-      setSelectedType(availableTypes[0]?.value || 'light');
-    }
-  }, [selectedProduct]);
+  // Interactive Options for Detail Modal (5년/6년 전용)
+  const [selectedTerm, setSelectedTerm] = useState<string>('72');
+  const [selectedCycle, setSelectedCycle] = useState<string>('12');
+  const [selectedType, setSelectedType] = useState<string>('001');
+  const [hyowonAccountCount, setHyowonAccountCount] = useState<number>(1);
+  const [applyCardDiscount, setApplyCardDiscount] = useState<boolean>(true);
 
   // Hyowon Plan 144 Showcase Tab (1, 2, 3, 4 Accounts)
   const [selectedPlanAccounts, setSelectedPlanAccounts] = useState<number>(1);
 
-  // Interactive Options for Detail Modal (5년/6년 전용)
-  const [selectedTerm, setSelectedTerm] = useState<string>('72');
-  const [selectedCycle, setSelectedCycle] = useState<string>('12');
-  const [selectedType, setSelectedType] = useState<string>('006');
-  const [hyowonAccountCount, setHyowonAccountCount] = useState<number>(1);
-  const [applyCardDiscount, setApplyCardDiscount] = useState<boolean>(true);
+  // Always initialize options & open with 'subscription' tab when product detail modal is opened
+  const handleOpenProductModal = (product: any) => {
+    setSelectedProduct(product);
+    setModalTab('subscription');
+
+    const defaultColor = product.colors?.find((c: any) => c.isDefault)?.name || product.colors?.[0]?.name || product.color || '블랙 틴트 미러';
+    setSelectedModalColor(defaultColor);
+    setTempSelectedColor(defaultColor);
+
+    const availableTerms = product.subscriptionOptions?.contractTerms || [];
+    const bestTerm = product.defaultTerm || (availableTerms.find((t: any) => t.value === '72') ? '72' : (availableTerms[0]?.value || '72'));
+    setSelectedTerm(bestTerm);
+
+    const bestCycle = product.defaultCycle || product.subscriptionOptions?.careServiceCycles?.[0]?.value || '12';
+    const bestType = product.defaultType || product.subscriptionOptions?.careServiceTypes?.[0]?.value || '001';
+
+    setSelectedCycle(bestCycle);
+    setSelectedType(bestType);
+  };
+
+  useEffect(() => {
+    if (selectedProduct) {
+      setModalTab('subscription');
+
+      const defaultColor = selectedProduct.colors?.find(c => (c as any).isDefault)?.name || selectedProduct.colors?.[0]?.name || selectedProduct.color || '블랙 틴트 미러';
+      setSelectedModalColor(defaultColor);
+      setTempSelectedColor(defaultColor);
+
+      const availableTerms = selectedProduct.subscriptionOptions?.contractTerms || [];
+      const bestTerm = (selectedProduct as any).defaultTerm || (availableTerms.find(t => t.value === '72') ? '72' : (availableTerms[0]?.value || '72'));
+      setSelectedTerm(bestTerm);
+
+      const bestCycle = (selectedProduct as any).defaultCycle || selectedProduct.subscriptionOptions?.careServiceCycles?.[0]?.value || '12';
+      const bestType = (selectedProduct as any).defaultType || selectedProduct.subscriptionOptions?.careServiceTypes?.[0]?.value || '001';
+
+      setSelectedCycle(bestCycle);
+      setSelectedType(bestType);
+    }
+  }, [selectedProduct]);
+
+  // Synchronize Cycle whenever Type changes (Guarantee 100% consistency)
+  useEffect(() => {
+    if (selectedProduct?.subscriptionOptions?.careServiceTypes) {
+      const types = selectedProduct.subscriptionOptions.careServiceTypes;
+      const targetType = types.find(t => t.value === selectedType);
+      if (targetType) {
+        const targetCycleVal = (targetType as any).cycleValue;
+        if (targetCycleVal && targetCycleVal !== selectedCycle) {
+          setSelectedCycle(targetCycleVal);
+        } else if (targetType.accentLabel?.includes('셀프') || targetType.accentLabel?.includes('자가')) {
+          if (selectedCycle !== 'self') setSelectedCycle('self');
+        }
+      }
+    }
+  }, [selectedType, selectedProduct]);
+
+  // 1:1 Bidirectional Auto Matching Handlers between Cycle and Type
+  const handleSelectCycle = (cycleVal: string) => {
+    setSelectedCycle(cycleVal);
+    if (selectedProduct?.subscriptionOptions?.careServiceTypes) {
+      const types = selectedProduct.subscriptionOptions.careServiceTypes;
+      const matchingType = types.find(t => (t as any).cycleValue === cycleVal);
+      if (matchingType) {
+        setSelectedType(matchingType.value);
+        return;
+      }
+      if (cycleVal === 'self' || cycleVal.includes('자가')) {
+        const selfType = types.find(t => t.accentLabel?.includes('셀프') || t.accentLabel?.includes('자가') || t.label?.includes('자가'));
+        if (selfType) setSelectedType(selfType.value);
+      } else {
+        const visitType = types.find(t => t.accentLabel?.includes('방문') || t.label?.includes('방문'));
+        if (visitType) setSelectedType(visitType.value);
+      }
+    }
+  };
+
+  const handleSelectType = (typeVal: string) => {
+    setSelectedType(typeVal);
+    if (selectedProduct?.subscriptionOptions?.careServiceTypes) {
+      const types = selectedProduct.subscriptionOptions.careServiceTypes;
+      const targetType = types.find(t => t.value === typeVal);
+      if (targetType) {
+        const targetCycleVal = (targetType as any).cycleValue;
+        if (targetCycleVal) {
+          setSelectedCycle(targetCycleVal);
+          return;
+        }
+        if (targetType.accentLabel?.includes('셀프') || targetType.accentLabel?.includes('자가')) {
+          setSelectedCycle('self');
+        } else {
+          const cycles = selectedProduct.subscriptionOptions?.careServiceCycles || [];
+          const visitCycle = cycles.find(c => c.value !== 'self' && c.value !== '-');
+          if (visitCycle) setSelectedCycle(visitCycle.value);
+        }
+      }
+    }
+  };
 
   // Hero Slider States
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSlidePaused, setIsSlidePaused] = useState(false);
+  const [choiceModalProduct, setChoiceModalProduct] = useState<any | null>(null);
+
+  const handleOpenOfficialLink = (p: any, e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    const rels = (p as any)?.relatedUrls || [];
+    if (rels.length > 1) {
+      setChoiceModalProduct(p);
+    } else {
+      const initialUrl = rels.length === 1 && rels[0].url ? rels[0].url : (p as any)?.refUrl;
+      const imgMatch = (p?.image || (p?.images && p.images[0]) || '').match(/md(\d{6,10})/i);
+      const modelIdHint = imgMatch ? `MD${imgMatch[1]}` : (p as any)?.modelId;
+      const targetUrl = buildLgOfficialPdpUrl(initialUrl, p?.model, p?.categoryKey || p?.category, modelIdHint);
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   // Consultation Form States
   const [formName, setFormName] = useState('');
@@ -232,10 +364,298 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
     }
   }, [selectedProduct]);
 
-  // Pure 100% LG Official Products Catalog (Synchronized with LGE.COM care solutions)
-  const allProductList = useMemo(() => {
-    return LG_OFFICIAL_PRODUCTS;
-  }, []);
+  // Merge DB products by model code and build unified multi-care options
+  const allProductList = useMemo<LgProduct[]>(() => {
+    if (dbLgProducts && dbLgProducts.length > 0) {
+      // 1. Group raw DB items by clean model
+      const modelGroupMap = new Map<string, any[]>();
+      
+      for (const p of dbLgProducts) {
+        const cleanKey = (p.model || '').trim().split('.')[0].trim().toUpperCase();
+        if (!modelGroupMap.has(cleanKey)) {
+          modelGroupMap.set(cleanKey, []);
+        }
+        modelGroupMap.get(cleanKey)!.push(p);
+      }
+
+      // 2. Build merged product list
+      const mergedList: LgProduct[] = [];
+
+      for (const [cleanKey, items] of modelGroupMap.entries()) {
+        const p = items[0]; // Representative product
+        const specsMap: Record<string, string> = {};
+        if (p.specifications) {
+          for (const s of p.specifications) {
+            specsMap[s.name] = s.value;
+          }
+        }
+
+        // Collect all care options and care types across duplicate records
+        const allCareOptions: any[] = [];
+        const seenCareOptionKeys = new Set<string>();
+
+        for (const item of items) {
+          const rawOptions = (item as any).careOptions || [];
+          if (rawOptions.length > 0) {
+            for (const ro of rawOptions) {
+              const optKey = `${ro.cycle}_${ro.type}`;
+              if (!seenCareOptionKeys.has(optKey)) {
+                seenCareOptionKeys.add(optKey);
+                allCareOptions.push(ro);
+              }
+            }
+          } else {
+            const types = (item as any).careTypes || ['방문관리'];
+            const cycles = (item as any).careCycles || ['12개월'];
+            for (const t of types) {
+              for (const c of cycles) {
+                const optKey = `${c}_${t}`;
+                if (!seenCareOptionKeys.has(optKey)) {
+                  seenCareOptionKeys.add(optKey);
+                  allCareOptions.push({
+                    cycle: c,
+                    type: t,
+                    p5Base: item.rentalPrice5Year || 39900,
+                    p5Discount: item.discountPrice5Year || Math.floor((item.rentalPrice5Year || 39900) * 0.9 / 100) * 100,
+                    p6Base: item.rentalPrice6Year || 35900,
+                    p6Discount: item.discountPrice6Year || Math.floor((item.rentalPrice6Year || 35900) * 0.9 / 100) * 100,
+                  });
+                }
+              }
+            }
+          }
+        }
+
+        const contractTerms = [
+          { value: '60', label: '5년' },
+          { value: '72', label: '6년' }
+        ];
+
+        // Unique cycles formatted accurately without 1회 prefix for self-care or hyphens
+        const uniqueCycles = Array.from(new Set(allCareOptions.map(o => (o.cycle || '').trim() || '-')));
+        const careServiceCycles = uniqueCycles.map(c => {
+          const clean = (c || '').trim();
+          let label = clean;
+          let value = clean;
+          if (!clean || clean === '-' || clean === '해당없음' || clean === '없음') {
+            label = '-';
+            value = '-';
+          } else if (clean.includes('자가관리') || clean.includes('셀프')) {
+            label = '자가관리';
+            value = 'self';
+          } else if (clean.includes('개월') || clean.match(/^\d+$/)) {
+            const months = clean.replace(/\D/g, '');
+            label = months ? `1회 / ${months}개월` : clean;
+            value = months || clean;
+          } else if (clean.includes('회')) {
+            label = clean;
+            value = clean.replace(/\D/g, '') || clean;
+          }
+          return {
+            value,
+            label,
+            rawCycle: clean
+          };
+        });
+
+        // Unique Care Service Types (Context-aware official descriptions by product category)
+        const isTv = p.categoryKey === 'tv' || (p.category && p.category.includes('TV'));
+        const isStyler = p.categoryKey === 'styler' || (p.category && p.category.includes('스타일러'));
+        const isWater = p.categoryKey === 'water' || (p.category && p.category.includes('정수기'));
+
+        const careServiceTypes: Array<{ 
+          value: string; 
+          label: string; 
+          accentLabel: string; 
+          description?: string; 
+          cycleValue: string;
+          rawCycle: string;
+          p5Base?: number;
+          p6Base?: number;
+        }> = allCareOptions.map((ro, idx) => {
+          const typeName = (ro.type || '기본').trim();
+          let fullDesc = typeName;
+
+          if (isTv) {
+            if (typeName.includes('넷플릭스')) {
+              fullDesc = '넷플릭스 프리미엄/스탠다드 OTT 멤버십 결합 지원 및 계약기간 무상 A/S';
+            } else if (typeName.includes('스탠다드')) {
+              fullDesc = '기본 OTT 멤버십 결합 혜택 및 계약기간 무상 A/S';
+            } else {
+              fullDesc = 'LG 올레드/QNED 공식 무상 A/S 품질 보증 지원';
+            }
+          } else if (isStyler) {
+            if (typeName.includes('프리미엄')) {
+              fullDesc = '라이트(+) 기계실 분해세척, 급/배수통 교체, 향기시트 1box 제공, 인산염 키트 관리';
+            } else if (typeName.includes('라이트')) {
+              fullDesc = '스팀 케어, 조도 센서 점검, 무상A/S';
+            } else {
+              fullDesc = '전문 케어 매니저 방문 살균 세척 및 무상 부품 점검';
+            }
+          } else if (isWater) {
+            if (typeName.includes('자가관리') || typeName.includes('셀프')) {
+              fullDesc = '정기 직수관/필터 무상 배송 및 원터치 자가 교체';
+            } else if (typeName.includes('방문')) {
+              fullDesc = '케어 매니저 정기 방문 고온 살균 세척 및 코크/필터 무상 교체';
+            }
+          } else {
+            if (typeName.includes('자가관리') || typeName.includes('셀프')) {
+              fullDesc = '정기 소모품 무상 배송 및 고객 직접 교체';
+            } else if (typeName.includes('방문') || typeName.includes('케어')) {
+              fullDesc = '전문 케어 매니저 방문 살균 세척 및 무상 소모품 교체';
+            } else {
+              fullDesc = 'LG전자 공식 계약기간 내 100% 무상 A/S 품질 보증';
+            }
+          }
+
+          const rawCycle = (ro.cycle || '').trim();
+          let cycleValue = rawCycle;
+          if (rawCycle.includes('자가관리') || rawCycle.includes('셀프')) {
+            cycleValue = 'self';
+          } else if (rawCycle.includes('개월') || rawCycle.match(/^\d+$/)) {
+            cycleValue = rawCycle.replace(/\D/g, '') || rawCycle;
+          }
+
+          return {
+            value: String(idx + 1).padStart(3, '0'),
+            label: fullDesc,
+            accentLabel: typeName,
+            description: fullDesc,
+            cycleValue,
+            rawCycle,
+            p5Base: ro.p5Base,
+            p6Base: ro.p6Base,
+          };
+        });
+
+        // Build comprehensive priceMap for every combination
+        const priceMap: Record<string, { monthlyPrice: number; originalPrice?: number }> = {};
+        for (let i = 0; i < careServiceTypes.length; i++) {
+          const typeObj = careServiceTypes[i];
+          const ro = allCareOptions[i] || {};
+          const p5 = ro.p5Base || typeObj.p5Base || p.rentalPrice5Year || 39900;
+          const p6 = ro.p6Base || typeObj.p6Base || p.rentalPrice6Year || 35900;
+
+          const typeVal = typeObj.value;
+          const cycleVal = typeObj.cycleValue;
+
+          priceMap[`60_${cycleVal}_${typeVal}`] = { monthlyPrice: p5 };
+          priceMap[`72_${cycleVal}_${typeVal}`] = { monthlyPrice: p6 };
+          priceMap[`60_${cycleVal}`] = { monthlyPrice: p5 };
+          priceMap[`72_${cycleVal}`] = { monthlyPrice: p6 };
+          priceMap[`60_${typeVal}`] = { monthlyPrice: p5 };
+          priceMap[`72_${typeVal}`] = { monthlyPrice: p6 };
+        }
+
+        const subscriptionOptions = {
+          contractTerms,
+          careServiceCycles: careServiceCycles.length > 0 ? careServiceCycles : [{ value: '12', label: '1회 / 12개월' }],
+          careServiceTypes: careServiceTypes.length > 0 ? careServiceTypes : [{ value: '001', label: '방문관리', accentLabel: '방문관리' }],
+          priceMap
+        };
+
+        // Real Colors
+        const dbColors = p.colors && p.colors.length > 0 ? p.colors : [{ name: p.color || '기본', code: '#2B2B2B', isDefault: true }];
+        const defaultColor = dbColors.find((c: any) => c.isDefault)?.name || dbColors[0]?.name || p.color || '';
+
+        // Find lowest price option among all care options (6-year preferred, then 5-year)
+        let lowestOpt = allCareOptions[0] || {};
+        let minPrice = Infinity;
+        for (const opt of allCareOptions) {
+          const price = opt.p6Base || opt.p5Base || Infinity;
+          if (price > 0 && price < minPrice) {
+            minPrice = price;
+            lowestOpt = opt;
+          }
+        }
+
+        const rentalPrice = lowestOpt.p6Base || lowestOpt.p5Base || p.rentalPrice6Year || p.rentalPrice5Year || 39900;
+        const combinedDiscount = lowestOpt.p6Discount || lowestOpt.p5Discount || calc10PercentDiscount(rentalPrice);
+
+        // Find exact cycle and type value for lowestOpt
+        const lowestCycleClean = (lowestOpt.cycle || '').trim();
+        let defaultCycle = lowestCycleClean;
+        if (lowestCycleClean.includes('자가관리') || lowestCycleClean.includes('셀프')) {
+          defaultCycle = 'self';
+        } else if (lowestCycleClean.includes('개월') || lowestCycleClean.match(/^\d+$/)) {
+          defaultCycle = lowestCycleClean.replace(/\D/g, '') || lowestCycleClean;
+        }
+
+        const lowestOptIdx = allCareOptions.indexOf(lowestOpt);
+        const defaultType = String((lowestOptIdx >= 0 ? lowestOptIdx : 0) + 1).padStart(3, '0');
+        const defaultTerm = lowestOpt.p6Base ? '72' : '60';
+
+        mergedList.push({
+          id: p._id,
+          name: p.name,
+          model: p.model,
+          category: p.categoryKey,
+          categoryName: p.category,
+          group: p.group || 'living',
+          tag: 'LG 공식 가전구독 / 100% 무상 케어',
+          badge: p.discountRate6Year ? `${p.discountRate6Year}% 할인` : '프리미엄',
+          rentalPrice,
+          combinedDiscount,
+          finalPrice: 0,
+          cardDiscountPrice: 0,
+          accountCount: '1구좌 결합',
+          image: p.image,
+          images: p.images?.length ? p.images : [p.image],
+          color: defaultColor,
+          colors: dbColors,
+          careCycle: uniqueCycles.join(', ') || '1회 / 12개월 방문케어',
+          careBenefits: [
+            '전문가 방문 분해 살균 세척',
+            '핵심 소모품 무상 교체',
+            '계약기간 100% 무상 A/S'
+          ],
+          specs: specsMap,
+          subscriptionOptions,
+          careOptions: allCareOptions,
+          careCycles: uniqueCycles,
+          careTypes: careServiceTypes.map(t => t.accentLabel),
+          defaultCycle,
+          defaultType,
+          defaultTerm,
+          refUrl: p.refUrl,
+          relatedUrls: p.relatedUrls,
+          topBadges: (p as any).topBadges,
+          stickers: (p as any).stickers,
+          keywdTags: (p as any).keywdTags,
+          rating: (p as any).rating,
+          reviewCount: (p as any).reviewCount,
+          featureSummary: (p as any).featureSummary,
+          deliveryText: (p as any).deliveryText,
+        } as any);
+      }
+
+      return mergedList;
+    }
+    
+    // Fallback: Sort static products based on dynamically ordered categories
+    const catPriority: Record<string, number> = {};
+    for (let i = 0; i < categories.length; i++) {
+      catPriority[categories[i].id] = i + 1;
+    }
+
+    return [...LG_OFFICIAL_PRODUCTS].sort((a, b) => {
+      const pA = catPriority[a.category] || 99;
+      const pB = catPriority[b.category] || 99;
+      return pA - pB;
+    });
+  }, [dbLgProducts, categories]);
+
+  // Real product count per category for badges
+  const categoryProductCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const p of allProductList) {
+      const catKey = p.category || (p as any).categoryKey;
+      if (catKey) {
+        counts[catKey] = (counts[catKey] || 0) + 1;
+      }
+    }
+    return counts;
+  }, [allProductList]);
 
   // Current category's subtabs list
   const currentSubTabs = useMemo(() => {
@@ -254,7 +674,23 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
 
       // 2. Subcategory Tab Matching
       if (selectedSubTab !== 'all') {
-        const matchSub = (p.subCategory && p.subCategory.includes(selectedSubTab)) || p.name.includes(selectedSubTab);
+        const subTabs = CATEGORY_SUBTABS[selectedCategory] || [];
+        const matchedTabObj = subTabs.find(t => t.id === selectedSubTab);
+        const subName = matchedTabObj?.name || selectedSubTab;
+
+        const matchSub = matchesSubCategory(
+          {
+            category: p.category,
+            categoryName: p.categoryName,
+            subCategory: p.subCategory,
+            subCategoryName: p.subCategoryName,
+            name: p.name,
+            model: p.model,
+            specs: p.specs,
+          },
+          selectedSubTab,
+          subName
+        );
         if (!matchSub) return false;
       }
 
@@ -288,35 +724,84 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
     return matchedColor?.image || selectedProduct.image;
   }, [selectedProduct, tempSelectedColor]);
 
-  // Calculate current selected monthly price from priceMap
+  // Current Selected Care Type Object & Guaranteed Consistent Cycle Value
+  const currentSelectedTypeObj = useMemo(() => {
+    if (!selectedProduct?.subscriptionOptions?.careServiceTypes) return null;
+    const types = selectedProduct.subscriptionOptions.careServiceTypes;
+    return types.find(t => t.value === selectedType) || types[0] || null;
+  }, [selectedProduct, selectedType]);
+
+  const activeSelectedCycle = useMemo(() => {
+    if (currentSelectedTypeObj && (currentSelectedTypeObj as any).cycleValue) {
+      return (currentSelectedTypeObj as any).cycleValue;
+    }
+    return selectedCycle;
+  }, [currentSelectedTypeObj, selectedCycle]);
+
+  // Calculate current selected monthly price from priceMap & careOptions
   const currentMonthlyPrice = useMemo(() => {
-    if (!selectedProduct || !selectedProduct.subscriptionOptions) {
-      return selectedProduct ? selectedProduct.rentalPrice : 35900;
+    if (!selectedProduct) return 0;
+    if (!selectedProduct.subscriptionOptions) {
+      return selectedTerm === '60' ? (selectedProduct.rentalPrice5Year ?? selectedProduct.rentalPrice ?? 0) : (selectedProduct.rentalPrice6Year ?? selectedProduct.rentalPrice ?? 0);
     }
+
+    const types = selectedProduct.subscriptionOptions.careServiceTypes || [];
+    const matchedType = currentSelectedTypeObj || 
+                        types.find(t => t.value === selectedType) || 
+                        types.find(t => (t as any).cycleValue === activeSelectedCycle) || 
+                        types[0];
+
+    // 1. Check matchedType explicit p5Base / p6Base
+    if (matchedType) {
+      if (selectedTerm === '60' && (matchedType as any).p5Base !== undefined) {
+        return (matchedType as any).p5Base;
+      }
+      if (selectedTerm === '72' && (matchedType as any).p6Base !== undefined) {
+        return (matchedType as any).p6Base;
+      }
+    }
+
+    // 2. Check careOptions array
+    if (selectedProduct.careOptions && selectedProduct.careOptions.length > 0) {
+      const opt = selectedProduct.careOptions.find((o: any) => 
+        (o.type === selectedType || o.type === matchedType?.label || o.type === matchedType?.accentLabel) ||
+        (o.cycle === selectedCycle || o.cycle === activeSelectedCycle)
+      );
+      if (opt) {
+        if (selectedTerm === '60' && opt.p5Base !== undefined) return opt.p5Base;
+        if (selectedTerm === '72' && opt.p6Base !== undefined) return opt.p6Base;
+      }
+    }
+
+    // 3. Check priceMap
     const map = selectedProduct.subscriptionOptions.priceMap;
-    const key = `${selectedTerm}_${selectedCycle}_${selectedType}`;
+    const key = `${selectedTerm}_${activeSelectedCycle}_${selectedType}`;
 
-    if (map && map[key] && map[key].monthlyPrice) {
-      return map[key].monthlyPrice;
+    if (map && map[key] !== undefined) {
+      return map[key]?.monthlyPrice ?? 0;
     }
-    if (map) {
-      const matchingKey = Object.keys(map).find(k => k.startsWith(`${selectedTerm}_`));
-      if (matchingKey && map[matchingKey]) {
-        return map[matchingKey].monthlyPrice;
-      }
-      const firstKey = Object.keys(map)[0];
-      if (firstKey && map[firstKey]) {
-        return map[firstKey].monthlyPrice;
-      }
+    if (map && map[`${selectedTerm}_${selectedCycle}`] !== undefined) {
+      return map[`${selectedTerm}_${selectedCycle}`]?.monthlyPrice ?? 0;
+    }
+    if (map && map[`${selectedTerm}_${selectedType}`] !== undefined) {
+      return map[`${selectedTerm}_${selectedType}`]?.monthlyPrice ?? 0;
     }
 
-    return selectedProduct.rentalPrice;
-  }, [selectedProduct, selectedTerm, selectedCycle, selectedType]);
+    // If 24 months / specific type is selected and term is 5 years, return 0 if not explicitly available
+    if (selectedTerm === '60' && (selectedCycle === '24' || (matchedType as any)?.accentLabel?.includes('24'))) {
+      return 0;
+    }
 
-  // Hyowon Sangjo 144 Plan Calculations (Official Proposal Structure)
-  const hyowonMonthlyDiscount = Math.round(currentMonthlyPrice * 0.1); // 매월 10% 할인
-  const discountedAppliancePrice = currentMonthlyPrice - hyowonMonthlyDiscount;
-  const cardDiscountAmount = applyCardDiscount ? Math.min(42000, discountedAppliancePrice) : 0; // 제휴카드 할인 (월구독료 초과 시 월구독료만큼만 적용)
+    return selectedTerm === '60'
+      ? (selectedProduct.rentalPrice5Year ?? 0)
+      : (selectedProduct.rentalPrice6Year ?? 0);
+  }, [selectedProduct, selectedTerm, selectedCycle, selectedType, currentSelectedTypeObj, activeSelectedCycle]);
+
+  // Hyowon Sangjo 144 Plan Calculations (Official Proposal Structure with 10-won cut)
+  const discountedMonthlyPrice = Math.floor((currentMonthlyPrice * 0.9) / 100) * 100;
+  const hyowonMonthlyDiscount = currentMonthlyPrice - discountedMonthlyPrice;
+  const discountedAppliancePrice = discountedMonthlyPrice;
+  const cardDiscountAmount = applyCardDiscount ? Math.min(42000, discountedAppliancePrice) : 0; // 제휴카드 할인
   const finalMonthlyPayment = Math.max(0, discountedAppliancePrice - cardDiscountAmount);
   
   // Sangjo Timeline amounts based on account count (1~4 accounts)
@@ -968,10 +1453,11 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
             )}
           </div>
 
-          {/* Categories Grid - 20 categories balanced into 2 rows of 10 in PC */}
+          {/* Categories Grid - 20 categories balanced into 2 rows of 10 in PC (Dynamically ordered from Admin) */}
           <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-4">
-            {CATEGORIES.map((cat) => {
+            {categories.map((cat) => {
               const isSelected = selectedCategory === cat.id;
+              const count = categoryProductCounts[cat.id] || 0;
               return (
                 <button
                   key={cat.id}
@@ -991,13 +1477,20 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                       : 'bg-[#F9FAFB] border-[#E5E8EB] hover:bg-white hover:border-[#D1D6DB] hover:shadow-xs'
                   }`}
                 >
-                  {cat.badge && (
-                    <span className="absolute -top-1.5 -right-1 text-[8.5px] sm:text-[9px] font-black bg-[#EA1D2C] text-white px-1.5 py-0.2 rounded-full shadow-xs">
-                      {cat.badge}
-                    </span>
-                  )}
-                  <span className="text-[22px] sm:text-3xl mb-1 group-hover:scale-110 transition-transform">
-                    {cat.icon}
+                  {/* Category Product Count Badge */}
+                  <span className={`absolute -top-1.5 -right-1 text-[9px] sm:text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-xs z-10 transition-colors ${
+                    count > 0 
+                      ? (isSelected ? 'bg-[#EA1D2C] text-white ring-1 ring-white' : 'bg-[#FEECEF] text-[#EA1D2C] group-hover:bg-[#EA1D2C] group-hover:text-white')
+                      : 'bg-gray-100 text-gray-400 opacity-60'
+                  }`}>
+                    {count}
+                  </span>
+                  <span className="h-8 sm:h-9 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                    {cat.icon && (cat.icon.startsWith('http') || cat.icon.startsWith('data:image') || cat.icon.startsWith('/')) ? (
+                      <img src={cat.icon} alt={cat.name} className="w-7 h-7 sm:w-8 sm:h-8 object-contain" />
+                    ) : (
+                      <span className="text-[22px] sm:text-3xl leading-none">{cat.icon || '📦'}</span>
+                    )}
                   </span>
                   <span className={`text-[11px] sm:text-[13px] font-bold tracking-tight text-center whitespace-nowrap overflow-hidden text-ellipsis max-w-full px-0.5 ${
                     isSelected ? 'text-[#EA1D2C] font-black' : 'text-[#333D4B]'
@@ -1098,19 +1591,45 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
             >
               전체
             </button>
-            {currentSubTabs.map((sub) => (
-              <button
-                key={sub.id}
-                onClick={() => setSelectedSubTab(sub.name)}
-                className={`px-4 py-2 rounded-xl text-[13px] font-bold transition-all whitespace-nowrap ${
-                  selectedSubTab === sub.name
-                    ? 'bg-[#EA1D2C] text-white shadow-md shadow-[#EA1D2C]/20 font-black'
-                    : 'bg-white text-[#4E5968] border border-[#E5E8EB] hover:bg-[#F2F4F6]'
-                }`}
-              >
-                {sub.name}
-              </button>
-            ))}
+            {currentSubTabs.map((sub) => {
+              const matchCount = allProductList.filter(p => {
+                if (selectedCategory !== 'all' && p.category !== selectedCategory) return false;
+                return matchesSubCategory(
+                  {
+                    category: p.category,
+                    categoryName: p.categoryName,
+                    subCategory: p.subCategory,
+                    subCategoryName: p.subCategoryName,
+                    name: p.name,
+                    model: p.model,
+                    specs: p.specs,
+                  },
+                  sub.id,
+                  sub.name
+                );
+              }).length;
+
+              return (
+                <button
+                  key={sub.id}
+                  onClick={() => setSelectedSubTab(sub.name)}
+                  className={`px-4 py-2 rounded-xl text-[13px] font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                    selectedSubTab === sub.name
+                      ? 'bg-[#EA1D2C] text-white shadow-md shadow-[#EA1D2C]/20 font-black'
+                      : 'bg-white text-[#4E5968] border border-[#E5E8EB] hover:bg-[#F2F4F6]'
+                  }`}
+                >
+                  <span>{sub.name}</span>
+                  {matchCount > 0 && (
+                    <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-bold ${
+                      selectedSubTab === sub.name ? 'bg-white/20 text-white' : 'bg-[#F2F4F6] text-[#8B95A1]'
+                    }`}>
+                      {matchCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -1158,7 +1677,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
 
                   {/* 2. Center Product Image */}
                   <div 
-                    onClick={() => setSelectedProduct(product)}
+                    onClick={() => handleOpenProductModal(product)}
                     className="relative aspect-square px-8 py-4 flex items-center justify-center cursor-pointer bg-white"
                   >
                     <img 
@@ -1169,7 +1688,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedProduct(product);
+                        handleOpenProductModal(product);
                       }}
                       className="absolute bottom-2 right-4 bg-white/90 p-2 rounded-full text-[#8B95A1] hover:text-[#191F28] border border-[#E5E8EB] shadow-xs transition-transform group-hover:scale-110"
                       title="상세보기"
@@ -1183,31 +1702,64 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                     <div className="space-y-2.5">
                       {/* Title and Keywd Tags with Fixed Heights for Perfect Horizontal Alignment */}
                       <div>
-                        <h3 
-                          onClick={() => setSelectedProduct(product)}
-                          className="h-[48px] text-[16px] sm:text-[17px] font-black text-[#191F28] group-hover:text-[#EA1D2C] transition-colors leading-[24px] cursor-pointer line-clamp-2 flex items-start"
-                          title={product.name}
-                        >
-                          {product.name}
-                        </h3>
+                        {(() => {
+                          const capInfo = getProductCapacityInfo(
+                            product.model, 
+                            product.name, 
+                            product.category, 
+                            product.categoryName, 
+                            product.specs
+                          );
 
-                        {/* Spec Badges (e.g. 854L / 1등급) with Fixed Height */}
-                        <div className="h-[24px] flex items-center gap-1.5 mt-1.5">
-                          {product.keywdTags && product.keywdTags.length > 0 ? (
-                            product.keywdTags.map((tag, tIdx) => (
-                              <span 
-                                key={tIdx}
-                                className="text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-2 py-0.5 rounded border border-[#E5E8EB]"
+                          return (
+                            <>
+                              <h3 
+                                onClick={() => handleOpenProductModal(product)}
+                                className="h-[48px] text-[16px] sm:text-[17px] font-black text-[#191F28] group-hover:text-[#EA1D2C] transition-colors leading-[24px] cursor-pointer line-clamp-2 flex items-start flex-wrap gap-1"
+                                title={product.name}
                               >
-                                {tag}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-[11px] font-bold text-[#8B95A1] bg-[#F9FAFB] px-2 py-0.5 rounded border border-[#F2F4F6]">
-                              공식 정품
-                            </span>
-                          )}
-                        </div>
+                                <span>{product.name}</span>
+                                {capInfo && (
+                                  <span className="inline-flex items-center bg-[#E8F3FF] text-[#1B64DA] border border-[#BBDDFF] text-[11.5px] font-black px-1.5 py-0.2 rounded-md shrink-0">
+                                    {capInfo.label}
+                                  </span>
+                                )}
+                              </h3>
+
+                              {/* Spec Badges (Unique additional tags like 1등급, 에너지효율 등 - no duplicate capacity) with Fixed Height */}
+                              <div className="h-[24px] flex items-center gap-1.5 mt-1.5 overflow-hidden">
+                                {(() => {
+                                  const filteredTags = (product.keywdTags || []).filter(tag => {
+                                    if (!tag) return false;
+                                    const lower = tag.toLowerCase().trim();
+                                    // Filter out duplicate capacity tags
+                                    if (capInfo && (lower.includes('kg') || lower.includes('l') || lower.includes('평') || lower.includes('인용'))) {
+                                      return false;
+                                    }
+                                    return true;
+                                  });
+
+                                  if (filteredTags.length > 0) {
+                                    return filteredTags.map((tag, tIdx) => (
+                                      <span 
+                                        key={tIdx}
+                                        className="text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-2 py-0.5 rounded border border-[#E5E8EB] shrink-0"
+                                      >
+                                        {tag}
+                                      </span>
+                                    ));
+                                  }
+
+                                  return (
+                                    <span className="text-[11px] font-bold text-[#8B95A1] bg-[#F9FAFB] px-2 py-0.5 rounded border border-[#F2F4F6]">
+                                      공식 정품
+                                    </span>
+                                  );
+                                })()}
+                              </div>
+                            </>
+                          );
+                        })()}
                       </div>
 
                       {/* Feature Summary Line (주요 기능 요약) with Fixed Height */}
@@ -1217,15 +1769,34 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                         </p>
                       </div>
 
-                      {/* Model Code, Color & Rating with Fixed Height */}
+                      {/* Model Code, Color/Type & Rating with Fixed Height */}
                       <div className="h-[20px] flex items-center gap-1.5 text-[12px] text-[#8B95A1] overflow-hidden">
                         <span className="font-mono text-[#4E5968] font-bold shrink-0">{product.model}</span>
-                        {product.color && (
-                          <>
-                            <span className="text-[#D1D6DB] shrink-0">|</span>
-                            <span className="text-[#191F28] font-medium truncate">{product.color}</span>
-                          </>
-                        )}
+                        {(() => {
+                          const isTv = product.category === 'tv' || product.categoryName?.includes('TV') || product.name?.includes('TV') || product.name?.includes('QNED') || product.name?.includes('OLED');
+                          if (isTv) {
+                            const upperModel = (product.model || '').toUpperCase().trim();
+                            const isWall = upperModel.endsWith('W') || upperModel.endsWith('MW') || upperModel.endsWith('KW') || upperModel.endsWith('BKW') || upperModel.endsWith('BMW') || upperModel.includes('WALL') || product.name?.includes('벽걸이');
+                            const tvType = isWall ? '벽걸이형' : '스탠드형';
+                            return (
+                              <>
+                                <span className="text-[#D1D6DB] shrink-0">|</span>
+                                <span className="text-[#191F28] font-bold shrink-0">{tvType}</span>
+                              </>
+                            );
+                          }
+                          // Filter out color if it's just capacity like '24kg', '870L'
+                          const isColorCapacity = product.color && /^\d+(kg|l|평|인용)?$/i.test(product.color.trim());
+                          if (product.color && !isColorCapacity && product.color !== '기본') {
+                            return (
+                              <>
+                                <span className="text-[#D1D6DB] shrink-0">|</span>
+                                <span className="text-[#191F28] font-medium truncate">{product.color}</span>
+                              </>
+                            );
+                          }
+                          return null;
+                        })()}
                         {product.rating && (
                           <>
                             <span className="text-[#D1D6DB] shrink-0">|</span>
@@ -1237,54 +1808,56 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                       </div>
                     </div>
 
-                    {/* 4. Pricing Box - 3 Clear Steps */}
+                    {/* 4. Pricing Box - 3 Clear Graduated Steps */}
                     <div className="pt-3 mt-2 border-t border-[#F2F4F6] space-y-2">
-                      {/* Step 1: LG Official Monthly Price */}
-                      <div className="flex items-baseline justify-between">
-                        <span className="text-[13px] text-[#4E5968] font-bold">1. 월 구독료</span>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-[13px] text-[#191F28] font-bold">월</span>
-                          <span className="text-[19px] sm:text-[21px] font-black text-[#191F28]">
+                      {/* Step 1: LG Official Monthly Price (Subtle Reference Price) */}
+                      <div className="flex items-baseline justify-between px-1 text-[#6B7684]">
+                        <span className="text-[12px] font-semibold">1. LG 공식 월 구독료</span>
+                        <div className="flex items-baseline gap-0.5">
+                          <span className="text-[11px] font-medium">월</span>
+                          <span className="text-[14px] sm:text-[15px] font-bold text-[#4E5968]">
                             {product.rentalPrice.toLocaleString()}
                           </span>
-                          <span className="text-[13px] text-[#191F28] font-bold">원</span>
+                          <span className="text-[11px] font-medium">원</span>
                         </div>
                       </div>
 
-                      {/* Step 2: Hyowon Sangjo 10% Discount Benefit Box */}
-                      <div className="bg-[#FEECEF] rounded-xl p-2.5 border border-[#EA1D2C]/30 flex items-center justify-between">
+                      {/* Step 2: Hyowon Sangjo 10% Discount Benefit Box (Larger & Prominent) */}
+                      <div className="bg-[#FFF0F2] rounded-xl p-2.5 border border-[#EA1D2C]/30 flex items-center justify-between shadow-2xs">
                         <div className="text-[12px]">
                           <span className="font-extrabold text-[#EA1D2C] block">2. 효원상조 결합 혜택</span>
                           <span className="text-[10px] text-[#6B7684]">매월 10% 할인 + 만기 100% 환급</span>
                         </div>
                         <div className="text-right">
-                          <span className="text-[16px] font-black text-[#EA1D2C] block">
-                            월 {Math.round(product.rentalPrice * 0.9).toLocaleString()}원
+                          <span className="text-[17px] sm:text-[18px] font-black text-[#EA1D2C] block leading-tight">
+                            월 {calc10PercentDiscount(product.rentalPrice).toLocaleString()}원
                           </span>
-                          <span className="text-[10px] text-[#EA1D2C] font-bold">
+                          <span className="text-[10px] text-[#EA1D2C] font-extrabold">
                             만기축하금 +144만~
                           </span>
                         </div>
                       </div>
 
-                      {/* Step 3: LG Subscription Affiliate Card Applied Price */}
-                      <div className="flex items-center justify-between text-[12px] bg-[#F0FDF4] p-2 rounded-xl border border-[#22C55E]/30">
-                        <span className="text-[#166534] font-bold flex items-center gap-1">
-                          <CreditCard className="w-3.5 h-3.5 text-[#22C55E]" />
-                          3. 제휴카드 적용 시
-                        </span>
-                        <div className="text-right">
-                          <span className="text-[14px] font-black text-[#166534]">
-                            월 {Math.max(0, Math.round(product.rentalPrice * 0.9) - 42000).toLocaleString()}원
+                      {/* Step 3: LG Subscription Affiliate Card Applied Price (Largest & Most Eye-catching Highlight) */}
+                      <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-[#F0FDF4] to-[#DCFCE7] border-2 border-[#22C55E]/60 shadow-xs">
+                        <div>
+                          <span className="text-[#15803D] font-extrabold text-[12px] sm:text-[13px] flex items-center gap-1">
+                            <CreditCard className="w-4 h-4 text-[#16A34A]" />
+                            3. 제휴카드 적용 시
                           </span>
-                          <span className="text-[10px] text-[#15803D] block font-medium">
-                            (제휴카드 최대 -42,000원 할인)
+                          <span className="text-[10px] text-[#166534] block font-medium mt-0.5">
+                            (제휴카드 최대 -42,000원 추가할인)
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[20px] sm:text-[22px] font-black text-[#15803D] block tracking-tight leading-none">
+                            월 {Math.max(0, calc10PercentDiscount(product.rentalPrice) - 42000).toLocaleString()}원
                           </span>
                         </div>
                       </div>
 
                       {/* Delivery & Care Notice */}
-                      <div className="text-[11px] text-[#8B95A1] pt-0.5 flex items-center justify-between">
+                      <div className="text-[11px] text-[#8B95A1] pt-0.5 px-1 flex items-center justify-between">
                         <span>설치비 안내</span>
                         <span>{product.deliveryText || '전문기사 설치 | 이번주 도착 예정'}</span>
                       </div>
@@ -1293,7 +1866,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                     {/* 5. Action Buttons */}
                     <div className="grid grid-cols-2 gap-2 pt-3">
                       <button 
-                        onClick={() => setSelectedProduct(product)}
+                        onClick={() => handleOpenProductModal(product)}
                         className="py-2.5 px-3 rounded-xl text-[12px] font-bold bg-[#F2F4F6] hover:bg-[#E5E8EB] text-[#333D4B] transition-colors text-center"
                       >
                         구독 옵션 보기
@@ -2035,69 +2608,118 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   <span className="text-[11px] font-mono font-bold text-[#8B95A1] bg-[#F2F4F6] px-2 py-0.5 rounded">
                     {selectedProduct.model}
                   </span>
+                  {(() => {
+                    const capInfo = getProductCapacityInfo(
+                      selectedProduct.model, 
+                      selectedProduct.name, 
+                      selectedProduct.category, 
+                      selectedProduct.categoryName, 
+                      selectedProduct.specs
+                    );
+                    return capInfo ? (
+                      <span className="text-[11px] font-black text-[#1B64DA] bg-[#E8F3FF] px-2.5 py-0.5 rounded border border-[#BBDDFF] flex items-center gap-1">
+                        ⚡ {capInfo.label}
+                      </span>
+                    ) : null;
+                  })()}
                   {selectedProduct.rating && (
                     <span className="text-[11px] font-bold text-[#FF8A00] bg-[#FFF8E6] px-2 py-0.5 rounded flex items-center gap-0.5 border border-[#FFE2A8]/50">
                       ★ {selectedProduct.rating} <span className="text-[#8B95A1] font-normal">{selectedProduct.reviewCount || ''}</span>
                     </span>
                   )}
                 </div>
-                <h3 className="text-[17px] sm:text-[20px] font-black text-[#191F28] leading-snug">
-                  {selectedProduct.name}
+                <h3 className="text-[17px] sm:text-[20px] font-black text-[#191F28] leading-snug flex items-center flex-wrap gap-2">
+                  <span>{selectedProduct.name}</span>
                 </h3>
-                {(selectedProduct.material || selectedModalColor || selectedProduct.color) && (
-                  <div className="inline-flex items-center gap-2 bg-[#F8FAFC] px-3 py-1.5 rounded-xl border border-[#E5E8EB] text-[12px] sm:text-[13px]">
-                    <span className="text-[#8B95A1] font-medium">색상/소재:</span>
-                    <span className="font-extrabold text-[#191F28]">
-                      {selectedProduct.material ? `${selectedProduct.material} · ` : ''}{selectedModalColor || selectedProduct.color}
+                <div className="flex flex-wrap items-center gap-2">
+                  {(() => {
+                    const isTv = selectedProduct.category === 'tv' || selectedProduct.categoryName?.includes('TV') || selectedProduct.name?.includes('TV') || selectedProduct.name?.includes('QNED') || selectedProduct.name?.includes('OLED');
+                    if (isTv) {
+                      const upperModel = (selectedProduct.model || '').toUpperCase().trim();
+                      const isWall = upperModel.endsWith('W') || upperModel.endsWith('MW') || upperModel.endsWith('KW') || upperModel.endsWith('BKW') || upperModel.endsWith('BMW') || upperModel.includes('WALL') || selectedProduct.name?.includes('벽걸이');
+                      const tvType = isWall ? '벽걸이형' : '스탠드형';
+                      return (
+                        <div className="inline-flex items-center gap-2 bg-[#F8FAFC] px-3 py-1.5 rounded-xl border border-[#E5E8EB] text-[12px] sm:text-[13px]">
+                          <span className="text-[#8B95A1] font-medium">설치 형태:</span>
+                          <span className="font-extrabold text-[#191F28]">{tvType}</span>
+                        </div>
+                      );
+                    }
+
+                    return (selectedProduct.material || selectedModalColor || selectedProduct.color) ? (
+                      <div className="inline-flex items-center gap-2 bg-[#F8FAFC] px-3 py-1.5 rounded-xl border border-[#E5E8EB] text-[12px] sm:text-[13px]">
+                        <span className="text-[#8B95A1] font-medium">색상/소재:</span>
+                        <span className="font-extrabold text-[#191F28]">
+                          {selectedProduct.material ? `${selectedProduct.material} · ` : ''}{selectedModalColor || selectedProduct.color}
+                        </span>
+                      </div>
+                    ) : null;
+                  })()}
+                  {(selectedProduct as any).refUrl && (
+                    <span className="text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-2.5 py-1 rounded-lg">
+                      LG 공식 케어솔루션 인증 제품
                     </span>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Main Tabs Header: [구독] vs [효원특가] */}
-            <div className="grid grid-cols-2 gap-1.5 rounded-2xl bg-[#F2F4F6] p-1.5 border border-[#E5E8EB]">
+            {/* Main Tabs Header: 3-Tab Structure */}
+            <div className="grid grid-cols-3 gap-1 rounded-2xl bg-[#F2F4F6] p-1.5 border border-[#E5E8EB]">
               <button
                 type="button"
                 onClick={() => setModalTab('subscription')}
-                className={`py-2.5 sm:py-3 px-2 text-center rounded-xl transition-all flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
+                className={`py-2.5 px-1.5 sm:px-2 text-center rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
                   modalTab === 'subscription'
                     ? 'bg-white text-[#191F28] shadow-sm font-black'
                     : 'text-[#8B95A1] hover:text-[#191F28] font-bold'
                 }`}
               >
-                <span className="text-[13px] sm:text-[14px]">LG 공식 가전 구독</span>
-                <span className="text-[10px] sm:text-[11px] font-bold text-[#8B95A1] bg-[#F2F4F6] px-1.5 py-0.5 rounded">
-                  옵션별 요금
-                </span>
+                <span className="text-[12px] sm:text-[13px] leading-tight">LG 공식 가전구독</span>
+                <span className="text-[10px] text-[#8B95A1]">정가 요금</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setModalTab('hyowon')}
-                className={`py-2.5 sm:py-3 px-2 text-center rounded-xl transition-all flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
+                className={`py-2.5 px-1.5 sm:px-2 text-center rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
                   modalTab === 'hyowon'
                     ? 'bg-[#EA1D2C] text-white shadow-md shadow-[#EA1D2C]/20 font-black'
                     : 'text-[#EA1D2C] bg-[#FEECEF] hover:bg-[#FEECEF]/80 font-bold'
                 }`}
               >
-                <div className="flex items-center gap-1 text-[13px] sm:text-[14px]">
-                  <Sparkles className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-0.5 text-[12px] sm:text-[13px] leading-tight">
+                  <Sparkles className="w-3 h-3" />
                   <span>효원 결합 혜택</span>
                 </div>
-                <span className={`text-[10px] sm:text-[11px] font-black px-1.5 py-0.5 rounded-full ${
-                  modalTab === 'hyowon' ? 'bg-white/20 text-white' : 'bg-[#EA1D2C] text-white'
+                <span className={`text-[10px] font-black ${
+                  modalTab === 'hyowon' ? 'text-white/90' : 'text-[#EA1D2C]'
                 }`}>
                   10%할인+만기환급
                 </span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setModalTab('card')}
+                className={`py-2.5 px-1.5 sm:px-2 text-center rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+                  modalTab === 'card'
+                    ? 'bg-[#191F28] text-white shadow-sm font-black'
+                    : 'text-[#4E5968] hover:text-[#191F28] font-bold'
+                }`}
+              >
+                <span className="text-[12px] sm:text-[13px] leading-tight">제휴카드 추가할인</span>
+                <span className={`text-[10px] ${modalTab === 'card' ? 'text-white/80' : 'text-[#16A34A] font-extrabold'}`}>
+                  최대 -4.2만원
+                </span>
+              </button>
             </div>
 
-            {/* TAB 1: [구독] 탭 - LG전자 공식 상세 옵션 선택기 */}
+            {/* TAB 1: [LG 공식 가전구독] 탭 - LG 전자 공홈 디자인 100% 일치 */}
             {modalTab === 'subscription' && (
-              <div className="space-y-5 sm:space-y-6 animate-in fade-in duration-200">
-                {/* 0. 옵션 선택 (소재 / 색상 선택 버튼 - LG 공홈 화면과 100% 일치) */}
-                {selectedProduct.colors && selectedProduct.colors.length > 0 && (
+              <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200">
+                {/* 0. 색상/옵션 선택 (복수 색상이 실제로 존재할 때만 노출) */}
+                {selectedProduct.colors && selectedProduct.colors.length > 1 && (
                   <div className="space-y-1.5">
                     <label className="text-[13px] font-black text-[#191F28]">
                       옵션 선택
@@ -2108,10 +2730,16 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                         setTempSelectedColor(selectedModalColor);
                         setIsOptionSelectModalOpen(true);
                       }}
-                      className="w-full bg-[#F9FAFB] hover:bg-white border border-[#E5E8EB] rounded-2xl p-3.5 sm:p-4 flex items-center justify-between transition-all group cursor-pointer shadow-2xs hover:border-[#191F28]"
+                      className="w-full bg-white hover:bg-[#F9FAFB] border border-[#E5E8EB] hover:border-[#191F28] rounded-xl p-3 flex items-center justify-between transition-all group cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[13px] sm:text-[14px] text-[#191F28]">
+                        <span
+                          className="w-3.5 h-3.5 rounded-full border border-black/20 shrink-0"
+                          style={{
+                            backgroundColor: selectedProduct.colors.find(c => c.name === selectedModalColor)?.code || '#D1D6DB'
+                          }}
+                        />
+                        <span className="font-extrabold text-[13px] sm:text-[14px] text-[#191F28]">
                           {selectedProduct.material ? `${selectedProduct.material} / ` : ''}{selectedModalColor}
                         </span>
                       </div>
@@ -2120,14 +2748,12 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   </div>
                 )}
 
-                {/* 1. 계약기간 (5년 / 6년 결합 특가 대상) */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[13px] font-black text-[#191F28] flex items-center gap-1.5">
-                      <span>계약기간 (5년/6년 10% 추가할인 대상)</span>
-                      <Info className="w-3.5 h-3.5 text-[#8B95A1]" />
-                    </label>
-                  </div>
+                {/* 1. 계약기간 */}
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-black text-[#191F28] flex items-center gap-1.5">
+                    <span>계약기간</span>
+                    <Info className="w-3.5 h-3.5 text-[#8B95A1]" />
+                  </label>
                   <div className="grid grid-cols-2 gap-2">
                     {selectedProduct.subscriptionOptions.contractTerms
                       .filter((term) => term.value === '60' || term.value === '72' || term.label.includes('5년') || term.label.includes('6년'))
@@ -2136,10 +2762,10 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                           key={term.value}
                           type="button"
                           onClick={() => setSelectedTerm(term.value)}
-                          className={`py-2.5 sm:py-3 px-3 rounded-xl text-[13px] font-extrabold border transition-all text-center cursor-pointer ${
+                          className={`py-3 px-3 rounded-xl text-[13px] font-extrabold border transition-all text-center cursor-pointer ${
                             selectedTerm === term.value
-                              ? 'bg-[#191F28] text-white border-[#191F28] shadow-xs'
-                              : 'bg-[#F9FAFB] text-[#4E5968] border-[#E5E8EB] hover:bg-white'
+                              ? 'bg-white text-[#191F28] border-2 border-[#191F28] font-black shadow-2xs'
+                              : 'bg-white text-[#4E5968] border border-[#E5E8EB] hover:border-[#B0B8C1]'
                           }`}
                         >
                           {term.label}
@@ -2149,13 +2775,11 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                 </div>
 
                 {/* 2. 케어서비스 주기 */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[13px] font-black text-[#191F28] flex items-center gap-1.5">
-                      <span>케어서비스 주기</span>
-                      <Info className="w-3.5 h-3.5 text-[#8B95A1]" />
-                    </label>
-                  </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-black text-[#191F28] flex items-center gap-1.5">
+                    <span>케어서비스 주기</span>
+                    <Info className="w-3.5 h-3.5 text-[#8B95A1]" />
+                  </label>
                   <div className={`grid gap-2 ${
                     selectedProduct.subscriptionOptions.careServiceCycles.length === 1 
                       ? 'grid-cols-1' 
@@ -2167,11 +2791,11 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                       <button
                         key={cycle.value}
                         type="button"
-                        onClick={() => setSelectedCycle(cycle.value)}
-                        className={`py-2.5 sm:py-3 px-3 rounded-xl text-[13px] font-extrabold border transition-all text-center cursor-pointer ${
-                          selectedCycle === cycle.value
-                            ? 'bg-[#191F28] text-white border-[#191F28] shadow-xs'
-                            : 'bg-[#F9FAFB] text-[#4E5968] border-[#E5E8EB] hover:bg-white'
+                        onClick={() => handleSelectCycle(cycle.value)}
+                        className={`py-3 px-3 rounded-xl text-[13px] font-extrabold border transition-all text-center cursor-pointer ${
+                          activeSelectedCycle === cycle.value
+                            ? 'bg-white text-[#191F28] border-2 border-[#191F28] font-black shadow-2xs'
+                            : 'bg-white text-[#4E5968] border border-[#E5E8EB] hover:border-[#B0B8C1]'
                         }`}
                       >
                         {cycle.label}
@@ -2180,39 +2804,32 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   </div>
                 </div>
 
-                {/* 3. 케어서비스 유형 (LG 공홈 문구 100% 일치) */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[13px] font-black text-[#191F28] flex items-center gap-1.5">
-                      <span>케어서비스 유형</span>
-                      <Info className="w-3.5 h-3.5 text-[#8B95A1]" />
-                    </label>
-                  </div>
+                {/* 3. 케어서비스 유형 (LG 공홈 2단 분할 레이아웃) */}
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-black text-[#191F28] flex items-center gap-1.5">
+                    <span>케어서비스 유형</span>
+                    <Info className="w-3.5 h-3.5 text-[#8B95A1]" />
+                  </label>
                   <div className="space-y-2">
                     {selectedProduct.subscriptionOptions.careServiceTypes.map((type) => {
                       const isSelected = selectedType === type.value;
                       return (
                         <div
                           key={type.value}
-                          onClick={() => setSelectedType(type.value)}
-                          className={`p-3.5 sm:p-4 rounded-2xl border cursor-pointer transition-all flex items-center justify-between gap-3 ${
+                          onClick={() => handleSelectType(type.value)}
+                          className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-between gap-3 ${
                             isSelected
-                              ? 'bg-white border-[#191F28] shadow-xs ring-1 ring-[#191F28]'
-                              : 'bg-[#F9FAFB] border-[#E5E8EB] hover:bg-white'
+                              ? 'bg-white border-2 border-[#191F28] shadow-2xs'
+                              : 'bg-white border border-[#E5E8EB] hover:border-[#B0B8C1]'
                           }`}
                         >
                           <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4 min-w-0 flex-1">
-                            <span className="text-[14px] font-black text-[#191F28] shrink-0">
+                            <span className="text-[13px] font-black text-[#191F28] shrink-0">
                               {type.accentLabel || type.label}
                             </span>
-                            <span className="text-[12px] text-[#6B7684]">
+                            <span className="text-[11px] sm:text-[12px] text-[#6B7684] truncate">
                               {type.label || type.description}
                             </span>
-                          </div>
-                          <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                            isSelected ? 'border-[#191F28] bg-[#191F28] text-white' : 'border-[#D1D6DB]'
-                          }`}>
-                            {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
                           </div>
                         </div>
                       );
@@ -2220,50 +2837,84 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   </div>
                 </div>
 
-                {/* Pricing Summary Box */}
-                <div className="bg-[#F8FAFC] rounded-2xl p-4 sm:p-5 border border-[#E5E8EB] space-y-2.5">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-bold text-[#4E5968] text-[13px] sm:text-[14px] shrink-0">1. LG 공식 월 구독료</span>
-                    <span className="text-[20px] sm:text-[24px] font-black text-[#191F28] text-right">
+                {/* 이용 요금 표시 (금액이 0원이거나 없는 옵션은 금액 영역을 노출하지 않음) */}
+                {currentMonthlyPrice > 0 ? (
+                  <div className="pt-3 border-t border-[#E5E8EB] flex items-center justify-between">
+                    <span className="text-[15px] font-black text-[#191F28]">이용 요금 &gt;</span>
+                    <span className="text-[22px] sm:text-[24px] font-black text-[#191F28]">
                       월 {currentMonthlyPrice.toLocaleString()}원
                     </span>
                   </div>
-
-                  <div className="flex items-center justify-between text-[11px] sm:text-[12px] text-[#16A34A] font-bold pt-2 border-t border-[#E5E8EB]">
-                    <span className="flex items-center gap-1">
-                      <CreditCard className="w-3.5 h-3.5" />
-                      LG구독 제휴카드 최대 할인 시
+                ) : (
+                  <div className="pt-3 border-t border-[#E5E8EB] p-3 rounded-xl bg-[#F8FAFC] border border-dashed border-[#D1D6DB] text-center">
+                    <span className="text-[12px] font-bold text-[#6B7684]">
+                      선택하신 케어서비스 유형은 {selectedTerm === '60' ? '6년 약정' : '5년 약정'}에서 제공됩니다.
                     </span>
-                    <span>월 {Math.max(0, currentMonthlyPrice - 42000).toLocaleString()}원</span>
                   </div>
-                </div>
+                )}
 
-                {/* Move to Hyowon Special CTA */}
-                <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#FFF5F6] to-[#FFF0F2] border border-[#EA1D2C]/20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
-                  <div className="space-y-0.5">
-                    <div className="text-[12px] sm:text-[13px] font-black text-[#EA1D2C] leading-snug">
-                      💡 효원상조 결합 시 매월 10% 추가할인 + 만기환급
+                {/* LG 공홈 바로가기 링크 (팝업 차단 없이 100% 정상 작동하는 네이티브 <a> 태그) */}
+                {(() => {
+                  const rels = (selectedProduct as any)?.relatedUrls || [];
+                  const initialUrl = rels.length === 1 && rels[0].url ? rels[0].url : (selectedProduct as any)?.refUrl;
+                  const imgMatch = (selectedProduct?.image || (selectedProduct?.images && selectedProduct.images[0]) || '').match(/md(\d{6,10})/i);
+                  const modelIdHint = imgMatch ? `MD${imgMatch[1]}` : (selectedProduct as any)?.modelId;
+                  const officialTargetUrl = buildLgOfficialPdpUrl(initialUrl, selectedProduct?.model, selectedProduct?.categoryKey || selectedProduct?.category, modelIdHint);
+
+                  if (rels.length > 1) {
+                    return (
+                      <button
+                        type="button"
+                        onClick={() => setChoiceModalProduct(selectedProduct)}
+                        className="w-full py-2.5 px-4 rounded-xl border border-[#D1D6DB] hover:border-[#191F28] bg-[#F8F9FA] hover:bg-white text-[#4E5968] hover:text-[#191F28] text-[12px] font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <span>LG 공식 홈페이지에서 제품 및 정가 확인하기</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    );
+                  }
+
+                  return (
+                    <a
+                      href={officialTargetUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2.5 px-4 rounded-xl border border-[#D1D6DB] hover:border-[#191F28] bg-[#F8F9FA] hover:bg-white text-[#4E5968] hover:text-[#191F28] text-[12px] font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer text-center"
+                    >
+                      <span>LG 공식 홈페이지에서 제품 및 정가 확인하기</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
+                  );
+                })()}
+
+                {/* Move to Hyowon Special CTA (금액이 있을 때만 노출) */}
+                {currentMonthlyPrice > 0 && (
+                  <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#FFF5F6] to-[#FFF0F2] border border-[#EA1D2C]/20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+                    <div className="space-y-0.5">
+                      <div className="text-[12px] sm:text-[13px] font-black text-[#EA1D2C]">
+                        💡 효원 결합 시 매월 10% 추가 할인 지원
+                      </div>
+                      <div className="text-[11px] text-[#6B7684]">
+                        월 {discountedMonthlyPrice.toLocaleString()}원 + 만기 시 100% 환급 및 144만원 지원
+                      </div>
                     </div>
-                    <div className="text-[11px] text-[#6B7684] leading-tight">
-                      월 구독료 10% 즉시 할인 + 만기 시 100% 전액 환급 및 144만원 지원금
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setModalTab('hyowon')}
+                      className="px-3.5 py-2 rounded-xl text-[12px] font-black bg-[#EA1D2C] hover:bg-[#D41423] text-white shadow-xs whitespace-nowrap active:scale-95 transition-all text-center shrink-0 cursor-pointer"
+                    >
+                      결합 혜택 계산하기 →
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setModalTab('hyowon')}
-                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-[12px] sm:text-[13px] font-black bg-[#EA1D2C] hover:bg-[#D41423] text-white shadow-xs whitespace-nowrap active:scale-95 transition-all text-center shrink-0 cursor-pointer"
-                  >
-                    결합 혜택 계산하기 →
-                  </button>
-                </div>
+                )}
               </div>
             )}
 
-            {/* TAB 2: [효원특가] 탭 - 효원상조 144 결합 파격 지원관 */}
+            {/* TAB 2: [효원특가] 탭 - 10%할인 (10원 단위 절삭) + 상조 결합 만기환급 */}
             {modalTab === 'hyowon' && (
-              <div className="space-y-5 sm:space-y-6 animate-in fade-in duration-200">
+              <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200">
                 {/* Current Selected Option Recap */}
-                <div className="bg-[#F8FAFC] rounded-2xl p-3 sm:p-3.5 border border-[#E5E8EB] space-y-1.5 shadow-2xs">
+                <div className="bg-[#F8FAFC] rounded-xl p-3 border border-[#E5E8EB] space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-[#6B7684] bg-[#EEF2F6] px-2 py-0.5 rounded-md">
                       선택된 구독 옵션
@@ -2283,7 +2934,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                 </div>
 
                 {/* Select Hyowon Sangjo Account (1~4 accounts) */}
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <div className="flex items-center justify-between gap-1">
                     <label className="text-[13px] font-black text-[#191F28] flex items-center gap-1.5 min-w-0">
                       <Gift className="w-4 h-4 text-[#EA1D2C] shrink-0" />
@@ -2295,19 +2946,19 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
-                      { count: 1, label: '1구좌 (SINGLE)', bonus: '지원금 +144만', svc: '서비스 1회' },
-                      { count: 2, label: '2구좌 (DOUBLE)', bonus: '지원금 +288만', svc: '서비스 2회 (추천)' },
-                      { count: 3, label: '3구좌 (TRIPLE)', bonus: '지원금 +432만', svc: '서비스 3회' },
-                      { count: 4, label: '4구좌 (QUAD)', bonus: '지원금 +576만', svc: '서비스 4회' }
+                      { count: 1, label: '1구좌 (SINGLE)', bonus: '지원금 +144만' },
+                      { count: 2, label: '2구좌 (DOUBLE)', bonus: '지원금 +288만 (추천)' },
+                      { count: 3, label: '3구좌 (TRIPLE)', bonus: '지원금 +432만' },
+                      { count: 4, label: '4구좌 (QUAD)', bonus: '지원금 +576만' }
                     ].map((item) => (
                       <button
                         key={item.count}
                         type="button"
                         onClick={() => setHyowonAccountCount(item.count)}
-                        className={`p-2.5 sm:p-3 rounded-2xl border text-center transition-all cursor-pointer ${
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                           hyowonAccountCount === item.count
-                            ? 'bg-[#FEECEF] border-[#EA1D2C] text-[#EA1D2C] font-black shadow-xs ring-1 ring-[#EA1D2C]'
-                            : 'bg-[#F9FAFB] border-[#E5E8EB] text-[#4E5968] hover:bg-white font-bold'
+                            ? 'bg-[#FEECEF] border-2 border-[#EA1D2C] text-[#EA1D2C] font-black shadow-2xs'
+                            : 'bg-white border border-[#E5E8EB] text-[#4E5968] hover:border-[#B0B8C1] font-bold'
                         }`}
                       >
                         <div className="text-[12px] sm:text-[13px]">{item.label}</div>
@@ -2317,106 +2968,168 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   </div>
                 </div>
 
-                {/* Card Discount Toggle */}
-                <div className="space-y-2">
-                  <div 
-                    onClick={() => setApplyCardDiscount(!applyCardDiscount)}
-                    className="p-3.5 sm:p-4 rounded-2xl bg-[#F8FAFC] border border-[#E5E8EB] flex items-center justify-between cursor-pointer hover:bg-white transition-all shadow-2xs"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors ${
-                        applyCardDiscount ? 'bg-[#191F28] border-[#191F28] text-white' : 'border-[#D1D6DB] bg-white'
-                      }`}>
-                        {applyCardDiscount && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                      </div>
-                      <div>
-                        <div className="text-[13px] sm:text-[14px] font-bold text-[#191F28] flex items-center gap-1.5">
-                          <span>LG구독 제휴카드 청구할인 적용</span>
-                          <span className="text-[11px] font-normal text-[#8B95A1]">(월 최대 -42,000원)</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsCardModalOpen(true);
-                      }}
-                      className="text-[11px] sm:text-[12px] font-bold text-[#3182F6] hover:underline whitespace-nowrap pl-2"
-                    >
-                      카드 안내 &gt;
-                    </button>
-                  </div>
-                </div>
-
-                {/* 4. Comparison Calculation Card */}
-                <div className="bg-[#191F28] text-white rounded-3xl p-4 sm:p-6 space-y-4 shadow-xl">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-[#FF8591]" />
-                      <span className="font-extrabold text-[14px] sm:text-[15px]">효원 144 결합 최종 계산서</span>
+                {/* 4. Comparison Calculation Card (제휴카드 제외 - 순수 효원 10%할인 + 만기환급) */}
+                <div className="bg-[#191F28] text-white rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xl">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-[#FF8591]" />
+                      <span className="font-extrabold text-[14px]">효원 144 결합 최종 계산서</span>
                     </div>
                     <span className="text-[11px] bg-[#EA1D2C] text-white px-2 py-0.5 rounded-full font-bold">
                       {hyowonAccountCount}구좌 적용
                     </span>
                   </div>
 
-                  <div className="space-y-2 text-[12px] sm:text-[13px]">
+                  <div className="space-y-1.5 text-[12px] sm:text-[13px]">
                     {/* 1. LG 공식 구독료 */}
                     <div className="flex items-center justify-between gap-2 text-[#A6ADB8]">
-                      <span className="min-w-0">1. LG 공식 월 구독료</span>
-                      <span className="font-semibold text-white whitespace-nowrap shrink-0">{currentMonthlyPrice.toLocaleString()}원/월</span>
+                      <span>1. LG 공식 월 구독료</span>
+                      <span className="font-semibold text-white whitespace-nowrap">{currentMonthlyPrice.toLocaleString()}원/월</span>
                     </div>
 
-                    {/* 2. 효원 10% 추가할인 */}
+                    {/* 2. 효원 10% 추가할인 (10원 단위 절삭) */}
                     <div className="flex items-center justify-between gap-2 text-[#55E4B0] font-bold">
-                      <span className="min-w-0">2. 효원 결합 10% 다이렉트 지원</span>
-                      <span className="whitespace-nowrap shrink-0">-{hyowonMonthlyDiscount.toLocaleString()}원/월</span>
+                      <span>2. 효원 결합 10% 다이렉트 지원</span>
+                      <span className="whitespace-nowrap">-{hyowonMonthlyDiscount.toLocaleString()}원/월</span>
                     </div>
-
-                    {/* 3. LG구독 제휴카드 적용 시 */}
-                    {applyCardDiscount && (
-                      <div className="flex items-center justify-between gap-2 text-[#55E4B0] font-bold">
-                        <span className="min-w-0">3. LG 제휴카드 추가 청구할인</span>
-                        <span className="whitespace-nowrap shrink-0">-{cardDiscountAmount.toLocaleString()}원/월</span>
-                      </div>
-                    )}
                   </div>
 
                   {/* 4. 최종 고객 실부담 월 납부금 */}
-                  <div className="pt-3 border-t border-white/10 flex items-baseline justify-between gap-2">
+                  <div className="pt-2.5 border-t border-white/10 flex items-baseline justify-between gap-2">
                     <div>
-                      <div className="text-[11px] font-bold text-[#A6ADB8]">최종 실부담 월 납부금</div>
+                      <div className="text-[11px] font-bold text-[#A6ADB8]">효원 결합 실부담 월 구독료</div>
                     </div>
                     <div className="text-right whitespace-nowrap shrink-0">
-                      <span className="text-[22px] sm:text-[28px] font-black text-[#FF8591]">
-                        월 {finalMonthlyPayment.toLocaleString()}원
+                      <span className="text-[22px] sm:text-[26px] font-black text-[#FF8591]">
+                        월 {discountedMonthlyPrice.toLocaleString()}원
                       </span>
                     </div>
                   </div>
 
                   {/* Sangjo Maturity Highlight Box */}
-                  <div className="bg-white/10 rounded-2xl p-3.5 sm:p-4 space-y-2 border border-white/10 text-[11px] sm:text-[12px]">
-                    <div className="flex items-center justify-between gap-2 text-white font-bold pb-1.5 border-b border-white/10">
-                      <div className="text-[#FF8591] text-[12px] sm:text-[13px] leading-tight">
-                        <div>상조 만기 혜택</div>
-                      </div>
-                      <span className="text-[13px] sm:text-[14px] text-[#55E4B0] font-black whitespace-nowrap shrink-0">
+                  <div className="bg-white/10 rounded-xl p-3 space-y-1.5 border border-white/10 text-[11px] sm:text-[12px]">
+                    <div className="flex items-center justify-between gap-2 text-white font-bold pb-1 border-b border-white/10">
+                      <span className="text-[#FF8591]">상조 만기 혜택</span>
+                      <span className="text-[#55E4B0] font-black whitespace-nowrap">
                         총 {totalMaturityPayout.toLocaleString()}원 지급
                       </span>
                     </div>
                     <div className="text-[#A6ADB8] space-y-1 pt-0.5">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="min-w-0">• 상조 실납입금 (100% 환급):</span>
-                        <span className="text-white font-bold whitespace-nowrap shrink-0">{totalSangjoDeposit.toLocaleString()}원</span>
+                        <span>• 상조 실납입금 (100% 전액 환급):</span>
+                        <span className="text-white font-bold">{totalSangjoDeposit.toLocaleString()}원</span>
                       </div>
                       <div className="flex items-center justify-between gap-2 text-[#55E4B0]">
-                        <span className="min-w-0">• 만기축하금 ({hyowonAccountCount}구좌 지원):</span>
-                        <span className="font-black whitespace-nowrap shrink-0">+{maturityBonus.toLocaleString()}원</span>
+                        <span>• 만기 축하금 ({hyowonAccountCount}구좌 지원):</span>
+                        <span className="font-black">+{maturityBonus.toLocaleString()}원</span>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* TAB 3: [제휴카드 추가할인] 탭 - 제휴카드 전용 할인 계산기 */}
+            {modalTab === 'card' && (
+              <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200">
+                {/* 1. LG 제휴카드사 선택 */}
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-black text-[#191F28] flex items-center gap-1.5">
+                    <CreditCard className="w-4 h-4 text-[#3182F6]" />
+                    <span>LG구독 제휴카드 선택</span>
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {[
+                      { id: 'woori', name: 'LG전자 우리 Platinum', maxDisc: 42000 },
+                      { id: 'shinhan', name: 'LG전자 신한카드', maxDisc: 25000 },
+                      { id: 'kb', name: 'LG전자 KB국민카드', maxDisc: 25000 },
+                      { id: 'lotte', name: 'LG전자 롯데카드', maxDisc: 26000 },
+                      { id: 'hana', name: 'LG전자 하나카드', maxDisc: 25000 },
+                      { id: 'hyundai', name: 'LG전자 현대카드', maxDisc: 25000 },
+                    ].map((card) => (
+                      <button
+                        key={card.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCardCompany(card.id);
+                          setSelectedCardSpend(card.id === 'woori' ? 1200000 : 700000);
+                        }}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          selectedCardCompany === card.id
+                            ? 'bg-white border-2 border-[#3182F6] shadow-2xs ring-1 ring-[#3182F6]'
+                            : 'bg-white border border-[#E5E8EB] hover:border-[#B0B8C1]'
+                        }`}
+                      >
+                        <div className="text-[12px] font-extrabold text-[#191F28] truncate">{card.name}</div>
+                        <div className="text-[10px] text-[#3182F6] font-bold mt-0.5">월 최대 -{(card.maxDisc / 10000).toFixed(1)}만원</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. 전월 이용 실적 선택 */}
+                <div className="space-y-1.5">
+                  <label className="text-[13px] font-black text-[#191F28]">
+                    전월 카드 이용 실적
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { spend: 300000, label: '30만원 이상', disc: 15000 },
+                      { spend: 700000, label: '70만원 이상', disc: 20000 },
+                      { spend: 1200000, label: '120만원 이상', disc: selectedCardCompany === 'woori' ? 42000 : 25000 },
+                    ].map((tier) => (
+                      <button
+                        key={tier.spend}
+                        type="button"
+                        onClick={() => setSelectedCardSpend(tier.spend)}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                          selectedCardSpend === tier.spend
+                            ? 'bg-[#191F28] text-white border-[#191F28] font-bold shadow-xs'
+                            : 'bg-white text-[#4E5968] border border-[#E5E8EB] hover:border-[#B0B8C1]'
+                        }`}
+                      >
+                        <div className="text-[12px] font-bold">{tier.label}</div>
+                        <div className={`text-[11px] font-black mt-0.5 ${selectedCardSpend === tier.spend ? 'text-[#55E4B0]' : 'text-[#3182F6]'}`}>
+                          -{(tier.disc).toLocaleString()}원/월
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. 제휴카드 적용 최종 체감가 (효원 10% 할인가 기준) */}
+                {(() => {
+                  const cardDisc = selectedCardSpend >= 1200000
+                    ? (selectedCardCompany === 'woori' ? 42000 : 25000)
+                    : (selectedCardSpend >= 700000 ? 20000 : 15000);
+                  const finalWithCard = Math.max(0, discountedMonthlyPrice - cardDisc);
+
+                  return (
+                    <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-[#E5E8EB] space-y-3">
+                      <div className="flex items-center justify-between text-[12px] text-[#6B7684]">
+                        <span>LG 공식 월 구독료</span>
+                        <span className="text-[#8B95A1] line-through">{currentMonthlyPrice.toLocaleString()}원</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[12px] text-[#EA1D2C] font-bold">
+                        <span>효원 결합 10% 할인가</span>
+                        <span>{discountedMonthlyPrice.toLocaleString()}원/월</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[12px] text-[#16A34A] font-bold">
+                        <span>제휴카드 청구할인</span>
+                        <span>-{cardDisc.toLocaleString()}원/월</span>
+                      </div>
+                      <div className="pt-2 border-t border-[#E5E8EB] flex items-baseline justify-between">
+                        <span className="text-[14px] font-black text-[#191F28]">제휴카드 적용 최종 체감가</span>
+                        <span className="text-[22px] sm:text-[26px] font-black text-[#EA1D2C]">
+                          월 {finalWithCard.toLocaleString()}원
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-[#8B95A1] leading-tight">
+                        ※ 효원 결합 10% 할인 금액에 제휴카드 전월 실적 충족 시 추가 청구할인이 중복 적용됩니다.
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
@@ -2538,7 +3251,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                             className="w-7 h-7 rounded-full border border-black/10 shrink-0 shadow-2xs relative flex items-center justify-center"
                             style={{ background: c.code || '#E8E1D5' }}
                           >
-                            {isSelected && <Check className="w-3.5 h-3.5 text-black/70 stroke-[3]" />}
+                            {isSelected && <Check className="w-3.5 h-3.5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] stroke-[3]" />}
                           </div>
                           <div className="min-w-0">
                             <span className={`text-[12px] sm:text-[13px] font-bold block truncate ${
@@ -3235,6 +3948,101 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
           </div>
         </div>
       </footer>
+
+      {/* Choice Modal for Multiple Matched/Fuzzy Models */}
+      {choiceModalProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-[#E5E8EB] flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-[#EA1D2C] bg-red-50 px-2 py-0.5 rounded">
+                  공홈 공식 제품 선택
+                </span>
+                <h3 className="text-[16px] font-black text-[#191F28] mt-1">
+                  이동할 제품 페이지를 선택하세요
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setChoiceModalProduct(null)}
+                className="text-[#8B95A1] hover:text-[#191F28] p-1 rounded-lg hover:bg-[#F2F4F6] cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <div className="bg-[#F8F9FA] p-3 rounded-xl border border-[#E5E8EB]">
+                <p className="text-[12px] font-bold text-[#6B7684]">요청 모델</p>
+                <p className="text-[14px] font-black text-[#191F28] font-mono">
+                  {choiceModalProduct.model} ({choiceModalProduct.name})
+                </p>
+                <p className="text-[11px] text-[#8B95A1] mt-1">
+                  공홈에서 일치/유사한 제품 옵션이 확인되었습니다. 아래에서 원하는 형태를 클릭하시면 해당 공홈 페이지로 바로 이동합니다:
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {choiceModalProduct.relatedUrls?.map((rel: any, i: number) => {
+                  const safeUrl = buildLgOfficialPdpUrl(rel.url, rel.model, choiceModalProduct.categoryKey || choiceModalProduct.category);
+                  return (
+                    <a
+                      key={i}
+                      href={safeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setChoiceModalProduct(null)}
+                      className="flex items-center justify-between p-3.5 rounded-xl border border-[#E5E8EB] hover:border-[#3182F6] hover:bg-[#F8FAFF] transition-all group cursor-pointer"
+                    >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-[#E8F3FF] text-[#1B64DA] flex items-center justify-center font-bold text-[12px] shrink-0">
+                        {i + 1}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[12px] font-extrabold bg-[#F2F4F6] group-hover:bg-[#E8F3FF] text-[#333D4B] group-hover:text-[#1B64DA] px-2 py-0.5 rounded">
+                            {rel.title}
+                          </span>
+                          <span className="text-[13px] font-black text-[#191F28] font-mono">
+                            {rel.model}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[#8B95A1] mt-0.5 truncate max-w-[260px]">
+                          {rel.url}
+                        </p>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-[#8B95A1] group-hover:text-[#3182F6] shrink-0 transition-transform group-hover:translate-x-0.5" />
+                  </a>
+                );
+              })}
+
+                {/* Direct Search Link Fallback */}
+                <a
+                  href={`https://www.lge.co.kr/search/search-all?searchKey=${encodeURIComponent(choiceModalProduct.model)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setChoiceModalProduct(null)}
+                  className="flex items-center justify-between p-3 rounded-xl border border-dashed border-[#D1D6DB] hover:border-[#4E5968] hover:bg-gray-50 transition-all text-[#6B7684] hover:text-[#191F28] text-[12px] font-bold"
+                >
+                  <span>🔍 LG 공홈에서 &apos;{choiceModalProduct.model}&apos; 전체 검색결과 보기</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+
+            <div className="p-4 bg-[#F8F9FA] border-t border-[#E5E8EB] flex justify-end">
+              <button
+                type="button"
+                onClick={() => setChoiceModalProduct(null)}
+                className="px-4 py-2 bg-white border border-[#D1D6DB] hover:bg-[#F2F4F6] text-[#4E5968] text-[13px] font-bold rounded-xl cursor-pointer"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

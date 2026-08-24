@@ -66,220 +66,86 @@ export interface LgProduct {
 
 export const CATEGORY_SUBTABS: Record<string, Array<{ id: string; name: string }>> = {
   "fridge": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "STEM",
-      "name": "STEM"
-    },
-    {
-      "id": "상냉장/하냉동",
-      "name": "상냉장/하냉동"
-    },
-    {
-      "id": "양문형",
-      "name": "양문형"
-    },
-    {
-      "id": "일반형",
-      "name": "일반형"
-    },
-    {
-      "id": "컨버터블 패키지",
-      "name": "컨버터블 패키지"
-    }
+    { id: "all", name: "전체" },
+    { id: "STEM / 얼음정수기", name: "STEM / 얼음정수기" },
+    { id: "4도어 (상냉장)", name: "4도어 (상냉장)" },
+    { id: "양문형 (2도어)", name: "양문형 (2도어)" },
+    { id: "일반 냉장고", name: "일반 냉장고" },
+    { id: "컨버터블 패키지", name: "컨버터블 패키지" }
   ],
   "water": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "냉온정수기",
-      "name": "냉온정수기"
-    },
-    {
-      "id": "냉정수기",
-      "name": "냉정수기"
-    },
-    {
-      "id": "정수전용",
-      "name": "정수전용"
-    },
-    {
-      "id": "얼음정수기",
-      "name": "얼음정수기"
-    }
+    { id: "all", name: "전체" },
+    { id: "냉온정수기", name: "냉온정수기" },
+    { id: "얼음정수기", name: "얼음정수기" },
+    { id: "음성인식 맞춤출수", name: "음성인식 맞춤출수" },
+    { id: "냉정수기", name: "냉정수기" },
+    { id: "정수전용", name: "정수전용" }
   ],
   "kimchi": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "스탠드형 (4도어)",
-      "name": "스탠드형 (4도어)"
-    },
-    {
-      "id": "스탠드형 (3도어)",
-      "name": "스탠드형 (3도어)"
-    },
-    {
-      "id": "뚜껑형",
-      "name": "뚜껑형"
-    }
+    { id: "all", name: "전체" },
+    { id: "4도어 스탠드형", name: "4도어 스탠드형" },
+    { id: "3도어 스탠드형", name: "3도어 스탠드형" },
+    { id: "1도어 (컨버터블)", name: "1도어 (컨버터블)" },
+    { id: "뚜껑형", name: "뚜껑형" }
   ],
   "dishwasher": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "14인용",
-      "name": "14인용"
-    },
-    {
-      "id": "12인용",
-      "name": "12인용"
-    }
+    { id: "all", name: "전체" },
+    { id: "14인용 대용량", name: "14인용 대용량" },
+    { id: "12인용", name: "12인용" }
   ],
   "range": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "인덕션",
-      "name": "인덕션"
-    },
-    {
-      "id": "하이브리드",
-      "name": "하이브리드"
-    }
+    { id: "all", name: "전체" },
+    { id: "인덕션", name: "인덕션" },
+    { id: "하이브리드", name: "하이브리드" }
   ],
   "washer": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "드럼 세탁기",
-      "name": "드럼 세탁기"
-    },
-    {
-      "id": "통돌이 세탁기",
-      "name": "통돌이 세탁기"
-    }
+    { id: "all", name: "전체" },
+    { id: "드럼 세탁기", name: "드럼 세탁기" },
+    { id: "통돌이 세탁기", name: "통돌이 세탁기" }
   ],
   "washtower": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "워시타워",
-      "name": "워시타워"
-    },
-    {
-      "id": "워시타워 컴팩트",
-      "name": "워시타워 컴팩트"
-    }
+    { id: "all", name: "전체" },
+    { id: "워시타워 (대용량)", name: "워시타워 (대용량)" },
+    { id: "워시타워 컴팩트", name: "워시타워 컴팩트" }
   ],
   "washcombo": [
-    {
-      "id": "all",
-      "name": "전체"
-    }
+    { id: "all", name: "전체" }
   ],
   "dryer": [
-    {
-      "id": "all",
-      "name": "전체"
-    }
+    { id: "all", name: "전체" }
   ],
   "styler": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "올 뉴 스타일러",
-      "name": "올 뉴 스타일러"
-    },
-    {
-      "id": "오브제 스타일러",
-      "name": "오브제 스타일러"
-    }
+    { id: "all", name: "전체" },
+    { id: "대용량 (5벌)", name: "대용량 (5벌)" },
+    { id: "슬림 (3벌)", name: "슬림 (3벌)" }
   ],
   "aircon": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "스탠드",
-      "name": "스탠드"
-    },
-    {
-      "id": "벽걸이",
-      "name": "벽걸이"
-    },
-    {
-      "id": "2in1",
-      "name": "2in1"
-    }
+    { id: "all", name: "전체" },
+    { id: "2in1 (투인원)", name: "2in1 (투인원)" },
+    { id: "스탠드형", name: "스탠드형" },
+    { id: "벽걸이형", name: "벽걸이형" }
   ],
   "airpurifier": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "퓨리케어 360",
-      "name": "퓨리케어 360"
-    },
-    {
-      "id": "퓨리케어 Hit",
-      "name": "퓨리케어 Hit"
-    }
+    { id: "all", name: "전체" },
+    { id: "퓨리케어 360", name: "퓨리케어 360" },
+    { id: "퓨리케어 Hit", name: "퓨리케어 Hit" },
+    { id: "에어로타워", name: "에어로타워" }
   ],
   "aerotower": [
-    {
-      "id": "all",
-      "name": "전체"
-    }
+    { id: "all", name: "전체" }
   ],
   "humidifier": [
-    {
-      "id": "all",
-      "name": "전체"
-    }
+    { id: "all", name: "전체" }
   ],
   "dehumidifier": [
-    {
-      "id": "all",
-      "name": "전체"
-    }
+    { id: "all", name: "전체" }
   ],
   "tv": [
-    {
-      "id": "all",
-      "name": "전체"
-    },
-    {
-      "id": "올레드 evo",
-      "name": "올레드 evo"
-    },
-    {
-      "id": "올레드 TV",
-      "name": "올레드 TV"
-    },
-    {
-      "id": "QNED TV",
-      "name": "QNED TV"
-    }
+    { id: "all", name: "전체" },
+    { id: "올레드 TV", name: "올레드 TV" },
+    { id: "QNED TV", name: "QNED TV" },
+    { id: "울트라HD / 나노셀", name: "울트라HD / 나노셀" },
+    { id: "스탠바이미", name: "스탠바이미" }
   ],
   "standby": [
     {
@@ -326,6 +192,12 @@ export const CATEGORY_SUBTABS: Record<string, Array<{ id: string; name: string }
       "id": "all",
       "name": "전체"
     }
+  ],
+  "bathair": [
+    { id: "all", name: "전체" },
+    { id: "프리미엄 듀얼", name: "프리미엄 듀얼" },
+    { id: "프리미엄", name: "프리미엄" },
+    { id: "일반", name: "일반" }
   ]
 };
 
@@ -510,7 +382,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10366864/md10366864-280x280.jpg",
@@ -518,14 +390,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "프라임 실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10366862/md10366862-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10561872/md10561872-280x280.jpg",
         "material": "네이처(메탈)"
@@ -637,14 +509,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559846/md10559846-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559849/md10559849-280x280.jpg",
         "material": "네이처(메탈)"
@@ -827,21 +699,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/convertible-refrigerators/md10583867/md10583867-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/convertible-refrigerators/md10574833/md10574833-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/convertible-refrigerators/md10583876/md10583876-280x280.jpg",
         "material": "미스트(글라스)"
@@ -855,14 +727,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 레몬",
-        "code": "#FFFACD",
+        "code": "#F5E5A4",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/convertible-refrigerators/md10583874/md10583874-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 피치",
-        "code": "#FFDAB9",
+        "code": "#F2C2B4",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/convertible-refrigerators/md10583873/md10583873-280x280.jpg",
         "material": "미스트(글라스)"
@@ -960,7 +832,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md09164830/md09164830-280x280.jpg",
@@ -968,28 +840,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "핑크/핑크",
-        "code": "#D4C5A9",
+        "code": "#E8A598",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md09164831/md09164831-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "핑크/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #E8A598 50%, #7A6652 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md09164834/md09164834-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "#7A6652",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md09164835/md09164835-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 화이트/크림 화이트",
-        "code": "#FFFDD0",
+        "code": "#F7F5F0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10053827/md10053827-280x280.jpg",
         "material": "미스트(글라스)"
@@ -1367,42 +1239,42 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "클레이 핑크/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #DCA094 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10615834/md10615834-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10597854/md10597854-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10615835/md10615835-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10615836/md10615836-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10615837/md10615837-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "네이비/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10615839/md10615839-280x280.jpg",
         "material": "네이처(메탈)"
@@ -1500,28 +1372,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780848/md10780848-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780849/md10780849-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780850/md10780850-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780851/md10780851-280x280.jpg",
         "material": "스톤(스테인리스)"
@@ -1708,7 +1580,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10366864/md10366864-280x280.jpg",
@@ -1716,14 +1588,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "프라임 실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10366862/md10366862-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10561872/md10561872-280x280.jpg",
         "material": "네이처(메탈)"
@@ -1835,7 +1707,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "66% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10604870/md10604870-280x280.jpg",
@@ -1843,14 +1715,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10604871/md10604871-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10604872/md10604872-280x280.jpg",
         "material": "미스트(글라스)"
@@ -1948,21 +1820,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10681861/md10681861-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10681860/md10681860-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "크림 그레이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #B5BAC0 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10758829/md10758829-280x280.jpg",
         "material": "네이처(메탈)"
@@ -2060,7 +1932,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780848/md10780848-280x280.jpg",
@@ -2068,21 +1940,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780849/md10780849-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780850/md10780850-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780851/md10780851-280x280.jpg",
         "material": "스톤(스테인리스)"
@@ -2269,7 +2141,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10635830/md10635830-280x280.jpg",
@@ -2277,7 +2149,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10635831/md10635831-280x280.jpg",
         "material": "네이처(메탈)"
@@ -2464,14 +2336,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md09322826/md09322826-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "크림 화이트/크림 화이트",
-        "code": "#FFFDD0",
+        "code": "#F7F5F0",
         "badge": "66% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md09935830/md09935830-280x280.jpg",
@@ -2479,7 +2351,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "클레이 민트/베이지",
-        "code": "#B8D4C8",
+        "code": "linear-gradient(180deg, #A3C6B8 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md09479832/md09479832-280x280.jpg",
         "material": "네이처(메탈)"
@@ -2943,21 +2815,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780840/md10780840-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780842/md10780842-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780841/md10780841-280x280.jpg",
         "material": "솔리드(스테인리스)"
@@ -3246,14 +3118,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10781899/md10781899-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10781898/md10781898-280x280.jpg",
         "material": "솔리드(스테인리스)"
@@ -3453,21 +3325,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780840/md10780840-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780842/md10780842-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780841/md10780841-280x280.jpg",
         "material": "솔리드(스테인리스)"
@@ -3766,7 +3638,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10681847/md10681847-280x280.jpg",
@@ -3774,7 +3646,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10681848/md10681848-280x280.jpg",
         "material": "네이처(메탈)"
@@ -3971,28 +3843,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555866/md10555866-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555867/md10555867-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "클레이 핑크/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #DCA094 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555868/md10555868-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "badge": "100% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555869/md10555869-280x280.jpg",
@@ -4000,49 +3872,49 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555870/md10555870-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555871/md10555871-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "아몬드/토프",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9E8B76 50%, #8B7D6B 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555872/md10555872-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555873/md10555873-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 스카이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9BBFD4 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555874/md10555874-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #B5BAC0 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555876/md10555876-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10556828/md10556828-280x280.jpg",
         "material": "네이처(메탈)"
@@ -4153,14 +4025,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10781899/md10781899-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10781898/md10781898-280x280.jpg",
         "material": "솔리드(스테인리스)"
@@ -4660,21 +4532,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10623826/md10623826-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "클레이 핑크/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #DCA094 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10623827/md10623827-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10604857/md10604857-280x280.jpg",
@@ -4682,28 +4554,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10623828/md10623828-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10623829/md10623829-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10623830/md10623830-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "네이비/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10623832/md10623832-280x280.jpg",
         "material": "네이처(메탈)"
@@ -5158,14 +5030,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10411835/md10411835-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #7A6652 50%)",
         "badge": "100% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10411836/md10411836-280x280.jpg",
@@ -5277,21 +5149,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780840/md10780840-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780842/md10780842-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780841/md10780841-280x280.jpg",
         "material": "솔리드(스테인리스)"
@@ -5487,7 +5359,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555866/md10555866-280x280.jpg",
@@ -5495,70 +5367,70 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555867/md10555867-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "클레이 핑크/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #DCA094 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555868/md10555868-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555869/md10555869-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555870/md10555870-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555871/md10555871-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "아몬드/토프",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9E8B76 50%, #8B7D6B 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555872/md10555872-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555873/md10555873-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 스카이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9BBFD4 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555874/md10555874-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #B5BAC0 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555876/md10555876-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10556828/md10556828-280x280.jpg",
         "material": "네이처(메탈)"
@@ -5754,28 +5626,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555866/md10555866-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555867/md10555867-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "클레이 핑크/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #DCA094 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555868/md10555868-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "badge": "33% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555869/md10555869-280x280.jpg",
@@ -5783,14 +5655,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555870/md10555870-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "badge": "33% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555871/md10555871-280x280.jpg",
@@ -5798,7 +5670,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "아몬드/토프",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9E8B76 50%, #8B7D6B 50%)",
         "badge": "33% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555872/md10555872-280x280.jpg",
@@ -5806,28 +5678,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555873/md10555873-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 스카이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9BBFD4 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555874/md10555874-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #B5BAC0 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555876/md10555876-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10556828/md10556828-280x280.jpg",
         "material": "네이처(메탈)"
@@ -6026,14 +5898,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780843/md10780843-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780844/md10780844-280x280.jpg",
         "material": "미스트(글라스)"
@@ -6717,14 +6589,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10681841/md10681841-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10681842/md10681842-280x280.jpg",
         "material": "미스트(글라스)"
@@ -6923,56 +6795,56 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555923/md10555923-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555922/md10555922-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555926/md10555926-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555927/md10555927-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555928/md10555928-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "아몬드/토프",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9E8B76 50%, #8B7D6B 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555929/md10555929-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555930/md10555930-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #B5BAC0 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555933/md10555933-280x280.jpg",
         "material": "네이처(메탈)"
@@ -7159,14 +7031,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780846/md10780846-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "badge": "100% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780847/md10780847-280x280.jpg",
@@ -7265,28 +7137,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780848/md10780848-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780849/md10780849-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780850/md10780850-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780851/md10780851-280x280.jpg",
         "material": "스톤(스테인리스)"
@@ -7384,14 +7256,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780854/md10780854-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780853/md10780853-280x280.jpg",
         "material": "미스트(글라스)"
@@ -7489,14 +7361,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780854/md10780854-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10780853/md10780853-280x280.jpg",
         "material": "미스트(글라스)"
@@ -7594,14 +7466,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10681838/md10681838-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10681839/md10681839-280x280.jpg",
         "material": "미스트(글라스)"
@@ -7888,56 +7760,56 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555923/md10555923-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555922/md10555922-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555926/md10555926-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555927/md10555927-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555928/md10555928-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "아몬드/토프",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9E8B76 50%, #8B7D6B 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555929/md10555929-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555930/md10555930-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #B5BAC0 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555933/md10555933-280x280.jpg",
         "material": "네이처(메탈)"
@@ -8034,56 +7906,56 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "실버/실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555923/md10555923-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555922/md10555922-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555926/md10555926-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555927/md10555927-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555928/md10555928-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "아몬드/토프",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9E8B76 50%, #8B7D6B 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555929/md10555929-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555930/md10555930-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #B5BAC0 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10555933/md10555933-280x280.jpg",
         "material": "네이처(메탈)"
@@ -8383,14 +8255,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559867/md10559867-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559868/md10559868-280x280.jpg",
         "material": "네이처(메탈)"
@@ -8501,14 +8373,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559846/md10559846-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559849/md10559849-280x280.jpg",
         "material": "네이처(메탈)"
@@ -8707,7 +8579,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "클레이 민트/베이지",
-        "code": "#B8D4C8",
+        "code": "linear-gradient(180deg, #A3C6B8 50%, #D9CAB3 50%)",
         "badge": "50% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559859/md10559859-280x280.jpg",
@@ -8715,14 +8587,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 그레이/에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #B5BAC0 50%, #F8F8FA 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559856/md10559856-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "베이지/에센스 화이트",
-        "code": "#DDD5C0",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #F8F8FA 50%)",
         "badge": "50% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559861/md10559861-280x280.jpg",
@@ -9024,14 +8896,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559867/md10559867-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559868/md10559868-280x280.jpg",
         "material": "네이처(메탈)"
@@ -9143,7 +9015,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "badge": "100% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10559866/md10559866-280x280.jpg",
@@ -9151,7 +9023,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "프라임 실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10825860/md10825860-280x280.jpg",
         "material": "네이처(메탈)"
@@ -9940,7 +9812,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "샤인",
-        "code": "#D4C5A9",
+        "code": "#D0D4D8",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md08953826/md08953826-280x280.jpg"
       }
@@ -10131,7 +10003,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "다크 그라파이트",
-        "code": "#D4C5A9",
+        "code": "#383B3E",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10680829/md10680829-280x280.jpg",
         "material": "네이처(메탈)"
@@ -10228,14 +10100,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10366859/md10366859-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "프라임 실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10590828/md10590828-280x280.jpg",
@@ -10243,7 +10115,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10561873/md10561873-280x280.jpg",
         "material": "네이처(메탈)"
@@ -10516,14 +10388,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "프라임 실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10672827/md10672827-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "맨해튼 미드나잇",
-        "code": "#2C2C3A",
+        "code": "#202430",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10672826/md10672826-280x280.jpg",
         "material": "네이처(메탈)"
@@ -10708,14 +10580,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10580827/md10580827-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "크림 화이트/크림 화이트",
-        "code": "#FFFDD0",
+        "code": "#F7F5F0",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10580828/md10580828-280x280.jpg",
         "material": "네이처(메탈)"
@@ -10988,21 +10860,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "크림 화이트/크림 화이트",
-        "code": "#FFFDD0",
+        "code": "#F7F5F0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10254827/md10254827-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10249830/md10249830-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10301830/md10301830-280x280.jpg",
@@ -11100,7 +10972,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "크림 화이트",
-        "code": "#FFFDD0",
+        "code": "#F7F5F0",
         "badge": "100% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10207846/md10207846-280x280.jpg",
@@ -11108,28 +10980,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 피치",
-        "code": "#FFDAB9",
+        "code": "#F2C2B4",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10207843/md10207843-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "핑크",
-        "code": "#FFB6C1",
+        "code": "#E8A598",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10207840/md10207840-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운",
-        "code": "#8B7355",
+        "code": "#7A6652",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10207841/md10207841-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/refrigerators/md10207839/md10207839-280x280.jpg",
         "material": "미스트(글라스)"
@@ -11348,20 +11220,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "badge": "64% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10699831/md10699831-280x280.jpg"
       },
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10699832/md10699832-280x280.jpg"
       },
       {
         "name": "카밍 클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "#7A6652",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10699833/md10699833-280x280.jpg"
       }
@@ -11476,20 +11348,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "badge": "68% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10748847/md10748847-280x280.jpg"
       },
       {
         "name": "블랙",
-        "code": "#333333",
+        "code": "#232629",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10748848/md10748848-280x280.jpg"
       },
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10748849/md10748849-280x280.jpg"
       }
@@ -11710,32 +11582,32 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "badge": "77% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10597839/md10597839-280x280.jpg"
       },
       {
         "name": "카밍 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10597831/md10597831-280x280.jpg"
       },
       {
         "name": "카밍 크림 스카이",
-        "code": "#D4C5A9",
+        "code": "#9BBFD4",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10597843/md10597843-280x280.jpg"
       },
       {
         "name": "카밍 핑크",
-        "code": "#D4C5A9",
+        "code": "#E8A598",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10597841/md10597841-280x280.jpg"
       },
       {
         "name": "카밍 크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10598874/md10598874-280x280.jpg"
       }
@@ -11956,20 +11828,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10612831/md10612831-280x280.jpg"
       },
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "badge": "50% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10612833/md10612833-280x280.jpg"
       },
       {
         "name": "블랙",
-        "code": "#333333",
+        "code": "#232629",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10612832/md10612832-280x280.jpg"
       }
@@ -12295,14 +12167,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "카밍 크림 화이트",
-        "code": "#D4C5A9",
+        "code": "#F7F5F0",
         "badge": "87% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md09951827/md09951827-280x280.jpg"
       },
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md09951826/md09951826-280x280.jpg"
       }
@@ -12416,20 +12288,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "badge": "75% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10597923/md10597923-280x280.jpg"
       },
       {
         "name": "블랙",
-        "code": "#333333",
+        "code": "#232629",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10375826/md10375826-280x280.jpg"
       },
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10545831/md10545831-280x280.jpg"
       }
@@ -12755,14 +12627,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10222841/md10222841-280x280.jpg"
       },
       {
         "name": "카밍 클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "#7A6652",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10222843/md10222843-280x280.jpg"
       }
@@ -12876,26 +12748,26 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "솔리드 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "57% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10017839/md10017839-280x280.jpg"
       },
       {
         "name": "솔리드 크림 화이트",
-        "code": "#D4C5A9",
+        "code": "#F7F5F0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10017838/md10017838-280x280.jpg"
       },
       {
         "name": "솔리드 블랙",
-        "code": "#D4C5A9",
+        "code": "#232629",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10017837/md10017837-280x280.jpg"
       },
       {
         "name": "솔리드 클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "#7A6652",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10017836/md10017836-280x280.jpg"
       }
@@ -13009,14 +12881,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "badge": "74% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md09976827/md09976827-280x280.jpg"
       },
       {
         "name": "카밍 크림 화이트",
-        "code": "#D4C5A9",
+        "code": "#F7F5F0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md09976826/md09976826-280x280.jpg"
       }
@@ -13342,20 +13214,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "badge": "60% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10017842/md10017842-280x280.jpg"
       },
       {
         "name": "카밍 그린",
-        "code": "#7BA78A",
+        "code": "#3B5B4C",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10017843/md10017843-280x280.jpg"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10017845/md10017845-280x280.jpg"
       }
@@ -13670,13 +13542,13 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "카밍 에센스 화이트/크림스카이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #F8F8FA 50%, #9BBFD4 50%)",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10597838/md10597838-280x280.jpg"
       },
       {
         "name": "카밍 에센스 화이트/핑크",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #F8F8FA 50%, #E8A598 50%)",
         "badge": "55% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10598873/md10598873-280x280.jpg"
@@ -13899,20 +13771,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "badge": "66% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10801841/md10801841-280x280.jpg"
       },
       {
         "name": "카밍 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10599835/md10599835-280x280.jpg"
       },
       {
         "name": "카밍 크림 스카이",
-        "code": "#D4C5A9",
+        "code": "#9BBFD4",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10606848/md10606848-280x280.jpg"
       }
@@ -14026,14 +13898,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10324830/md10324830-280x280.jpg"
       },
       {
         "name": "카밍 클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "#7A6652",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10324832/md10324832-280x280.jpg"
       }
@@ -14360,19 +14232,19 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10833832/md10833832-280x280.jpg"
       },
       {
         "name": "블랙",
-        "code": "#333333",
+        "code": "#232629",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10833834/md10833834-280x280.jpg"
       },
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "badge": "38% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10833833/md10833833-280x280.jpg"
@@ -14593,32 +14465,32 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "badge": "77% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10597839/md10597839-280x280.jpg"
       },
       {
         "name": "카밍 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10597831/md10597831-280x280.jpg"
       },
       {
         "name": "카밍 크림 스카이",
-        "code": "#D4C5A9",
+        "code": "#9BBFD4",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10597843/md10597843-280x280.jpg"
       },
       {
         "name": "카밍 핑크",
-        "code": "#D4C5A9",
+        "code": "#E8A598",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10597841/md10597841-280x280.jpg"
       },
       {
         "name": "카밍 크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10598874/md10598874-280x280.jpg"
       }
@@ -14732,20 +14604,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "badge": "64% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10699831/md10699831-280x280.jpg"
       },
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10699832/md10699832-280x280.jpg"
       },
       {
         "name": "카밍 클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "#7A6652",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10699833/md10699833-280x280.jpg"
       }
@@ -14859,20 +14731,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "badge": "68% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10748847/md10748847-280x280.jpg"
       },
       {
         "name": "블랙",
-        "code": "#333333",
+        "code": "#232629",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10748848/md10748848-280x280.jpg"
       },
       {
         "name": "카밍 베이지",
-        "code": "#C8B89E",
+        "code": "#DDD4C7",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/water-purifiers/md10748849/md10748849-280x280.jpg"
       }
@@ -14969,21 +14841,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10790830/md10790830-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10792836/md10792836-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "badge": "66% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10792838/md10792838-280x280.jpg",
@@ -14991,7 +14863,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10792837/md10792837-280x280.jpg",
         "material": "미스트(글라스)"
@@ -15087,21 +14959,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10366996/md10366996-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430836/md10430836-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10366997/md10366997-280x280.jpg",
@@ -15109,35 +14981,35 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555936/md10555936-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555937/md10555937-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367004/md10367004-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367006/md10367006-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367007/md10367007-280x280.jpg",
         "material": "네이처(메탈)"
@@ -15233,7 +15105,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "80% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10545829/md10545829-280x280.jpg",
@@ -15241,21 +15113,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10681874/md10681874-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "맨해튼 미드나잇",
-        "code": "#2C2C3A",
+        "code": "#202430",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10550826/md10550826-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "프라임 실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10545830/md10545830-280x280.jpg",
         "material": "네이처(메탈)"
@@ -15353,28 +15225,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10790830/md10790830-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10792836/md10792836-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10792838/md10792838-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10792837/md10792837-280x280.jpg",
         "material": "미스트(글라스)"
@@ -15472,28 +15344,28 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "럭스 실버",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10790830/md10790830-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10792836/md10792836-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10792838/md10792838-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10792837/md10792837-280x280.jpg",
         "material": "미스트(글라스)"
@@ -15589,56 +15461,56 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10366996/md10366996-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430836/md10430836-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10366997/md10366997-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555936/md10555936-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555937/md10555937-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367004/md10367004-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367006/md10367006-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367007/md10367007-280x280.jpg",
         "material": "네이처(메탈)"
@@ -15734,56 +15606,56 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10366996/md10366996-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430836/md10430836-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10366997/md10366997-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555936/md10555936-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555937/md10555937-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367004/md10367004-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367006/md10367006-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367007/md10367007-280x280.jpg",
         "material": "네이처(메탈)"
@@ -15966,56 +15838,56 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10366996/md10366996-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430836/md10430836-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10366997/md10366997-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555936/md10555936-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555937/md10555937-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367004/md10367004-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367006/md10367006-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367007/md10367007-280x280.jpg",
         "material": "네이처(메탈)"
@@ -16111,70 +15983,70 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367009/md10367009-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430841/md10430841-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367012/md10367012-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #7A6652 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367014/md10367014-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430842/md10430842-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555938/md10555938-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555939/md10555939-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367017/md10367017-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367019/md10367019-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367020/md10367020-280x280.jpg",
         "material": "네이처(메탈)"
@@ -16270,70 +16142,70 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367009/md10367009-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430841/md10430841-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367012/md10367012-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #7A6652 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367014/md10367014-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430842/md10430842-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555938/md10555938-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555939/md10555939-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367017/md10367017-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367019/md10367019-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367020/md10367020-280x280.jpg",
         "material": "네이처(메탈)"
@@ -16429,14 +16301,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367018/md10367018-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367012/md10367012-280x280.jpg",
         "material": "미스트(글라스)"
@@ -16532,70 +16404,70 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367009/md10367009-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430841/md10430841-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367012/md10367012-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #7A6652 50%)",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367014/md10367014-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430842/md10430842-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555938/md10555938-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555939/md10555939-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367017/md10367017-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367019/md10367019-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367020/md10367020-280x280.jpg",
         "material": "네이처(메탈)"
@@ -16691,70 +16563,70 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367009/md10367009-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430841/md10430841-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367012/md10367012-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #7A6652 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367014/md10367014-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10430842/md10430842-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555938/md10555938-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555939/md10555939-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367017/md10367017-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367019/md10367019-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10367020/md10367020-280x280.jpg",
         "material": "네이처(메탈)"
@@ -16850,77 +16722,77 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561861/md10561861-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561862/md10561862-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561860/md10561860-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561864/md10561864-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #7A6652 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561863/md10561863-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561866/md10561866-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561865/md10561865-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561868/md10561868-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561871/md10561871-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/네이비",
-        "code": "#D4C5A9",
+        "code": "#1E2D4A",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561870/md10561870-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561869/md10561869-280x280.jpg",
         "material": "네이처(메탈)"
@@ -17016,77 +16888,77 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561861/md10561861-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561862/md10561862-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561860/md10561860-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561864/md10561864-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #7A6652 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561863/md10561863-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561866/md10561866-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561865/md10561865-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561868/md10561868-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561871/md10561871-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/네이비",
-        "code": "#D4C5A9",
+        "code": "#1E2D4A",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561870/md10561870-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561869/md10561869-280x280.jpg",
         "material": "네이처(메탈)"
@@ -17269,77 +17141,77 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561861/md10561861-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561862/md10561862-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561860/md10561860-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561864/md10561864-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #7A6652 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561863/md10561863-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561866/md10561866-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561865/md10561865-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561868/md10561868-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561871/md10561871-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/네이비",
-        "code": "#D4C5A9",
+        "code": "#1E2D4A",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561870/md10561870-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561869/md10561869-280x280.jpg",
         "material": "네이처(메탈)"
@@ -17435,77 +17307,77 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "그린/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561861/md10561861-280x280.jpg",
         "material": "솔리드(스테인리스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561862/md10561862-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561860/md10561860-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561864/md10561864-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "베이지/클레이 브라운",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #7A6652 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561863/md10561863-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561866/md10561866-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561865/md10561865-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561868/md10561868-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #B5BAC0 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561871/md10561871-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "네이비/네이비",
-        "code": "#D4C5A9",
+        "code": "#1E2D4A",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561870/md10561870-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10561869/md10561869-280x280.jpg",
         "material": "네이처(메탈)"
@@ -17601,14 +17473,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10545826/md10545826-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "크림 그레이/크림 그레이",
-        "code": "#D4C5A9",
+        "code": "#B5BAC0",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10545827/md10545827-280x280.jpg",
         "material": "네이처(메탈)"
@@ -17805,42 +17677,42 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645849/md10645849-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645847/md10645847-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645850/md10645850-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645851/md10645851-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "화이트/화이트",
-        "code": "#D4C5A9",
+        "code": "#FFFFFF",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645854/md10645854-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645852/md10645852-280x280.jpg",
         "material": "미스트(글라스)"
@@ -17950,7 +17822,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645849/md10645849-280x280.jpg",
@@ -17958,35 +17830,35 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645847/md10645847-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645850/md10645850-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645851/md10645851-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "화이트/화이트",
-        "code": "#D4C5A9",
+        "code": "#FFFFFF",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645854/md10645854-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645852/md10645852-280x280.jpg",
         "material": "미스트(글라스)"
@@ -18096,42 +17968,42 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645849/md10645849-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645847/md10645847-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "클레이 브라운/베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #7A6652 50%, #D9CAB3 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645850/md10645850-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645851/md10645851-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "화이트/화이트",
-        "code": "#D4C5A9",
+        "code": "#FFFFFF",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645854/md10645854-280x280.jpg",
         "material": "네이처(메탈)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645852/md10645852-280x280.jpg",
         "material": "미스트(글라스)"
@@ -18241,21 +18113,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "클레이 핑크/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #DCA094 50%, #C4C8CC 50%)",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645855/md10645855-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645856/md10645856-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645859/md10645859-280x280.jpg",
         "material": "네이처(메탈)"
@@ -18365,21 +18237,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "클레이 핑크/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #DCA094 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645855/md10645855-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645856/md10645856-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645859/md10645859-280x280.jpg",
         "material": "네이처(메탈)"
@@ -18489,21 +18361,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "클레이 핑크/실버",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #DCA094 50%, #C4C8CC 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645855/md10645855-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645856/md10645856-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645859/md10645859-280x280.jpg",
         "material": "네이처(메탈)"
@@ -18613,21 +18485,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645865/md10645865-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645866/md10645866-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645869/md10645869-280x280.jpg",
         "material": "네이처(메탈)"
@@ -18737,21 +18609,21 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645865/md10645865-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645866/md10645866-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10645869/md10645869-280x280.jpg",
         "material": "네이처(메탈)"
@@ -18847,42 +18719,42 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "실버",
-        "code": "#C0C0C0",
+        "code": "#C4C8CC",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10432831/md10432831-280x280.jpg",
         "material": "스톤(스테인리스)"
       },
       {
         "name": "베이지/베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10432829/md10432829-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/토프",
-        "code": "#D4C5A9",
+        "code": "#8B7D6B",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555826/md10555826-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "토프/아몬드",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #8B7D6B 50%, #9E8B76 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555827/md10555827-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "아몬드/토프",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9E8B76 50%, #8B7D6B 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10555935/md10555935-280x280.jpg",
         "material": "미스트(글라스)"
       },
       {
         "name": "에센스 화이트/에센스 화이트",
-        "code": "#F5F0EB",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/kimchi-refrigerators/md10432835/md10432835-280x280.jpg",
         "material": "미스트(글라스)"
@@ -18991,14 +18863,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/dishwashers/md10491826/md10491826-280x280.jpg"
       },
       {
         "name": "솔리드 그린",
-        "code": "#D4C5A9",
+        "code": "#2E493C",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dishwashers/md10492828/md10492828-280x280.jpg"
       }
@@ -19406,14 +19278,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "75% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/dishwashers/md10492829/md10492829-280x280.jpg"
       },
       {
         "name": "네이처 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dishwashers/md10492830/md10492830-280x280.jpg"
       }
@@ -20922,14 +20794,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dishwashers/md10491826/md10491826-280x280.jpg"
       },
       {
         "name": "솔리드 그린",
-        "code": "#D4C5A9",
+        "code": "#2E493C",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/dishwashers/md10492828/md10492828-280x280.jpg"
       }
@@ -21111,26 +20983,26 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "미스트 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10517827/md10517827-280x280.jpg"
       },
       {
         "name": "미스트 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "badge": "91% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10517826/md10517826-280x280.jpg"
       },
       {
         "name": "미스트 핑크",
-        "code": "#D4C5A9",
+        "code": "#E8A598",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10517828/md10517828-280x280.jpg"
       },
       {
         "name": "미스트 크림 스카이",
-        "code": "#D4C5A9",
+        "code": "#9BBFD4",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10517829/md10517829-280x280.jpg"
       }
@@ -21486,20 +21358,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "미스트 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "61% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10525832/md10525832-280x280.jpg"
       },
       {
         "name": "미스트 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10525831/md10525831-280x280.jpg"
       },
       {
         "name": "미스트 핑크",
-        "code": "#D4C5A9",
+        "code": "#E8A598",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10529850/md10529850-280x280.jpg"
       }
@@ -21594,20 +21466,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "미스트 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "badge": "96% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10807826/md10807826-280x280.jpg"
       },
       {
         "name": "미스트 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10844828/md10844828-280x280.jpg"
       },
       {
         "name": "미스트 크림 스카이",
-        "code": "#D4C5A9",
+        "code": "#9BBFD4",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10844829/md10844829-280x280.jpg"
       }
@@ -21702,14 +21574,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "미스트 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "82% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10372830/md10372830-280x280.jpg"
       },
       {
         "name": "미스트 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10372829/md10372829-280x280.jpg"
       }
@@ -21804,20 +21676,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "미스트 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "61% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10525832/md10525832-280x280.jpg"
       },
       {
         "name": "미스트 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10525831/md10525831-280x280.jpg"
       },
       {
         "name": "미스트 핑크",
-        "code": "#D4C5A9",
+        "code": "#E8A598",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10529850/md10529850-280x280.jpg"
       }
@@ -22084,20 +21956,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "미스트 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10511830/md10511830-280x280.jpg"
       },
       {
         "name": "미스트 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "badge": "100% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10511828/md10511828-280x280.jpg"
       },
       {
         "name": "미스트 핑크",
-        "code": "#D4C5A9",
+        "code": "#E8A598",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10511829/md10511829-280x280.jpg"
       }
@@ -22366,14 +22238,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "미스트 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "82% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10372830/md10372830-280x280.jpg"
       },
       {
         "name": "미스트 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10372829/md10372829-280x280.jpg"
       }
@@ -22729,20 +22601,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "미스트 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10511830/md10511830-280x280.jpg"
       },
       {
         "name": "미스트 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10511828/md10511828-280x280.jpg"
       },
       {
         "name": "미스트 핑크",
-        "code": "#D4C5A9",
+        "code": "#E8A598",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/electric-ranges/md10511829/md10511829-280x280.jpg"
       }
@@ -24069,12 +23941,12 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
   },
   {
     "id": "lg-washer-fg24en",
-    "name": "LG 통돌이 컴포트 세탁기",
+    "name": "LG 트롬 오브제컬렉션 세탁기",
     "model": "FG24EN",
     "category": "washer",
     "categoryName": "세탁기",
-    "subCategory": "상냉장/하냉동",
-    "subCategoryName": "상냉장/하냉동",
+    "subCategory": "드럼 세탁기",
+    "subCategoryName": "드럼 세탁기",
     "group": "living",
     "tag": "LG 공식 가전구독 / 100% 무상 케어",
     "badge": "추천",
@@ -24166,24 +24038,24 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://www.lge.co.kr/kr/images/washing-machines/md10420859/md10420859-450x450.jpg"
       },
       {
         "name": "네이처 그린",
-        "code": "#3E5641",
+        "code": "#2E493C",
         "badge": "인기",
         "image": "https://www.lge.co.kr/kr/images/washing-machines/md10420859/md10420859-450x450.jpg"
       },
       {
         "name": "스페이스 블랙",
-        "code": "#2B2B2B",
+        "code": "#1A1A1A",
         "image": "https://www.lge.co.kr/kr/images/washing-machines/md10420859/md10420859-450x450.jpg"
       },
       {
         "name": "릴리 화이트",
-        "code": "#FFFFFF",
+        "code": "#FAF9F6",
         "image": "https://www.lge.co.kr/kr/images/washing-machines/md10420859/md10420859-450x450.jpg"
       }
     ]
@@ -24778,7 +24650,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미드프리실버",
-        "code": "#D4C5A9",
+        "code": "#B0B5BA",
         "badge": "70% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/washing-machines/md09745828/md09745828-280x280.jpg"
@@ -25271,25 +25143,25 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "모던 스테인레스",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/washing-machines/md09744827/md09744827-280x280.jpg"
       },
       {
         "name": "블랙 스테인레스",
-        "code": "#D4C5A9",
+        "code": "#2A2D30",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/washing-machines/md09744826/md09744826-280x280.jpg"
       },
       {
         "name": "네이처 그린",
-        "code": "#D4C5A9",
+        "code": "#2E493C",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/washing-machines/md09088897/md09088897-280x280.jpg"
       },
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "52% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/washing-machines/md09092827/md09092827-280x280.jpg"
@@ -27630,20 +27502,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "55% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/wash-tower/md10576827/md10576827-280x280.jpg"
       },
       {
         "name": "네이처 크림 그레이/네이처 네이비",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #9AA1A6 50%, #1E2D4A 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/wash-tower/md10576829/md10576829-280x280.jpg"
       },
       {
         "name": "네이처 네이비/네이처 크림 그레이",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #1E2D4A 50%, #9AA1A6 50%)",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/wash-tower/md10576828/md10576828-280x280.jpg"
       }
@@ -28632,13 +28504,13 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 그린/네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #2E493C 50%, #D9CAB3 50%)",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/wash-tower/md10575826/md10575826-280x280.jpg"
       },
       {
         "name": "네이처 베이지/네이처 그린",
-        "code": "#D4C5A9",
+        "code": "linear-gradient(180deg, #D9CAB3 50%, #2E493C 50%)",
         "badge": "66% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/wash-tower/md10575827/md10575827-280x280.jpg"
@@ -28747,7 +28619,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 에센스 화이트",
-        "code": "#D4C5A9",
+        "code": "#F8F8FA",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/wash-tower/md10575828/md10575828-280x280.jpg"
@@ -30515,14 +30387,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/wash-combo/md10480828/md10480828-280x280.jpg"
       },
       {
         "name": "네이처 그린",
-        "code": "#D4C5A9",
+        "code": "#2E493C",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/wash-combo/md10480829/md10480829-280x280.jpg"
       }
@@ -31395,14 +31267,14 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "100% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/wash-combo/md10548827/md10548827-280x280.jpg"
       },
       {
         "name": "네이처 그린",
-        "code": "#D4C5A9",
+        "code": "#2E493C",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/wash-combo/md10548828/md10548828-280x280.jpg"
       }
@@ -33361,20 +33233,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 그린",
-        "code": "#D4C5A9",
+        "code": "#2E493C",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09944837/md09944837-280x280.jpg"
       },
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "66% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09944838/md09944838-280x280.jpg"
       },
       {
         "name": "스테인리스 실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09944839/md09944839-280x280.jpg"
       },
@@ -34186,7 +34058,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "모던 스테인레스",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09669829/md09669829-280x280.jpg"
       }
@@ -34491,19 +34363,19 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09944842/md09944842-280x280.jpg"
       },
       {
         "name": "모던 스테인레스",
-        "code": "#D4C5A9",
+        "code": "#B8BCC0",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09944843/md09944843-280x280.jpg"
       },
       {
         "name": "릴리 화이트",
-        "code": "#D4C5A9",
+        "code": "#FAF9F6",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09944844/md09944844-280x280.jpg"
       }
@@ -35006,13 +34878,13 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09148838/md09148838-280x280.jpg"
       },
       {
         "name": "네이처 그린",
-        "code": "#D4C5A9",
+        "code": "#2E493C",
         "badge": "100% 선택",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09148833/md09148833-280x280.jpg"
@@ -35121,20 +34993,20 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "colors": [
       {
         "name": "네이처 그린",
-        "code": "#D4C5A9",
+        "code": "#2E493C",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09944837/md09944837-280x280.jpg"
       },
       {
         "name": "네이처 베이지",
-        "code": "#D4C5A9",
+        "code": "#D9CAB3",
         "badge": "66% 선택",
         "isDefault": true,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09944838/md09944838-280x280.jpg"
       },
       {
         "name": "스테인리스 실버",
-        "code": "#D4C5A9",
+        "code": "#C4C8CC",
         "isDefault": false,
         "image": "https://static.lge.co.kr/kr/images/dryers/md09944839/md09944839-280x280.jpg"
       },
@@ -35240,7 +35112,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10751839/md10751839-450x450.jpg"
       },
       {
@@ -35344,7 +35216,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10754832/md10754832-450x450.jpg"
       },
       {
@@ -35448,7 +35320,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10724835/md10724835-450x450.jpg"
       },
       {
@@ -35552,7 +35424,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10681877/md10681877-450x450.jpg"
       },
       {
@@ -35656,7 +35528,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10754828/md10754828-450x450.jpg"
       },
       {
@@ -35760,7 +35632,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10754842/md10754842-450x450.jpg"
       },
       {
@@ -35864,7 +35736,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10754840/md10754840-450x450.jpg"
       },
       {
@@ -35968,7 +35840,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10680835/md10680835-450x450.jpg"
       },
       {
@@ -36072,7 +35944,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10751841/md10751841-450x450.jpg"
       },
       {
@@ -36176,7 +36048,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10747827/md10747827-450x450.jpg"
       },
       {
@@ -36280,7 +36152,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10544833/md10544833-450x450.jpg"
       },
       {
@@ -36385,7 +36257,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10863834/md10863834-450x450.jpg"
       },
       {
@@ -36489,7 +36361,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10754834/md10754834-450x450.jpg"
       },
       {
@@ -36593,7 +36465,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10680831/md10680831-450x450.jpg"
       },
       {
@@ -36697,7 +36569,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10544839/md10544839-450x450.jpg"
       },
       {
@@ -36801,7 +36673,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10751842/md10751842-450x450.jpg"
       },
       {
@@ -36905,7 +36777,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10754830/md10754830-450x450.jpg"
       },
       {
@@ -37009,7 +36881,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10751845/md10751845-450x450.jpg"
       },
       {
@@ -37114,7 +36986,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10754838/md10754838-450x450.jpg"
       },
       {
@@ -37219,7 +37091,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10754841/md10754841-450x450.jpg"
       },
       {
@@ -37323,7 +37195,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10680836/md10680836-450x450.jpg"
       },
       {
@@ -37428,7 +37300,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10754844/md10754844-450x450.jpg"
       },
       {
@@ -37532,7 +37404,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10513832/md10513832-450x450.jpg"
       },
       {
@@ -37636,7 +37508,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "미스트 베이지",
-        "code": "#D9CDBF",
+        "code": "#D9CAB3",
         "image": "https://www.lge.co.kr/kr/images/lg-styler/md10286835/md10286835-450x450.jpg"
       },
       {
@@ -40879,7 +40751,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10762830/md10762830-450x450.jpg"
       },
       {
@@ -40994,7 +40866,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10762836/md10762836-450x450.jpg"
       },
       {
@@ -41109,7 +40981,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10762834/md10762834-450x450.jpg"
       },
       {
@@ -41223,7 +41095,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md09317826/md09317826-450x450.jpg"
       },
       {
@@ -41337,7 +41209,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10772832/md10772832-450x450.jpg"
       },
       {
@@ -41451,7 +41323,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10772840/md10772840-450x450.jpg"
       },
       {
@@ -41565,7 +41437,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10526830/md10526830-450x450.jpg"
       },
       {
@@ -41679,7 +41551,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10612826/md10612826-450x450.jpg"
       },
       {
@@ -41793,7 +41665,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10526829/md10526829-450x450.jpg"
       },
       {
@@ -41908,7 +41780,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10762838/md10762838-450x450.jpg"
       },
       {
@@ -42022,7 +41894,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10772839/md10772839-450x450.jpg"
       },
       {
@@ -42136,7 +42008,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md09301827/md09301827-450x450.jpg"
       },
       {
@@ -42250,7 +42122,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10772841/md10772841-450x450.jpg"
       },
       {
@@ -42365,7 +42237,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10752827/md10752827-450x450.jpg"
       },
       {
@@ -42479,7 +42351,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10526828/md10526828-450x450.jpg"
       },
       {
@@ -42593,7 +42465,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10526831/md10526831-450x450.jpg"
       },
       {
@@ -42707,7 +42579,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10570829/md10570829-450x450.jpg"
       },
       {
@@ -42822,7 +42694,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10689826/md10689826-450x450.jpg"
       },
       {
@@ -42937,7 +42809,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10762833/md10762833-450x450.jpg"
       },
       {
@@ -43052,7 +42924,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10762835/md10762835-450x450.jpg"
       },
       {
@@ -43166,7 +43038,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10570829/md10570829-450x450.jpg"
       },
       {
@@ -43280,7 +43152,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10526826/md10526826-450x450.jpg"
       },
       {
@@ -43394,7 +43266,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10526827/md10526827-450x450.jpg"
       },
       {
@@ -43508,7 +43380,7 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
       },
       {
         "name": "크림 화이트",
-        "code": "#F5F5F7",
+        "code": "#F7F5F0",
         "image": "https://www.lge.co.kr/kr/images/air-purifier/md10526830/md10526830-450x450.jpg"
       },
       {
@@ -44283,10 +44155,11 @@ export const LG_OFFICIAL_PRODUCTS: LgProduct[] = [
     "finalPrice": 0,
     "cardDiscountPrice": 0,
     "accountCount": "1구좌 결합",
-    "image": "https://www.lge.co.kr/kr/images/dehumidifiers/md10586830/md10586830-450x450.jpg",
+    "image": "https://www.lge.co.kr/kr/images/dehumidifiers/md10821835/md10821835-450x450.jpg",
     "images": [
-      "https://www.lge.co.kr/kr/images/dehumidifiers/md10586830/md10586830-450x450.jpg"
+      "https://www.lge.co.kr/kr/images/dehumidifiers/md10821835/md10821835-450x450.jpg"
     ],
+    "refUrl": "https://www.lge.co.kr/product/care-solutions/dehumidifiers/dq256mwgas?modelId=MD10821835&pdpType=SUBSCRIPTION",
     "careCycle": "1회 / 12개월 전문가 방문 케어",
     "careBenefits": [
       "전문가 방문 분해 살균 세척",

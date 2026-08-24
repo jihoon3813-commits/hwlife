@@ -8,6 +8,7 @@ import Statistics from './pages/Statistics';
 import Settings from './pages/Settings';
 import LandingManagement from './pages/LandingManagement';
 import ConsentManagement from './pages/ConsentManagement';
+import LgProductManagement from './pages/LgProductManagement';
 
 export default function AdminApp() {
   console.log('AdminApp Mounting...');
@@ -108,6 +109,8 @@ export default function AdminApp() {
         return <ConsentManagement channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
       case 'products':
         return <ProductManagement key="products" />;
+      case 'lg_products':
+        return <LgProductManagement key="lg_products" />;
       case 'channels':
         return <ChannelManagement 
             currentChannelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined}

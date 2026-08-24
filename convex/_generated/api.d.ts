@@ -18,6 +18,8 @@ import type * as fix_plans from "../fix_plans.js";
 import type * as images from "../images.js";
 import type * as inquiries from "../inquiries.js";
 import type * as landings from "../landings.js";
+import type * as lgCategories from "../lgCategories.js";
+import type * as lgProducts from "../lgProducts.js";
 import type * as plans from "../plans.js";
 import type * as products from "../products.js";
 import type * as settings from "../settings.js";
@@ -44,6 +46,8 @@ declare const fullApi: ApiFromModules<{
   images: typeof images;
   inquiries: typeof inquiries;
   landings: typeof landings;
+  lgCategories: typeof lgCategories;
+  lgProducts: typeof lgProducts;
   plans: typeof plans;
   products: typeof products;
   settings: typeof settings;
