@@ -240,12 +240,23 @@ export default function LgProductManagement() {
     return found ? found.key : 'all';
   }, [dbCategories]);
 
-  // Ordered Categories (combining 'all' with DB ordered list or static list)
+  // Ordered Categories (combining 'all' with DB ordered list or static list + merging new static categories like bathair)
   const categoriesList = useMemo<LgCategory[]>(() => {
-    const baseList = dbCategories && dbCategories.length > 0 ? dbCategories : LG_CATEGORIES.filter(c => c.key !== 'all');
+    const staticList = LG_CATEGORIES.filter(c => c.key !== 'all');
+    if (!dbCategories || dbCategories.length === 0) {
+      return [{ key: 'all', name: '전체 카테고리', icon: '✨' }, ...staticList];
+    }
+
+    const mergedList = [...dbCategories];
+    for (const sc of staticList) {
+      if (!mergedList.some(dc => dc.key === sc.key)) {
+        mergedList.push(sc as any);
+      }
+    }
+
     return [
       { key: 'all', name: '전체 카테고리', icon: '✨' },
-      ...baseList.map(c => ({
+      ...mergedList.map(c => ({
         key: c.key,
         name: c.name,
         icon: c.icon,
@@ -377,15 +388,35 @@ export default function LgProductManagement() {
 
   // Helper to get resolved category key for any product record
   const getProductCategoryKey = (p: any): string => {
-    if (p.categoryKey === 'bathair' || p.category === '바스에어시스템') return 'bathair';
+    if (!p) return 'water';
+    const cat = (p.category || '').trim();
+    const catKey = (p.categoryKey || '').trim();
+    const name = (p.name || '').trim();
     const m = (p.model || '').toUpperCase().trim();
-    if (m.startsWith('MX0120') || m.startsWith('M-X0120') || m.includes('BASV') || m.includes('BASR') || m.includes('BASA')) {
+
+    if (
+      catKey === 'bathair' ||
+      catKey === 'bath-air-system' ||
+      catKey === 'bath' ||
+      cat.includes('바스') ||
+      cat.includes('욕실') ||
+      name.includes('바스') ||
+      name.includes('욕실') ||
+      m.startsWith('MX0120') ||
+      m.startsWith('M-X0120') ||
+      m.includes('BASV') ||
+      m.includes('BASR') ||
+      m.includes('BASA') ||
+      m.startsWith('MX01') ||
+      m.startsWith('M-X01')
+    ) {
       return 'bathair';
     }
-    if (p.categoryKey && p.categoryKey !== 'water' && p.categoryKey !== 'fridge') {
-      return p.categoryKey;
+
+    if (catKey && catKey !== 'water' && catKey !== 'fridge') {
+      return catKey;
     }
-    return mapExcelCategoryToKey(p.category || p.model).key;
+    return mapExcelCategoryToKey(cat || name || m).key;
   };
 
   // Category counts
