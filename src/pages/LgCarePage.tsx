@@ -132,13 +132,18 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
   // Dynamic Categories from DB (reflecting admin drag & drop ordering)
   const categories = useMemo<CategoryItem[]>(() => {
     if (dbCategories && dbCategories.length > 0) {
-      return dbCategories.map(c => ({
+      const cleaned = dbCategories.filter(c => c.name !== '바스에어' && c.key !== 'bath-air' && c.key !== 'bath_air');
+      const list = cleaned.map(c => ({
         id: c.key,
         name: c.name,
         icon: c.icon,
         badge: c.badge,
         group: (c.group as any) || 'living'
       }));
+      if (!list.some(c => c.id === 'bathair')) {
+        list.push({ id: 'bathair', name: '바스에어시스템', icon: '🛁', badge: '신제품', group: 'air' });
+      }
+      return list;
     }
     return CATEGORIES;
   }, [dbCategories]);

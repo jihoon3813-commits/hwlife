@@ -22,6 +22,7 @@ export const DEFAULT_LG_CATEGORIES = [
   { key: 'vacuum', name: '청소기', icon: '🧹', group: 'living' },
   { key: 'massage', name: '안마의자', icon: '💆', group: 'health' },
   { key: 'shoecare', name: '슈케어', icon: '👟', group: 'living' },
+  { key: 'bathair', name: '바스에어시스템', icon: '🛁', group: 'air' },
 ];
 
 export const getOrdered = query({
@@ -32,7 +33,10 @@ export const getOrdered = query({
       .withIndex("by_order")
       .collect();
 
-    if (list.length === 0) {
+    // Filter out duplicate or legacy empty '바스에어' category (keep only '바스에어시스템')
+    const cleaned = list.filter(c => c.name !== '바스에어' && c.key !== 'bath-air' && c.key !== 'bath_air');
+
+    if (cleaned.length === 0) {
       return DEFAULT_LG_CATEGORIES.map((c, idx) => ({
         ...c,
         order: idx,
@@ -40,7 +44,7 @@ export const getOrdered = query({
       }));
     }
 
-    return list;
+    return cleaned;
   },
 });
 
