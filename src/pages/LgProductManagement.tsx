@@ -51,6 +51,7 @@ export const LG_CATEGORIES: LgCategory[] = [
   { key: 'vacuum', name: '청소기', icon: '🧹', group: 'living' },
   { key: 'massage', name: '안마의자', icon: '💆', group: 'health' },
   { key: 'shoecare', name: '슈케어', icon: '👟', group: 'living' },
+  { key: 'bathair', name: '바스에어시스템', icon: '🛁', group: 'air' },
 ];
 
 function mapExcelCategoryToKey(rawCat: string): { key: string; name: string } {
