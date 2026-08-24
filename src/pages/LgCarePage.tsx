@@ -646,17 +646,8 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
       return mergedList;
     }
     
-    // Fallback: Sort static products based on dynamically ordered categories
-    const catPriority: Record<string, number> = {};
-    for (let i = 0; i < categories.length; i++) {
-      catPriority[categories[i].id] = i + 1;
-    }
-
-    return [...LG_OFFICIAL_PRODUCTS].sort((a, b) => {
-      const pA = catPriority[a.category] || 99;
-      const pB = catPriority[b.category] || 99;
-      return pA - pB;
-    });
+    // Strictly reflect DB products only (0 products in DB => 0 products on landing)
+    return [];
   }, [dbLgProducts, categories]);
 
   // Real product count per category for badges
@@ -1914,13 +1905,8 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
         ) : (
           <div className="py-20 text-center bg-white rounded-3xl border border-dashed border-[#D1D6DB] space-y-3">
             <Search className="w-10 h-10 text-[#8B95A1] mx-auto" />
-            <p className="text-[16px] font-bold text-[#4E5968]">해당 조건에 맞는 가전 구독 상품이 없습니다.</p>
-            <button 
-              onClick={() => { setSelectedCategory('all'); setSelectedSubTab('all'); setSearchTerm(''); }}
-              className="text-[13px] font-bold text-[#EA1D2C] hover:underline"
-            >
-              필터 초기화
-            </button>
+            <p className="text-[16px] font-bold text-[#191F28]">등록된 가전 구독 상품이 없습니다.</p>
+            <p className="text-[13px] text-[#8B95A1]">관리자 페이지에서 가전구독 제품을 등록하시면 이곳에 실시간으로 표시됩니다.</p>
           </div>
         )}
       </section>
