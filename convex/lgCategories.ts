@@ -33,10 +33,10 @@ export const getOrdered = query({
       .withIndex("by_order")
       .collect();
 
-    // Filter out legacy hyphenated key 'bath-air' / 'bath_air' if any
-    const cleaned = list.filter(c => c.key !== 'bath-air' && c.key !== 'bath_air');
+    // Filter out legacy hyphenated key 'bath-air' / 'bath_air' and user-deleted categories
+    const cleaned = list.filter(c => c.key !== 'bath-air' && c.key !== 'bath_air' && !c.isDeleted);
 
-    if (cleaned.length === 0) {
+    if (list.length === 0) {
       return DEFAULT_LG_CATEGORIES.map((c, idx) => ({
         ...c,
         order: idx,
@@ -230,6 +230,67 @@ export const setDefaultLandingCategory = mutation({
     }
 
     return { success: true, defaultKey: args.key };
+  },
+});
+
+// Delete category (sets isDeleted: true so it is removed from UI and won't reappear from defaults)
+export const removeCategory = mutation({
+  args: {
+    key: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const allCats = await ctx.db.query("lg_categories").collect();
+
+    // If categories table is empty, seed defaults with this one marked as deleted
+    if (allCats.length === 0) {
+      for (let i = 0; i < DEFAULT_LG_CATEGORIES.length; i++) {
+        const c = DEFAULT_LG_CATEGORIES[i];
+        await ctx.db.insert("lg_categories", {
+          key: c.key,
+          name: c.name,
+          icon: c.icon,
+          group: c.group,
+          badge: c.badge,
+          order: i,
+          isVisible: true,
+          isDeleted: c.key === args.key,
+        });
+      }
+      return { success: true };
+    }
+
+    const target = allCats.find((c) => c.key === args.key);
+    if (target) {
+      await ctx.db.patch(target._id, { isDeleted: true, isDefault: false });
+    } else {
+      // If was not in DB yet, insert with isDeleted: true
+      const def = DEFAULT_LG_CATEGORIES.find((d) => d.key === args.key) || {
+        key: args.key,
+        name: args.key,
+        icon: '📦',
+        group: 'living',
+      };
+      await ctx.db.insert("lg_categories", {
+        key: args.key,
+        name: def.name,
+        icon: def.icon,
+        group: def.group,
+        order: allCats.length,
+        isVisible: false,
+        isDeleted: true,
+        isDefault: false,
+      });
+    }
+
+    // If the deleted category was the default landing category, assign a new default
+    if (target && target.isDefault) {
+      const remaining = allCats.filter((c) => c.key !== args.key && !c.isDeleted);
+      if (remaining.length > 0) {
+        await ctx.db.patch(remaining[0]._id, { isDefault: true });
+      }
+    }
+
+    return { success: true };
   },
 });
 

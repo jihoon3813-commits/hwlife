@@ -274,6 +274,7 @@ export default defineSchema({
     order: v.number(),                     // 드래그앤드롭 정렬 순서
     isVisible: v.optional(v.boolean()),    // 카테고리 노출 여부
     isDefault: v.optional(v.boolean()),    // 랜딩 첫 화면 기본 노출 카테고리 여부
+    isDeleted: v.optional(v.boolean()),    // 사용자 삭제 여부
   }).index("by_order", ["order"])
     .index("by_key", ["key"]),
 });

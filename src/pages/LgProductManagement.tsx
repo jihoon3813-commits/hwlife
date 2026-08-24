@@ -199,6 +199,7 @@ export default function LgProductManagement() {
   const updateCategoryOrder = useMutation(api.lgCategories.updateCategoryOrder);
   const updateCategoryDetails = useMutation(api.lgCategories.updateCategoryDetails);
   const setDefaultLandingCategory = useMutation(api.lgCategories.setDefaultLandingCategory);
+  const removeCategory = useMutation(api.lgCategories.removeCategory);
   const createProduct = useMutation(api.lgProducts.create);
   const updateProduct = useMutation(api.lgProducts.update);
   const removeProduct = useMutation(api.lgProducts.remove);
@@ -347,6 +348,23 @@ export default function LgProductManagement() {
     } catch (err) {
       console.error('Failed to save category details:', err);
       alert('카테고리 저장 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleDeleteCategory = async (cat: { key: string; name: string }) => {
+    if (!window.confirm(`'${cat.name}' 카테고리를 정말 삭제하시겠습니까?\n(등록된 제품은 삭제되지 않으며 언제든 다시 등록할 수 있습니다)`)) {
+      return;
+    }
+    try {
+      await removeCategory({ key: cat.key });
+      if (selectedCategoryKey === cat.key) {
+        setSelectedCategoryKey('all');
+      }
+      setIsCategoryModalOpen(false);
+      setEditingCategory(null);
+    } catch (err) {
+      console.error('Failed to delete category:', err);
+      alert('카테고리 삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -1455,17 +1473,33 @@ export default function LgProductManagement() {
                   </div>
                   <div className="flex items-center gap-1 shrink-0 ml-1">
                     {isDraggable && (
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        onClick={(e) => handleOpenCategoryEdit(cat, e)}
-                        className={`p-1 rounded hover:bg-black/10 transition-colors opacity-0 group-hover/cat:opacity-100 cursor-pointer ${
-                          isActive ? 'text-white' : 'text-[#8B95A1] hover:text-[#191F28]'
-                        }`}
-                        title="카테고리 이름 및 아이콘 수정"
-                      >
-                        <Edit className="w-3 h-3" />
-                      </span>
+                      <div className="flex items-center gap-0.5 opacity-0 group-hover/cat:opacity-100 transition-opacity">
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => handleOpenCategoryEdit(cat, e)}
+                          className={`p-1 rounded hover:bg-black/10 transition-colors cursor-pointer ${
+                            isActive ? 'text-white' : 'text-[#8B95A1] hover:text-[#191F28]'
+                          }`}
+                          title="카테고리 정보 수정"
+                        >
+                          <Edit className="w-3 h-3" />
+                        </span>
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteCategory(cat);
+                          }}
+                          className={`p-1 rounded hover:bg-red-500/20 transition-colors cursor-pointer ${
+                            isActive ? 'text-white hover:text-red-200' : 'text-[#8B95A1] hover:text-red-600'
+                          }`}
+                          title="카테고리 삭제"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </span>
+                      </div>
                     )}
                     <span
                       className={`text-[10.5px] px-1.5 py-0.2 rounded-full font-extrabold ${
@@ -3157,20 +3191,30 @@ export default function LgProductManagement() {
               </div>
 
               {/* Actions */}
-              <div className="pt-3 border-t border-[#E5E8EB] flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-[#E5E8EB] flex items-center justify-between gap-2">
                 <button
                   type="button"
-                  onClick={() => setIsCategoryModalOpen(false)}
-                  className="px-4 py-2 bg-white border border-[#D1D6DB] hover:bg-[#F2F4F6] text-[#4E5968] text-[13px] font-bold rounded-xl cursor-pointer"
+                  onClick={() => handleDeleteCategory(editingCategory)}
+                  className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-[#EA1D2C] border border-red-200 text-[12.5px] font-bold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  취소
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>카테고리 삭제</span>
                 </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-[#EA1D2C] hover:bg-[#C81020] text-white text-[13px] font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
-                >
-                  저장하기
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsCategoryModalOpen(false)}
+                    className="px-4 py-2 bg-white border border-[#D1D6DB] hover:bg-[#F2F4F6] text-[#4E5968] text-[13px] font-bold rounded-xl cursor-pointer"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-[#EA1D2C] hover:bg-[#C81020] text-white text-[13px] font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
+                  >
+                    저장하기
+                  </button>
+                </div>
               </div>
             </form>
           </div>
