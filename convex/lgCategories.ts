@@ -33,8 +33,8 @@ export const getOrdered = query({
       .withIndex("by_order")
       .collect();
 
-    // Filter out duplicate or legacy empty '바스에어' category (keep only '바스에어시스템')
-    const cleaned = list.filter(c => c.name !== '바스에어' && c.key !== 'bath-air' && c.key !== 'bath_air');
+    // Filter out legacy hyphenated key 'bath-air' / 'bath_air' if any
+    const cleaned = list.filter(c => c.key !== 'bath-air' && c.key !== 'bath_air');
 
     if (cleaned.length === 0) {
       return DEFAULT_LG_CATEGORIES.map((c, idx) => ({
@@ -153,35 +153,44 @@ export const updateCategoryDetails = mutation({
       }
     }
 
+    const trimmedName = args.name.trim();
+
     if (existing) {
       await ctx.db.patch(existing._id, {
-        name: args.name.trim(),
+        name: trimmedName,
         icon: args.icon.trim(),
         badge: args.badge ? args.badge.trim() : undefined,
         isDefault: args.isDefault !== undefined ? args.isDefault : existing.isDefault,
       });
-      return { success: true };
+    } else {
+      // If not existing yet, create
+      const def = DEFAULT_LG_CATEGORIES.find((d) => d.key === args.key) || {
+        key: args.key,
+        name: args.name,
+        icon: args.icon,
+        group: 'living',
+      };
+
+      const count = (await ctx.db.query("lg_categories").collect()).length;
+      await ctx.db.insert("lg_categories", {
+        key: args.key,
+        name: trimmedName,
+        icon: args.icon.trim(),
+        badge: args.badge ? args.badge.trim() : undefined,
+        group: def.group,
+        order: count,
+        isVisible: true,
+        isDefault: args.isDefault || false,
+      });
     }
 
-    // If not existing yet, create
-    const def = DEFAULT_LG_CATEGORIES.find((d) => d.key === args.key) || {
-      key: args.key,
-      name: args.name,
-      icon: args.icon,
-      group: 'living',
-    };
-
-    const count = (await ctx.db.query("lg_categories").collect()).length;
-    await ctx.db.insert("lg_categories", {
-      key: args.key,
-      name: args.name.trim(),
-      icon: args.icon.trim(),
-      badge: args.badge ? args.badge.trim() : undefined,
-      group: def.group,
-      order: count,
-      isVisible: true,
-      isDefault: args.isDefault || false,
-    });
+    // Also sync category name across all matching products in lg_products
+    const allProducts = await ctx.db.query("lg_products").collect();
+    for (const p of allProducts) {
+      if (p.categoryKey === args.key && p.category !== trimmedName) {
+        await ctx.db.patch(p._id, { category: trimmedName });
+      }
+    }
 
     return { success: true };
   },

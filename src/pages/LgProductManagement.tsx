@@ -247,8 +247,8 @@ export default function LgProductManagement() {
       return [{ key: 'all', name: '전체 카테고리', icon: '✨' }, ...staticList];
     }
 
-    // Filter out invalid/duplicate '바스에어' category (keep only '바스에어시스템')
-    const cleanedDbCats = dbCategories.filter(c => c.name !== '바스에어' && c.key !== 'bath-air' && c.key !== 'bath_air');
+    // Filter out legacy hyphenated key 'bath-air' / 'bath_air' if any
+    const cleanedDbCats = dbCategories.filter(c => c.key !== 'bath-air' && c.key !== 'bath_air');
 
     const mergedList = [...cleanedDbCats];
     for (const sc of staticList) {

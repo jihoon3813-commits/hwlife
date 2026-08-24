@@ -132,7 +132,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
   // Dynamic Categories from DB (reflecting admin drag & drop ordering)
   const categories = useMemo<CategoryItem[]>(() => {
     if (dbCategories && dbCategories.length > 0) {
-      const cleaned = dbCategories.filter(c => c.name !== '바스에어' && c.key !== 'bath-air' && c.key !== 'bath_air');
+      const cleaned = dbCategories.filter(c => c.key !== 'bath-air' && c.key !== 'bath_air');
       const list = cleaned.map(c => ({
         id: c.key,
         name: c.name,
