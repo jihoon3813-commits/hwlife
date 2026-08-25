@@ -1103,11 +1103,13 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
   return (
     <div className="min-h-screen bg-[#F7F8FA] text-[#191F28] font-sans antialiased selection:bg-[#EA1D2C] selection:text-white">
       <SEO 
-        title="LG전자 가전 구독 공식 할인몰 | 효원상조 결합 혜택"
+        title={isCare10 
+          ? "효원상조 X LG가전구독 | 매월 10% 추가할인 & 만기 100% 전액환급"
+          : "LG전자 가전 구독 공식 할인몰 | 효원회원 특별할인 혜택"}
         description={isCare10 
           ? "LG전자 가전 구독 공식 혜택! 오브제컬렉션, 워시타워, 정수기, 냉장고 등 원하는 가전에 정기 방문 케어와 100% 무상 A/S, 효원상조 결합 시 매월 10% 할인 + 만기 시 144만원 지원까지!"
-          : "LG전자 가전 구독 공식 혜택! 오브제컬렉션, 워시타워, 정수기, 냉장고 등 원하는 가전에 정기 방문 케어와 100% 무상 A/S, 효원상조 결합 시 회원 특별할인 + 만기 시 144만원 지원까지!"}
-        image="https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?q=80&w=1200"
+          : "LG전자 공식 가전구독에 효원상조 혜택을 더하다! 회원 특별할인 지원 + 만기 100% 전액환급 & 축하금 지원. 본사 100% 무상 케어 서비스까지."}
+        image="https://res.cloudinary.com/lyjyvy54/image/upload/v1787663880/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._14_x1xbix.png"
       />
 
       {/* Top Banner Bar (Hidden on Mobile) */}
