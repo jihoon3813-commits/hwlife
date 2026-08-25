@@ -447,19 +447,23 @@ export default function LgProductManagement() {
     return counts;
   }, [products]);
 
-  // Verification counts
+  // Verification counts (dynamically calculated for selected category)
   const verificationCounts = useMemo(() => {
     let verified = 0;
     let unverified = 0;
-    for (const p of products) {
+    const targetProducts = selectedCategoryKey === 'all'
+      ? products
+      : products.filter((p) => getProductCategoryKey(p) === selectedCategoryKey);
+
+    for (const p of targetProducts) {
       const isVer = p.isOfficialVerified !== undefined 
         ? p.isOfficialVerified 
         : (Boolean(p.image) && Boolean(p.refUrl) && p.refUrl.includes('lge.co.kr') && !p.refUrl.includes('/search/'));
       if (isVer) verified++;
       else unverified++;
     }
-    return { verified, unverified };
-  }, [products]);
+    return { total: targetProducts.length, verified, unverified };
+  }, [products, selectedCategoryKey]);
 
   // Filtered product list
   const filteredProducts = useMemo(() => {
@@ -1632,7 +1636,7 @@ export default function LgProductManagement() {
                     : 'text-[#6B7684] hover:text-[#191F28]'
                 }`}
               >
-                전체 ({products.length})
+                전체 ({verificationCounts.total})
               </button>
               <button
                 type="button"
