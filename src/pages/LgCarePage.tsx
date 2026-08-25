@@ -1686,9 +1686,16 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                     className="relative aspect-square px-8 py-4 flex items-center justify-center cursor-pointer bg-white"
                   >
                     <img 
-                      src={product.image} 
+                      src={product.image || 'https://www.lge.co.kr/kr/images/common/no-image.jpg'} 
                       alt={product.name} 
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
                       className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = 'https://www.lge.co.kr/kr/images/common/no-image.jpg';
+                      }}
                     />
                     <button 
                       onClick={(e) => {
@@ -2595,9 +2602,15 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pb-4 border-b border-[#F2F4F6]">
               <div className="w-24 h-24 sm:w-28 sm:h-28 bg-[#F8FAFC] rounded-2xl p-2 border border-[#E5E8EB] flex items-center justify-center shrink-0">
                 <img 
-                  src={currentProductImage} 
+                  src={currentProductImage || 'https://www.lge.co.kr/kr/images/common/no-image.jpg'} 
                   alt={selectedProduct.name} 
-                  className="w-full h-full object-contain transition-all duration-300" 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-contain transition-all duration-300"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = 'https://www.lge.co.kr/kr/images/common/no-image.jpg';
+                  }}
                 />
               </div>
               <div className="space-y-1.5 pr-8 flex-1">

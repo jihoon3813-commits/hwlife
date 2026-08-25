@@ -1860,9 +1860,12 @@ export default function LgProductManagement() {
                           <img
                             src={p.image}
                             alt={p.name}
+                            referrerPolicy="no-referrer"
+                            loading="lazy"
                             className="w-full h-full object-contain"
                             onError={(e) => {
-                              (e.target as HTMLElement).style.display = 'none';
+                              const target = e.target as HTMLElement;
+                              target.style.display = 'none';
                             }}
                           />
                         ) : (
@@ -2078,9 +2081,12 @@ export default function LgProductManagement() {
                                 <img
                                   src={p.image}
                                   alt={p.name}
+                                  referrerPolicy="no-referrer"
+                                  loading="lazy"
                                   className="w-full h-full object-contain p-0.5"
                                   onError={(e) => {
-                                    (e.target as HTMLElement).style.display = 'none';
+                                    const target = e.target as HTMLElement;
+                                    target.style.display = 'none';
                                   }}
                                 />
                               ) : (
