@@ -6,7 +6,8 @@ import {
   Clock, Flame, CheckSquare, Square, ChevronDown, FileText, Layers, Tag,
   Maximize2, Zap, ArrowRight, ThumbsUp, HeartHandshake, Headphones,
   Percent, CreditCard, RotateCcw, Wrench, Sparkle, RefreshCw, Calendar,
-  Shield, CheckCircle, Smartphone, AlertCircle, Share2, Heart, KeyRound
+  Shield, CheckCircle, Smartphone, AlertCircle, Share2, Heart, KeyRound,
+  Unlock, PartyPopper
 } from 'lucide-react';
 import { formatPhoneNumber } from '../utils/phone';
 import PrivacyModal from '../components/PrivacyModal';
@@ -245,6 +246,9 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
     }
   };
 
+  // Auth Success Celebration Modal State
+  const [authSuccessData, setAuthSuccessData] = useState<{ code: string; customerName?: string } | null>(null);
+
   const handleVerifyDiscountCode = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const cleanCode = inputDiscountCode.trim().toUpperCase();
@@ -272,7 +276,10 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
         }
         closeDiscountModal();
         setInputDiscountCode('');
-        alert(`[${res.code}] 시크릿 할인코드가 인증되었습니다!\n회원 특별할인 혜택이 즉시 잠금 해제되었습니다.`);
+        setAuthSuccessData({
+          code: res.code,
+          customerName: res.customerName,
+        });
       } else {
         setDiscountError(res.reason || '유효하지 않은 할인코드입니다.');
       }
@@ -4505,6 +4512,104 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                 </form>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Luxury Auth Success Celebration Modal */}
+      {authSuccessData && (
+        <div 
+          onClick={() => setAuthSuccessData(null)}
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-gradient-to-b from-[#1C2331] via-[#161C26] to-[#0F131A] text-white w-full max-w-sm sm:max-w-md rounded-3xl border border-[#EA1D2C]/40 shadow-2xl overflow-hidden relative text-center p-6 sm:p-8 animate-in zoom-in-95 duration-250"
+          >
+            {/* Background Glows */}
+            <div className="absolute -top-12 -left-12 w-40 h-40 bg-[#EA1D2C]/25 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -right-12 w-40 h-40 bg-[#3182F6]/20 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Top Icon with Sparkle Burst */}
+            <div className="relative mx-auto w-20 h-20 mb-4 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-[#EA1D2C]/20 animate-ping" />
+              <div className="w-18 h-18 rounded-3xl bg-gradient-to-tr from-[#EA1D2C] via-[#FF3B4E] to-[#FF8591] text-white flex items-center justify-center shadow-xl shadow-[#EA1D2C]/50 relative z-10">
+                <Unlock className="w-9 h-9 text-white stroke-[2.5]" />
+              </div>
+              <div className="absolute -top-1 -right-1 p-1 bg-amber-400 text-black rounded-full shadow-md animate-bounce z-20">
+                <Sparkles className="w-4 h-4 fill-black" />
+              </div>
+            </div>
+
+            {/* Badge & Title */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EA1D2C]/20 border border-[#EA1D2C]/40 text-[#FF8591] text-[11px] font-black tracking-wider uppercase mb-2.5">
+              <PartyPopper className="w-3.5 h-3.5" />
+              <span>AUTHENTICATION SUCCESS</span>
+            </div>
+
+            <h3 className="text-[20px] sm:text-[23px] font-black text-white tracking-tight leading-tight mb-1.5">
+              시크릿 혜택 잠금 해제!
+            </h3>
+
+            <p className="text-[12.5px] sm:text-[13px] text-[#A6ADB8] break-keep mb-5">
+              {authSuccessData.customerName ? (
+                <><strong>{authSuccessData.customerName}</strong> 고객님만을 위한 회원 특별할인가가 공개되었습니다.</>
+              ) : (
+                <>회원 특별할인가 및 결합 혜택이 정상적으로 공개되었습니다.</>
+              )}
+            </p>
+
+            {/* Code Highlight Box */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-3 sm:p-3.5 mb-5 flex items-center justify-between gap-3">
+              <div className="text-left">
+                <span className="text-[10px] text-[#8B95A1] font-bold block uppercase">Applied Code</span>
+                <span className="text-[14px] sm:text-[16px] font-mono font-black text-[#FF8591] tracking-wider">
+                  {authSuccessData.code}
+                </span>
+              </div>
+              <div className="inline-flex items-center gap-1 text-[11px] font-extrabold text-[#00B074] bg-[#00B074]/15 px-2.5 py-1 rounded-lg">
+                <Check className="w-3.5 h-3.5 stroke-[3]" />
+                <span>인증 완료</span>
+              </div>
+            </div>
+
+            {/* Unlocked Benefits List */}
+            <div className="bg-[#12161E] rounded-2xl p-3.5 sm:p-4 border border-white/5 space-y-2 text-left mb-6 text-[12px] text-[#D1D6DB]">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-[#EA1D2C]/20 text-[#EA1D2C] flex items-center justify-center shrink-0">
+                  <Check className="w-3 h-3 stroke-[3]" />
+                </div>
+                <span className="font-bold text-white">LG 공식 전 가전 회원 특별할인가 즉시 공개</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-[#EA1D2C]/20 text-[#EA1D2C] flex items-center justify-center shrink-0">
+                  <Check className="w-3 h-3 stroke-[3]" />
+                </div>
+                <span>상조 결합 시 만기 144만원 지원 혜택 적용</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-[#EA1D2C]/20 text-[#EA1D2C] flex items-center justify-center shrink-0">
+                  <Check className="w-3 h-3 stroke-[3]" />
+                </div>
+                <span>LG전자 본사 직배송 & 100% 무상 케어 서비스</span>
+              </div>
+            </div>
+
+            {/* Action Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setAuthSuccessData(null);
+                const prdSection = document.getElementById('product-section');
+                if (prdSection) {
+                  prdSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="w-full py-3.5 sm:py-4 bg-gradient-to-r from-[#EA1D2C] via-[#E21524] to-[#C81020] hover:from-[#D41423] hover:to-[#B30E1B] text-white rounded-2xl font-black text-[14px] sm:text-[15px] shadow-xl shadow-[#EA1D2C]/40 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>특별할인가 가전 보러가기</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
