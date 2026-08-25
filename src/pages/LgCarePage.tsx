@@ -2622,11 +2622,11 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
       {selectedProduct && (
         <div 
           onClick={handleCloseProductModal}
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto overscroll-contain"
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-1.5 sm:p-4 overflow-y-auto overscroll-contain"
         >
           <div 
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[88dvh] sm:max-h-[90vh] flex flex-col shadow-2xl border border-[#E5E8EB] relative animate-in fade-in zoom-in duration-200 my-auto"
+            className="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full h-[96dvh] sm:h-auto sm:max-h-[92vh] flex flex-col shadow-2xl border border-[#E5E8EB] relative animate-in fade-in zoom-in duration-200 my-auto"
           >
             {/* Modal Header Bar with Close Button (Fixed at top of modal) */}
             <div className="p-3.5 sm:p-5 border-b border-[#F2F4F6] flex items-center justify-between shrink-0 bg-white rounded-t-2xl sm:rounded-t-3xl">
@@ -2727,34 +2727,34 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
             </div>
 
             {/* Main Tabs Header: 3-Tab Structure */}
-            <div className="grid grid-cols-3 gap-1 rounded-2xl bg-[#F2F4F6] p-1.5 border border-[#E5E8EB]">
+            <div className="grid grid-cols-3 gap-1 rounded-2xl bg-[#F2F4F6] p-1 sm:p-1.5 border border-[#E5E8EB]">
               <button
                 type="button"
                 onClick={() => setModalTab('subscription')}
-                className={`py-2.5 px-1.5 sm:px-2 text-center rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+                className={`py-2 px-1 sm:px-2 text-center rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
                   modalTab === 'subscription'
                     ? 'bg-white text-[#191F28] shadow-sm font-black'
                     : 'text-[#8B95A1] hover:text-[#191F28] font-bold'
                 }`}
               >
-                <span className="text-[12px] sm:text-[13px] leading-tight">LG 공식 가전구독</span>
-                <span className="text-[10px] text-[#8B95A1]">정가 요금</span>
+                <span className="text-[10.5px] sm:text-[13px] leading-tight whitespace-nowrap tracking-tighter sm:tracking-normal">LG 공식 가전구독</span>
+                <span className="text-[9.5px] sm:text-[10px] text-[#8B95A1] whitespace-nowrap">정가 요금</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setModalTab('hyowon')}
-                className={`py-2.5 px-1.5 sm:px-2 text-center rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+                className={`py-2 px-1 sm:px-2 text-center rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
                   modalTab === 'hyowon'
                     ? 'bg-[#EA1D2C] text-white shadow-md shadow-[#EA1D2C]/20 font-black'
                     : 'text-[#EA1D2C] bg-[#FEECEF] hover:bg-[#FEECEF]/80 font-bold'
                 }`}
               >
-                <div className="flex items-center gap-0.5 text-[12px] sm:text-[13px] leading-tight">
-                  <Sparkles className="w-3 h-3" />
+                <div className="flex items-center gap-0.5 text-[10.5px] sm:text-[13px] leading-tight whitespace-nowrap tracking-tighter sm:tracking-normal">
+                  <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" />
                   <span>효원 결합 혜택</span>
                 </div>
-                <span className={`text-[10px] font-black ${
+                <span className={`text-[9.5px] sm:text-[10px] font-black whitespace-nowrap ${
                   modalTab === 'hyowon' ? 'text-white/90' : 'text-[#EA1D2C]'
                 }`}>
                   10%할인+만기환급
@@ -2764,14 +2764,14 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
               <button
                 type="button"
                 onClick={() => setModalTab('card')}
-                className={`py-2.5 px-1.5 sm:px-2 text-center rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
+                className={`py-2 px-1 sm:px-2 text-center rounded-xl transition-all flex flex-col items-center justify-center gap-0.5 cursor-pointer ${
                   modalTab === 'card'
                     ? 'bg-[#191F28] text-white shadow-sm font-black'
                     : 'text-[#4E5968] hover:text-[#191F28] font-bold'
                 }`}
               >
-                <span className="text-[12px] sm:text-[13px] leading-tight">제휴카드 추가할인</span>
-                <span className={`text-[10px] ${modalTab === 'card' ? 'text-white/80' : 'text-[#16A34A] font-extrabold'}`}>
+                <span className="text-[10.5px] sm:text-[13px] leading-tight whitespace-nowrap tracking-tighter sm:tracking-normal">제휴카드 추가할인</span>
+                <span className={`text-[9.5px] sm:text-[10px] whitespace-nowrap ${modalTab === 'card' ? 'text-white/80' : 'text-[#16A34A] font-extrabold'}`}>
                   최대 -4.2만원
                 </span>
               </button>
