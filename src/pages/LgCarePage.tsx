@@ -21,6 +21,7 @@ interface LgCarePageProps {
 
 import { LG_OFFICIAL_PRODUCTS, CATEGORY_SUBTABS, LgProduct, SubscriptionOptions } from '../data/lgCareProducts';
 import { getProductCapacityInfo } from '../utils/productCapacity';
+import { matchesSubCategory } from '../utils/subCategoryMatcher';
 import { buildLgOfficialPdpUrl, getOptimizedImageUrl } from '../utils/lgeUrl';
 
 export { type LgProduct, type SubscriptionOptions };
