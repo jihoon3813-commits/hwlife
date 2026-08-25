@@ -1015,7 +1015,9 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
     <div className="min-h-screen bg-[#F7F8FA] text-[#191F28] font-sans antialiased selection:bg-[#EA1D2C] selection:text-white">
       <SEO 
         title="LG전자 가전 구독 공식 할인몰 | 효원상조 결합 혜택"
-        description="LG전자 가전 구독 공식 혜택! 오브제컬렉션, 워시타워, 정수기, 냉장고 등 원하는 가전에 정기 방문 케어와 100% 무상 A/S, 효원상조 결합 시 매월 10% 할인 + 만기 시 144만원 지원까지!"
+        description={isCare10 
+          ? "LG전자 가전 구독 공식 혜택! 오브제컬렉션, 워시타워, 정수기, 냉장고 등 원하는 가전에 정기 방문 케어와 100% 무상 A/S, 효원상조 결합 시 매월 10% 할인 + 만기 시 144만원 지원까지!"
+          : "LG전자 가전 구독 공식 혜택! 오브제컬렉션, 워시타워, 정수기, 냉장고 등 원하는 가전에 정기 방문 케어와 100% 무상 A/S, 효원상조 결합 시 회원 특별할인 + 만기 시 144만원 지원까지!"}
         image="https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?q=80&w=1200"
       />
 
@@ -2314,7 +2316,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                 </div>
 
                 <p className="text-[13px] sm:text-[14px] text-[#4E5968] leading-relaxed break-keep">
-                  {selectedPlanAccounts === 1 && 'LG 가전 구독 10% 할인과 기본적인 1인 미래 라이프케어를 원하는 고객에게 추천합니다.'}
+                  {selectedPlanAccounts === 1 && (isCare10 ? 'LG 가전 구독 10% 할인과 기본적인 1인 미래 라이프케어를 원하는 고객에게 추천합니다.' : 'LG 가전 구독 회원 특별할인과 기본적인 1인 미래 라이프케어를 원하는 고객에게 추천합니다.')}
                   {selectedPlanAccounts === 2 && '부부 또는 부모·자녀 등 가족 내 2회의 라이프서비스 이용 가능성을 고려하는 고객에게 최적입니다.'}
                   {selectedPlanAccounts === 3 && '가족 단위 보장 횟수와 만기 환급 자금(432만원 축하금) 규모를 함께 높이려는 고객에게 적합합니다.'}
                   {selectedPlanAccounts === 4 && '1인 최대 한도! 만기축하금 576만원과 4회의 프리미엄 전환 서비스를 완벽하게 준비할 수 있습니다.'}
@@ -2386,7 +2388,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                 </div>
 
                 <div className="bg-white/10 rounded-xl p-3 text-[11px] sm:text-[12px] text-[#E5E8EB] leading-relaxed break-keep">
-                  💡 가전을 이용하는 동안 <strong>매월 10% 구독료를 할인</strong>받고, 상조를 만기까지 유지하면 <strong>낸 돈 전액과 만기축하금 {(144 * selectedPlanAccounts)}만원</strong>을 고스란히 돌려받습니다.
+                  💡 가전을 이용하는 동안 <strong>{isCare10 ? '매월 10% 구독료를 할인' : '매월 회원 특별할인을'}</strong>받고, 상조를 만기까지 유지하면 <strong>낸 돈 전액과 만기축하금 {(144 * selectedPlanAccounts)}만원</strong>을 고스란히 돌려받습니다.
                 </div>
               </div>
             </div>
@@ -2416,7 +2418,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
 
               {/* Minus Box 2 */}
               <div className="bg-[#E8F3FF] p-4 sm:p-6 rounded-2xl border border-[#3182F6]/20 text-center space-y-0.5 sm:space-y-1">
-                <span className="text-[11px] sm:text-[12px] text-[#3182F6] font-bold block">매월 10% 즉시 할인</span>
+                <span className="text-[11px] sm:text-[12px] text-[#3182F6] font-bold block">{isCare10 ? '매월 10% 즉시 할인' : '회원 특별할인 지원'}</span>
                 <span className="text-[20px] sm:text-[22px] font-black text-[#3182F6] block whitespace-nowrap">-360,000원</span>
                 <span className="text-[11px] text-[#3182F6]">월 5,000원 × 72개월 절감</span>
               </div>
@@ -2886,7 +2888,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                 <span className={`text-[9.5px] sm:text-[10px] font-black whitespace-nowrap ${
                   modalTab === 'hyowon' ? 'text-white/90' : 'text-[#EA1D2C]'
                 }`}>
-                  10%할인+만기환급
+                  {isCare10 ? '10%할인+만기환급' : '특별할인+만기환급'}
                 </span>
               </button>
 
