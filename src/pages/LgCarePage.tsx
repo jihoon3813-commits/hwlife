@@ -1674,7 +1674,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
         {displayedProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {displayedProducts.map((product) => (
+              {displayedProducts.map((product, pIdx) => (
                 <div 
                   key={product.id}
                   className="bg-white rounded-2xl overflow-hidden border border-[#E5E8EB] shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col group relative"
@@ -1718,10 +1718,11 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                     className="relative w-full h-28 sm:h-36 px-2 py-1 flex items-center justify-center cursor-pointer bg-white overflow-hidden"
                   >
                     <img 
-                      src={getOptimizedImageUrl(product.image)} 
+                      src={getOptimizedImageUrl(product.image, 'thumb')} 
                       alt={product.name} 
                       referrerPolicy="no-referrer"
-                      loading="lazy"
+                      loading={pIdx < 6 ? 'eager' : 'lazy'}
+                      decoding="async"
                       className="w-full h-full max-h-[105px] sm:max-h-[135px] object-contain group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -2654,7 +2655,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pb-4 border-b border-[#F2F4F6]">
                 <div className="w-20 h-20 sm:w-28 sm:h-28 bg-[#F8FAFC] rounded-2xl p-2 border border-[#E5E8EB] flex items-center justify-center shrink-0 mx-auto sm:mx-0">
                   <img 
-                    src={getOptimizedImageUrl(currentProductImage)} 
+                    src={getOptimizedImageUrl(currentProductImage, 'modal')} 
                     alt={selectedProduct.name} 
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-contain transition-all duration-300"

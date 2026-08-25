@@ -226,7 +226,7 @@ export function buildLgOfficialPdpUrl(rawUrl?: string, modelCode?: string, categ
  * Optimizes image URLs by converting lge.co.kr to static.lge.co.kr
  * to avoid 302 redirects which get blocked by mobile browsers.
  */
-export function getOptimizedImageUrl(url?: string): string {
+export function getOptimizedImageUrl(url?: string, size: 'thumb' | 'modal' | 'full' = 'thumb'): string {
   if (!url) return 'https://static.lge.co.kr/kr/images/common/no-image.jpg';
   let clean = url.trim();
   if (clean.startsWith('//')) {
@@ -237,7 +237,9 @@ export function getOptimizedImageUrl(url?: string): string {
   // This completely bypasses hotlink block, 302 redirect, carrier DNS issues on mobile phones!
   if (clean.includes('lge.co.kr')) {
     const rawTarget = clean.replace(/^https?:\/\//i, '').replace(/^www\.lge\.co\.kr/i, 'static.lge.co.kr');
-    return `https://images.weserv.nl/?url=${encodeURIComponent(rawTarget)}&output=webp&q=85`;
+    const width = size === 'thumb' ? 260 : size === 'modal' ? 400 : 600;
+    const quality = size === 'thumb' ? 75 : 85;
+    return `https://images.weserv.nl/?url=${encodeURIComponent(rawTarget)}&w=${width}&h=${width}&fit=contain&output=webp&q=${quality}`;
   }
 
   return clean;
