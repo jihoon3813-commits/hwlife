@@ -27,11 +27,11 @@ export default function LandingRouter() {
 
   const path = currentPath;
   
-  // /lgsub, /care, /care-solutions, /lg 경로 → LG가전 구독 할인 전용 랜딩페이지
-  if (path === '/lgsub' || path.startsWith('/lgsub/') ||
-      path === '/care' || path.startsWith('/care/') || 
-      path === '/care-solutions' || path.startsWith('/care-solutions/') ||
-      path === '/lg' || path.startsWith('/lg/')) {
+  // /lgsub, /care, /care10, /care_copy, /care-solutions, /lg 경로 → LG가전 구독 할인 전용 랜딩페이지
+  if (path === '/lgsub' || path.startsWith('/lgsub') ||
+      path === '/care' || path.startsWith('/care') || 
+      path === '/care-solutions' || path.startsWith('/care-solutions') ||
+      path === '/lg' || path.startsWith('/lg')) {
     const parts = path.split('/').filter(Boolean);
     const sub = parts.length >= 2 ? parts[1] : undefined;
     return <LgCarePage channelSubdomain={sub} landingPath={path} />;
