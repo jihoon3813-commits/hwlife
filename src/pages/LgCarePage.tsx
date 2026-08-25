@@ -173,10 +173,14 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
         }
         return parsed;
       }
-      // Fallback to legacy key
+      // If only old boolean key exists without stored auth info, treat as unverified
       if (localStorage.getItem('hw_care_unlocked') === 'true') {
-        const legacyCode = localStorage.getItem('hw_care_code') || 'SPECIAL';
-        return { code: legacyCode, verifiedAt: Date.now() };
+        const legacyCode = localStorage.getItem('hw_care_code');
+        if (legacyCode) {
+          const fallback = { code: legacyCode, verifiedAt: 1 };
+          localStorage.setItem('hw_care_auth', JSON.stringify(fallback));
+          return fallback;
+        }
       }
       return null;
     } catch {
@@ -184,17 +188,18 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
     }
   });
 
-  const isUnlocked = isCare10 || !!authInfo;
-
   // Real-time server-side validity & admin reset check
   const serverAuthCheck = useQuery(
     api.discountCodes.checkCodeValidity,
     !isCare10 && authInfo ? { code: authInfo.code, verifiedAt: authInfo.verifiedAt } : "skip"
   );
 
+  // Unlocked only if isCare10 OR (authInfo exists AND server check hasn't failed)
+  const isUnlocked = isCare10 || (!!authInfo && serverAuthCheck?.isValid !== false);
+
   useEffect(() => {
     if (!isCare10 && authInfo && serverAuthCheck !== undefined && !serverAuthCheck.isValid) {
-      // Admin reset or code invalidated -> lock page
+      // Admin reset or code invalidated -> immediately lock page
       setAuthInfo(null);
       try {
         localStorage.removeItem('hw_care_auth');

@@ -83,7 +83,7 @@ export const checkCodeValidity = query({
       return { isValid: false, reason: '유효기간이 만료되었습니다.' };
     }
 
-    if (item.lastResetAt && item.lastResetAt > args.verifiedAt) {
+    if (item.lastResetAt && item.lastResetAt >= args.verifiedAt) {
       return { isValid: false, reason: '관리자에 의해 인증이 리셋되었습니다.' };
     }
 
