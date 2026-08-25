@@ -43,12 +43,76 @@ export const verify = mutation({
       useCount: (item.useCount || 0) + 1,
     });
 
+    const now = Date.now();
     return {
       success: true,
       code: item.code,
       customerName: item.customerName,
       memo: item.memo,
+      expiresAt: item.expiresAt,
+      verifiedAt: now,
     };
+  },
+});
+
+export const checkCodeValidity = query({
+  args: {
+    code: v.string(),
+    verifiedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const cleanCode = args.code.trim().toUpperCase();
+    if (!cleanCode) {
+      return { isValid: false, reason: '코드 미입력' };
+    }
+
+    const item = await ctx.db
+      .query('discount_codes')
+      .withIndex('by_code', (q) => q.eq('code', cleanCode))
+      .first();
+
+    if (!item) {
+      return { isValid: false, reason: '코드가 삭제되었거나 존재하지 않습니다.' };
+    }
+
+    if (!item.isActive) {
+      return { isValid: false, reason: '사용 중단된 코드입니다.' };
+    }
+
+    if (item.expiresAt && item.expiresAt < Date.now()) {
+      return { isValid: false, reason: '유효기간이 만료되었습니다.' };
+    }
+
+    if (item.lastResetAt && item.lastResetAt > args.verifiedAt) {
+      return { isValid: false, reason: '관리자에 의해 인증이 리셋되었습니다.' };
+    }
+
+    return { isValid: true, code: item.code };
+  },
+});
+
+export const resetAuth = mutation({
+  args: {
+    id: v.id('discount_codes'),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      lastResetAt: Date.now(),
+    });
+  },
+});
+
+export const batchResetAuth = mutation({
+  args: {
+    ids: v.array(v.id('discount_codes')),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    for (const id of args.ids) {
+      await ctx.db.patch(id, {
+        lastResetAt: now,
+      });
+    }
   },
 });
 

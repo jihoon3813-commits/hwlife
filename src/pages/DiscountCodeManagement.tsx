@@ -14,6 +14,8 @@ export default function DiscountCodeManagement() {
   const removeCode = useMutation(api.discountCodes.remove);
   const batchDeleteCodes = useMutation(api.discountCodes.batchDelete);
   const toggleActive = useMutation(api.discountCodes.toggleActive);
+  const resetAuth = useMutation(api.discountCodes.resetAuth);
+  const batchResetAuth = useMutation(api.discountCodes.batchResetAuth);
 
   // States
   const [searchTerm, setSearchTerm] = useState('');
@@ -113,25 +115,46 @@ export default function DiscountCodeManagement() {
 
   const handleBatchDelete = async () => {
     if (selectedIds.length === 0) return;
-    if (!window.confirm(`selected ${selectedIds.length} codes delete?`)) return;
+    if (!window.confirm(`선택한 ${selectedIds.length}개의 할인코드를 삭제하시겠습니까?`)) return;
     try {
       await batchDeleteCodes({ ids: selectedIds as any });
       setSelectedIds([]);
-      alert('selected discount codes deleted successfully');
+      alert('선택한 할인코드가 삭제되었습니다.');
     } catch (err) {
       console.error(err);
-      alert('error deleting discount codes');
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleBatchResetAuth = async () => {
+    if (selectedIds.length === 0) return;
+    if (!window.confirm(`선택한 ${selectedIds.length}개 할인코드의 모든 사용자 인증을 리셋하시겠습니까?\n\n이 코드로 인증했던 사용자의 화면에서 특가가 즉시 다시 잠깁니다.`)) return;
+    try {
+      await batchResetAuth({ ids: selectedIds as any });
+      alert(`선택한 ${selectedIds.length}개 할인코드의 사용자 인증이 리셋되었습니다.`);
+    } catch (err: any) {
+      alert(err.message || '인증 리셋 중 오류가 발생했습니다.');
     }
   };
 
   const handleDelete = async (id: string, code: string) => {
-    if (!window.confirm(`delete discount code '${code}'?`)) return;
+    if (!window.confirm(`할인코드 [${code}]를 삭제하시겠습니까?`)) return;
     try {
       await removeCode({ id: id as any });
       setSelectedIds((prev) => prev.filter((i) => i !== id));
     } catch (err) {
       console.error(err);
-      alert('error deleting discount code');
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleResetAuth = async (id: any, code: string) => {
+    if (!window.confirm(`할인코드 [${code}]의 사용자 인증을 리셋하시겠습니까?\n\n이 코드로 접속 중이던 사용자의 화면에서 특가가 즉시 다시 잠기며, 코드를 다시 입력해야 합니다.`)) return;
+    try {
+      await resetAuth({ id });
+      alert(`[${code}] 할인코드의 사용자 인증이 리셋되었습니다.\n접속 중인 사용자의 특가가 즉시 잠겼습니다.`);
+    } catch (err: any) {
+      alert(err.message || '인증 리셋 중 오류가 발생했습니다.');
     }
   };
   const calculateExpiry = (preset: string, customDate: string): number | undefined => {
@@ -364,13 +387,23 @@ export default function DiscountCodeManagement() {
           </div>
 
           {selectedIds.length > 0 && (
-            <button
-              onClick={handleBatchDelete}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-[12.5px] font-bold border border-rose-200 transition-colors whitespace-nowrap cursor-pointer"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>{selectedIds.length}개 일괄 삭제</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleBatchResetAuth}
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-xl text-[12.5px] font-bold border border-amber-200 transition-colors whitespace-nowrap cursor-pointer"
+                title="선택한 코드의 사용자 인증을 일괄 리셋합니다."
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>{selectedIds.length}개 인증 리셋</span>
+              </button>
+              <button
+                onClick={handleBatchDelete}
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-[12.5px] font-bold border border-rose-200 transition-colors whitespace-nowrap cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{selectedIds.length}개 일괄 삭제</span>
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -396,7 +429,7 @@ export default function DiscountCodeManagement() {
                 <th className="py-3.5 px-4">유효기간</th>
                 <th className="py-3.5 px-4 text-center">인증 횟수</th>
                 <th className="py-3.5 px-4 text-center">상태</th>
-                <th className="py-3.5 px-4 text-center w-20">관리</th>
+                <th className="py-3.5 px-4 text-center w-28">관리</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F2F4F6]">
@@ -484,13 +517,24 @@ export default function DiscountCodeManagement() {
                       </button>
                     </td>
                     <td className="py-3.5 px-4 text-center">
-                      <button
-                        onClick={() => handleDelete(code._id, code.code)}
-                        className="p-1.5 text-[#8B95A1] hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                        title="삭제"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleResetAuth(code._id, code.code)}
+                          className="p-1.5 text-[#8B95A1] hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+                          title={code.lastResetAt ? `인증 리셋 (최근 리셋: ${formatDateTime(code.lastResetAt)})` : '인증 리셋 (접속자 특가 다시 잠금)'}
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(code._id, code.code)}
+                          className="p-1.5 text-[#8B95A1] hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          title="삭제"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

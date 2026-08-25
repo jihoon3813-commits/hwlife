@@ -287,6 +287,7 @@ export default defineSchema({
     isActive: v.boolean(),                 // 활성화 여부
     createdAt: v.number(),                 // 생성일시 타임스탬프
     useCount: v.optional(v.number()),      // 사용 횟수
+    lastResetAt: v.optional(v.number()),   // 관리자 인증 리셋 일시 (해당 시점 이전 인증 무효화)
   }).index("by_code", ["code"])
     .index("by_createdAt", ["createdAt"])
     .index("by_isActive", ["isActive"]),

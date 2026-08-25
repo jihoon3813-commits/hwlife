@@ -154,13 +154,57 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
 
   // Care10 vs Care mode & Discount Code Unlocked State
   const isCare10 = landingPath === '/care10';
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+
+  interface StoredAuthInfo {
+    code: string;
+    verifiedAt: number;
+    expiresAt?: number;
+  }
+
+  const [authInfo, setAuthInfo] = useState<StoredAuthInfo | null>(() => {
     try {
-      return localStorage.getItem('hw_care_unlocked') === 'true';
+      const raw = localStorage.getItem('hw_care_auth');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.expiresAt && parsed.expiresAt < Date.now()) {
+          localStorage.removeItem('hw_care_auth');
+          localStorage.removeItem('hw_care_unlocked');
+          return null;
+        }
+        return parsed;
+      }
+      // Fallback to legacy key
+      if (localStorage.getItem('hw_care_unlocked') === 'true') {
+        const legacyCode = localStorage.getItem('hw_care_code') || 'SPECIAL';
+        return { code: legacyCode, verifiedAt: Date.now() };
+      }
+      return null;
     } catch {
-      return false;
+      return null;
     }
   });
+
+  const isUnlocked = isCare10 || !!authInfo;
+
+  // Real-time server-side validity & admin reset check
+  const serverAuthCheck = useQuery(
+    api.discountCodes.checkCodeValidity,
+    !isCare10 && authInfo ? { code: authInfo.code, verifiedAt: authInfo.verifiedAt } : "skip"
+  );
+
+  useEffect(() => {
+    if (!isCare10 && authInfo && serverAuthCheck !== undefined && !serverAuthCheck.isValid) {
+      // Admin reset or code invalidated -> lock page
+      setAuthInfo(null);
+      try {
+        localStorage.removeItem('hw_care_auth');
+        localStorage.removeItem('hw_care_unlocked');
+        localStorage.removeItem('hw_care_code');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }, [isCare10, authInfo, serverAuthCheck]);
 
   // Discount Code Modal States
   const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
@@ -180,11 +224,17 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
     setDiscountError('');
     try {
       const res = await verifyDiscountCodeMutation({ code: cleanCode });
-      if (res.success) {
-        setIsUnlocked(true);
+      if (res.success && res.code && res.verifiedAt) {
+        const newAuth: StoredAuthInfo = {
+          code: res.code,
+          verifiedAt: res.verifiedAt,
+          expiresAt: res.expiresAt,
+        };
+        setAuthInfo(newAuth);
         try {
           localStorage.setItem('hw_care_unlocked', 'true');
-          if (res.code) localStorage.setItem('hw_care_code', res.code);
+          localStorage.setItem('hw_care_code', res.code);
+          localStorage.setItem('hw_care_auth', JSON.stringify(newAuth));
         } catch (err) {
           console.error(err);
         }
