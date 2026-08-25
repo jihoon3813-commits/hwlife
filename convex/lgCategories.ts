@@ -184,14 +184,6 @@ export const updateCategoryDetails = mutation({
       });
     }
 
-    // Also sync category name across all matching products in lg_products
-    const allProducts = await ctx.db.query("lg_products").collect();
-    for (const p of allProducts) {
-      if (p.categoryKey === args.key && p.category !== trimmedName) {
-        await ctx.db.patch(p._id, { category: trimmedName });
-      }
-    }
-
     return { success: true };
   },
 });

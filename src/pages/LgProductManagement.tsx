@@ -220,6 +220,10 @@ export default function LgProductManagement() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
+  // Pagination States for high performance
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(30);
+
   // Batch Verification State
   const [isBatchVerifying, setIsBatchVerifying] = useState(false);
   const [verifyProgress, setVerifyProgress] = useState<{ current: number; total: number } | null>(null);
@@ -241,26 +245,19 @@ export default function LgProductManagement() {
     return found ? found.key : 'all';
   }, [dbCategories]);
 
-  // Ordered Categories (combining 'all' with DB ordered list or static list + merging new static categories like bathair)
+  // Ordered Categories (strictly reflecting DB categories when present)
   const categoriesList = useMemo<LgCategory[]>(() => {
     const staticList = LG_CATEGORIES.filter(c => c.key !== 'all');
     if (!dbCategories || dbCategories.length === 0) {
       return [{ key: 'all', name: '전체 카테고리', icon: '✨' }, ...staticList];
     }
 
-    // Filter out legacy hyphenated key 'bath-air' / 'bath_air' if any
-    const cleanedDbCats = dbCategories.filter(c => c.key !== 'bath-air' && c.key !== 'bath_air');
-
-    const mergedList = [...cleanedDbCats];
-    for (const sc of staticList) {
-      if (!mergedList.some(dc => dc.key === sc.key)) {
-        mergedList.push(sc as any);
-      }
-    }
+    // Filter out legacy hyphenated keys and deleted categories
+    const cleanedDbCats = dbCategories.filter(c => c.key !== 'bath-air' && c.key !== 'bath_air' && !(c as any).isDeleted);
 
     return [
       { key: 'all', name: '전체 카테고리', icon: '✨' },
-      ...mergedList.map(c => ({
+      ...cleanedDbCats.map(c => ({
         key: c.key,
         name: c.name,
         icon: c.icon,
@@ -494,6 +491,19 @@ export default function LgProductManagement() {
       return true;
     });
   }, [products, selectedCategoryKey, verificationFilter, searchTerm]);
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategoryKey, verificationFilter, searchTerm]);
+
+  // Paginated product slice for fast rendering
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / (pageSize || 30)));
+  const paginatedProducts = useMemo(() => {
+    if (pageSize >= 9999) return filteredProducts;
+    const start = (currentPage - 1) * pageSize;
+    return filteredProducts.slice(start, start + pageSize);
+  }, [filteredProducts, currentPage, pageSize]);
 
   // Handle Hide Unverified Products
   const handleHideUnverified = async () => {
@@ -1755,9 +1765,10 @@ export default function LgProductManagement() {
           ) : viewMode === 'card' ? (
             /* CARD GRID VIEW (Optimized for narrow/laptop screens) */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5">
-              {filteredProducts.map((p, idx) => {
+              {paginatedProducts.map((p, idx) => {
+                const globalIdx = (currentPage - 1) * (pageSize >= 9999 ? 0 : pageSize) + idx;
                 const isChecked = selectedIds.includes(p._id);
-                const isDragging = draggedIndex === idx;
+                const isDragging = draggedIndex === globalIdx;
                 const capInfo = getProductCapacityInfo(p.model, p.name, p.categoryKey, p.category, p.specifications);
                 const isVer = p.isOfficialVerified !== undefined 
                   ? p.isOfficialVerified 
@@ -1767,9 +1778,9 @@ export default function LgProductManagement() {
                   <div
                     key={p._id}
                     draggable
-                    onDragStart={() => handleDragStart(idx)}
+                    onDragStart={() => handleDragStart(globalIdx)}
                     onDragOver={handleDragOver}
-                    onDrop={() => handleDrop(idx)}
+                    onDrop={() => handleDrop(globalIdx)}
                     className={`bg-white rounded-2xl border transition-all p-3.5 flex flex-col justify-between space-y-3 group hover:shadow-md ${
                       isDragging ? 'opacity-30 bg-gray-100 border-dashed border-[#EA1D2C]' : 'border-[#E5E8EB]'
                     } ${isChecked ? 'ring-2 ring-[#EA1D2C] bg-[#FFF5F6]/40' : ''}`}
@@ -1792,7 +1803,7 @@ export default function LgProductManagement() {
                           )}
                         </button>
                         <span className="text-[11px] font-mono font-bold text-[#8B95A1] bg-[#F2F4F6] px-1.5 py-0.2 rounded">
-                          #{idx + 1}
+                          #{globalIdx + 1}
                         </span>
                         <span className="text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-1.5 py-0.2 rounded">
                           {p.category}
@@ -2021,17 +2032,18 @@ export default function LgProductManagement() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E5E8EB]">
-                    {filteredProducts.map((p, idx) => {
+                    {paginatedProducts.map((p, idx) => {
+                      const globalIdx = (currentPage - 1) * (pageSize >= 9999 ? 0 : pageSize) + idx;
                       const isChecked = selectedIds.includes(p._id);
-                      const isDragging = draggedIndex === idx;
+                      const isDragging = draggedIndex === globalIdx;
 
                       return (
                         <tr
                           key={p._id}
                           draggable
-                          onDragStart={() => handleDragStart(idx)}
+                          onDragStart={() => handleDragStart(globalIdx)}
                           onDragOver={handleDragOver}
-                          onDrop={() => handleDrop(idx)}
+                          onDrop={() => handleDrop(globalIdx)}
                           className={`hover:bg-[#F8F9FA] transition-colors group ${
                             isDragging ? 'opacity-30 bg-gray-100' : ''
                           } ${isChecked ? 'bg-[#FEECEF]/30' : ''}`}
@@ -2040,7 +2052,7 @@ export default function LgProductManagement() {
                           <td className="py-2.5 px-2 text-center text-[#8B95A1] cursor-grab active:cursor-grabbing">
                             <div className="flex items-center justify-center gap-1">
                               <MoveVertical className="w-3.5 h-3.5 text-[#B0B8C1] group-hover:text-[#191F28]" />
-                              <span className="text-[11px] font-mono">{idx + 1}</span>
+                              <span className="text-[11px] font-mono">{globalIdx + 1}</span>
                             </div>
                           </td>
 
@@ -2369,6 +2381,106 @@ export default function LgProductManagement() {
                   </tbody>
                 </table>
               </div>
+            </div>
+          )}
+
+          {/* Pagination Controls Bar */}
+          {filteredProducts.length > 0 && (
+            <div className="mt-5 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-[#E5E8EB] shadow-2xs">
+              {/* Page info & Page size selector */}
+              <div className="flex items-center gap-3 text-[12.5px] text-[#4E5968]">
+                <span className="font-bold">
+                  총 <strong className="text-[#191F28]">{filteredProducts.length}</strong>개 제품 중{' '}
+                  <strong className="text-[#EA1D2C]">
+                    {Math.min((currentPage - 1) * (pageSize >= 9999 ? filteredProducts.length : pageSize) + 1, filteredProducts.length)}~{Math.min(currentPage * (pageSize >= 9999 ? filteredProducts.length : pageSize), filteredProducts.length)}
+                  </strong>
+                  개 표시
+                </span>
+                <div className="flex items-center gap-1.5 border-l border-[#E5E8EB] pl-3">
+                  <span className="text-[12px] text-[#8B95A1]">페이지당:</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="bg-[#F8F9FA] border border-[#D1D6DB] rounded-lg px-2 py-1 text-[12px] font-bold text-[#191F28] focus:outline-none focus:border-[#EA1D2C] cursor-pointer"
+                  >
+                    <option value={20}>20개씩</option>
+                    <option value={30}>30개씩 (추천)</option>
+                    <option value={50}>50개씩</option>
+                    <option value={100}>100개씩</option>
+                    <option value={9999}>전체 보기</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Page Navigation Buttons */}
+              {totalPages > 1 && pageSize < 9999 && (
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                    className="px-2.5 py-1.5 rounded-lg border border-[#E5E8EB] text-[12px] font-bold text-[#4E5968] hover:bg-[#F2F4F6] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    title="첫 페이지"
+                  >
+                    «
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 rounded-lg border border-[#E5E8EB] text-[12px] font-bold text-[#4E5968] hover:bg-[#F2F4F6] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    ‹ 이전
+                  </button>
+
+                  <div className="flex items-center gap-1 px-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+                      .map((p, idx, arr) => {
+                        const prev = arr[idx - 1];
+                        const showEllipsis = prev && p - prev > 1;
+
+                        return (
+                          <React.Fragment key={p}>
+                            {showEllipsis && <span className="px-1 text-gray-400 text-[11px]">...</span>}
+                            <button
+                              type="button"
+                              onClick={() => setCurrentPage(p)}
+                              className={`w-8 h-8 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
+                                currentPage === p
+                                  ? 'bg-[#EA1D2C] text-white shadow-xs font-black'
+                                  : 'text-[#4E5968] hover:bg-[#F2F4F6] border border-transparent'
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          </React.Fragment>
+                        );
+                      })}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 rounded-lg border border-[#E5E8EB] text-[12px] font-bold text-[#4E5968] hover:bg-[#F2F4F6] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    다음 ›
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="px-2.5 py-1.5 rounded-lg border border-[#E5E8EB] text-[12px] font-bold text-[#4E5968] hover:bg-[#F2F4F6] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    title="마지막 페이지"
+                  >
+                    »
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
