@@ -5,6 +5,7 @@ import {
   KeyRound, Plus, Trash2, Copy, Check, Search, User, Phone, 
   Clock, AlertTriangle, Sparkles, CheckCircle2, XCircle, RefreshCw
 } from 'lucide-react';
+import { formatPhoneNumber } from '../utils/phone';
 
 export default function DiscountCodeManagement() {
   const discountCodes = useQuery(api.discountCodes.list) || [];
@@ -578,9 +579,10 @@ export default function DiscountCodeManagement() {
                     <div className="space-y-1.5">
                       <label className="text-[12px] font-bold text-[#4E5968]">연락처</label>
                       <input
-                        type="text"
+                        type="tel"
+                        maxLength={13}
                         value={singleForm.customerPhone}
-                        onChange={e => setSingleForm(prev => ({ ...prev, customerPhone: e.target.value }))}
+                        onChange={e => setSingleForm(prev => ({ ...prev, customerPhone: formatPhoneNumber(e.target.value) }))}
                         placeholder="010-1234-5678"
                         className="w-full px-3.5 py-2 bg-[#F9FAFB] border border-[#E5E8EB] rounded-xl text-[13px] focus:bg-white focus:border-[#3182F6] outline-none"
                       />
