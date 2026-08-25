@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Plus, Edit2, Trash2, Globe, ExternalLink, ShieldCheck, Check, Sparkles } from 'lucide-react';
+import { Plus, Edit2, Trash2, Globe, ExternalLink, ShieldCheck, Check, Sparkles, Copy } from 'lucide-react';
 
 export default function LandingManagement({ userType = 'admin', subdomain }: { userType?: string, subdomain?: string }) {
   const landings = useQuery(api.landings.get) || [];
@@ -10,12 +10,12 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
   const createLanding = useMutation(api.landings.create);
   const updateLanding = useMutation(api.landings.update);
   const removeLanding = useMutation(api.landings.remove);
+  const duplicateLanding = useMutation(api.landings.duplicate);
   const seedLandings = useMutation(api.landings.seed);
   const updateDefaultThumbnails = useMutation(api.landings.updateDefaultThumbnails);
 
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit' | 'duplicate'>('create');
   const [hasChecked, setHasChecked] = useState(false);
   const [sortOrder, setSortOrder] = useState<'latest' | 'oldest' | 'name'>('latest');
   const [formData, setFormData] = useState({
@@ -26,7 +26,6 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
     thumbnail: '',
     isActive: true
   });
-
 
   // Assigned landing paths for channel admin
   const assignedPaths = currentChannel?.landingPages || (currentChannel?.landingPage ? [currentChannel?.landingPage] : []);
@@ -60,28 +59,73 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
     }
   }, [landings, seedLandings, updateDefaultThumbnails, userType, hasChecked]);
 
-
   const openCreateModal = () => {
     if (userType !== 'admin') return;
-    setIsEditing(false);
+    setModalMode('create');
     setFormData({ _id: '', name: '', path: '', description: '', thumbnail: '', isActive: true });
     setIsModalOpen(true);
-
   };
 
   const openEditModal = (landing: any) => {
     if (userType !== 'admin') return;
-    setIsEditing(true);
+    setModalMode('edit');
     setFormData({ ...landing });
     setIsModalOpen(true);
+  };
+
+  const openDuplicateModal = (landing: any) => {
+    if (userType !== 'admin') return;
+    setModalMode('duplicate');
+    
+    // Auto-generate suggested path
+    const baseClean = landing.path === '/' ? '/copy' : `${landing.path}_copy`;
+    let suggestedPath = baseClean;
+    let counter = 1;
+    while (landings.some(l => l.path === suggestedPath)) {
+      counter++;
+      suggestedPath = `${baseClean}${counter}`;
+    }
+
+    setFormData({
+      _id: landing._id,
+      name: `${landing.name} (복사본)`,
+      path: suggestedPath,
+      description: landing.description || '',
+      thumbnail: landing.thumbnail || '',
+      isActive: landing.isActive
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleQuickDuplicate = async (landing: any) => {
+    if (userType !== 'admin') return;
+    if (!window.confirm(`'${landing.name}' 랜딩페이지를 복제하시겠습니까?`)) {
+      return;
+    }
+    try {
+      await duplicateLanding({ id: landing._id as any });
+      alert(`'${landing.name}' 복제가 완료되었습니다.`);
+    } catch (err) {
+      console.error(err);
+      alert('복제 중 오류가 발생했습니다.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (userType !== 'admin') return;
     try {
-      if (isEditing) {
+      if (modalMode === 'edit') {
         await updateLanding({
+          id: formData._id as any,
+          name: formData.name,
+          path: formData.path,
+          description: formData.description,
+          thumbnail: formData.thumbnail,
+          isActive: formData.isActive
+        });
+      } else if (modalMode === 'duplicate') {
+        await duplicateLanding({
           id: formData._id as any,
           name: formData.name,
           path: formData.path,
@@ -214,16 +258,27 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="bg-white p-3 rounded-full hover:scale-110 transition-transform shadow-lg"
+                  title="랜딩페이지 바로가기"
                 >
                   <ExternalLink className="w-5 h-5 text-[#191F28]" />
                 </a>
                 {userType === 'admin' && (
-                  <button 
-                    onClick={() => openEditModal(landing)}
-                    className="bg-[#3182F6] p-3 rounded-full hover:scale-110 transition-transform shadow-lg"
-                  >
-                    <Edit2 className="w-5 h-5 text-white" />
-                  </button>
+                  <>
+                    <button 
+                      onClick={() => openEditModal(landing)}
+                      className="bg-[#3182F6] p-3 rounded-full hover:scale-110 transition-transform shadow-lg text-white"
+                      title="랜딩페이지 수정"
+                    >
+                      <Edit2 className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={() => openDuplicateModal(landing)}
+                      className="bg-emerald-500 hover:bg-emerald-600 p-3 rounded-full hover:scale-110 transition-transform shadow-lg text-white"
+                      title="랜딩페이지 복제"
+                    >
+                      <Copy className="w-5 h-5" />
+                    </button>
+                  </>
                 )}
               </div>
               {!landing.isActive && (
@@ -246,15 +301,30 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
               </p>
               
               <div className="mt-auto flex flex-col gap-3">
-                <a 
-                  href={getCustomUrl(landing.path)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 bg-[#3182F6] text-white py-3 rounded-[12px] font-bold text-[14px] hover:bg-[#1B64DA] transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  랜딩 바로가기
-                </a>
+                <div className="grid grid-cols-2 gap-2">
+                  <a 
+                    href={getCustomUrl(landing.path)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1.5 bg-[#3182F6] text-white py-2.5 rounded-[12px] font-bold text-[13px] hover:bg-[#1B64DA] transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    바로가기
+                  </a>
+                  {userType === 'admin' ? (
+                    <button 
+                      onClick={() => openDuplicateModal(landing)}
+                      className="flex items-center justify-center gap-1.5 bg-[#F2F4F6] text-[#333D4B] hover:bg-[#E5E8EB] py-2.5 rounded-[12px] font-bold text-[13px] transition-colors cursor-pointer"
+                    >
+                      <Copy className="w-4 h-4 text-[#4E5968]" />
+                      복제하기
+                    </button>
+                  ) : (
+                    <div className="flex items-center justify-center gap-1.5 bg-[#F2F4F6] text-[#6B7684] py-2.5 rounded-[12px] font-medium text-[13px]">
+                      공식 랜딩
+                    </div>
+                  )}
+                </div>
                 
                 <div className="flex items-center justify-between pt-4 border-t border-[#F2F4F6]">
                   <div className="flex items-center gap-2">
@@ -269,10 +339,25 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
                     )}
                   </div>
                   {userType === 'admin' && (
-                    <div className="flex gap-1">
+                    <div className="flex items-center gap-1">
+                      <button 
+                        onClick={() => openEditModal(landing)}
+                        className="p-2 text-[#8B95A1] hover:text-[#3182F6] hover:bg-[#F2F4F6] rounded-lg transition-colors cursor-pointer"
+                        title="수정"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => openDuplicateModal(landing)}
+                        className="p-2 text-[#8B95A1] hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                        title="복제"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
                       <button 
                         onClick={() => handleDelete(landing._id)}
-                        className="p-2 text-[#8B95A1] hover:text-[#F04452] transition-colors"
+                        className="p-2 text-[#8B95A1] hover:text-[#F04452] hover:bg-[#FEECEF] rounded-lg transition-colors cursor-pointer"
+                        title="삭제"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -298,12 +383,13 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-6">
           <div className="bg-white rounded-[32px] w-full max-w-[480px] shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
             <div className="p-6 border-b border-[#F2F4F6] flex justify-between items-center">
-              <h2 className="text-[18px] font-black text-[#191F28]">
-                {isEditing ? '랜딩페이지 수정' : '신규 랜딩 등록'}
+              <h2 className="text-[18px] font-black text-[#191F28] flex items-center gap-2">
+                {modalMode === 'duplicate' && <Copy className="w-5 h-5 text-emerald-600" />}
+                {modalMode === 'duplicate' ? '랜딩페이지 복제' : modalMode === 'edit' ? '랜딩페이지 수정' : '신규 랜딩 등록'}
               </h2>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="w-10 h-10 flex items-center justify-center bg-[#F9FAFB] rounded-full hover:bg-[#F2F4F6] transition-colors"
+                className="w-10 h-10 flex items-center justify-center bg-[#F9FAFB] rounded-full hover:bg-[#F2F4F6] transition-colors cursor-pointer"
               >
                 <Plus className="w-6 h-6 text-[#8B95A1] rotate-45" />
               </button>
@@ -330,9 +416,14 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
                     required
                     value={formData.path}
                     onChange={(e) => setFormData({...formData, path: e.target.value})}
-                    placeholder="예: /living"
+                    placeholder="예: /living_copy"
                     className="w-full bg-[#F2F4F6] px-5 py-4 rounded-[16px] text-[15px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 transition-all"
                   />
+                  {modalMode === 'duplicate' && (
+                    <p className="text-[11px] text-[#8B95A1] mt-1.5 px-1">
+                      ※ 기존 랜딩과 중복되지 않도록 고유한 접속 경로(Path)를 지정해주세요.
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -362,7 +453,7 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
                   <button 
                     type="button"
                     onClick={() => setFormData({...formData, isActive: !formData.isActive})}
-                    className={`w-12 h-6 rounded-full relative transition-colors ${formData.isActive ? 'bg-[#3182F6]' : 'bg-[#D1D6DB]'}`}
+                    className={`w-12 h-6 rounded-full relative transition-colors cursor-pointer ${formData.isActive ? 'bg-[#3182F6]' : 'bg-[#D1D6DB]'}`}
                   >
                     <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isActive ? 'left-7' : 'left-1'}`} />
                   </button>
@@ -372,9 +463,13 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
               <div className="mt-10">
                 <button 
                   type="submit"
-                  className="w-full py-5 bg-[#3182F6] text-white font-black rounded-[20px] hover:bg-[#1B64DA] transition-all shadow-lg shadow-[#3182F6]/20 active:scale-[0.98]"
+                  className={`w-full py-5 text-white font-black rounded-[20px] transition-all shadow-lg active:scale-[0.98] cursor-pointer ${
+                    modalMode === 'duplicate' 
+                      ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20' 
+                      : 'bg-[#3182F6] hover:bg-[#1B64DA] shadow-[#3182F6]/20'
+                  }`}
                 >
-                  {isEditing ? '변경사항 저장' : '새 랜딩페이지 등록'}
+                  {modalMode === 'duplicate' ? '복제본 생성하기' : modalMode === 'edit' ? '변경사항 저장' : '새 랜딩페이지 등록'}
                 </button>
               </div>
             </form>

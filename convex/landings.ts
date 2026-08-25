@@ -53,6 +53,58 @@ export const remove = mutation({
   },
 });
 
+export const duplicate = mutation({
+  args: {
+    id: v.id("landings"),
+    name: v.optional(v.string()),
+    path: v.optional(v.string()),
+    description: v.optional(v.string()),
+    thumbnail: v.optional(v.string()),
+    isActive: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const source = await ctx.db.get(args.id);
+    if (!source) {
+      throw new Error("복제할 원본 랜딩페이지를 찾을 수 없습니다.");
+    }
+
+    const allLandings = await ctx.db.query("landings").collect();
+
+    // Determine target name
+    const targetName = args.name || `${source.name} (복사본)`;
+
+    // Determine target path
+    let targetPath = args.path;
+    if (!targetPath) {
+      const baseClean = source.path === '/' ? '/copy' : `${source.path}_copy`;
+      targetPath = baseClean;
+      let counter = 1;
+      while (allLandings.some(l => l.path === targetPath)) {
+        counter++;
+        targetPath = `${baseClean}${counter}`;
+      }
+    } else {
+      // If provided path already exists, append counter
+      if (allLandings.some(l => l.path === targetPath)) {
+        let counter = 1;
+        const base = targetPath;
+        while (allLandings.some(l => l.path === targetPath)) {
+          counter++;
+          targetPath = `${base}_${counter}`;
+        }
+      }
+    }
+
+    return await ctx.db.insert("landings", {
+      name: targetName,
+      path: targetPath,
+      description: args.description !== undefined ? args.description : source.description,
+      thumbnail: args.thumbnail !== undefined ? args.thumbnail : source.thumbnail,
+      isActive: args.isActive !== undefined ? args.isActive : source.isActive,
+    });
+  },
+});
+
 // Seed function to initialize the landing pages
 export const seed = mutation({
   handler: async (ctx) => {
