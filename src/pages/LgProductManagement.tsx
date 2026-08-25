@@ -538,7 +538,7 @@ export default function LgProductManagement() {
     const total = products.length;
     setVerifyProgress({ current: 0, total });
 
-    const CHUNK_SIZE = 12;
+    const CHUNK_SIZE = 8;
     let verifiedCount = 0;
     let unverifiedCount = 0;
 
@@ -547,29 +547,33 @@ export default function LgProductManagement() {
         const chunk = products.slice(i, i + CHUNK_SIZE);
         setVerifyProgress({ current: i, total });
 
-        const results = await verifyExistingProductsBatchAction({
-          items: chunk.map((p) => ({
-            id: p._id,
-            model: p.model,
-            refUrl: p.refUrl,
-            category: p.category,
-          })),
-        });
-
-        if (results && results.length > 0) {
-          for (const r of results) {
-            if (r.isOfficialVerified) verifiedCount++;
-            else unverifiedCount++;
-          }
-
-          await batchUpdateVerification({
-            results: results.map((r: any) => ({
-              id: r.id as any,
-              isOfficialVerified: r.isOfficialVerified,
-              refUrl: r.refUrl,
-              autoHideUnverified: true,
+        try {
+          const results = await verifyExistingProductsBatchAction({
+            items: chunk.map((p) => ({
+              id: p._id as string,
+              model: p.model || '',
+              refUrl: p.refUrl || '',
+              category: p.category || '',
             })),
           });
+
+          if (results && results.length > 0) {
+            for (const r of results) {
+              if (r.isOfficialVerified) verifiedCount++;
+              else unverifiedCount++;
+            }
+
+            await batchUpdateVerification({
+              results: results.map((r: any) => ({
+                id: r.id as any,
+                isOfficialVerified: Boolean(r.isOfficialVerified),
+                refUrl: r.refUrl,
+                autoHideUnverified: true,
+              })),
+            });
+          }
+        } catch (chunkErr) {
+          console.warn(`Chunk ${i} verification warning:`, chunkErr);
         }
       }
 
