@@ -701,6 +701,34 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
     return list.filter(s => s.name && s.name !== '전체' && s.name !== selectedCategory);
   }, [selectedCategory]);
 
+  // Preload ALL product thumbnail images on mount so category switching is instant
+  useEffect(() => {
+    if (allProductList.length === 0) return;
+    const preloadBatch = (urls: string[], batchSize: number, delay: number) => {
+      let i = 0;
+      const loadNext = () => {
+        const batch = urls.slice(i, i + batchSize);
+        batch.forEach(url => {
+          const img = new Image();
+          img.src = url;
+        });
+        i += batchSize;
+        if (i < urls.length) {
+          setTimeout(loadNext, delay);
+        }
+      };
+      loadNext();
+    };
+    const thumbUrls = allProductList
+      .map(p => p.image)
+      .filter(Boolean)
+      .map(url => getOptimizedImageUrl(url, 'thumb'));
+    // Deduplicate
+    const unique = [...new Set(thumbUrls)];
+    // Load first 12 immediately, then rest in batches of 8 every 200ms
+    preloadBatch(unique, 12, 200);
+  }, [allProductList]);
+
   // Filtered Products
   const filteredProducts = useMemo(() => {
     return allProductList.filter((p) => {
