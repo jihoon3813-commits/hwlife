@@ -1683,14 +1683,14 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   {/* 2. Center Product Image */}
                   <div 
                     onClick={() => handleOpenProductModal(product)}
-                    className="relative aspect-square px-8 py-4 flex items-center justify-center cursor-pointer bg-white"
+                    className="relative w-full aspect-square min-h-[160px] sm:min-h-[220px] p-3 sm:px-8 sm:py-4 flex items-center justify-center cursor-pointer bg-white overflow-hidden"
                   >
                     <img 
                       src={product.image || 'https://www.lge.co.kr/kr/images/common/no-image.jpg'} 
                       alt={product.name} 
                       referrerPolicy="no-referrer"
                       loading="lazy"
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full max-h-[160px] sm:max-h-none object-contain group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
@@ -1702,7 +1702,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                         e.stopPropagation();
                         handleOpenProductModal(product);
                       }}
-                      className="absolute bottom-2 right-4 bg-white/90 p-2 rounded-full text-[#8B95A1] hover:text-[#191F28] border border-[#E5E8EB] shadow-xs transition-transform group-hover:scale-110"
+                      className="absolute bottom-2 right-2 sm:right-4 bg-white/90 p-2 rounded-full text-[#8B95A1] hover:text-[#191F28] border border-[#E5E8EB] shadow-xs transition-transform group-hover:scale-110"
                       title="상세보기"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
