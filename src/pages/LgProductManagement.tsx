@@ -11,7 +11,7 @@ import { api } from '../../convex/_generated/api';
 import * as XLSX from 'xlsx';
 import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
 import { getProductCapacityInfo } from '../utils/productCapacity';
-import { buildLgOfficialPdpUrl } from '../utils/lgeUrl';
+import { buildLgOfficialPdpUrl, getOptimizedImageUrl } from '../utils/lgeUrl';
 
 // Build in-memory fast index for official products (0ms lookup)
 const OFFICIAL_CATALOG_MAP = new Map<string, any>();
@@ -1858,7 +1858,7 @@ export default function LgProductManagement() {
                       <div className="w-16 h-16 rounded-xl bg-[#F8F9FA] border border-[#E5E8EB] overflow-hidden flex items-center justify-center shrink-0 p-1">
                         {p.image ? (
                           <img
-                            src={p.image}
+                            src={getOptimizedImageUrl(p.image)}
                             alt={p.name}
                             referrerPolicy="no-referrer"
                             loading="lazy"
@@ -2079,7 +2079,7 @@ export default function LgProductManagement() {
                             <div className="w-11 h-11 rounded-lg bg-[#F2F4F6] border border-[#E5E8EB] overflow-hidden flex items-center justify-center mx-auto">
                               {p.image ? (
                                 <img
-                                  src={p.image}
+                                  src={getOptimizedImageUrl(p.image)}
                                   alt={p.name}
                                   referrerPolicy="no-referrer"
                                   loading="lazy"

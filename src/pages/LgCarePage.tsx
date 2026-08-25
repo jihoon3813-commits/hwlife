@@ -21,8 +21,7 @@ interface LgCarePageProps {
 
 import { LG_OFFICIAL_PRODUCTS, CATEGORY_SUBTABS, LgProduct, SubscriptionOptions } from '../data/lgCareProducts';
 import { getProductCapacityInfo } from '../utils/productCapacity';
-import { matchesSubCategory } from '../utils/subCategoryMatcher';
-import { buildLgOfficialPdpUrl } from '../utils/lgeUrl';
+import { buildLgOfficialPdpUrl, getOptimizedImageUrl } from '../utils/lgeUrl';
 
 export { type LgProduct, type SubscriptionOptions };
 
@@ -612,9 +611,8 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
           combinedDiscount,
           finalPrice: 0,
           cardDiscountPrice: 0,
-          accountCount: '1구좌 결합',
-          image: p.image,
-          images: p.images?.length ? p.images : [p.image],
+          image: getOptimizedImageUrl(p.image),
+          images: p.images?.length ? p.images.map(getOptimizedImageUrl) : [getOptimizedImageUrl(p.image)],
           color: defaultColor,
           colors: dbColors,
           careCycle: uniqueCycles.join(', ') || '1회 / 12개월 방문케어',
@@ -1686,7 +1684,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                     className="relative w-full aspect-square min-h-[160px] sm:min-h-[220px] p-3 sm:px-8 sm:py-4 flex items-center justify-center cursor-pointer bg-white overflow-hidden"
                   >
                     <img 
-                      src={product.image || 'https://www.lge.co.kr/kr/images/common/no-image.jpg'} 
+                      src={getOptimizedImageUrl(product.image)} 
                       alt={product.name} 
                       referrerPolicy="no-referrer"
                       loading="lazy"
@@ -1694,7 +1692,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
-                        target.src = 'https://www.lge.co.kr/kr/images/common/no-image.jpg';
+                        target.src = 'https://static.lge.co.kr/kr/images/common/no-image.jpg';
                       }}
                     />
                     <button 
@@ -2602,14 +2600,14 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pb-4 border-b border-[#F2F4F6]">
               <div className="w-24 h-24 sm:w-28 sm:h-28 bg-[#F8FAFC] rounded-2xl p-2 border border-[#E5E8EB] flex items-center justify-center shrink-0">
                 <img 
-                  src={currentProductImage || 'https://www.lge.co.kr/kr/images/common/no-image.jpg'} 
+                  src={getOptimizedImageUrl(currentProductImage)} 
                   alt={selectedProduct.name} 
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-contain transition-all duration-300"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
-                    target.src = 'https://www.lge.co.kr/kr/images/common/no-image.jpg';
+                    target.src = 'https://static.lge.co.kr/kr/images/common/no-image.jpg';
                   }}
                 />
               </div>

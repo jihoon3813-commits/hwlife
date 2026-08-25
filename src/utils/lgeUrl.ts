@@ -221,3 +221,18 @@ export function buildLgOfficialPdpUrl(rawUrl?: string, modelCode?: string, categ
 
   return 'https://www.lge.co.kr/care-solutions';
 }
+
+/**
+ * Optimizes image URLs by converting lge.co.kr to static.lge.co.kr
+ * to avoid 302 redirects which get blocked by mobile browsers.
+ */
+export function getOptimizedImageUrl(url?: string): string {
+  if (!url) return 'https://static.lge.co.kr/kr/images/common/no-image.jpg';
+  let clean = url.trim();
+  if (clean.startsWith('//')) {
+    clean = 'https:' + clean;
+  }
+  // Replace www.lge.co.kr/kr/images/ or lge.co.kr/kr/images/ with static.lge.co.kr/kr/images/
+  clean = clean.replace(/^https?:\/\/(www\.)?lge\.co\.kr\/kr\/images\//i, 'https://static.lge.co.kr/kr/images/');
+  return clean;
+}
