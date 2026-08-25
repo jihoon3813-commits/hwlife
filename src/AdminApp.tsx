@@ -9,6 +9,7 @@ import Settings from './pages/Settings';
 import LandingManagement from './pages/LandingManagement';
 import ConsentManagement from './pages/ConsentManagement';
 import LgProductManagement from './pages/LgProductManagement';
+import DiscountCodeManagement from './pages/DiscountCodeManagement';
 
 export default function AdminApp() {
   console.log('AdminApp Mounting...');
@@ -110,7 +111,15 @@ export default function AdminApp() {
       case 'products':
         return <ProductManagement key="products" />;
       case 'lg_products':
-        return <LgProductManagement key="lg_products" />;
+        return <LgProductManagement 
+            onOpenLandingSetting={() => {
+              setActiveMenu('landings');
+            }} 
+        />;
+
+      case 'discount_codes':
+        return <DiscountCodeManagement />;
+
       case 'channels':
         return <ChannelManagement 
             currentChannelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined}

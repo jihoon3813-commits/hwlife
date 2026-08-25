@@ -14,6 +14,7 @@ import type * as check_stats from "../check_stats.js";
 import type * as check_types from "../check_types.js";
 import type * as competitors from "../competitors.js";
 import type * as crawler from "../crawler.js";
+import type * as discountCodes from "../discountCodes.js";
 import type * as fix_plans from "../fix_plans.js";
 import type * as images from "../images.js";
 import type * as inquiries from "../inquiries.js";
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   check_types: typeof check_types;
   competitors: typeof competitors;
   crawler: typeof crawler;
+  discountCodes: typeof discountCodes;
   fix_plans: typeof fix_plans;
   images: typeof images;
   inquiries: typeof inquiries;

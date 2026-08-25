@@ -277,4 +277,17 @@ export default defineSchema({
     isDeleted: v.optional(v.boolean()),    // 사용자 삭제 여부
   }).index("by_order", ["order"])
     .index("by_key", ["key"]),
+
+  discount_codes: defineTable({
+    code: v.string(),                      // 할인코드 (대문자 고유 코드)
+    customerName: v.optional(v.string()),  // 제공 고객명
+    customerPhone: v.optional(v.string()), // 고객 연락처
+    memo: v.optional(v.string()),          // 발급 메모 / 사유
+    expiresAt: v.optional(v.number()),     // 유효기간 타임스탬프 (undefined일 경우 무제한)
+    isActive: v.boolean(),                 // 활성화 여부
+    createdAt: v.number(),                 // 생성일시 타임스탬프
+    useCount: v.optional(v.number()),      // 사용 횟수
+  }).index("by_code", ["code"])
+    .index("by_createdAt", ["createdAt"])
+    .index("by_isActive", ["isActive"]),
 });

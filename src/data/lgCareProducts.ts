@@ -61,6 +61,8 @@ export interface LgProduct {
   careBenefits: string[];
   specs: { [key: string]: string };
   isRecommended?: boolean;
+  refUrl?: string;
+  relatedUrls?: Array<{ model: string; url: string }>;
   subscriptionOptions: SubscriptionOptions;
 }
 

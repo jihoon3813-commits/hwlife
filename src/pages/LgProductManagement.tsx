@@ -188,8 +188,8 @@ export function renderCategoryIcon(icon: string, name: string, className = "w-5 
   return <span className="text-[16px] leading-none">{icon}</span>;
 }
 
-function formatSubscriptionRefUrl(url?: string, modelCode?: string, categoryKey?: string): string {
-  return buildLgOfficialPdpUrl(url, modelCode, categoryKey);
+function formatSubscriptionRefUrl(url?: string, modelCode?: string, categoryKey?: string, modelIdHint?: string): string {
+  return buildLgOfficialPdpUrl(url, modelCode, categoryKey, modelIdHint);
 }
 
 export default function LgProductManagement() {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutGrid, Users, Box, BarChart3, Settings as SettingsIcon, LogOut, Menu, X, Globe, ShieldCheck, ExternalLink, Shield, Sparkles } from 'lucide-react';
+import { LayoutGrid, Users, Box, BarChart3, Settings as SettingsIcon, LogOut, Menu, X, Globe, ShieldCheck, ExternalLink, Shield, Sparkles, KeyRound } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -25,6 +25,7 @@ export default function AdminLayout({
     { id: 'customers', label: '고객관리', icon: Users },
     { id: 'products', label: '제품관리', icon: Box },
     { id: 'lg_products', label: 'LG구독제품관리', icon: Sparkles },
+    { id: 'discount_codes', label: '할인코드 관리', icon: KeyRound },
     { id: 'landings', label: '랜딩관리', icon: Globe },
     { id: 'channels', label: '채널관리', icon: LayoutGrid },
     { id: 'statistics', label: '통계분석', icon: BarChart3 },

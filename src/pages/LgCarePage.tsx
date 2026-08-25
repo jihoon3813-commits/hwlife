@@ -6,7 +6,7 @@ import {
   Clock, Flame, CheckSquare, Square, ChevronDown, FileText, Layers, Tag,
   Maximize2, Zap, ArrowRight, ThumbsUp, HeartHandshake, Headphones,
   Percent, CreditCard, RotateCcw, Wrench, Sparkle, RefreshCw, Calendar,
-  Shield, CheckCircle, Smartphone, AlertCircle, Share2, Heart
+  Shield, CheckCircle, Smartphone, AlertCircle, Share2, Heart, KeyRound
 } from 'lucide-react';
 import { formatPhoneNumber } from '../utils/phone';
 import PrivacyModal from '../components/PrivacyModal';
@@ -66,25 +66,29 @@ const HERO_SLIDES = [
     id: 1,
     badge: '월 5천원 상조 + 144만원 만기축하금',
     title: '월 5천원으로 시작하는',
-    highlight: 'LG가전 구독 할인',
-    desc: '구독료는 매월 10% 할인, 만기에는 낸 돈 + 144만원\nLG가전 구독 예정이라면 그냥 가입하지 마세요',
+    highlight: 'LG가전 구독 혜택',
+    desc: '효원상조 결합 시 가전 구독료 특별 할인 지원, 만기에는 낸 돈 + 144만원\nLG가전 구독 예정이라면 그냥 가입하지 마세요',
+    desc10: '구독료는 매월 10% 할인, 만기에는 낸 돈 + 144만원\nLG가전 구독 예정이라면 그냥 가입하지 마세요',
     subDesc: '',
     ctaText: '무료 상담받기',
     disclaimer: '※ 1구좌 기준 1~48회 월 5천원, 49~200회 월 28,000원. 만기 지급은 약관 조건 충족 시.',
     image: 'https://res.cloudinary.com/lyjyvy54/image/upload/v1787280194/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_21%EC%9D%BC_%EC%98%A4%EC%A0%84_11_40_31_1_1_cwr88q.png',
-    tag: '매월 10% 할인 + 만기 시 낸 돈 + 144만원'
+    tag: '회원 특별할인 + 만기 시 낸 돈 + 144만원',
+    tag10: '매월 10% 할인 + 만기 시 낸 돈 + 144만원'
   },
   {
     id: 2,
     badge: '효원상조 결합 스마트 할인',
     title: 'LG가전 구독,',
     highlight: '정가대로 내고 계세요?',
-    desc: '효원상조와 함께하면 LG가전 구독료 매월 10% 할인\n상조 만기에는 낸 돈 + 1구좌당 144만원',
+    desc: '효원상조와 함께하면 LG가전 구독료 회원 특별할인\n상조 만기에는 낸 돈 + 1구좌당 144만원',
+    desc10: '효원상조와 함께하면 LG가전 구독료 매월 10% 할인\n상조 만기에는 낸 돈 + 1구좌당 144만원',
     subDesc: '',
     ctaText: '내 할인금액 확인하기',
     disclaimer: '※ LG 구독료 할인은 제품별 5년 또는 6년 계약기간 적용. 만기 지급은 상조 200회 완납 및 라이프서비스 미사용 등 약관 조건 충족 시.',
     image: 'https://res.cloudinary.com/lyjyvy54/image/upload/v1787280194/ChatGPT_Image_2026%EB%85%84_8%EC%9B%94_21%EC%9D%BC_%EC%98%A4%EC%A0%84_11_40_32_2_1_gbpavn.png',
-    tag: '매월 10% 할인 + 만기 시 1구좌당 144만원 지원'
+    tag: '회원 특별할인 + 만기 시 1구좌당 144만원 지원',
+    tag10: '매월 10% 할인 + 만기 시 1구좌당 144만원 지원'
   }
 ];
 
@@ -147,6 +151,56 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
     }
     return CATEGORIES;
   }, [dbCategories]);
+
+  // Care10 vs Care mode & Discount Code Unlocked State
+  const isCare10 = landingPath === '/care10';
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('hw_care_unlocked') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  // Discount Code Modal States
+  const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
+  const [inputDiscountCode, setInputDiscountCode] = useState('');
+  const [discountError, setDiscountError] = useState('');
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const verifyDiscountCodeMutation = useMutation(api.discountCodes.verify);
+
+  const handleVerifyDiscountCode = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const cleanCode = inputDiscountCode.trim().toUpperCase();
+    if (!cleanCode) {
+      setDiscountError('할인코드를 입력해주세요.');
+      return;
+    }
+    setIsVerifyingCode(true);
+    setDiscountError('');
+    try {
+      const res = await verifyDiscountCodeMutation({ code: cleanCode });
+      if (res.success) {
+        setIsUnlocked(true);
+        try {
+          localStorage.setItem('hw_care_unlocked', 'true');
+          if (res.code) localStorage.setItem('hw_care_code', res.code);
+        } catch (err) {
+          console.error(err);
+        }
+        setIsDiscountModalOpen(false);
+        setInputDiscountCode('');
+        alert(`[${res.code}] 시크릿 할인코드가 인증되었습니다!\n회원 특별할인 혜택이 즉시 잠금 해제되었습니다.`);
+      } else {
+        setDiscountError(res.reason || '유효하지 않은 할인코드입니다.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setDiscountError(err.message || '할인코드 인증 중 오류가 발생했습니다.');
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
 
   // States
   const [activeTab, setActiveTab] = useState<string>('all');
@@ -724,7 +778,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
       .filter(Boolean)
       .map(url => getOptimizedImageUrl(url, 'thumb'));
     // Deduplicate
-    const unique = [...new Set(thumbUrls)];
+    const unique = [...new Set(thumbUrls)] as string[];
     // Load first 12 immediately, then rest in batches of 8 every 200ms
     preloadBatch(unique, 12, 200);
   }, [allProductList]);
@@ -970,7 +1024,13 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
         <span className="bg-[#EA1D2C] text-white text-[11px] font-black px-2 py-0.5 rounded-full">
           LG X 효원상조
         </span>
-        <span>효원상조 결합 시 <strong>LG가전 구독료 매월 10% 즉시할인</strong> & 만기 시 <strong>전액환급 + 144만원 지원!</strong></span>
+        <span>
+          {isCare10 ? (
+            <>효원상조 결합 시 <strong>LG가전 구독료 매월 10% 즉시할인</strong> & 만기 시 <strong>전액환급 + 144만원 지원!</strong></>
+          ) : (
+            <>효원상조 결합 시 <strong>LG가전 구독료 회원 특별할인</strong> & 만기 시 <strong>전액환급 + 144만원 지원!</strong></>
+          )}
+        </span>
         <button 
           type="button"
           onClick={() => handleSelectProductForConsult()} 
@@ -1100,7 +1160,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
 
               {/* Description with Fixed Height */}
               <div className="h-[48px] sm:h-[55px] flex flex-col justify-start text-[14px] sm:text-[16px] text-[#D1D6DB] leading-relaxed max-w-xl break-keep whitespace-pre-line overflow-hidden">
-                <p>{HERO_SLIDES[currentSlide].desc}</p>
+                <p>{isCare10 ? HERO_SLIDES[currentSlide].desc10 : HERO_SLIDES[currentSlide].desc}</p>
               </div>
 
               {/* CTA Buttons right under description (Single row on mobile & desktop) */}
@@ -1166,7 +1226,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 sm:p-6">
                   <span className="text-[11px] sm:text-[12px] font-bold text-[#FF8591] bg-black/60 backdrop-blur-md px-2.5 sm:px-3 py-1 rounded-md self-start mb-2 border border-white/10 whitespace-nowrap shrink-0">
-                    {HERO_SLIDES[currentSlide].tag}
+                    {isCare10 ? HERO_SLIDES[currentSlide].tag10 : HERO_SLIDES[currentSlide].tag}
                   </span>
                   <p className="text-[16px] sm:text-[18px] font-black text-white line-clamp-1">
                     {HERO_SLIDES[currentSlide].title} {HERO_SLIDES[currentSlide].highlight}
@@ -1211,7 +1271,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#EA1D2C]/10 blur-[140px] pointer-events-none rounded-full" />
       </section>
 
-      {/* Infographic Guide Section: LG가전 구독료 10% 할인, 이렇게 받으세요 */}
+      {/* Infographic Guide Section: LG가전 구독료 결합할인, 이렇게 받으세요 */}
       <section className="bg-[#F8F9FA] py-10 sm:py-16 border-b border-[#E5E8EB]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-14">
           
@@ -1223,10 +1283,18 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                 <span>EASY STEP GUIDE</span>
               </div>
               <h2 className="text-[23px] sm:text-[34px] font-black text-[#191F28] tracking-tight leading-[1.25]">
-                LG가전 구독료 10% 할인,<br className="sm:hidden" /> 이렇게 받으세요
+                {isCare10 ? (
+                  <>LG가전 구독료 10% 할인,<br className="sm:hidden" /> 이렇게 받으세요</>
+                ) : (
+                  <>LG가전 구독료 특별할인,<br className="sm:hidden" /> 이렇게 받으세요</>
+                )}
               </h2>
               <p className="text-[14px] sm:text-[16px] text-[#4E5968] font-medium break-keep leading-relaxed">
-                상조 <strong>월 5천원</strong>으로 시작하고,<br className="sm:hidden" /> 원하는 LG가전 구독료는 <strong>매월 10% 할인</strong>받으세요.
+                {isCare10 ? (
+                  <>상조 <strong>월 5천원</strong>으로 시작하고,<br className="sm:hidden" /> 원하는 LG가전 구독료는 <strong>매월 10% 할인</strong>받으세요.</>
+                ) : (
+                  <>상조 <strong>월 5천원</strong>으로 시작하고,<br className="sm:hidden" /> 원하는 LG가전 구독료는 <strong>회원 특별할인</strong>받으세요.</>
+                )}
               </p>
             </div>
 
@@ -1309,7 +1377,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                         3
                       </span>
                       <h3 className="text-[16px] sm:text-[18px] font-black text-white tracking-tight">
-                        혜택: 매월 구독료 10% 할인
+                        {isCare10 ? '혜택: 매월 구독료 10% 할인' : '혜택: 회원 특별할인 적용'}
                       </h3>
                     </div>
                     <span className="text-[10px] sm:text-[11px] font-bold text-[#FF8591] bg-white/10 px-2 py-0.5 rounded-full border border-white/10 shrink-0">
@@ -1317,12 +1385,14 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                     </span>
                   </div>
                   <p className="text-[12px] sm:text-[13px] text-[#D1D6DB] font-medium pl-0.5">
-                    LG가전 구독료 청구 시 10% 할인된 금액 적용
+                    {isCare10 ? 'LG가전 구독료 청구 시 10% 할인된 금액 적용' : 'LG가전 구독료 청구 시 회원 특별할인가 적용'}
                   </p>
                   <div className="bg-white/10 backdrop-blur-xs rounded-xl sm:rounded-2xl p-3 sm:p-3.5 space-y-1.5 border border-white/10">
                     <div className="flex items-center justify-between">
-                      <span className="text-[12px] sm:text-[13px] text-[#D1D6DB]">매월 구독료 할인율</span>
-                      <strong className="text-[15px] sm:text-[17px] text-[#FF8591] font-black">매월 10% 즉시할인</strong>
+                      <span className="text-[12px] sm:text-[13px] text-[#D1D6DB]">매월 구독료 혜택</span>
+                      <strong className="text-[15px] sm:text-[17px] text-[#FF8591] font-black">
+                        {isCare10 ? '매월 10% 즉시할인' : '회원 특별할인 지원'}
+                      </strong>
                     </div>
                     <p className="text-[11px] text-[#A6ADB8] leading-tight">
                       계약 기간(60~72개월) 내내 매월 청구 시 자동 할인 적용
@@ -1895,23 +1965,45 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                         </div>
                       </div>
 
-                      {/* Step 2: Hyowon Sangjo 10% Discount Benefit Box (Larger & Prominent) */}
+                      {/* Step 2: Hyowon Sangjo Discount Benefit Box */}
                       <div className="bg-[#FFF0F2] rounded-xl p-2.5 border border-[#EA1D2C]/30 flex items-center justify-between shadow-2xs">
                         <div className="text-[12px]">
-                          <span className="font-extrabold text-[#EA1D2C] block">2. 효원상조 결합 혜택</span>
-                          <span className="text-[10px] text-[#6B7684]">매월 10% 할인 + 만기 100% 환급</span>
+                          <span className="font-extrabold text-[#EA1D2C] block">2. 효원 결합 혜택</span>
+                          <span className="text-[10px] text-[#6B7684]">
+                            {isCare10 
+                              ? '매월 10% 할인 + 만기 100% 환급' 
+                              : isUnlocked 
+                                ? '✓ 회원 특별할인 적용됨 + 만기 환급' 
+                                : '회원 특별할인 + 만기 100% 환급'}
+                          </span>
                         </div>
                         <div className="text-right">
-                          <span className="text-[17px] sm:text-[18px] font-black text-[#EA1D2C] block leading-tight">
-                            월 {calc10PercentDiscount(product.rentalPrice).toLocaleString()}원
-                          </span>
-                          <span className="text-[10px] text-[#EA1D2C] font-extrabold">
-                            만기축하금 +144만~
-                          </span>
+                          {!isCare10 && !isUnlocked ? (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsDiscountModalOpen(true);
+                              }}
+                              className="inline-flex items-center gap-1 bg-[#EA1D2C] hover:bg-[#C81020] text-white text-[11px] font-black px-2.5 py-1.5 rounded-lg shadow-xs transition-transform active:scale-95 cursor-pointer animate-pulse"
+                            >
+                              <KeyRound className="w-3 h-3" />
+                              할인코드 입력
+                            </button>
+                          ) : (
+                            <>
+                              <span className="text-[17px] sm:text-[18px] font-black text-[#EA1D2C] block leading-tight">
+                                월 {calc10PercentDiscount(product.rentalPrice).toLocaleString()}원
+                              </span>
+                              <span className="text-[10px] text-[#EA1D2C] font-extrabold">
+                                만기축하금 +144만~
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
 
-                      {/* Step 3: LG Subscription Affiliate Card Applied Price (Largest & Most Eye-catching Highlight) */}
+                      {/* Step 3: LG Subscription Affiliate Card Applied Price */}
                       <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-[#F0FDF4] to-[#DCFCE7] border-2 border-[#22C55E]/60 shadow-xs">
                         <div>
                           <span className="text-[#15803D] font-extrabold text-[12px] sm:text-[13px] flex items-center gap-1">
@@ -1924,7 +2016,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                         </div>
                         <div className="text-right">
                           <span className="text-[20px] sm:text-[22px] font-black text-[#15803D] block tracking-tight leading-none">
-                            월 {Math.max(0, calc10PercentDiscount(product.rentalPrice) - 42000).toLocaleString()}원
+                            월 {Math.max(0, (!isCare10 && !isUnlocked ? product.rentalPrice : calc10PercentDiscount(product.rentalPrice)) - 42000).toLocaleString()}원
                           </span>
                         </div>
                       </div>
@@ -2111,7 +2203,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
               LG 가전 구독료는 낮추고,<br className="sm:hidden" /> 상조 만기 혜택은 더하고!
             </h2>
             <p className="text-[13px] sm:text-[15px] text-[#4E5968] break-keep leading-relaxed">
-              단순히 가전을 빌려 쓰는 비용에 그치지 않고, <strong>매월 구독료 10% 즉시 할인</strong>받으면서 미래의 <strong>라이프서비스와 만기 100% 환급+축하금 144만원</strong>까지 준비하는 파격 결합형 상품입니다.
+              단순히 가전을 빌려 쓰는 비용에 그치지 않고, <strong>{isCare10 ? '매월 구독료 10% 즉시 할인' : '매월 구독료 회원 특별할인'}</strong>받으면서 미래의 <strong>라이프서비스와 만기 100% 환급+축하금 144만원</strong>까지 준비하는 파격 결합형 상품입니다.
             </p>
           </div>
 
@@ -2123,13 +2215,21 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                 지금 받는 즉시 혜택
               </div>
               <div className="text-[26px] sm:text-[34px] font-black text-[#3182F6] whitespace-nowrap">
-                매월 10% <span className="text-[17px] sm:text-[20px] font-bold text-[#191F28]">할인</span>
+                {isCare10 ? (
+                  <>매월 10% <span className="text-[17px] sm:text-[20px] font-bold text-[#191F28]">할인</span></>
+                ) : (
+                  <>회원 <span className="text-[17px] sm:text-[20px] font-bold text-[#191F28]">특별할인</span></>
+                )}
               </div>
               <h3 className="text-[15px] sm:text-[18px] font-black text-[#191F28] whitespace-nowrap">
-                LG 가전 구독료 매월 10% 즉시 할인
+                {isCare10 ? 'LG 가전 구독료 매월 10% 즉시 할인' : 'LG 가전 구독료 회원 특별할인'}
               </h3>
               <p className="text-[12px] sm:text-[13px] text-[#6B7684] leading-relaxed break-keep">
-                상조 결합 유지 기간 동안 5년(60개월) 또는 6년(72개월) 계약 전 기간 내내 매월 가전 구독료를 10% 파격 할인해 드립니다.
+                {isCare10 ? (
+                  '상조 결합 유지 기간 동안 5년(60개월) 또는 6년(72개월) 계약 전 기간 내내 매월 가전 구독료를 10% 파격 할인해 드립니다.'
+                ) : (
+                  '상조 결합 유지 기간 동안 5년(60개월) 또는 6년(72개월) 계약 전 기간 내내 매월 가전 구독료를 회원 특별가로 할인 지원해 드립니다.'
+                )}
               </p>
             </div>
 
@@ -2983,10 +3083,10 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#FFF5F6] to-[#FFF0F2] border border-[#EA1D2C]/20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
                     <div className="space-y-0.5">
                       <div className="text-[12px] sm:text-[13px] font-black text-[#EA1D2C]">
-                        💡 효원 결합 시 매월 10% 추가 할인 지원
+                        {isCare10 ? '💡 효원 결합 시 매월 10% 추가 할인 지원' : '💡 효원 결합 시 매월 회원 특별할인 지원'}
                       </div>
                       <div className="text-[11px] text-[#6B7684]">
-                        월 {discountedMonthlyPrice.toLocaleString()}원 + 만기 시 100% 환급 및 144만원 지원
+                        {!isCare10 && !isUnlocked ? '할인코드 입력 시 특가 공개' : `월 ${discountedMonthlyPrice.toLocaleString()}원`} + 만기 시 100% 환급 및 144만원 지원
                       </div>
                     </div>
                     <button
@@ -3001,7 +3101,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
               </div>
             )}
 
-            {/* TAB 2: [효원특가] 탭 - 10%할인 (10원 단위 절삭) + 상조 결합 만기환급 */}
+            {/* TAB 2: [효원특가] 탭 - 특별할인 + 상조 결합 만기환급 */}
             {modalTab === 'hyowon' && (
               <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200">
                 {/* Current Selected Option Recap */}
@@ -3059,7 +3159,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   </div>
                 </div>
 
-                {/* 4. Comparison Calculation Card (제휴카드 제외 - 순수 효원 10%할인 + 만기환급) */}
+                {/* 4. Comparison Calculation Card */}
                 <div className="bg-[#191F28] text-white rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xl">
                   <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
                     <div className="flex items-center gap-1.5">
@@ -3078,23 +3178,47 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                       <span className="font-semibold text-white whitespace-nowrap">{currentMonthlyPrice.toLocaleString()}원/월</span>
                     </div>
 
-                    {/* 2. 효원 10% 추가할인 (10원 단위 절삭) */}
+                    {/* 2. 효원 추가할인 */}
                     <div className="flex items-center justify-between gap-2 text-[#55E4B0] font-bold">
-                      <span>2. 효원 결합 10% 다이렉트 지원</span>
-                      <span className="whitespace-nowrap">-{hyowonMonthlyDiscount.toLocaleString()}원/월</span>
+                      <span>
+                        {isCare10 ? '2. 효원 결합 10% 다이렉트 지원' : '2. 효원 회원 특별할인 지원'}
+                      </span>
+                      <span className="whitespace-nowrap">
+                        {!isCare10 && !isUnlocked ? (
+                          <span className="text-[#FF8591] font-normal text-[11px]">할인코드 필요</span>
+                        ) : (
+                          `-${hyowonMonthlyDiscount.toLocaleString()}원/월`
+                        )}
+                      </span>
                     </div>
                   </div>
 
                   {/* 4. 최종 고객 실부담 월 납부금 */}
                   <div className="pt-2.5 border-t border-white/10 flex items-baseline justify-between gap-2">
-                    <div>
-                      <div className="text-[11px] font-bold text-[#A6ADB8]">효원 결합 실부담 월 구독료</div>
-                    </div>
-                    <div className="text-right whitespace-nowrap shrink-0">
-                      <span className="text-[22px] sm:text-[26px] font-black text-[#FF8591]">
-                        월 {discountedMonthlyPrice.toLocaleString()}원
-                      </span>
-                    </div>
+                    {!isCare10 && !isUnlocked ? (
+                      <div className="flex items-center justify-between w-full pt-1">
+                        <div className="text-[12px] font-bold text-[#A6ADB8]">회원 특별할인가</div>
+                        <button
+                          type="button"
+                          onClick={() => setIsDiscountModalOpen(true)}
+                          className="inline-flex items-center gap-1.5 bg-[#EA1D2C] hover:bg-[#C81020] text-white px-3.5 py-1.5 rounded-xl text-[12px] font-black shadow-md shadow-[#EA1D2C]/30 transition-transform active:scale-95 cursor-pointer animate-pulse"
+                        >
+                          <KeyRound className="w-3.5 h-3.5" />
+                          할인코드 입력하고 특가 확인
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div>
+                          <div className="text-[11px] font-bold text-[#A6ADB8]">효원 결합 실부담 월 구독료</div>
+                        </div>
+                        <div className="text-right whitespace-nowrap shrink-0">
+                          <span className="text-[22px] sm:text-[26px] font-black text-[#FF8591]">
+                            월 {discountedMonthlyPrice.toLocaleString()}원
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Sangjo Maturity Highlight Box */}
@@ -3188,12 +3312,13 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   </div>
                 </div>
 
-                {/* 3. 제휴카드 적용 최종 체감가 (효원 10% 할인가 기준) */}
+                {/* 3. 제휴카드 적용 최종 체감가 */}
                 {(() => {
                   const cardDisc = selectedCardSpend >= 1200000
                     ? (selectedCardCompany === 'woori' ? 42000 : 25000)
                     : (selectedCardSpend >= 700000 ? 20000 : 15000);
-                  const finalWithCard = Math.max(0, discountedMonthlyPrice - cardDisc);
+                  const basePrice = !isCare10 && !isUnlocked ? currentMonthlyPrice : discountedMonthlyPrice;
+                  const finalWithCard = Math.max(0, basePrice - cardDisc);
 
                   return (
                     <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-[#E5E8EB] space-y-3">
@@ -3202,8 +3327,20 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                         <span className="text-[#8B95A1] line-through">{currentMonthlyPrice.toLocaleString()}원</span>
                       </div>
                       <div className="flex items-center justify-between text-[12px] text-[#EA1D2C] font-bold">
-                        <span>효원 결합 10% 할인가</span>
-                        <span>{discountedMonthlyPrice.toLocaleString()}원/월</span>
+                        <span>{isCare10 ? '효원 결합 10% 할인가' : '효원 회원 특별할인가'}</span>
+                        <span>
+                          {!isCare10 && !isUnlocked ? (
+                            <button
+                              type="button"
+                              onClick={() => setIsDiscountModalOpen(true)}
+                              className="text-[11px] bg-[#EA1D2C] text-white px-2 py-0.5 rounded font-black hover:bg-[#C81020]"
+                            >
+                              할인코드 입력 시 공개
+                            </button>
+                          ) : (
+                            `${discountedMonthlyPrice.toLocaleString()}원/월`
+                          )}
+                        </span>
                       </div>
                       <div className="flex items-center justify-between text-[12px] text-[#16A34A] font-bold">
                         <span>제휴카드 청구할인</span>
@@ -3216,7 +3353,11 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                         </span>
                       </div>
                       <p className="text-[10px] text-[#8B95A1] leading-tight">
-                        ※ 효원 결합 10% 할인 금액에 제휴카드 전월 실적 충족 시 추가 청구할인이 중복 적용됩니다.
+                        {isCare10 ? (
+                          '※ 효원 결합 10% 할인 금액에 제휴카드 전월 실적 충족 시 추가 청구할인이 중복 적용됩니다.'
+                        ) : (
+                          '※ 효원 회원 특별 할인 금액에 제휴카드 전월 실적 충족 시 추가 청구할인이 중복 적용됩니다.'
+                        )}
                       </p>
                     </div>
                   );
@@ -4131,6 +4272,152 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
               >
                 닫기
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Premium Discount Code Modal */}
+      {isDiscountModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
+          <div 
+            className="bg-[#191F28] text-white w-full max-w-md rounded-3xl border border-white/15 shadow-2xl overflow-hidden relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Background Glow */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#EA1D2C]/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#3182F6]/15 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Header */}
+            <div className="p-6 pb-4 border-b border-white/10 flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#EA1D2C] to-[#8E0914] flex items-center justify-center shadow-lg shadow-[#EA1D2C]/40">
+                  <KeyRound className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-[17px] font-black text-white flex items-center gap-1.5">
+                    <span>시크릿 할인코드 인증</span>
+                    <Sparkles className="w-4 h-4 text-[#FF8591]" />
+                  </h3>
+                  <p className="text-[11px] text-[#A6ADB8]">
+                    효원회원 특별할인가 및 혜택 잠금 해제
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDiscountModalOpen(false);
+                  setDiscountError('');
+                }}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-[#A6ADB8] hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-5 relative z-10">
+              {isUnlocked ? (
+                <div className="bg-[#1E2734] rounded-2xl p-4 border border-[#00B074]/30 space-y-3">
+                  <div className="flex items-center gap-2 text-[#00B074]">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span className="text-[14px] font-black">회원 특별할인이 적용 중입니다!</span>
+                  </div>
+                  <p className="text-[12px] text-[#A6ADB8] leading-relaxed">
+                    현재 브라우저에서 모든 가전 제품의 회원 특별할인 혜택이 정상적으로 공개되어 있습니다.
+                  </p>
+                  <div className="pt-2 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsDiscountModalOpen(false)}
+                      className="flex-1 py-2.5 bg-[#00B074] hover:bg-[#009663] text-white font-bold rounded-xl text-[12px] transition-colors"
+                    >
+                      확인 완료
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        localStorage.removeItem('hw_care_unlocked');
+                        localStorage.removeItem('hw_care_code');
+                        setIsUnlocked(false);
+                        alert('인증이 해제되었습니다.');
+                      }}
+                      className="px-3 py-2.5 bg-white/10 hover:bg-white/20 text-[#D1D6DB] font-bold rounded-xl text-[12px] transition-colors"
+                    >
+                      코드 재입력
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleVerifyDiscountCode} className="space-y-4">
+                  <div className="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2 text-[12px] text-[#D1D6DB] leading-relaxed">
+                    <p className="font-extrabold text-white text-[13px] flex items-center gap-1.5">
+                      <Gift className="w-4 h-4 text-[#FF8591]" />
+                      <span>할인코드 혜택 안내</span>
+                    </p>
+                    <p>
+                      발급받으신 시크릿 할인코드를 입력하시면, 비공개된 <strong>효원회원 특별할인가</strong>가 즉시 공개되며 결합 혜택을 적용받으실 수 있습니다.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[12px] font-bold text-[#A6ADB8] block">
+                      할인코드 입력
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={inputDiscountCode}
+                        onChange={(e) => {
+                          setInputDiscountCode(e.target.value.toUpperCase());
+                          setDiscountError('');
+                        }}
+                        placeholder="예: LG2026-VIP, WELCOME"
+                        autoFocus
+                        className="w-full px-4 py-3.5 bg-white/10 border-2 border-white/20 focus:border-[#EA1D2C] focus:bg-white/15 rounded-2xl text-[16px] font-mono font-bold text-white placeholder:text-white/30 tracking-wider uppercase transition-all outline-none"
+                      />
+                      {inputDiscountCode && (
+                        <button
+                          type="button"
+                          onClick={() => setInputDiscountCode('')}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                    {discountError && (
+                      <p className="text-[12px] text-[#FF8591] font-bold flex items-center gap-1 animate-in fade-in">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span>{discountError}</span>
+                      </p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isVerifyingCode || !inputDiscountCode.trim()}
+                    className="w-full py-3.5 bg-gradient-to-r from-[#EA1D2C] to-[#D41423] hover:from-[#D41423] hover:to-[#B30E1B] disabled:opacity-50 text-white rounded-2xl font-black text-[14px] shadow-lg shadow-[#EA1D2C]/40 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {isVerifyingCode ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>코드 검증 중...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        <span>할인코드 적용 및 특가 확인</span>
+                      </>
+                    )}
+                  </button>
+
+                  <p className="text-[11px] text-[#8B95A1] text-center">
+                    ※ 할인코드가 없으신 고객님은 전문 상담사에게 문의해 주세요.
+                  </p>
+                </form>
+              )}
             </div>
           </div>
         </div>
