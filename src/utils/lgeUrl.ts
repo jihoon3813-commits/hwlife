@@ -232,7 +232,13 @@ export function getOptimizedImageUrl(url?: string): string {
   if (clean.startsWith('//')) {
     clean = 'https:' + clean;
   }
-  // Replace www.lge.co.kr/kr/images/ or lge.co.kr/kr/images/ with static.lge.co.kr/kr/images/
-  clean = clean.replace(/^https?:\/\/(www\.)?lge\.co\.kr\/kr\/images\//i, 'https://static.lge.co.kr/kr/images/');
+
+  // If it is an LG image, route through global high-speed image proxy (images.weserv.nl)
+  // This completely bypasses hotlink block, 302 redirect, carrier DNS issues on mobile phones!
+  if (clean.includes('lge.co.kr')) {
+    const rawTarget = clean.replace(/^https?:\/\//i, '').replace(/^www\.lge\.co\.kr/i, 'static.lge.co.kr');
+    return `https://images.weserv.nl/?url=${encodeURIComponent(rawTarget)}&output=webp&q=85`;
+  }
+
   return clean;
 }

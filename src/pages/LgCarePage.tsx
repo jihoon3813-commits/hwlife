@@ -198,6 +198,9 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
   // Hyowon Plan 144 Showcase Tab (1, 2, 3, 4 Accounts)
   const [selectedPlanAccounts, setSelectedPlanAccounts] = useState<number>(1);
 
+  // Mobile Back Button Support for Modal
+  const isModalPushed = useRef(false);
+
   // Always initialize options & open with 'subscription' tab when product detail modal is opened
   const handleOpenProductModal = (product: any) => {
     setSelectedProduct(product);
@@ -216,7 +219,37 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
 
     setSelectedCycle(bestCycle);
     setSelectedType(bestType);
+
+    // Push history state so pressing mobile back button closes modal instead of exiting page
+    window.history.pushState({ modal: 'product-detail' }, '');
+    isModalPushed.current = true;
   };
+
+  const handleCloseProductModal = () => {
+    setSelectedProduct(null);
+    if (isModalPushed.current) {
+      isModalPushed.current = false;
+      window.history.back();
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (selectedProduct) {
+        setSelectedProduct(null);
+        isModalPushed.current = false;
+      }
+      if (isConsultModalOpen) {
+        setIsConsultModalOpen(false);
+      }
+      if (isSuccessModalOpen) {
+        setIsSuccessModalOpen(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [selectedProduct, isConsultModalOpen, isSuccessModalOpen]);
 
   useEffect(() => {
     if (selectedProduct) {
@@ -1646,9 +1679,9 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   className="bg-white rounded-2xl overflow-hidden border border-[#E5E8EB] shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col group relative"
                 >
                   {/* 1. Top Badges (Filtered) */}
-                  <div className="p-4 pb-0 flex items-start justify-between min-h-[36px]">
+                  <div className="px-3 py-2 pb-0 flex items-start justify-between min-h-[28px]">
                     {/* Top Badges */}
-                    <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1">
                       {product.topBadges && product.topBadges.length > 0 ? (
                         product.topBadges
                           .filter(badge => 
@@ -1661,7 +1694,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                           .map((badge, bIdx) => (
                             <span 
                               key={bIdx}
-                              className={`text-[11px] font-bold px-2 py-0.5 rounded-xs tracking-tight ${
+                              className={`text-[10px] sm:text-[11px] font-bold px-1.5 py-0.2 rounded-xs tracking-tight ${
                                 badge.includes('출시') 
                                   ? 'bg-[#191F28] text-white' 
                                   : 'bg-[#EA1D2C] text-white'
@@ -1671,24 +1704,24 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                             </span>
                           ))
                       ) : (
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-xs bg-[#EA1D2C] text-white">
+                        <span className="text-[10px] sm:text-[11px] font-bold px-1.5 py-0.2 rounded-xs bg-[#EA1D2C] text-white">
                           무상철거및재설치
                         </span>
                       )}
                     </div>
                   </div>
 
-                  {/* 2. Center Product Image */}
+                  {/* 2. Center Product Image (Reduced size by 50% & minimized vertical paddings) */}
                   <div 
                     onClick={() => handleOpenProductModal(product)}
-                    className="relative w-full aspect-square min-h-[160px] sm:min-h-[220px] p-3 sm:px-8 sm:py-4 flex items-center justify-center cursor-pointer bg-white overflow-hidden"
+                    className="relative w-full h-28 sm:h-36 px-2 py-1 flex items-center justify-center cursor-pointer bg-white overflow-hidden"
                   >
                     <img 
                       src={getOptimizedImageUrl(product.image)} 
                       alt={product.name} 
                       referrerPolicy="no-referrer"
                       loading="lazy"
-                      className="w-full h-full max-h-[160px] sm:max-h-none object-contain group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full max-h-[105px] sm:max-h-[135px] object-contain group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
@@ -1700,15 +1733,15 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                         e.stopPropagation();
                         handleOpenProductModal(product);
                       }}
-                      className="absolute bottom-2 right-2 sm:right-4 bg-white/90 p-2 rounded-full text-[#8B95A1] hover:text-[#191F28] border border-[#E5E8EB] shadow-xs transition-transform group-hover:scale-110"
+                      className="absolute bottom-1 right-1 sm:right-2 bg-white/90 p-1.5 rounded-full text-[#8B95A1] hover:text-[#191F28] border border-[#E5E8EB] shadow-2xs transition-transform group-hover:scale-110"
                       title="상세보기"
                     >
-                      <Maximize2 className="w-3.5 h-3.5" />
+                      <Maximize2 className="w-3 h-3" />
                     </button>
                   </div>
 
-                  {/* 3. Product Info & Key Specs */}
-                  <div className="p-5 pt-2 flex-1 flex flex-col justify-between border-t border-[#F2F4F6]">
+                  {/* 3. Product Info & Key Specs (Minimized paddings) */}
+                  <div className="p-3.5 sm:p-4 pt-1 flex-1 flex flex-col justify-between border-t border-[#F2F4F6]">
                     <div className="space-y-2.5">
                       {/* Title and Keywd Tags with Fixed Heights for Perfect Horizontal Alignment */}
                       <div>
@@ -2586,39 +2619,56 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
 
       {/* Product Detail Interactive Modal ([구독] 탭 vs [효원특가] 탭) */}
       {selectedProduct && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto hide-scrollbar">
-          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto hide-scrollbar shadow-2xl border border-[#E5E8EB] p-5 sm:p-8 space-y-6 relative animate-in fade-in zoom-in duration-200">
-            {/* Close Button */}
-            <button 
-              onClick={() => setSelectedProduct(null)}
-              className="absolute top-5 right-5 p-2.5 rounded-full bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB] transition-colors z-20"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Product Header Summary */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pb-4 border-b border-[#F2F4F6]">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 bg-[#F8FAFC] rounded-2xl p-2 border border-[#E5E8EB] flex items-center justify-center shrink-0">
-                <img 
-                  src={getOptimizedImageUrl(currentProductImage)} 
-                  alt={selectedProduct.name} 
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-contain transition-all duration-300"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null;
-                    target.src = 'https://static.lge.co.kr/kr/images/common/no-image.jpg';
-                  }}
-                />
+        <div 
+          onClick={handleCloseProductModal}
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto overscroll-contain"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[88dvh] sm:max-h-[90vh] flex flex-col shadow-2xl border border-[#E5E8EB] relative animate-in fade-in zoom-in duration-200 my-auto"
+          >
+            {/* Modal Header Bar with Close Button (Fixed at top of modal) */}
+            <div className="p-3.5 sm:p-5 border-b border-[#F2F4F6] flex items-center justify-between shrink-0 bg-white rounded-t-2xl sm:rounded-t-3xl">
+              <div className="flex items-center gap-2 min-w-0 pr-2">
+                <span className="text-[11px] font-black bg-[#EA1D2C] text-white px-2 py-0.5 rounded shrink-0">
+                  {selectedProduct.categoryName}
+                </span>
+                <span className="text-[13px] sm:text-[15px] font-black text-[#191F28] truncate">
+                  {selectedProduct.name}
+                </span>
               </div>
-              <div className="space-y-1.5 pr-8 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[11px] font-black bg-[#EA1D2C] text-white px-2 py-0.5 rounded">
-                    {selectedProduct.categoryName}
-                  </span>
-                  <span className="text-[11px] font-mono font-bold text-[#8B95A1] bg-[#F2F4F6] px-2 py-0.5 rounded">
-                    {selectedProduct.model}
-                  </span>
+              <button 
+                type="button"
+                onClick={handleCloseProductModal}
+                className="p-1.5 sm:p-2 rounded-full bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB] transition-colors shrink-0 cursor-pointer"
+                title="닫기"
+              >
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            </div>
+
+            {/* Modal Scrollable Content Body */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-7 space-y-5 overscroll-contain">
+              {/* Product Header Summary */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pb-4 border-b border-[#F2F4F6]">
+                <div className="w-20 h-20 sm:w-28 sm:h-28 bg-[#F8FAFC] rounded-2xl p-2 border border-[#E5E8EB] flex items-center justify-center shrink-0 mx-auto sm:mx-0">
+                  <img 
+                    src={getOptimizedImageUrl(currentProductImage)} 
+                    alt={selectedProduct.name} 
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-contain transition-all duration-300"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = 'https://static.lge.co.kr/kr/images/common/no-image.jpg';
+                    }}
+                  />
+                </div>
+                <div className="space-y-1 pr-2 flex-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[11px] font-mono font-bold text-[#8B95A1] bg-[#F2F4F6] px-2 py-0.5 rounded">
+                      {selectedProduct.model}
+                    </span>
                   {(() => {
                     const capInfo = getProductCapacityInfo(
                       selectedProduct.model, 
@@ -3143,13 +3193,14 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                 })()}
               </div>
             )}
+            </div>
 
-            {/* Modal Bottom CTA Actions */}
-            <div className="flex items-center gap-2 sm:gap-3 pt-2">
+            {/* Modal Bottom CTA Actions (Fixed at bottom of modal container) */}
+            <div className="p-3 sm:p-4 border-t border-[#F2F4F6] bg-white rounded-b-2xl sm:rounded-b-3xl shrink-0 flex items-center gap-2 sm:gap-3">
               <button 
                 type="button"
-                onClick={() => setSelectedProduct(null)}
-                className="w-24 sm:w-28 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-[13px] sm:text-[14px] bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB] transition-colors shrink-0 cursor-pointer"
+                onClick={handleCloseProductModal}
+                className="w-20 sm:w-28 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold text-[13px] sm:text-[14px] bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB] transition-colors shrink-0 cursor-pointer"
               >
                 닫기
               </button>
@@ -3163,10 +3214,10 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   const typeLabel = typeObj?.accentLabel || (selectedType === 'premium' ? '프리미엄' : selectedType === 'light' ? '라이트' : '라이트플러스');
                   const optionStr = `${selectedProduct.material ? selectedProduct.material + ' / ' : ''}${selectedModalColor || selectedProduct.color || ''}, ${selectedTerm ? parseInt(selectedTerm)/12 + '년' : '6년'}/${cycleLabel}/${typeLabel}`;
                   const account = hyowonAccountCount;
-                  setSelectedProduct(null);
+                  handleCloseProductModal();
                   handleSelectProductForConsult(p, optionStr, account);
                 }}
-                className="flex-1 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[13px] sm:text-[15px] bg-[#EA1D2C] hover:bg-[#C81020] text-white transition-colors shadow-lg shadow-[#EA1D2C]/20 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer whitespace-nowrap"
+                className="flex-1 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-black text-[13px] sm:text-[15px] bg-[#EA1D2C] hover:bg-[#C81020] text-white transition-colors shadow-lg shadow-[#EA1D2C]/20 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer whitespace-nowrap"
               >
                 <Gift className="w-4 h-4 shrink-0" />
                 <span>이 조건으로 특가 예약</span>

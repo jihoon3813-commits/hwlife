@@ -15,7 +15,17 @@ import Package60Page from '../pages/Package60Page';
 import LgCarePage from '../pages/LgCarePage';
 
 export default function LandingRouter() {
-  const path = window.location.pathname.toLowerCase();
+  const [currentPath, setCurrentPath] = React.useState(() => window.location.pathname.toLowerCase());
+
+  React.useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname.toLowerCase());
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  const path = currentPath;
   
   // /lgsub, /care, /care-solutions, /lg 경로 → LG가전 구독 할인 전용 랜딩페이지
   if (path === '/lgsub' || path.startsWith('/lgsub/') ||
