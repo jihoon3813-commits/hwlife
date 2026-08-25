@@ -218,6 +218,33 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
   const [isVerifyingCode, setIsVerifyingCode] = useState(false);
   const verifyDiscountCodeMutation = useMutation(api.discountCodes.verify);
 
+  // Mobile Back Button PopState Handler for Discount Modal
+  useEffect(() => {
+    if (!isDiscountModalOpen) return;
+
+    // Push modal state into browser history
+    window.history.pushState({ modal: 'discount-code' }, '');
+
+    const handlePopState = () => {
+      setIsDiscountModalOpen(false);
+      setDiscountError('');
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isDiscountModalOpen]);
+
+  const closeDiscountModal = () => {
+    if (window.history.state?.modal === 'discount-code') {
+      window.history.back();
+    } else {
+      setIsDiscountModalOpen(false);
+      setDiscountError('');
+    }
+  };
+
   const handleVerifyDiscountCode = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const cleanCode = inputDiscountCode.trim().toUpperCase();
@@ -243,7 +270,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
         } catch (err) {
           console.error(err);
         }
-        setIsDiscountModalOpen(false);
+        closeDiscountModal();
         setInputDiscountCode('');
         alert(`[${res.code}] 시크릿 할인코드가 인증되었습니다!\n회원 특별할인 혜택이 즉시 잠금 해제되었습니다.`);
       } else {
@@ -4336,9 +4363,12 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
 
       {/* Premium Discount Code Modal */}
       {isDiscountModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
+        <div 
+          onClick={closeDiscountModal}
+          className="fixed inset-0 z-[100] flex items-start sm:items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md overflow-y-auto pt-6 sm:pt-4 pb-24 sm:pb-4 animate-in fade-in duration-200"
+        >
           <div 
-            className="bg-[#191F28] text-white w-full max-w-md rounded-3xl border border-white/15 shadow-2xl overflow-hidden relative"
+            className="bg-[#191F28] text-white w-full max-w-md rounded-3xl border border-white/15 shadow-2xl overflow-hidden relative my-2 sm:my-auto shrink-0"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Background Glow */}
@@ -4346,49 +4376,46 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#3182F6]/15 rounded-full blur-3xl pointer-events-none" />
 
             {/* Header */}
-            <div className="p-6 pb-4 border-b border-white/10 flex items-center justify-between relative z-10">
+            <div className="p-4 sm:p-6 pb-3 sm:pb-4 border-b border-white/10 flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#EA1D2C] to-[#8E0914] flex items-center justify-center shadow-lg shadow-[#EA1D2C]/40">
-                  <KeyRound className="w-5 h-5 text-white" />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-br from-[#EA1D2C] to-[#8E0914] flex items-center justify-center shadow-lg shadow-[#EA1D2C]/40 shrink-0">
+                  <KeyRound className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-[17px] font-black text-white flex items-center gap-1.5">
+                  <h3 className="text-[15px] sm:text-[17px] font-black text-white flex items-center gap-1.5">
                     <span>시크릿 할인코드 인증</span>
-                    <Sparkles className="w-4 h-4 text-[#FF8591]" />
+                    <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FF8591]" />
                   </h3>
-                  <p className="text-[11px] text-[#A6ADB8]">
+                  <p className="text-[10.5px] sm:text-[11px] text-[#A6ADB8]">
                     효원회원 특별할인가 및 혜택 잠금 해제
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  setIsDiscountModalOpen(false);
-                  setDiscountError('');
-                }}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-[#A6ADB8] hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                onClick={closeDiscountModal}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-[#A6ADB8] hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Body */}
-            <div className="p-6 space-y-5 relative z-10">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 relative z-10">
               {isUnlocked ? (
                 <div className="bg-[#1E2734] rounded-2xl p-4 border border-[#00B074]/30 space-y-3">
                   <div className="flex items-center gap-2 text-[#00B074]">
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span className="text-[14px] font-black">회원 특별할인이 적용 중입니다!</span>
+                    <CheckCircle2 className="w-5 h-5 shrink-0" />
+                    <span className="text-[13px] sm:text-[14px] font-black">회원 특별할인이 적용 중입니다!</span>
                   </div>
-                  <p className="text-[12px] text-[#A6ADB8] leading-relaxed">
+                  <p className="text-[11.5px] sm:text-[12px] text-[#A6ADB8] leading-relaxed">
                     현재 브라우저에서 모든 가전 제품의 회원 특별할인 혜택이 정상적으로 공개되어 있습니다.
                   </p>
                   <div className="pt-2 flex gap-2">
                     <button
                       type="button"
-                      onClick={() => setIsDiscountModalOpen(false)}
-                      className="flex-1 py-2.5 bg-[#00B074] hover:bg-[#009663] text-white font-bold rounded-xl text-[12px] transition-colors"
+                      onClick={closeDiscountModal}
+                      className="flex-1 py-2.5 bg-[#00B074] hover:bg-[#009663] text-white font-bold rounded-xl text-[12px] transition-colors cursor-pointer"
                     >
                       확인 완료
                     </button>
@@ -4396,30 +4423,31 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                       type="button"
                       onClick={() => {
                         localStorage.removeItem('hw_care_unlocked');
+                        localStorage.removeItem('hw_care_auth');
                         localStorage.removeItem('hw_care_code');
-                        setIsUnlocked(false);
+                        setAuthInfo(null);
                         alert('인증이 해제되었습니다.');
                       }}
-                      className="px-3 py-2.5 bg-white/10 hover:bg-white/20 text-[#D1D6DB] font-bold rounded-xl text-[12px] transition-colors"
+                      className="px-3 py-2.5 bg-white/10 hover:bg-white/20 text-[#D1D6DB] font-bold rounded-xl text-[12px] transition-colors cursor-pointer"
                     >
                       코드 재입력
                     </button>
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleVerifyDiscountCode} className="space-y-4">
-                  <div className="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2 text-[12px] text-[#D1D6DB] leading-relaxed">
-                    <p className="font-extrabold text-white text-[13px] flex items-center gap-1.5">
-                      <Gift className="w-4 h-4 text-[#FF8591]" />
+                <form onSubmit={handleVerifyDiscountCode} className="space-y-3.5 sm:space-y-4">
+                  <div className="bg-white/5 rounded-2xl p-3 sm:p-4 border border-white/10 space-y-1.5 sm:space-y-2 text-[11.5px] sm:text-[12px] text-[#D1D6DB] leading-relaxed">
+                    <p className="font-extrabold text-white text-[12.5px] sm:text-[13px] flex items-center gap-1.5">
+                      <Gift className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FF8591]" />
                       <span>할인코드 혜택 안내</span>
                     </p>
                     <p>
-                      발급받으신 시크릿 할인코드를 입력하시면, 비공개된 <strong>효원회원 특별할인가</strong>가 즉시 공개되며 결합 혜택을 적용받으실 수 있습니다.
+                      발급받으신 시크릿 할인코드를 입력하시면, 비공개된 <strong>효원회원 특별할인가</strong>가 즉시 공개됩니다.
                     </p>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[12px] font-bold text-[#A6ADB8] block">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <label className="text-[11.5px] sm:text-[12px] font-bold text-[#A6ADB8] block">
                       할인코드 입력
                     </label>
                     <div className="relative">
@@ -4430,22 +4458,23 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                           setInputDiscountCode(e.target.value.toUpperCase());
                           setDiscountError('');
                         }}
-                        placeholder="예: LG2026-VIP, WELCOME"
+                        placeholder="예: LG-TEST, VIP-2026"
                         autoFocus
-                        className="w-full px-4 py-3.5 bg-white/10 border-2 border-white/20 focus:border-[#EA1D2C] focus:bg-white/15 rounded-2xl text-[16px] font-mono font-bold text-white placeholder:text-white/30 tracking-wider uppercase transition-all outline-none"
+                        inputMode="text"
+                        className="w-full px-3.5 sm:px-4 py-3 sm:py-3.5 bg-white/10 border-2 border-white/20 focus:border-[#EA1D2C] focus:bg-white/15 rounded-2xl text-[15px] sm:text-[16px] font-mono font-bold text-white placeholder:text-white/30 tracking-wider uppercase transition-all outline-none"
                       />
                       {inputDiscountCode && (
                         <button
                           type="button"
                           onClick={() => setInputDiscountCode('')}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white p-1"
                         >
                           <X className="w-4 h-4" />
                         </button>
                       )}
                     </div>
                     {discountError && (
-                      <p className="text-[12px] text-[#FF8591] font-bold flex items-center gap-1 animate-in fade-in">
+                      <p className="text-[11.5px] sm:text-[12px] text-[#FF8591] font-bold flex items-center gap-1 animate-in fade-in">
                         <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                         <span>{discountError}</span>
                       </p>
@@ -4455,7 +4484,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                   <button
                     type="submit"
                     disabled={isVerifyingCode || !inputDiscountCode.trim()}
-                    className="w-full py-3.5 bg-gradient-to-r from-[#EA1D2C] to-[#D41423] hover:from-[#D41423] hover:to-[#B30E1B] disabled:opacity-50 text-white rounded-2xl font-black text-[14px] shadow-lg shadow-[#EA1D2C]/40 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-[#EA1D2C] to-[#D41423] hover:from-[#D41423] hover:to-[#B30E1B] disabled:opacity-50 text-white rounded-2xl font-black text-[13.5px] sm:text-[14px] shadow-lg shadow-[#EA1D2C]/40 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {isVerifyingCode ? (
                       <>
