@@ -54,14 +54,30 @@ function AutoSwipingCardThumbnail({
 }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   useEffect(() => {
     if (imageList.length <= 1 || isHovered) return;
     const interval = setInterval(() => {
       setCurrentIdx((prev) => (prev + 1) % imageList.length);
-    }, 1500);
+    }, 2000);
     return () => clearInterval(interval);
   }, [imageList.length, isHovered]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null || imageList.length <= 1) return;
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (diff > 40) {
+      setCurrentIdx((prev) => (prev + 1) % imageList.length);
+    } else if (diff < -40) {
+      setCurrentIdx((prev) => (prev - 1 + imageList.length) % imageList.length);
+    }
+    setTouchStartX(null);
+  };
 
   const mainImg = imageList[currentIdx] || 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
 
@@ -69,8 +85,10 @@ function AutoSwipingCardThumbnail({
     <div 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       onClick={onClick}
-      className="relative w-full aspect-square bg-[#F8FAFC] border-b border-[#E5E8EB] overflow-hidden group/thumb transition-colors select-none p-0 flex items-center justify-center cursor-pointer"
+      className="relative w-full aspect-square bg-[#F8FAFC] border-b border-[#E5E8EB] overflow-hidden group/thumb transition-colors select-none cursor-pointer"
     >
       <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-30 pointer-events-none">
         <span className="text-[11px] font-extrabold bg-[#191F28]/90 text-white px-2 py-0.5 rounded-xs tracking-wider shadow-xs backdrop-blur-xs">
@@ -90,26 +108,16 @@ function AutoSwipingCardThumbnail({
 
       <motion.div
         key={currentIdx}
-        initial={{ opacity: 0.85, x: 15 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0.85, x: -15 }}
-        transition={{ duration: 0.3 }}
-        drag={imageList.length > 1 ? "x" : false}
-        dragConstraints={{ left: 0, right: 0 }}
-        onDragEnd={(_, info) => {
-          if (imageList.length <= 1) return;
-          if (info.offset.x < -30) {
-            setCurrentIdx((prev) => (prev + 1) % imageList.length);
-          } else if (info.offset.x > 30) {
-            setCurrentIdx((prev) => (prev - 1 + imageList.length) % imageList.length);
-          }
-        }}
-        className="w-full h-full p-0 m-0"
+        initial={{ opacity: 0.85 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0.85 }}
+        transition={{ duration: 0.25 }}
+        className="absolute inset-0 w-full h-full flex items-center justify-center p-3 sm:p-4"
       >
         <img 
           src={mainImg} 
           alt={productName}
-          className="w-full h-full object-cover object-center group-hover/thumb:scale-105 transition-transform duration-500 block"
+          className="w-full h-full max-h-full max-w-full object-contain object-center group-hover/thumb:scale-105 transition-transform duration-500 block"
           loading="lazy"
         />
       </motion.div>
@@ -472,17 +480,19 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                           }}
                           className="cursor-pointer group"
                         >
-                          <div className="relative aspect-square rounded-sm overflow-hidden bg-[#F8FAFC] border border-[#E2E8F0] mb-4 flex items-center justify-center p-1 sm:p-2">
-                            <img 
-                              src={heroImg}
-                              alt={heroItem.name}
-                              className="w-full h-full object-contain object-center transform group-hover:scale-105 transition-transform duration-300"
-                            />
-                            <div className="absolute top-3 left-3 bg-[#191F28]/90 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-sm flex items-center gap-1.5 shadow-sm">
+                          <div className="relative aspect-square rounded-sm overflow-hidden bg-[#F8FAFC] border border-[#E2E8F0] mb-4">
+                            <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-4">
+                              <img 
+                                src={heroImg}
+                                alt={heroItem.name}
+                                className="w-full h-full max-h-full max-w-full object-contain object-center transform group-hover:scale-105 transition-transform duration-300 block"
+                              />
+                            </div>
+                            <div className="absolute top-3 left-3 bg-[#191F28]/90 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-sm flex items-center gap-1.5 shadow-sm z-10">
                               <Sparkles className="w-3.5 h-3.5 text-[#3182F6] fill-current" />
                               상조&가전 패키지
                             </div>
-                            <div className="absolute top-3 right-3 bg-[#3182F6] text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-xs shadow-sm">
+                            <div className="absolute top-3 right-3 bg-[#3182F6] text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-xs shadow-sm z-10">
                               {heroAccount ? heroAccount.replace('지원', '').trim() + ' 전용' : '1구좌 전용'}
                             </div>
                           </div>
@@ -1037,13 +1047,14 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                       return (
                         <>
                           {/* Main Preview Box */}
-                          <div className="aspect-square bg-[#F8FAFC] rounded-md border border-[#E2E8F0] relative overflow-hidden p-0 shadow-xs">
-                            <img 
-                              src={currentImg} 
-                              alt={selectedSpecProduct.name}
-                              className="w-full h-full object-cover object-center"
-                              style={{ objectFit: 'cover', objectPosition: 'center' }}
-                            />
+                          <div className="aspect-square bg-[#F8FAFC] rounded-md border border-[#E2E8F0] relative overflow-hidden shadow-xs">
+                            <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-4">
+                              <img 
+                                src={currentImg} 
+                                alt={selectedSpecProduct.name}
+                                className="w-full h-full max-h-full max-w-full object-contain object-center"
+                              />
+                            </div>
                             {safeIdx === 0 && (
                               <span className="absolute top-2 left-2 bg-[#3182F6] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-xs shadow-xs z-10">
                                 대표 썸네일
