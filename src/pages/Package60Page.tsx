@@ -7,6 +7,7 @@ import {
   Maximize2, Zap
 } from 'lucide-react';
 import { formatPhoneNumber } from '../utils/phone';
+import { getOptimizedImageUrl } from '../utils/lgeUrl';
 import PrivacyModal from '../components/PrivacyModal';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -21,13 +22,17 @@ interface Package60PageProps {
 const getProductImageList = (p: any): string[] => {
   if (!p) return ['https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400'];
   const list: string[] = [];
-  if (p.image) {
-    list.push(p.image);
+  if (p.image && typeof p.image === 'string' && p.image.trim() !== '') {
+    const opt = getOptimizedImageUrl(p.image, 'modal');
+    list.push(opt);
   }
   if (Array.isArray(p.images)) {
     for (const img of p.images) {
-      if (img && !list.includes(img)) {
-        list.push(img);
+      if (img && typeof img === 'string' && img.trim() !== '') {
+        const opt = getOptimizedImageUrl(img, 'modal');
+        if (!list.includes(opt)) {
+          list.push(opt);
+        }
       }
     }
   }
@@ -79,7 +84,7 @@ function AutoSwipingCardThumbnail({
     setTouchStartX(null);
   };
 
-  const mainImg = imageList[currentIdx] || 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
+  const mainImg = imageList[currentIdx] ? getOptimizedImageUrl(imageList[currentIdx], 'modal') : 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
 
   return (
     <div 
@@ -118,8 +123,14 @@ function AutoSwipingCardThumbnail({
           src={mainImg} 
           alt={productName}
           referrerPolicy="no-referrer"
+          decoding="async"
           className="w-full h-full max-h-full max-w-full object-contain object-center group-hover/thumb:scale-105 transition-transform duration-500 block"
           loading="lazy"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.onerror = null;
+            target.src = 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
+          }}
         />
       </motion.div>
 
@@ -473,7 +484,8 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                   {(() => {
                     const safeHeroIdx = currentHeroIdx % heroProducts.length;
                     const heroItem = heroProducts[safeHeroIdx] || heroProducts[0];
-                    const heroImg = heroItem.image || (heroItem.images && heroItem.images[0]) || 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png';
+                    const heroRawImg = heroItem.image || (heroItem.images && heroItem.images[0]) || 'https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png';
+                    const heroImg = getOptimizedImageUrl(heroRawImg, 'modal');
                     const heroAccount = heroItem.accountCount || `${heroItem.planId || 1}구좌`;
 
                     return (
@@ -492,7 +504,13 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                                 src={heroImg}
                                 alt={heroItem.name}
                                 referrerPolicy="no-referrer"
+                                decoding="async"
                                 className="w-full h-full max-h-full max-w-full object-contain object-center transform group-hover:scale-105 transition-transform duration-300 block"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.onerror = null;
+                                  target.src = 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
+                                }}
                               />
                             </div>
                             <div className="absolute top-3 left-3 bg-[#191F28]/90 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-sm flex items-center gap-1.5 shadow-sm z-10">
@@ -565,7 +583,8 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                             <div className="grid grid-cols-4 gap-1.5">
                               {heroProducts.map((hProd, hIdx) => {
                                 const isSelected = safeHeroIdx === hIdx;
-                                const thumbImg = hProd.image || (hProd.images && hProd.images[0]) || 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
+                                const rawThumb = hProd.image || (hProd.images && hProd.images[0]) || 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
+                                const thumbImg = getOptimizedImageUrl(rawThumb, 'thumb');
                                 return (
                                   <button
                                     key={hProd._id || hIdx}
@@ -585,7 +604,13 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                                       src={thumbImg} 
                                       alt={hProd.name} 
                                       referrerPolicy="no-referrer"
+                                      decoding="async"
                                       className="w-full h-full object-cover object-center rounded-xs"
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.onerror = null;
+                                        target.src = 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
+                                      }}
                                     />
                                     {isSelected && (
                                       <div className="absolute inset-0 bg-[#3182F6]/10 pointer-events-none" />
@@ -1061,7 +1086,13 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                                 src={currentImg} 
                                 alt={selectedSpecProduct.name}
                                 referrerPolicy="no-referrer"
+                                decoding="async"
                                 className="w-full h-full max-h-full max-w-full object-contain object-center"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.onerror = null;
+                                  target.src = 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
+                                }}
                               />
                             </div>
                             {safeIdx === 0 && (
@@ -1084,7 +1115,18 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                                   }`}
                                   title={idx === 0 ? "대표 썸네일 보기" : `${idx + 1}번 상세 이미지 보기`}
                                 >
-                                  <img src={imgUrl} alt="" referrerPolicy="no-referrer" className="w-full h-full object-contain object-center" />
+                                  <img 
+                                    src={imgUrl} 
+                                    alt="" 
+                                    referrerPolicy="no-referrer" 
+                                    decoding="async"
+                                    className="w-full h-full object-contain object-center" 
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.onerror = null;
+                                      target.src = 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
+                                    }}
+                                  />
                                 </button>
                               ))}
                             </div>
