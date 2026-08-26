@@ -117,6 +117,7 @@ function AutoSwipingCardThumbnail({
         <img 
           src={mainImg} 
           alt={productName}
+          referrerPolicy="no-referrer"
           className="w-full h-full max-h-full max-w-full object-contain object-center group-hover/thumb:scale-105 transition-transform duration-500 block"
           loading="lazy"
         />
@@ -206,7 +207,7 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
   const createInquiry = useMutation(api.inquiries.create);
   const logVisit = useMutation(api.stats.logVisit);
 
-  const [activePackageTab, setActivePackageTab] = useState<'1구좌' | '2구좌' | '3구좌' | '4구좌'>('2구좌');
+  const [activePackageTab, setActivePackageTab] = useState<'1구좌' | '2구좌' | '3구좌' | '4구좌'>('1구좌');
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -224,28 +225,6 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentHeroIdx, setCurrentHeroIdx] = useState(0);
   const [isHeroHovered, setIsHeroHovered] = useState(false);
-
-  const heroProducts = useMemo(() => {
-    const heroList = allProducts.filter(p => !!p.showOnHero);
-    if (heroList.length >= 4) return heroList.slice(0, 4);
-
-    const combined = [...heroList];
-    for (const p of allProducts) {
-      if (combined.length >= 4) break;
-      if (!combined.some(item => item._id === p._id)) {
-        combined.push(p);
-      }
-    }
-    return combined.slice(0, 4);
-  }, [allProducts]);
-
-  useEffect(() => {
-    if (heroProducts.length <= 1 || isHeroHovered) return;
-    const timer = setInterval(() => {
-      setCurrentHeroIdx((prev) => (prev + 1) % heroProducts.length);
-    }, 1500);
-    return () => clearInterval(timer);
-  }, [heroProducts.length, isHeroHovered]);
 
   const formRef = useRef<HTMLDivElement>(null);
   const productSectionRef = useRef<HTMLDivElement>(null);
@@ -265,16 +244,47 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
     );
   }, [allProducts, landingPath]);
 
+  const heroProducts = useMemo(() => {
+    // 1. Pick from package60Products with valid images
+    const heroList = package60Products.filter(p => !!p.showOnHero && (p.image || (p.images && p.images.length > 0)));
+    if (heroList.length >= 4) return heroList.slice(0, 4);
+
+    const combined = [...heroList];
+    for (const p of package60Products) {
+      if (combined.length >= 4) break;
+      if ((p.image || (p.images && p.images.length > 0)) && !combined.some(item => item._id === p._id)) {
+        combined.push(p);
+      }
+    }
+    if (combined.length > 0) return combined.slice(0, 4);
+
+    for (const p of allProducts) {
+      if (combined.length >= 4) break;
+      if ((p.image || (p.images && p.images.length > 0)) && !combined.some(item => item._id === p._id)) {
+        combined.push(p);
+      }
+    }
+    return combined.slice(0, 4);
+  }, [package60Products, allProducts]);
+
+  useEffect(() => {
+    if (heroProducts.length <= 1 || isHeroHovered) return;
+    const timer = setInterval(() => {
+      setCurrentHeroIdx((prev) => (prev + 1) % heroProducts.length);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [heroProducts.length, isHeroHovered]);
+
   const availablePackageTabs = useMemo(() => {
     const ALL_KEYS = ['1구좌', '2구좌', '3구좌', '4구좌'] as const;
     const available = ALL_KEYS.filter(pkgKey => {
       const pkgData = PACKAGE_DATA[pkgKey];
       return package60Products.some(p => {
         const pAccount = p.accountCount ? p.accountCount.replace(/\s/g, '') : `${p.planId}구좌`;
-        return pAccount === pkgKey || p.planId === pkgData.accountNum || pAccount.includes(pkgKey);
+        return pAccount === pkgKey || pAccount.includes(pkgKey) || p.planId === pkgData.accountNum;
       });
     });
-    return available;
+    return available.length > 0 ? available : ['1구좌'];
   }, [package60Products]);
 
   useEffect(() => {
@@ -285,28 +295,24 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
 
   const currentPkg = PACKAGE_DATA[activePackageTab] || PACKAGE_DATA['1구좌'];
 
-  const filteredProducts = allProducts.filter(p => {
-    const isPackage60Product = 
-      (p.landingPages && (p.landingPages.includes(landingPath) || p.landingPages.includes('/package60') || p.landingPages.includes('/package_up'))) ||
-      p.isSmartRegistered === true;
+  const filteredProducts = useMemo(() => {
+    return package60Products.filter(p => {
+      const pAccount = p.accountCount ? p.accountCount.replace(/\s/g, '') : `${p.planId}구좌`;
+      const matchesPackage = pAccount === activePackageTab || pAccount.includes(activePackageTab) || (p.planId === currentPkg.accountNum);
+      if (!matchesPackage) return false;
 
-    if (!isPackage60Product) return false;
+      const matchesCategory = selectedCategory === '전체' || 
+        (p.category && p.category.replace(/\s/g, '').includes(selectedCategory.replace(/\s/g, '')));
+      if (!matchesCategory) return false;
 
-    const pAccount = p.accountCount || `${p.planId}구좌`;
-    const matchesPackage = pAccount === activePackageTab || (p.planId === currentPkg.accountNum);
-    if (!matchesPackage) return false;
+      const matchesSearch = !searchQuery.trim() || 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        p.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.brand.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory = selectedCategory === '전체' || 
-      (p.category && p.category.replace(/\s/g, '').includes(selectedCategory.replace(/\s/g, '')));
-    if (!matchesCategory) return false;
-
-    const matchesSearch = !searchQuery.trim() || 
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      p.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.brand.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return matchesSearch;
-  });
+      return matchesSearch;
+    });
+  }, [package60Products, activePackageTab, currentPkg.accountNum, selectedCategory, searchQuery]);
 
   const categoryOptions = ['전체', '냉장고', '세탁기/건조기', 'TV', '에어컨', '청소기', '주방가전'];
 
@@ -485,6 +491,7 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                               <img 
                                 src={heroImg}
                                 alt={heroItem.name}
+                                referrerPolicy="no-referrer"
                                 className="w-full h-full max-h-full max-w-full object-contain object-center transform group-hover:scale-105 transition-transform duration-300 block"
                               />
                             </div>
@@ -577,6 +584,7 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                                     <img 
                                       src={thumbImg} 
                                       alt={hProd.name} 
+                                      referrerPolicy="no-referrer"
                                       className="w-full h-full object-cover object-center rounded-xs"
                                     />
                                     {isSelected && (
@@ -1052,6 +1060,7 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                               <img 
                                 src={currentImg} 
                                 alt={selectedSpecProduct.name}
+                                referrerPolicy="no-referrer"
                                 className="w-full h-full max-h-full max-w-full object-contain object-center"
                               />
                             </div>
@@ -1075,7 +1084,7 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                                   }`}
                                   title={idx === 0 ? "대표 썸네일 보기" : `${idx + 1}번 상세 이미지 보기`}
                                 >
-                                  <img src={imgUrl} alt="" className="w-full h-full object-contain object-center" />
+                                  <img src={imgUrl} alt="" referrerPolicy="no-referrer" className="w-full h-full object-contain object-center" />
                                 </button>
                               ))}
                             </div>
@@ -1289,6 +1298,7 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                     <img 
                       src={selectedProductForInquiry.image || selectedProductForInquiry.images?.[0]} 
                       alt="" 
+                      referrerPolicy="no-referrer"
                       className="w-12 h-12 object-contain bg-white rounded-sm p-1 border border-[#E5E8EB]"
                     />
                     <div>
