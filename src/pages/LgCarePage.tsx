@@ -1100,6 +1100,15 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
     setIsConsultModalOpen(true);
   };
 
+  const handleOpenDiscountCodeRequest = () => {
+    setIsDiscountModalOpen(false);
+    setFormSelectedProduct(null);
+    setFormProductOptions('');
+    setFormProduct('[할인코드 신청] 효원회원 특별 시크릿 할인코드 발급');
+    setFormAccountCount(selectedPlanAccounts || 1);
+    setIsConsultModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#F7F8FA] text-[#191F28] font-sans antialiased selection:bg-[#EA1D2C] selection:text-white">
       <SEO 
@@ -1109,7 +1118,9 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
         description={isCare10 
           ? "LG전자 가전 구독 공식 혜택! 오브제컬렉션, 워시타워, 정수기, 냉장고 등 원하는 가전에 정기 방문 케어와 100% 무상 A/S, 효원상조 결합 시 매월 10% 할인 + 만기 시 144만원 지원까지!"
           : "LG전자 공식 가전구독에 효원상조 혜택을 더하다! 회원 특별할인 지원 + 만기 100% 전액환급 & 축하금 지원. 본사 100% 무상 케어 서비스까지."}
-        image="https://res.cloudinary.com/lyjyvy54/image/upload/v1787663880/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._14_x1xbix.png"
+        image={isCare10
+          ? "https://res.cloudinary.com/lyjyvy54/image/upload/v1787294543/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._13_crzmtj.png"
+          : "https://res.cloudinary.com/lyjyvy54/image/upload/v1787663880/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._14_x1xbix.png"}
       />
 
       {/* Top Banner Bar (Hidden on Mobile) */}
@@ -3916,13 +3927,15 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
               <div className="space-y-1">
                 <div className="inline-flex items-center gap-1.5 text-[11px] font-black text-[#EA1D2C] bg-[#FEECEF] px-2.5 py-0.5 rounded-md">
                   <Gift className="w-3.5 h-3.5" />
-                  <span>LG 가전구독 X 효원상조 결합 특가</span>
+                  <span>{formProduct.includes('할인코드') ? '효원회원 시크릿 할인코드 발급' : 'LG 가전구독 X 효원상조 결합 특가'}</span>
                 </div>
                 <h3 className="text-[20px] sm:text-[22px] font-black text-[#191F28]">
-                  간편 상담 신청
+                  {formProduct.includes('할인코드') ? '시크릿 할인코드 발급 신청' : '간편 상담 신청'}
                 </h3>
                 <p className="text-[13px] text-[#6B7684]">
-                  전담 전문 상담원이 최대 결합 할인 혜택을 1:1로 맞춤 안내해 드립니다.
+                  {formProduct.includes('할인코드') 
+                    ? '비공개 효원회원 특별할인가가 적용되는 시크릿 할인코드를 즉시 안내해 드립니다.'
+                    : '전담 전문 상담원이 최대 결합 할인 혜택을 1:1로 맞춤 안내해 드립니다.'}
                 </p>
               </div>
               <button 
@@ -3975,6 +3988,9 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                         onChange={(e) => setFormProduct(e.target.value)}
                         className="w-full max-w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-2xl text-[13px] sm:text-[14px] font-bold text-[#191F28] focus:outline-none focus:border-[#EA1D2C] focus:bg-white transition-all cursor-pointer truncate"
                       >
+                        <option value="[할인코드 신청] 효원회원 특별 시크릿 할인코드 발급">
+                          🎁 [할인코드 신청] 효원회원 특별 시크릿 할인코드 발급
+                        </option>
                         <option value="상담 시 제품선택 (전문 상담원 맞춤 추천)">
                           선택: 상담 시 맞춤 추천
                         </option>
@@ -4508,9 +4524,32 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
                     )}
                   </button>
 
-                  <p className="text-[11px] text-[#8B95A1] text-center">
-                    ※ 할인코드가 없으신 고객님은 전문 상담사에게 문의해 주세요.
-                  </p>
+                  <div className="pt-2 border-t border-white/10 space-y-2">
+                    <div className="bg-gradient-to-br from-[#00C473]/15 via-[#00B074]/10 to-[#047857]/15 rounded-2xl p-3.5 sm:p-4 border border-[#00C473]/40 text-center space-y-2 relative overflow-hidden shadow-inner">
+                      {/* Ambient Green Glow */}
+                      <div className="absolute -top-10 -right-10 w-24 h-24 bg-[#00C473]/20 rounded-full blur-2xl pointer-events-none" />
+                      
+                      <div className="flex items-center justify-center gap-1.5 text-[12px] sm:text-[13px] font-extrabold text-[#34D399]">
+                        <Sparkles className="w-4 h-4 text-[#00E588] shrink-0" />
+                        <span>할인코드가 아직 없으신가요?</span>
+                      </div>
+                      <p className="text-[11.5px] sm:text-[12px] text-[#D1D6DB] leading-snug break-keep">
+                        지금 할인코드를 발급받지 않으시면 <strong className="text-white font-black underline decoration-[#00C473] underline-offset-2">매월 가전 구독료 특별할인 & 만기 144만원 지원</strong> 혜택을 정가로 놓치게 됩니다!
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleOpenDiscountCodeRequest}
+                        className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#00B074] to-[#009663] hover:from-[#00C473] hover:to-[#00B074] text-white border border-[#00E588]/40 rounded-xl font-black text-[12.5px] sm:text-[13px] transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-[#00B074]/30 active:scale-98 cursor-pointer group"
+                      >
+                        <Gift className="w-4 h-4 text-white group-hover:rotate-12 transition-transform" />
+                        <span>시크릿 할인코드 무료 발급받기</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    </div>
+                    <p className="text-[10.5px] sm:text-[11px] text-[#8B95A1] text-center">
+                      ※ 1분 간편 신청 시 전담 상담원이 인증 코드를 신속히 발송해 드립니다.
+                    </p>
+                  </div>
                 </form>
               )}
             </div>
