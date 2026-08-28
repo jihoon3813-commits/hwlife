@@ -44,108 +44,52 @@ const formatNumber = (val: string | number | undefined) => {
   return val.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-function AutoSwipingCardThumbnail({
-  imageList,
+function ProductCardThumbnail({
+  image,
   productName,
   accountCount,
   tagColor,
   onClick,
 }: {
-  imageList: string[];
+  image: string;
   productName: string;
   accountCount: string;
   tagColor: string;
   onClick?: () => void;
 }) {
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-  const [touchStartX, setTouchStartX] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (imageList.length <= 1 || isHovered) return;
-    const interval = setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % imageList.length);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, [imageList.length, isHovered]);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStartX(e.touches[0].clientX);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX === null || imageList.length <= 1) return;
-    const diff = touchStartX - e.changedTouches[0].clientX;
-    if (diff > 40) {
-      setCurrentIdx((prev) => (prev + 1) % imageList.length);
-    } else if (diff < -40) {
-      setCurrentIdx((prev) => (prev - 1 + imageList.length) % imageList.length);
-    }
-    setTouchStartX(null);
-  };
-
-  const mainImg = imageList[currentIdx] ? getOptimizedImageUrl(imageList[currentIdx], 'modal') : 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
+  const mainImg = image ? getOptimizedImageUrl(image, 'modal') : 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
 
   return (
     <div 
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
       onClick={onClick}
-      className="relative w-full aspect-square bg-[#F8FAFC] border-b border-[#E5E8EB] overflow-hidden group/thumb transition-colors select-none cursor-pointer"
+      className="relative w-full aspect-square bg-white overflow-hidden group/thumb transition-colors select-none cursor-pointer"
     >
-      <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-30 pointer-events-none">
-        <span className="text-[11px] font-extrabold bg-[#191F28]/90 text-white px-2 py-0.5 rounded-xs tracking-wider shadow-xs backdrop-blur-xs">
+      <div className="absolute top-2 left-2 right-2 sm:top-2.5 sm:left-2.5 sm:right-2.5 flex items-center justify-between z-20 pointer-events-none gap-1">
+        <span className="text-[10px] sm:text-[11px] font-extrabold bg-[#191F28]/90 text-white px-1.5 sm:px-2 py-0.5 rounded-xs tracking-wider shadow-xs backdrop-blur-xs whitespace-nowrap">
           가전&상조 60패키지
         </span>
-        <div className="flex items-center gap-1">
-          {imageList.length > 1 && (
-            <span className="text-[10px] font-extrabold bg-black/60 text-white px-1.5 py-0.5 rounded-xs backdrop-blur-xs">
-              {currentIdx + 1} / {imageList.length}
-            </span>
-          )}
-          <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded-xs border shadow-xs backdrop-blur-xs ${tagColor}`}>
-            {accountCount ? accountCount.replace('지원', '').trim() + ' 전용' : '1구좌 전용'}
-          </span>
-        </div>
+        <span className={`text-[10px] sm:text-[11px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-xs border shadow-xs backdrop-blur-xs whitespace-nowrap ${tagColor}`}>
+          {accountCount ? accountCount.replace('지원', '').trim() + ' 전용' : '1구좌 전용'}
+        </span>
       </div>
 
-      <motion.div
-        key={currentIdx}
-        initial={{ opacity: 0.85 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0.85 }}
-        transition={{ duration: 0.25 }}
-        className="absolute inset-0 w-full h-full flex items-center justify-center p-3 sm:p-4"
-      >
-        <img 
-          src={mainImg} 
-          alt={productName}
-          referrerPolicy="no-referrer"
-          decoding="async"
-          className="w-full h-full max-h-full max-w-full object-contain object-center group-hover/thumb:scale-105 transition-transform duration-500 block"
-          loading="lazy"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.onerror = null;
-            target.src = 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
-          }}
-        />
-      </motion.div>
-
-      {imageList.length > 1 && (
-        <div className="absolute bottom-2 left-0 right-0 flex justify-center items-center gap-1 z-20 pointer-events-none">
-          {imageList.map((_, i) => (
-            <div 
-              key={i} 
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === currentIdx ? 'w-5 bg-[#3182F6]' : 'w-1.5 bg-black/20'
-              }`} 
-            />
-          ))}
+      <div className="w-full h-full flex items-center justify-center pt-6 px-4 pb-1 sm:pt-7 sm:px-5 sm:pb-1.5">
+        <div className="w-[82%] h-[82%] flex items-center justify-center">
+          <img 
+            src={mainImg} 
+            alt={productName}
+            referrerPolicy="no-referrer"
+            decoding="async"
+            className="w-full h-full max-h-full max-w-full object-contain object-center group-hover/thumb:scale-105 transition-transform duration-500 block"
+            loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src = 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
+            }}
+          />
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -221,6 +165,8 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
   const [activePackageTab, setActivePackageTab] = useState<'1구좌' | '2구좌' | '3구좌' | '4구좌'>('1구좌');
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [desktopCols, setDesktopCols] = useState<3 | 4>(4);
+  const [mobileCols, setMobileCols] = useState<1 | 2>(1);
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -753,40 +699,121 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
       {/* Product List Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-10">
         
-        {/* Category Filters & Search */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-          
-          {/* Categories */}
-          <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 no-scrollbar">
-            {categoryOptions.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-md text-[13px] font-bold whitespace-nowrap transition-colors ${
-                  selectedCategory === cat
-                    ? 'bg-[#191F28] text-white shadow-xs'
-                    : 'bg-white text-[#4E5968] border border-[#E5E8EB] hover:bg-[#F2F4F6]'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+        {/* Category Filters, Search & View Controls */}
+        <div className="flex flex-col gap-3 mb-6">
+          <div className="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-3">
+            
+            {/* Categories */}
+            <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 no-scrollbar">
+              {categoryOptions.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3.5 py-1.5 rounded-md text-[13px] font-bold whitespace-nowrap transition-colors cursor-pointer ${
+                    selectedCategory === cat
+                      ? 'bg-[#191F28] text-white shadow-xs'
+                      : 'bg-white text-[#4E5968] border border-[#E5E8EB] hover:bg-[#F2F4F6]'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
 
-          {/* Search Box */}
-          <div className="relative w-full sm:w-64">
-            <input 
-              type="text" 
-              placeholder="제품명 또는 모델명 검색" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-[#D1D6DB] rounded-md pl-9 pr-4 py-1.5 text-[13px] font-medium focus:outline-none focus:border-[#3182F6] shadow-2xs"
-            />
-            <Search className="w-4 h-4 text-[#8B95A1] absolute left-3 top-1/2 transform -translate-y-1/2" />
+            {/* Search Box & View Mode Toggle Buttons */}
+            <div className="flex items-center justify-between lg:justify-end gap-2.5">
+              
+              {/* Search Box */}
+              <div className="relative flex-1 lg:w-64">
+                <input 
+                  type="text" 
+                  placeholder="제품명 또는 모델명 검색" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white border border-[#D1D6DB] rounded-md pl-9 pr-4 py-1.5 text-[13px] font-medium focus:outline-none focus:border-[#3182F6] shadow-2xs"
+                />
+                <Search className="w-4 h-4 text-[#8B95A1] absolute left-3 top-1/2 transform -translate-y-1/2" />
+              </div>
+
+              {/* Desktop View Mode Toggle (3열 보기 / 4열 보기) - Visible on lg screens */}
+              <div className="hidden lg:inline-flex items-center bg-[#F2F4F6] p-1 rounded-md border border-[#E5E8EB] shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setDesktopCols(3)}
+                  className={`px-2.5 py-1 rounded text-[12px] font-extrabold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    desktopCols === 3
+                      ? 'bg-white text-[#191F28] shadow-xs'
+                      : 'text-[#8B95A1] hover:text-[#4E5968]'
+                  }`}
+                  title="3열로 보기"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
+                    <rect x="1" y="2" width="4" height="12" rx="1" />
+                    <rect x="6" y="2" width="4" height="12" rx="1" />
+                    <rect x="11" y="2" width="4" height="12" rx="1" />
+                  </svg>
+                  3열 보기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDesktopCols(4)}
+                  className={`px-2.5 py-1 rounded text-[12px] font-extrabold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    desktopCols === 4
+                      ? 'bg-white text-[#191F28] shadow-xs'
+                      : 'text-[#8B95A1] hover:text-[#4E5968]'
+                  }`}
+                  title="4열로 보기 (기본)"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
+                    <rect x="0.5" y="2" width="3" height="12" rx="0.5" />
+                    <rect x="4.5" y="2" width="3" height="12" rx="0.5" />
+                    <rect x="8.5" y="2" width="3" height="12" rx="0.5" />
+                    <rect x="12.5" y="2" width="3" height="12" rx="0.5" />
+                  </svg>
+                  4열 보기
+                </button>
+              </div>
+
+              {/* Mobile View Mode Toggle (1열 보기 / 2열 보기) - Visible below lg screens */}
+              <div className="inline-flex lg:hidden items-center bg-[#F2F4F6] p-1 rounded-md border border-[#E5E8EB] shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setMobileCols(1)}
+                  className={`px-2.5 py-1 rounded text-[11px] font-extrabold transition-all flex items-center gap-1 cursor-pointer ${
+                    mobileCols === 1
+                      ? 'bg-white text-[#191F28] shadow-xs'
+                      : 'text-[#8B95A1] hover:text-[#4E5968]'
+                  }`}
+                  title="1열로 보기 (기본)"
+                >
+                  <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor">
+                    <rect x="2" y="2" width="12" height="12" rx="1.5" />
+                  </svg>
+                  1열 보기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMobileCols(2)}
+                  className={`px-2.5 py-1 rounded text-[11px] font-extrabold transition-all flex items-center gap-1 cursor-pointer ${
+                    mobileCols === 2
+                      ? 'bg-white text-[#191F28] shadow-xs'
+                      : 'text-[#8B95A1] hover:text-[#4E5968]'
+                  }`}
+                  title="2열로 보기"
+                >
+                  <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor">
+                    <rect x="1" y="2" width="6" height="12" rx="1" />
+                    <rect x="9" y="2" width="6" height="12" rx="1" />
+                  </svg>
+                  2열 보기
+                </button>
+              </div>
+
+            </div>
           </div>
         </div>
 
-        {/* Product Cards Grid (3 Columns Desktop, 2 Columns Tablet, 1 Column Mobile) */}
+        {/* Product Cards Grid */}
         {filteredProducts.length === 0 ? (
           <div className="bg-white rounded-md border border-[#E5E8EB] p-12 text-center my-8">
             <div className="w-12 h-12 bg-[#F2F4F6] rounded-sm flex items-center justify-center mx-auto mb-3 text-[#8B95A1]">
@@ -800,9 +827,15 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-9 lg:gap-10">
+          <div className={`grid ${
+            mobileCols === 1 ? 'grid-cols-1' : 'grid-cols-2'
+          } ${
+            desktopCols === 3 ? 'lg:grid-cols-3' : 'sm:grid-cols-2 lg:grid-cols-4'
+          } ${
+            mobileCols === 2 ? 'gap-3 sm:gap-6 lg:gap-6' : 'gap-5 sm:gap-6 lg:gap-6'
+          }`}>
             {filteredProducts.map((p) => {
-              const imageList = getProductImageList(p);
+              const primaryImage = p.image || (p.images && p.images[0]) || '';
 
               return (
                 <div 
@@ -810,9 +843,9 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                   className="bg-white rounded-md border border-[#E5E8EB] overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
                 >
                   <div>
-                    {/* Auto-Swiping Thumbnail (1.5s interval & Mouse Drag Support) */}
-                    <AutoSwipingCardThumbnail 
-                      imageList={imageList}
+                    {/* Representative Product Thumbnail */}
+                    <ProductCardThumbnail 
+                      image={primaryImage}
                       productName={p.name}
                       accountCount={currentPkg.accountCount}
                       tagColor={currentPkg.tagColor}
@@ -823,18 +856,18 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                       }}
                     />
 
-                    {/* Content Section (Shaded Background bg-[#F8FAFC]) */}
-                    <div className="p-5 space-y-4 bg-[#F8FAFC]">
+                    {/* Content Section (Pure White Background with Tight Top Gap) */}
+                    <div className="px-3.5 sm:px-5 pt-1 pb-3.5 sm:pb-5 space-y-2.5 sm:space-y-3 bg-white">
                       
-                      {/* Gift Badge (Only rendered if giftText exists) */}
+                      {/* Gift Badge (Rendered only when giftText exists) */}
                       {p.giftText && (
-                        <div className="inline-flex items-center gap-1.5 bg-rose-50 border border-rose-200 text-rose-600 px-2.5 py-1 rounded-xs text-[12px] font-extrabold">
-                          <Gift className="w-3.5 h-3.5 text-rose-500" />
-                          사은품 : {p.giftText}
+                        <div className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 text-rose-600 px-2 sm:px-2.5 py-0.5 rounded-xs text-[11px] sm:text-[12px] font-extrabold line-clamp-1 max-w-full">
+                          <Gift className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                          <span className="truncate">사은품 : {p.giftText}</span>
                         </div>
                       )}
 
-                      {/* Product Name & Model */}
+                      {/* Product Name & Model (Uniform Fixed Height) */}
                       <div 
                         onClick={() => {
                           setSelectedSpecProduct(p);
@@ -843,83 +876,82 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                         }}
                         className="cursor-pointer group/title"
                       >
-                        <h3 className="font-extrabold text-[16px] text-[#191F28] group-hover/title:text-[#3182F6] transition-colors line-clamp-1 leading-snug">
+                        <h3 className="font-extrabold text-[14px] sm:text-[16px] text-[#191F28] group-hover/title:text-[#3182F6] transition-colors line-clamp-2 leading-snug h-[40px] sm:h-[46px] flex items-start">
                           {p.name}
                         </h3>
-                        <p className="text-[12px] font-bold text-[#8B95A1] mt-0.5">
+                        <p className="text-[11px] sm:text-[12px] font-bold text-[#8B95A1] mt-0.5 truncate">
                           {p.brand} {p.model}
                         </p>
                       </div>
 
-                      {/* Price Details Block (White box inside shaded area) */}
-                      <div className="bg-white border border-[#E2E8F0] shadow-2xs rounded-sm p-3.5 space-y-2">
+                      {/* Price Details Block (White box inside card) */}
+                      <div className="bg-white border border-[#E2E8F0] shadow-2xs rounded-sm p-2.5 sm:p-3.5 space-y-2">
                         <div className="flex justify-between items-baseline">
-                          <span className="text-[12px] text-[#64748B] font-bold">월 납입금</span>
+                          <span className="text-[11px] sm:text-[12px] text-[#64748B] font-bold">월 납입금</span>
                           <div className="text-right">
-                            <span className="text-[20px] font-black text-[#3182F6]">월 {currentPkg.monthlyPrice}원</span>
-                            <span className="text-[12px] text-[#64748B] font-bold ml-1">* 60회</span>
+                            <span className="text-[16px] sm:text-[18px] lg:text-[20px] font-black text-[#3182F6]">월 {currentPkg.monthlyPrice}원</span>
+                            <span className="text-[11px] sm:text-[12px] text-[#64748B] font-bold ml-0.5">*60회</span>
                           </div>
                         </div>
 
-                        <div className="pt-2 border-t border-[#E2E8F0] grid grid-cols-2 gap-2 text-[12px]">
-                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-1.5 rounded-xs text-center">
-                            <span className="text-[#64748B] block text-[10px]">가전 렌탈료</span>
-                            <strong className="text-[#1E293B] font-extrabold">{currentPkg.rentalPrice}원</strong>
+                        <div className="pt-2 border-t border-[#E2E8F0] grid grid-cols-2 gap-1.5 sm:gap-2 text-[11px] sm:text-[12px]">
+                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-1 sm:p-1.5 rounded-xs text-center">
+                            <span className="text-[#64748B] block text-[9px] sm:text-[10px]">가전 렌탈료</span>
+                            <strong className="text-[#1E293B] font-extrabold text-[11px] sm:text-[12px]">{currentPkg.rentalPrice}원</strong>
                           </div>
-                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-1.5 rounded-xs text-center">
-                            <span className="text-[#64748B] block text-[10px]">상조 회비</span>
-                            <strong className="text-[#1E293B] font-extrabold">{currentPkg.sangjoPrice}원</strong>
+                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-1 sm:p-1.5 rounded-xs text-center">
+                            <span className="text-[#64748B] block text-[9px] sm:text-[10px]">상조 회비</span>
+                            <strong className="text-[#1E293B] font-extrabold text-[11px] sm:text-[12px]">{currentPkg.sangjoPrice}원</strong>
                           </div>
                         </div>
                       </div>
 
                       {/* Benefits Bullet Points */}
-                      <div className="space-y-1.5 pt-1 text-[12px] text-[#475569] font-medium">
-                        <div className="flex items-start gap-1.5">
+                      <div className="space-y-1.5 pt-0.5 text-[11px] sm:text-[12px] text-[#475569] font-medium leading-relaxed">
+                        <div className="flex items-start gap-1 sm:gap-1.5">
                           <Check className="w-3.5 h-3.5 text-[#3182F6] shrink-0 mt-0.5" />
-                          <span className="relative inline-block px-1.5 py-0.5 rounded-xs text-[12px] font-black text-[#0F172A] z-10">
-                            {/* Yellow Highlighter Marker Pen Sweep from Left to Right, then Pulsing Effect */}
+                          <span className="relative inline-block px-1 sm:px-1.5 py-0.5 rounded-xs text-[11px] sm:text-[12px] font-black text-[#0F172A] z-10">
                             <span className="absolute inset-0 bg-yellow-300 -z-10 rounded-xs animate-highlighter-sweep"></span>
-                            60회 납입 후 가전 소유, 상조는 유지 여부 결정
+                            60회 납입 후 가전 소유
                           </span>
                         </div>
-                        <div className="flex items-start gap-1.5">
+                        <div className="flex items-start gap-1 sm:gap-1.5">
                           <Check className="w-3.5 h-3.5 text-[#3182F6] shrink-0 mt-0.5" />
-                          <span>상조는 61~200회까지 월 {currentPkg.extendPrice}원</span>
+                          <span>상조 61~200회차 월 {currentPkg.extendPrice}원</span>
                         </div>
-                        <div className="flex items-start gap-1.5 text-[#3182F6] font-bold">
+                        <div className="flex items-start gap-1 sm:gap-1.5 text-[#3182F6] font-bold">
                           <ShieldCheck className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                          <span>상조 만기 유지 시 가전렌탈료 전액 환급 지원</span>
+                          <span>상조 만기 시 가전렌탈료 전액 환급</span>
                         </div>
                       </div>
 
                     </div>
                   </div>
 
-                  {/* Card Footer Action Buttons (Shaded Background bg-[#F8FAFC]) */}
-                  <div className="p-5 pt-0 space-y-2 bg-[#F8FAFC]">
+                  {/* Card Footer Action Buttons (Pure White Background) */}
+                  <div className="p-3.5 sm:p-5 pt-0 space-y-1.5 sm:space-y-2 bg-white">
                     <button
                       onClick={() => {
                         setSelectedSpecProduct(p);
                         setSelectedSpecImageIdx(0);
                         setIsSpecModalOpen(true);
                       }}
-                      className="w-full bg-[#E8F3FF] hover:bg-[#D4E8FF] text-[#1B64DA] border border-[#B0D0FF] text-[13px] font-extrabold py-2 rounded-sm transition-all flex items-center justify-center gap-1.5 shadow-2xs group-hover:bg-[#D4E8FF] cursor-pointer"
+                      className="w-full bg-[#E8F3FF] hover:bg-[#D4E8FF] text-[#1B64DA] border border-[#B0D0FF] text-[12px] sm:text-[13px] font-extrabold py-1.5 sm:py-2 rounded-sm transition-all flex items-center justify-center gap-1 sm:gap-1.5 shadow-2xs group-hover:bg-[#D4E8FF] cursor-pointer"
                     >
-                      <FileText className="w-4 h-4 text-[#3182F6]" />
+                      <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#3182F6]" />
                       가전제품 스펙 상세보기
                     </button>
                     <button
                       onClick={() => setIsSangjoModalOpen(true)}
-                      className="w-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#334155] text-[12px] font-bold py-2 rounded-sm transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#334155] text-[11px] sm:text-[12px] font-bold py-1.5 sm:py-2 rounded-sm transition-colors flex items-center justify-center gap-1 cursor-pointer"
                     >
                       상조 서비스 더 자세히 알기
                     </button>
                     <button
                       onClick={() => scrollToInquiry(p)}
-                      className="w-full bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[14px] font-bold py-2.5 rounded-sm shadow-xs transition-all flex items-center justify-center gap-2 group-hover:bg-[#1B64DA] cursor-pointer"
+                      className="w-full bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[13px] sm:text-[14px] font-bold py-2 sm:py-2.5 rounded-sm shadow-xs transition-all flex items-center justify-center gap-1.5 sm:gap-2 group-hover:bg-[#1B64DA] cursor-pointer"
                     >
-                      가전상조 60패키지 상담 신청 <ChevronRight className="w-4 h-4" />
+                      상담 신청 <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
                   </div>
                 </div>
