@@ -75,14 +75,15 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
   // Browser Back Button Modal Handling
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
-      if (isContactModalOpen || isPrivacyModalOpen) {
+      if (isContactModalOpen || isPrivacyModalOpen || isSangjoModalOpen) {
         // Prevent default navigation
         setIsContactModalOpen(false);
         setIsPrivacyModalOpen(false);
+        setIsSangjoModalOpen(false);
       }
     };
 
-    if (isContactModalOpen || isPrivacyModalOpen) {
+    if (isContactModalOpen || isPrivacyModalOpen || isSangjoModalOpen) {
       window.history.pushState({ modal: true }, "");
       window.addEventListener('popstate', handlePopState);
     }
@@ -90,7 +91,7 @@ export default function LivingPage({ channelSubdomain }: { channelSubdomain?: st
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [isContactModalOpen, isPrivacyModalOpen]);
+  }, [isContactModalOpen, isPrivacyModalOpen, isSangjoModalOpen]);
 
 
 
