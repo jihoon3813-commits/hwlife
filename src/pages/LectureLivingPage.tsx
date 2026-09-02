@@ -8,6 +8,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import DrawingOverlay from '../components/DrawingOverlay';
+import { useTrackVisit } from '../hooks/useTrackVisit';
 const amountData = {
   '1': {
     title: '해피효원 리빙144 (1구좌)',
@@ -874,6 +875,7 @@ const SLIDES = [
 ];
 
 export default function LectureLivingPage() {
+  useTrackVisit(undefined, '/lecture/living');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
 

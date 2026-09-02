@@ -5,6 +5,7 @@ import {
   Coins, Heart, Rocket, ShieldCheck, Sparkles,
   CreditCard, Package, Wallet, Globe, Calendar, Phone
 } from 'lucide-react';
+import { useTrackVisit } from '../hooks/useTrackVisit';
 
 const SLIDES = [
   {
@@ -260,6 +261,7 @@ const SLIDES = [
 ];
 
 export default function LecturePage() {
+  useTrackVisit(undefined, '/lecture');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
 

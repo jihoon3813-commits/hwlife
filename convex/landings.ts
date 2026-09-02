@@ -201,6 +201,28 @@ export const updateDefaultThumbnails = mutation({
         isActive: true,
       });
     }
+
+    // Ensure LG Care 10% Discount exists
+    if (!paths.includes("/care10")) {
+      await ctx.db.insert("landings", {
+        name: "LG가전 구독 10% 할인 전용",
+        path: "/care10",
+        description: "LG전자 가전 구독 매월 10% 파격할인 전용 공식 랜딩페이지",
+        thumbnail: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=600",
+        isActive: true,
+      });
+    }
+
+    // Ensure Package UP exists
+    if (!paths.includes("/package_up")) {
+      await ctx.db.insert("landings", {
+        name: "가전상조 60패키지 (UP가전)",
+        path: "/package_up",
+        description: "LG UP가전 & 효원상조 60회 결합 프리미엄 쇼핑몰 랜딩페이지",
+        thumbnail: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=500",
+        isActive: true,
+      });
+    }
   },
 });
 

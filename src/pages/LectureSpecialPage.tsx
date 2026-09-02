@@ -8,6 +8,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import DrawingOverlay from '../components/DrawingOverlay';
+import { useTrackVisit } from '../hooks/useTrackVisit';
 
 const amountData = {
   '1': {
@@ -755,6 +756,7 @@ const SLIDES = [
 ];
 
 export default function LectureSpecialPage() {
+  useTrackVisit(undefined, '/lecture/special');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
 

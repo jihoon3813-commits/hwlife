@@ -14,6 +14,7 @@ import PrivacyModal from '../components/PrivacyModal';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import SEO from '../components/SEO';
+import { useTrackVisit } from '../hooks/useTrackVisit';
 
 interface LgCarePageProps {
   channelSubdomain?: string;
@@ -127,6 +128,9 @@ function calc10PercentDiscount(price: number): number {
 }
 
 export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: LgCarePageProps) {
+  // Real-time visit analytics tracking
+  useTrackVisit(channelSubdomain, landingPath);
+
   // Queries & Mutations
   const channel = useQuery(api.channels.getBySubdomain, channelSubdomain ? { subdomain: channelSubdomain } : "skip");
   const careLanding = useQuery(api.landings.getByPath, { path: landingPath || '/care' });

@@ -146,19 +146,39 @@ export const getDashboardStats = query({
       data.ips.add(v.ip);
     });
 
+    const allLandings = await ctx.db.query("landings").collect();
+    const landingNameMap = new Map<string, string>();
+    allLandings.forEach(l => {
+      if (l.path) {
+        landingNameMap.set(l.path.toLowerCase().split('?')[0], l.name);
+      }
+    });
+
     const landingStats = Array.from(pathMap.entries()).map(([path, data]) => {
-      let name = path;
-      if (path === '/') name = '메인 랜딩 (/)';
-      else if (path === '/living') name = '리빙144 (/living)';
-      else if (path.startsWith('/living/')) name = `리빙144 (${path})`;
-      else if (path === '/living2') name = '리빙144 v2 (/living2)';
-      else if (path.startsWith('/living2/')) name = `리빙144 v2 (${path})`;
-      else if (path === '/special') name = '스페셜299 (/special)';
-      else if (path.startsWith('/special/')) name = `스페셜299 (${path})`;
-      else if (path === '/special2') name = '스페셜299 v2 (/special2)';
-      else if (path.startsWith('/special2/')) name = `스페셜299 v2 (${path})`;
-      else if (path === '/kcc') name = 'KCC홈씨씨 (/kcc)';
-      else if (path.startsWith('/kcc/')) name = `KCC홈씨씨 (${path})`;
+      let name = landingNameMap.get(path);
+      if (!name) {
+        if (path === '/') name = '메인 랜딩 (/)';
+        else if (path === '/care' || path.startsWith('/care/')) name = `LG가전구독 (${path})`;
+        else if (path === '/care10' || path.startsWith('/care10/')) name = `LG구독 10%할인 (${path})`;
+        else if (path === '/care-solutions' || path.startsWith('/care-solutions/')) name = `LG케어솔루션 (${path})`;
+        else if (path === '/lgsub' || path.startsWith('/lgsub/')) name = `LG가전구독 (${path})`;
+        else if (path === '/lg' || path.startsWith('/lg/')) name = `LG가전 (${path})`;
+        else if (path === '/package60' || path.startsWith('/package60/')) name = `가전상조 60패키지 (${path})`;
+        else if (path === '/package_up' || path.startsWith('/package_up/')) name = `60패키지 UP가전 (${path})`;
+        else if (path === '/living') name = '리빙144 (/living)';
+        else if (path.startsWith('/living/')) name = `리빙144 (${path})`;
+        else if (path === '/living2') name = '리빙144 v2 (/living2)';
+        else if (path.startsWith('/living2/')) name = `리빙144 v2 (${path})`;
+        else if (path === '/special') name = '스페셜299 (/special)';
+        else if (path.startsWith('/special/')) name = `스페셜299 (${path})`;
+        else if (path === '/special2') name = '스페셜299 v2 (/special2)';
+        else if (path.startsWith('/special2/')) name = `스페셜299 v2 (${path})`;
+        else if (path === '/kcc') name = 'KCC홈씨씨 (/kcc)';
+        else if (path.startsWith('/kcc/')) name = `KCC홈씨씨 (${path})`;
+        else if (path === '/lecture' || path.startsWith('/lecture/')) name = `영업자 교육자료 (${path})`;
+        else if (path === '/consent' || path.startsWith('/consent/')) name = `동의서 서명 (${path})`;
+        else name = path;
+      }
       
       return {
         path,

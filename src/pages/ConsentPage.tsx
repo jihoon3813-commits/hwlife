@@ -3,8 +3,10 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
 import type { Id } from '../../convex/_generated/dataModel';
+import { useTrackVisit } from '../hooks/useTrackVisit';
 
 export default function ConsentPage() {
+  useTrackVisit(undefined, '/consent');
   const params = new URLSearchParams(window.location.search);
   const inquiryId = params.get('id') as Id<"inquiries"> | null;
   

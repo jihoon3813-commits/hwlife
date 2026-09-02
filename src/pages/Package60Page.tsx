@@ -12,6 +12,7 @@ import PrivacyModal from '../components/PrivacyModal';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import SEO from '../components/SEO';
+import { useTrackVisit } from '../hooks/useTrackVisit';
 import FuneralDetailModal from '../components/FuneralDetailModal';
 
 interface Package60PageProps {
@@ -224,13 +225,7 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
     };
   }, [isSpecModalOpen, isSangjoModalOpen, isContactModalOpen, isPrivacyModalOpen]);
 
-  useEffect(() => {
-    logVisit({
-      path: landingPath,
-      ip: 'client',
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'browser'
-    });
-  }, [logVisit, landingPath]);
+  useTrackVisit(channelSubdomain, landingPath);
 
   const package60Products = useMemo(() => {
     return allProducts.filter(p => 
