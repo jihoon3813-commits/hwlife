@@ -673,9 +673,9 @@ export default function ProductManagement() {
 
   const downloadSmartTemplate = () => {
     const data = [
-      ['모델명', '공급가', '사은품', '참고 URL'],
-      ['H875GBB012', '1,910,000', '현금 30만원', 'https://www.lge.co.kr/home'],
-      ['M876GBB28-B + H875GBB012', '3,750,000', '신세계 상품권 40만원', 'https://www.lge.co.kr/home']
+      ['구좌', '브랜드', '카테고리', '모델명1', '제품명1', '모델명2', '제품명2', '참고 URL'],
+      ['1구좌', 'LG전자', '냉장고', 'H875GBB012', 'LG 디오스 오브제컬렉션 냉장고', '', '', 'https://www.lge.co.kr/refrigerators/h875gbb012'],
+      ['2구좌', 'LG전자', '세탁기/건조기', 'FX23VVE', 'LG 트롬 세탁기', 'RD20WVE', 'LG 트롬 건조기', 'https://www.lge.co.kr/washers/fx23vve']
     ];
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -927,18 +927,40 @@ export default function ProductManagement() {
         }
 
         const headers = (excelData[0] || []).map(h => String(h || '').trim());
-        let modelIdx = headers.findIndex(h => h.includes('모델'));
-        let priceIdx = headers.findIndex(h => h.includes('공급') || h.includes('가격') || h.includes('금액'));
-        let giftIdx = headers.findIndex(h => h.includes('사은품') || h.includes('혜택') || h.includes('지원'));
-        let urlIdx = headers.findIndex(h => h.includes('URL') || h.includes('url') || h.includes('링크'));
+        let accountIdx = headers.findIndex(h => h.includes('구좌') || h.includes('플랜'));
+        let brandIdx = headers.findIndex(h => h.includes('브랜드') || h.includes('제조사'));
+        let categoryIdx = headers.findIndex(h => h.includes('카테고리') || h.includes('분류'));
+        let model1Idx = headers.findIndex(h => h === '모델명1' || h === '모델1' || h.includes('모델명1'));
+        let name1Idx = headers.findIndex(h => h === '제품명1' || h === '상품명1' || h.includes('제품명1'));
+        let model2Idx = headers.findIndex(h => h === '모델명2' || h === '모델2' || h.includes('모델명2'));
+        let name2Idx = headers.findIndex(h => h === '제품명2' || h === '상품명2' || h.includes('제품명2'));
+        let urlIdx = headers.findIndex(h => h.includes('URL') || h.includes('url') || h.includes('참고') || h.includes('링크'));
 
-        if (modelIdx === -1) modelIdx = 0;
-        if (priceIdx === -1) priceIdx = 1;
-        if (giftIdx === -1) giftIdx = (headers.length >= 3 && !String(headers[2] || '').toLowerCase().includes('http')) ? 2 : -1;
-        if (urlIdx === -1) urlIdx = giftIdx === 2 ? 3 : (headers.length >= 3 ? 2 : -1);
+        // 레거시 양식 또는 헤더명 fallback
+        if (model1Idx === -1) {
+          model1Idx = headers.findIndex(h => h.includes('모델'));
+        }
+        if (headers.length >= 8) {
+          if (accountIdx === -1) accountIdx = 0;
+          if (brandIdx === -1) brandIdx = 1;
+          if (categoryIdx === -1) categoryIdx = 2;
+          if (model1Idx === -1) model1Idx = 3;
+          if (name1Idx === -1) name1Idx = 4;
+          if (model2Idx === -1) model2Idx = 5;
+          if (name2Idx === -1) name2Idx = 6;
+          if (urlIdx === -1) urlIdx = 7;
+        } else {
+          if (accountIdx === -1 && headers.length > 0 && headers[0].includes('구좌')) accountIdx = 0;
+          if (urlIdx === -1) urlIdx = headers.findIndex(h => h.toLowerCase().includes('http') || h.includes('url') || h.includes('URL'));
+        }
 
         const rows = excelData.slice(1);
-        const validRows = rows.filter(r => r && r[modelIdx]);
+        const validRows = rows.filter(r => {
+          if (!r) return false;
+          const m1 = model1Idx !== -1 ? String(r[model1Idx] || '').trim() : '';
+          const m2 = model2Idx !== -1 ? String(r[model2Idx] || '').trim() : '';
+          return Boolean(m1 || m2);
+        });
 
         if (validRows.length === 0) {
           alert("엑셀 파일에 유효한 모델명이 작성된 행이 없습니다.");
@@ -953,52 +975,112 @@ export default function ProductManagement() {
 
         for (let i = 0; i < validRows.length; i++) {
           const row = validRows[i];
-          const rawModel = String(row[modelIdx] || '').trim();
-          const rawPrice = String(row[priceIdx] || '0').replace(/\D/g, '');
-          const rawGift = giftIdx !== -1 ? String(row[giftIdx] || '').trim() : '';
+          const rawAccount = accountIdx !== -1 ? String(row[accountIdx] || '').trim() : '';
+          const rawBrand = brandIdx !== -1 ? String(row[brandIdx] || '').trim() : '';
+          const rawCategory = categoryIdx !== -1 ? String(row[categoryIdx] || '').trim() : '';
+          const rawModel1 = model1Idx !== -1 ? String(row[model1Idx] || '').trim() : '';
+          const rawName1 = name1Idx !== -1 ? String(row[name1Idx] || '').trim() : '';
+          const rawModel2 = model2Idx !== -1 ? String(row[model2Idx] || '').trim() : '';
+          const rawName2 = name2Idx !== -1 ? String(row[name2Idx] || '').trim() : '';
           const refUrl = urlIdx !== -1 ? String(row[urlIdx] || '').trim() : '';
 
-          if (!rawModel) continue;
+          let combinedModel = '';
+          if (rawModel1 && rawModel2) {
+            combinedModel = `${rawModel1} + ${rawModel2}`;
+          } else {
+            combinedModel = rawModel1 || rawModel2;
+          }
 
-          setSmartProgress({ current: i + 1, total: validRows.length, currentModel: rawModel });
+          if (!combinedModel) continue;
+
+          setSmartProgress({ current: i + 1, total: validRows.length, currentModel: combinedModel });
+
+          // 플랜 매핑 (사용자가 현재 선택한 구좌 탭에 기본 등록, 플랜명이 명시된 경우만 이동)
+          let targetPlan = selectedPlan;
+          if (rawAccount) {
+            // 플랜 고유 이름(예: '스페셜299-UP가전', '리빙144')이 정확히 적힌 경우만 해당 플랜으로 매칭
+            const matchedByName = plans.find(p => p.name === rawAccount || (rawAccount.length >= 5 && p.name?.toLowerCase() === rawAccount.toLowerCase()));
+            if (matchedByName) {
+              targetPlan = matchedByName;
+            } else {
+              // '1구좌', '2구좌', '3구좌', '4구좌' 등은 현재 선택된 플랜(selectedPlan)에 등록!
+              targetPlan = selectedPlan;
+            }
+          }
+
+          const targetPlanId = targetPlan?.id ?? (selectedPlanId ?? plans[0]?.id);
+          const rawAccountNum = parseInt(rawAccount.replace(/\D/g, '') || '1', 10);
+          const planBaseNum = parseInt(String(targetPlan?.basePrice || '29900').replace(/\D/g, '') || '29900', 10);
+          const planBenefitNum = parseInt(String(targetPlan?.benefitPrice || '0').replace(/\D/g, '') || '0', 10);
+
+          // 만약 1구좌 플랜인데 2구좌, 3구좌 상품인 경우 구좌 수량에 맞춰 자동 계산
+          const isSingleAccountPlan = targetPlan?.accountCount === '1구좌';
+          const calculatedPrice = isSingleAccountPlan && rawAccountNum > 1 ? String(planBaseNum * rawAccountNum) : String(planBaseNum);
+          const calculatedBenefitPrice = isSingleAccountPlan && rawAccountNum > 1 ? String(planBenefitNum * rawAccountNum) : String(planBenefitNum);
+
+          const planPrice = calculatedPrice;
+          const planBenefitPrice = calculatedBenefitPrice;
+          const planAccount = rawAccount ? (rawAccount.includes('구좌') ? rawAccount : `${rawAccount}구좌`) : (targetPlan?.accountCount || (targetPlanId + "구좌"));
 
           try {
             const scraped = await scrapeProductInfoAction({
-              model: rawModel,
-              price: rawPrice,
+              model: combinedModel,
+              price: planPrice,
               refUrl
             });
 
-            if (!scraped.success && !scraped.thumbnail && (!scraped.specifications || scraped.specifications.length === 0)) {
+            const hasScrapedInfo = Boolean(scraped.success || scraped.thumbnail || (scraped.specifications && scraped.specifications.length > 0));
+            const hasUserProvidedInfo = Boolean(rawName1 || rawName2 || rawBrand || rawCategory);
+
+            if (!hasScrapedInfo && !hasUserProvidedInfo) {
               failCount++;
               smartResults.push({
-                model: rawModel,
+                model: combinedModel,
                 success: false,
-                reason: 'LG 공식 사이트에서 해당 모델 페이지를 찾지 못했거나 정보를 가져오지 못함 (404 미등록 모델)'
+                reason: `${rawBrand || '공식'} 제품 페이지를 찾지 못했거나 참고 URL 수집에 실패했습니다 (URL 형식 또는 모델명 확인 필요)`
               });
               continue;
             }
 
-            const currentPlan = plans.find(p => p.id === selectedPlanId) || selectedPlan;
-            const planPrice = currentPlan?.basePrice ? String(currentPlan.basePrice).replace(/\D/g, '') : "59800";
-            const planBenefitPrice = currentPlan?.benefitPrice ? String(currentPlan.benefitPrice).replace(/\D/g, '') : "34800";
-            const planAccount = currentPlan?.accountCount || (selectedPlanId + "구좌");
+            // 제품명 결정 (엑셀에서 입력한 제품명이 있으면 최우선 반영)
+            let finalName = '';
+            if (rawModel1 && rawModel2) {
+              if (rawName1 && rawName2) {
+                finalName = `${rawName1} + ${rawName2}`;
+              } else if (rawName1 && !rawName2) {
+                const scraped2 = (scraped as any).modelResults?.[1]?.name || (scraped.name?.split('+')[1]?.trim()) || rawModel2;
+                finalName = `${rawName1} + ${scraped2}`;
+              } else if (!rawName1 && rawName2) {
+                const scraped1 = (scraped as any).modelResults?.[0]?.name || (scraped.name?.split('+')[0]?.trim()) || rawModel1;
+                finalName = `${scraped1} + ${rawName2}`;
+              } else {
+                finalName = scraped.name || combinedModel;
+              }
+            } else {
+              const inputName = rawName1 || rawName2;
+              if (inputName) {
+                finalName = inputName;
+              } else {
+                finalName = scraped.name || combinedModel;
+              }
+            }
 
-            const existingProduct = allProducts?.find(
-              p => p.planId === selectedPlanId && p.model?.trim().toLowerCase() === rawModel.toLowerCase()
-            );
-
-            const scrapedName = (scraped.name && scraped.name !== `LG ${rawModel}`) ? scraped.name : rawModel;
+            const finalBrand = rawBrand || scraped.brand || 'LG전자';
+            const finalCategory = rawCategory || scraped.category || '가전';
             const scrapedThumb = scraped.thumbnail || undefined;
             const scrapedThumbs = scraped.thumbnails && scraped.thumbnails.length > 0 ? scraped.thumbnails : (scraped.thumbnail ? [scraped.thumbnail] : []);
+
+            const existingProduct = allProducts?.find(
+              p => p.planId === targetPlanId && p.model?.trim().toLowerCase() === combinedModel.toLowerCase()
+            );
 
             if (existingProduct) {
               await updateProduct({
                 id: existingProduct._id,
-                brand: scraped.brand || existingProduct.brand || 'LG전자',
-                category: scraped.category || existingProduct.category || '가전',
-                model: scraped.model || rawModel,
-                name: scrapedName !== rawModel ? scrapedName : (existingProduct.name || rawModel),
+                brand: finalBrand,
+                category: finalCategory,
+                model: scraped.model || combinedModel,
+                name: finalName || existingProduct.name || combinedModel,
                 image: scrapedThumb || existingProduct.image || undefined,
                 images: scrapedThumbs.length > 0 ? scrapedThumbs : (existingProduct.images || []),
                 detailImage: scraped.detailImages?.[0] || existingProduct.detailImage || undefined,
@@ -1006,17 +1088,15 @@ export default function ProductManagement() {
                 specifications: scraped.specifications && scraped.specifications.length > 0 ? scraped.specifications : (existingProduct.specifications || []),
                 isSmartRegistered: true,
                 isVisible: true,
-                accountCount: planAccount,
-                supplyPrice: rawPrice || existingProduct.supplyPrice || undefined,
-                giftText: rawGift || existingProduct.giftText || undefined
+                accountCount: planAccount
               });
             } else {
               await createProduct({
-                planId: selectedPlanId,
-                brand: scraped.brand || 'LG전자',
-                category: scraped.category || '가전',
-                model: scraped.model || rawModel,
-                name: scrapedName,
+                planId: targetPlanId,
+                brand: finalBrand,
+                category: finalCategory,
+                model: scraped.model || combinedModel,
+                name: finalName || combinedModel,
                 price: planPrice,
                 discountPrice: planBenefitPrice,
                 image: scrapedThumb,
@@ -1029,25 +1109,23 @@ export default function ProductManagement() {
                 showOnMain: false,
                 landingPages: ['/package60'],
                 comparisons: [],
-                accountCount: planAccount,
-                supplyPrice: rawPrice,
-                giftText: rawGift || undefined
+                accountCount: planAccount
               });
             }
 
             successCount++;
             smartResults.push({
-              model: rawModel,
+              model: combinedModel,
               success: true,
-              name: scrapedName,
+              name: finalName,
               thumbnail: scrapedThumb,
               specCount: scraped.specifications?.length || 0
             });
           } catch (err) {
-            console.error(`Smart register error for ${rawModel}:`, err);
+            console.error(`Smart register error for ${combinedModel}:`, err);
             failCount++;
             smartResults.push({
-              model: rawModel,
+              model: combinedModel,
               success: false,
               reason: '수집 처리 중 네트워크/서버 오류 발생'
             });
@@ -2270,22 +2348,37 @@ export default function ProductManagement() {
                 </div>
 
                 {/* 2. 엑셀 파일 업로드 & 양식 다운로드 */}
-                <div className="grid grid-cols-2 gap-3">
-                  <button 
-                    onClick={downloadSmartTemplate}
-                    className="bg-[#F2F8FF] border border-[#3182F6]/30 text-[#3182F6] py-3 rounded-[14px] text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-[#E5F0FF] transition-all cursor-pointer"
-                  >
-                    <Zap className="w-4 h-4" /> 스마트 엑셀 양식
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setIsSmartModalOpen(false);
-                      smartExcelInputRef.current?.click();
-                    }}
-                    className="bg-white border border-[#E5E8EB] text-[#4E5968] hover:text-[#3182F6] hover:border-[#3182F6] py-3 rounded-[14px] text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    <Upload className="w-4 h-4" /> 엑셀 파일 업로드
-                  </button>
+                <div className="space-y-2.5">
+                  <div className="p-3.5 bg-[#F8FAFC] border border-[#E5E8EB] rounded-[16px] text-[12px] text-[#4E5968] space-y-1.5">
+                    <div className="font-bold text-[#191F28] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#3182F6]" /> 스마트 등록 엑셀 양식 컬럼 안내:
+                    </div>
+                    <div className="font-mono text-[11px] text-[#3182F6] font-semibold bg-white p-2 rounded-[8px] border border-[#E5E8EB] break-all leading-relaxed">
+                      구좌 | 브랜드 | 카테고리 | 모델명1 | 제품명1 | 모델명2 | 제품명2 | 참고 URL
+                    </div>
+                    <p className="text-[11px] text-[#8B95A1] leading-relaxed">
+                      • 단일 제품: 모델명1에만 입력하고 모델명2는 비워두시면 됩니다.<br />
+                      • 결합 제품: 모델명1과 모델명2를 모두 입력하시면 1개 결합 상품으로 자동 수집됩니다.<br />
+                      • 제품명1, 제품명2를 입력하면 해당 명칭으로 등록되며, 비워두면 공식 제품명으로 자동 수집됩니다.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      onClick={downloadSmartTemplate}
+                      className="bg-[#F2F8FF] border border-[#3182F6]/30 text-[#3182F6] py-3 rounded-[14px] text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-[#E5F0FF] transition-all cursor-pointer"
+                    >
+                      <Zap className="w-4 h-4" /> 스마트 엑셀 양식 다운
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setIsSmartModalOpen(false);
+                        smartExcelInputRef.current?.click();
+                      }}
+                      className="bg-[#3182F6] hover:bg-[#1B64DA] text-white py-3 rounded-[14px] text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md shadow-[#3182F6]/20"
+                    >
+                      <Upload className="w-4 h-4" /> 엑셀 파일 업로드
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

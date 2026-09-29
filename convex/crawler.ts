@@ -67,7 +67,7 @@ function generate80PercentVariations(modelCode: string): string[] {
   return Array.from(set);
 }
 
-function isValidProductRefUrl(refUrl?: string, modelCode?: string): boolean {
+function isValidLgeProductRefUrl(refUrl?: string, modelCode?: string): boolean {
   if (!refUrl || typeof refUrl !== 'string') return false;
   if (!refUrl.includes('lge.co.kr')) return false;
   const lower = refUrl.toLowerCase();
@@ -108,11 +108,10 @@ function isValidProductRefUrl(refUrl?: string, modelCode?: string): boolean {
     if (sizeMatch) {
       const size = sizeMatch[1];
       if (!urlModelSlug.startsWith(size) && !urlModelSlug.includes(size)) {
-        return false; // Prevent 85 inch matching 65 inch!
+        return false;
       }
     }
 
-    // Extract core letters (e.g. qned81, oled83, wu923)
     const coreLetters = cleanModel.slice(0, Math.min(cleanModel.length, 7));
     if (coreLetters.length >= 4 && !urlModelSlug.includes(coreLetters)) {
       const commonPrefix = cleanModel.slice(0, 5);
@@ -122,6 +121,18 @@ function isValidProductRefUrl(refUrl?: string, modelCode?: string): boolean {
     }
   }
 
+  return true;
+}
+
+function isValidProductRefUrl(refUrl?: string, modelCode?: string): boolean {
+  if (!refUrl || typeof refUrl !== 'string') return false;
+  const trimmed = refUrl.trim().toLowerCase();
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) return false;
+  if (trimmed.endsWith('/home') || trimmed.endsWith('/main')) return false;
+  if (trimmed.includes('lge.co.kr')) {
+    return isValidLgeProductRefUrl(refUrl, modelCode);
+  }
+  // All other reference URLs (samsung.com, winia.com, etc.) are valid product URLs
   return true;
 }
 
@@ -165,10 +176,20 @@ async function resolveProductCandidates(modelCode: string, refUrl?: string, cate
   const lowerClean = cleanCode.toLowerCase().replace(/[^a-z0-9]/g, '');
   const lowerRaw = rawModel.toLowerCase().replace(/[^a-z0-9]/g, '');
   
-  if (isValidProductRefUrl(refUrl, cleanCode)) {
+  if (refUrl && isValidProductRefUrl(refUrl, cleanCode)) {
+    if (isSamsungMainOrHomeUrl(refUrl)) {
+      const officialPage = await resolveSamsungProductPage(cleanCode);
+      if (officialPage) {
+        return {
+          primaryUrl: officialPage,
+          candidates: [{ url: officialPage, title: '삼성 공식 제품 페이지', model: cleanCode.toUpperCase() }]
+        };
+      }
+    }
+
     return {
-      primaryUrl: refUrl!,
-      candidates: [{ url: refUrl!, title: '공식 제품 페이지', model: cleanCode.toUpperCase() }]
+      primaryUrl: refUrl.trim(),
+      candidates: [{ url: refUrl.trim(), title: '공식 제품 페이지', model: cleanCode.toUpperCase() }]
     };
   }
 
@@ -457,8 +478,8 @@ async function resolveProductUrl(modelCode: string, refUrl?: string, categoryHin
     } catch(e) {}
   }
 
-  // 5. Ultimate Guaranteed Fallback: Return Official LG Search Results Page URL (Guaranteed 100% valid landing)
-  return `https://www.lge.co.kr/search/search-all?searchKey=${encodeURIComponent(cleanCode)}`;
+  // 5. If not found on LG site, return null so external/Samsung resolver can be tried
+  return null;
 }
 
 async function scrapeSearchFallback(modelCode: string) {
@@ -526,11 +547,371 @@ async function scrapeSearchFallback(modelCode: string) {
   };
 }
 
+function isLogoOrInvalidImage(imgUrl: string): boolean {
+  if (!imgUrl) return true;
+  const l = imgUrl.toLowerCase();
+  return (
+    l.includes('bg-toast') ||
+    l.includes('samsungapp') ||
+    l.includes('samsung_logo') ||
+    l.includes('favicon') ||
+    l.includes('icon-') ||
+    l.includes('logo') ||
+    l.includes('welcomepopup') ||
+    l.includes('promotionlogo') ||
+    l.includes('img-induce-benefit')
+  );
+}
+
+function isSamsungMainOrHomeUrl(url?: string): boolean {
+  if (!url) return false;
+  const l = url.trim().toLowerCase().split('?')[0];
+  if (
+    l === 'https://www.samsung.com' ||
+    l === 'https://www.samsung.com/' ||
+    l === 'https://www.samsung.com/sec' ||
+    l === 'https://www.samsung.com/sec/' ||
+    l === 'http://www.samsung.com' ||
+    l === 'http://www.samsung.com/' ||
+    l.endsWith('/sec/home') ||
+    l.endsWith('/sec/main')
+  ) {
+    return true;
+  }
+  // If samsung.com but missing a specific product model slug or only general category path
+  if (l.includes('samsung.com/sec')) {
+    const afterSec = l.split('samsung.com/sec/')[1] || '';
+    const parts = afterSec.split('/').filter(Boolean);
+    if (parts.length <= 1) return true;
+  }
+  return false;
+}
+
+async function resolveSamsungProductPage(modelCode: string): Promise<string | null> {
+  const clean = modelCode.split('+')[0].trim();
+  const searchQueries = [
+    `삼성전자 ${clean}`,
+    `삼성닷컴 ${clean}`,
+    clean
+  ];
+
+  for (const q of searchQueries) {
+    try {
+      const res = await fetch(`https://search.naver.com/search.naver?query=${encodeURIComponent(q)}`, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+          'Accept-Language': 'ko-KR,ko;q=0.9'
+        }
+      });
+      if (res.ok) {
+        const html = await res.text();
+        const matches = html.match(/https?:\/\/(?:www\.)?samsung\.com\/sec\/[a-zA-Z0-9_\-\/]+/gi) || [];
+        const valid = Array.from(new Set(matches)).filter(u => {
+          const l = u.toLowerCase();
+          return !l.endsWith('/sec/') && 
+                 !l.endsWith('/sec') && 
+                 !l.includes('/search') && 
+                 !l.includes('/event') && 
+                 !l.includes('promotion') &&
+                 !l.includes('/all-') &&
+                 !l.includes('/care-') &&
+                 !l.includes('/static/') &&
+                 !l.includes('/_images/') &&
+                 !l.endsWith('.ico') &&
+                 !l.endsWith('.png') &&
+                 !l.endsWith('.jpg') &&
+                 !l.endsWith('.css') &&
+                 !l.endsWith('.js') &&
+                 !l.includes('/business');
+        });
+        const goodsUrl = valid.find(u => !u.includes('/support/') && !u.includes('/mypage'));
+        if (goodsUrl) return goodsUrl;
+        if (valid.length > 0) return valid[0];
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
+function isNonSpecKey(key: string): boolean {
+  if (!key) return true;
+  const l = key.trim().toLowerCase();
+  const blacklisted = [
+    '배송', '환불', '교환', '반품', '주문', '결제', '포인트', '혜택',
+    '사업자', '통신판매', '주소', '상호', '이메일', '고객센터', '대표자',
+    '개인정보', '이용약관', '할부', '배상금', '납부', '회수', '설치비',
+    '위약금', '상담', 'a/s', '안내', '고지', '동의', '약관', '청약', '책임',
+    '판매자', '분쟁', '소비자', '분실', '파손', '인도', '주의사항',
+    '보증금', '등록비', '멤버십', '쿠폰', '가입', '탈퇴', '청구'
+  ];
+  return blacklisted.some(b => l.includes(b));
+}
+
+async function fetchSamsungOfficialSpecs(html: string, pageUrl: string, modelCode: string): Promise<Array<{ category?: string; name: string; value: string }>> {
+  const specs: Array<{ category?: string; name: string; value: string }> = [];
+  try {
+    const cleanModel = cleanModelCode(modelCode);
+    let goodsId: string | null = null;
+
+    // 1. modelCode와 직접 매칭되는 StPrdtOptItemVO 내 goodsId 탐색
+    if (cleanModel) {
+      const m1 = html.match(new RegExp(`goodsId=([A-Z0-9]+)[^)]*mdlCode=${cleanModel}`, 'i'));
+      if (m1) goodsId = m1[1];
+      if (!goodsId) {
+        const m2 = html.match(new RegExp(`mdlCode=${cleanModel}[^)]*goodsId=([A-Z0-9]+)`, 'i'));
+        if (m2) goodsId = m2[1];
+      }
+    }
+
+    // 2. data-goods-id 또는 goodsId: "..." 탐색
+    if (!goodsId) {
+      const gMatch = html.match(/data-goods-id=["'](G\d+)["']/i) || html.match(/goodsId\s*[:=]\s*["'](G\d+)["']/i);
+      if (gMatch) goodsId = gMatch[1];
+    }
+
+    // 3. 페이지 내 모든 G로 시작하는 goodsId 중 첫번째 유효한 것
+    if (!goodsId) {
+      const allG = html.match(/["'](G\d{9})["']/g);
+      if (allG && allG.length > 0) {
+        goodsId = allG[0].replace(/["']/g, '');
+      }
+    }
+
+    if (goodsId) {
+      const specApiUrl = `https://www.samsung.com/sec/xhr/pf/compGoodsSpecList?goodsIds=${encodeURIComponent(goodsId)}`;
+      const res = await fetch(specApiUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+          'Referer': pageUrl
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.productsSpec) && data.productsSpec.length > 0) {
+          for (const item of data.productsSpec) {
+            const cat = item.dispNm1 ? item.dispNm1.trim() : '기본사양';
+            const name = item.dispNm2 ? item.dispNm2.trim() : '';
+            const val = item.specValue1 ? item.specValue1.trim() : '';
+            if (name && val && val !== '-' && val !== 'null') {
+              specs.push({
+                category: cat,
+                name,
+                value: val
+              });
+            }
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Error fetching Samsung official specs:', e);
+  }
+  return specs;
+}
+
+async function fetchFallbackThumbnail(modelCode: string): Promise<string> {
+  try {
+    const url = `https://search.naver.com/search.naver?where=nexearch&query=${encodeURIComponent(modelCode)}`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+    if (!res.ok) return '';
+    const html = await res.text();
+    const cleanModel = modelCode.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+    // 1. alt 속성에 모델명이 포함된 네이버 쇼핑 이미지 우선 검색
+    const regex = /<img[^>]+src=["'](https?:\/\/shopping-phinf\.pstatic\.net[^"']+)["'][^>]*alt=["']([^"']*)["']/gi;
+    let match;
+    let fallbackFirst = '';
+    while ((match = regex.exec(html)) !== null) {
+      const src = match[1];
+      const alt = match[2].toUpperCase().replace(/[^A-Z0-9가-힣]/g, '');
+      if (!fallbackFirst && src) fallbackFirst = src;
+      if (alt.includes(cleanModel)) {
+        return src;
+      }
+    }
+
+    if (fallbackFirst) return fallbackFirst;
+
+    const m = html.match(/https?:\/\/shopping-phinf\.pstatic\.net\/main_[^\s"'<>]+\.(?:jpg|png|webp)/i);
+    if (m) return m[0];
+  } catch (e) {}
+  return '';
+}
+
+async function scrapeUniversalWebPage(url: string, modelCode: string) {
+  try {
+    let targetUrl = url;
+    // 만약 삼성 메인 홈페이지 주소가 들어오면 모델명으로 공식 상세 페이지 자동 탐색
+    if (isSamsungMainOrHomeUrl(targetUrl)) {
+      const officialPage = await resolveSamsungProductPage(modelCode);
+      if (officialPage) targetUrl = officialPage;
+    }
+
+    const res = await fetch(targetUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept-Language': 'ko-KR,ko;q=0.9',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
+      }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+
+    // 1. og:title / title 추출
+    const ogTitleM = html.match(/property=["']og:title["']\s+content=["']([^"']+)["']/i) || 
+                     html.match(/content=["']([^"']+)["']\s+property=["']og:title["']/i);
+    let title = ogTitleM ? ogTitleM[1] : '';
+    if (!title) {
+      const titleTag = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+      if (titleTag) title = titleTag[1];
+    }
+    let cleanName = title.trim();
+    if (cleanName.includes('|')) {
+      const parts = cleanName.split('|').map(s => s.trim()).filter(Boolean);
+      cleanName = parts[0] || cleanName;
+    }
+
+    // 2. og:image 추출
+    const ogImageM = html.match(/property=["']og:image["']\s+content=["']([^"']+)["']/i) || 
+                     html.match(/content=["']([^"']+)["']\s+property=["']og:image["']/i);
+    let mainThumbnail = ogImageM ? ogImageM[1].trim() : '';
+    if (mainThumbnail.startsWith('//')) {
+      mainThumbnail = 'https:' + mainThumbnail;
+    }
+
+    // 3. 갤러리 이미지
+    const galleryImages: string[] = [];
+    if (mainThumbnail && !isLogoOrInvalidImage(mainThumbnail)) {
+      galleryImages.push(mainThumbnail);
+    } else {
+      mainThumbnail = '';
+    }
+
+    if (targetUrl.includes('samsung.com')) {
+      const samsungImgs = html.match(/(?:https:)?\/\/images\.samsung\.com[^\s"'\\]+\.(?:png|jpg|webp|jpeg)/gi) || [];
+      for (const raw of samsungImgs) {
+        const full = raw.startsWith('//') ? 'https:' + raw : raw;
+        if ((full.includes('/goods/') || full.includes('/product/')) && !isLogoOrInvalidImage(full)) {
+          if (!galleryImages.includes(full)) {
+            galleryImages.push(full);
+          }
+        }
+      }
+      if (!mainThumbnail && galleryImages.length > 0) {
+        mainThumbnail = galleryImages[0];
+      }
+    }
+
+    // 4. 브랜드 감지
+    let brand = '삼성전자';
+    const lowerUrl = targetUrl.toLowerCase();
+    const lowerTitle = title.toLowerCase();
+    if (lowerUrl.includes('samsung') || lowerTitle.includes('삼성') || lowerTitle.includes('samsung') || lowerTitle.includes('비스포크')) {
+      brand = '삼성전자';
+    } else if (lowerUrl.includes('lge.co.kr') || lowerTitle.includes('lg') || lowerTitle.includes('오브제')) {
+      brand = 'LG전자';
+    } else if (lowerUrl.includes('winia') || lowerTitle.includes('위니아') || lowerTitle.includes('딤채')) {
+      brand = '위니아';
+    } else if (lowerUrl.includes('cuckoo') || lowerTitle.includes('쿠쿠')) {
+      brand = '쿠쿠';
+    }
+
+    // 5. 카테고리 감지
+    let category = '가전';
+    const checkText = (title + ' ' + targetUrl).toLowerCase();
+    if (checkText.includes('세탁기') && checkText.includes('건조기')) category = '세탁기/건조기';
+    else if (checkText.includes('세탁기')) category = '세탁기';
+    else if (checkText.includes('건조기')) category = '건조기';
+    else if (checkText.includes('김치냉장고') || checkText.includes('딤채') || checkText.includes('김치플러스')) category = '김치냉장고';
+    else if (checkText.includes('냉장고')) category = '냉장고';
+    else if (checkText.includes('에어컨')) category = '에어컨';
+    else if (checkText.includes('공기청정기') || checkText.includes('큐브')) category = '공기청정기';
+    else if (checkText.includes('청소기') || checkText.includes('제트')) category = '청소기';
+    else if (checkText.includes('tv') || checkText.includes('티비')) category = 'TV';
+    else if (checkText.includes('식기세척기')) category = '식기세척기';
+    else if (checkText.includes('인덕션') || checkText.includes('전기레인지')) category = '전기레인지';
+    else if (checkText.includes('오븐') || checkText.includes('큐커')) category = '광파오븐/큐커';
+
+    // 6. 스펙 테이블 추출 (삼성 공식 API 우선, 실패 시 정제된 dl/dt/dd 파싱)
+    let specifications: Array<{ category?: string; name: string; value: string }> = [];
+
+    if (targetUrl.includes('samsung.com')) {
+      const samsungSpecs = await fetchSamsungOfficialSpecs(html, targetUrl, modelCode);
+      if (samsungSpecs && samsungSpecs.length > 0) {
+        specifications = samsungSpecs;
+      }
+    }
+
+    if (specifications.length === 0) {
+      const dtDdMatches = html.match(/<dt[^>]*>([^<]+)<\/dt>\s*<dd[^>]*>([^<]+)<\/dd>/gi);
+      if (dtDdMatches) {
+        for (const item of dtDdMatches.slice(0, 40)) {
+          const dt = item.match(/<dt[^>]*>([^<]+)<\/dt>/i)?.[1]?.trim();
+          const dd = item.match(/<dd[^>]*>([^<]+)<\/dd>/i)?.[1]?.trim();
+          if (dt && dd && !isNonSpecKey(dt) && dt.length < 50 && dd.length < 200) {
+            specifications.push({ category: '스펙', name: dt, value: dd });
+          }
+        }
+      }
+    }
+
+    // 7. 만약 썸네일을 찾지 못했거나 로고인 경우, 정품 제품 이미지 자동 fallback
+    if (!mainThumbnail || isLogoOrInvalidImage(mainThumbnail)) {
+      const fallbackThumb = await fetchFallbackThumbnail(modelCode);
+      if (fallbackThumb) {
+        mainThumbnail = fallbackThumb;
+        if (!galleryImages.includes(fallbackThumb)) {
+          galleryImages.unshift(fallbackThumb);
+        }
+      }
+    }
+
+    return {
+      success: Boolean(mainThumbnail || cleanName),
+      isOfficialVerified: true,
+      model: modelCode,
+      name: cleanName || modelCode,
+      brand,
+      category,
+      refUrl: targetUrl,
+      candidates: [{ url: targetUrl, title: cleanName || '제품 페이지', model: modelCode }],
+      thumbnail: mainThumbnail,
+      thumbnails: galleryImages,
+      detailImages: [],
+      specifications
+    };
+  } catch (err: any) {
+    console.error(`Error scraping universal page ${url}:`, err);
+    return null;
+  }
+}
+
 async function scrapeSingleModel(modelCode: string, refUrl?: string, categoryHint?: string) {
   const { primaryUrl, candidates } = await resolveProductCandidates(modelCode, refUrl, categoryHint);
   const url = primaryUrl;
   
+  // Non-LGE external URL handling (Samsung, Winia, Cuckoo, Danawa, etc.)
+  if (url && !url.includes('lge.co.kr')) {
+    const universal = await scrapeUniversalWebPage(url, modelCode);
+    if (universal && universal.success) {
+      return universal;
+    }
+  }
+
   if (!url) {
+    // 1. If URL not found, check if it is a Samsung product by resolving official page
+    const samsungOfficialUrl = await resolveSamsungProductPage(modelCode);
+    if (samsungOfficialUrl) {
+      const universal = await scrapeUniversalWebPage(samsungOfficialUrl, modelCode);
+      if (universal && universal.success) {
+        return universal;
+      }
+    }
+
     const fallback = await scrapeSearchFallback(modelCode);
     return {
       ...fallback,
@@ -940,36 +1321,65 @@ export const scrapeProductInfo = action({
       };
     }
 
-    // Dual product handling
+    // 1. 만약 참고 URL(refUrl)이 주어져 있다면, 패키지 전체 페이지일 수 있으므로 직접 스크랩 시도
+    let refScraped: any = null;
+    if (args.refUrl && isValidProductRefUrl(args.refUrl)) {
+      if (!args.refUrl.includes('lge.co.kr')) {
+        refScraped = await scrapeUniversalWebPage(args.refUrl, rawModel);
+      } else {
+        refScraped = await scrapeSingleModel(rawModel, args.refUrl);
+      }
+    }
+
+    // 2. 개별 모델 각각 스크랩
     const results = [];
     for (const m of modelParts) {
       results.push(await scrapeSingleModel(m, args.refUrl));
     }
 
-    const combinedName = results.map(r => r.name).join(' + ');
-    const combinedModel = results.map(r => r.model).join('+');
-    const combinedCategory = results[0]?.category || '가전/패키지';
-    const combinedBrand = results[0]?.brand || 'LG전자';
-    const combinedDetailImages = Array.from(new Set(results.flatMap(r => r.detailImages)));
-    const combinedSpecs = results.flatMap((r, i) => 
-      (r.specifications || []).map(s => ({
-        ...s,
-        category: `[제품 ${i + 1}] ${s.category || '스펙'}`
-      }))
-    );
+    const combinedName = (refScraped?.name && !refScraped.name.includes(rawModel)) 
+      ? refScraped.name 
+      : results.map(r => r.name).join(' + ');
+    const combinedModel = results.map(r => r.model).join(' + ');
+    const combinedCategory = refScraped?.category || results[0]?.category || '가전/패키지';
+    const combinedBrand = refScraped?.brand || results[0]?.brand || 'LG전자';
+    const combinedDetailImages = Array.from(new Set([...(refScraped?.detailImages || []), ...results.flatMap(r => r.detailImages || [])]));
+    const combinedThumbnails = Array.from(new Set([
+      ...(refScraped?.thumbnails || (refScraped?.thumbnail ? [refScraped.thumbnail] : [])),
+      ...results.flatMap(r => (r.thumbnails && r.thumbnails.length > 0) ? r.thumbnails : (r.thumbnail ? [r.thumbnail] : []))
+    ]));
+    const primaryThumb = refScraped?.thumbnail || results.find(r => r.thumbnail)?.thumbnail || combinedThumbnails[0] || '';
+    const combinedSpecs = [
+      ...(refScraped?.specifications || []),
+      ...results.flatMap((r, i) => 
+        (r.specifications || []).map(s => ({
+          ...s,
+          category: `[제품 ${i + 1}] ${s.category || '스펙'}`
+        }))
+      )
+    ];
+
+    const isSuccess = Boolean(refScraped?.success || results.some(r => r.success));
 
     return {
-      success: results.some(r => r.success),
+      success: isSuccess,
       model: combinedModel,
       name: combinedName,
       brand: combinedBrand,
       category: combinedCategory,
-      thumbnail: '',
-      thumbnails: [],
+      thumbnail: primaryThumb,
+      thumbnails: combinedThumbnails,
       detailImages: combinedDetailImages,
       specifications: combinedSpecs,
       price: String(args.price || '0').replace(/\D/g, ''),
-      isDual: true
+      isDual: true,
+      modelResults: results.map(r => ({
+        model: r.model,
+        name: r.name,
+        thumbnail: r.thumbnail,
+        thumbnails: r.thumbnails,
+        success: r.success
+      }))
     };
   }
 });
