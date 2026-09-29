@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square, Link, X, Star, Zap, Sparkles, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Plus, Download, Upload, Copy, Trash2, Edit, MoveVertical, GripVertical, Eye, EyeOff, ChevronRight, Settings2, ImageIcon, CheckSquare, Square, Link, X, Star, Zap, Sparkles, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import * as XLSX from 'xlsx';
@@ -87,6 +87,10 @@ export default function ProductManagement() {
 
   const selectedPlan = plans.find(p => p.id === selectedPlanId) || plans[0];
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const [draggedThumbIdx, setDraggedThumbIdx] = useState<number | null>(null);
+  const [dragOverThumbIdx, setDragOverThumbIdx] = useState<number | null>(null);
+  const [draggedDetailIdx, setDraggedDetailIdx] = useState<number | null>(null);
+  const [dragOverDetailIdx, setDragOverDetailIdx] = useState<number | null>(null);
 
   const [isSmartModalOpen, setIsSmartModalOpen] = useState(false);
   const [directModelsText, setDirectModelsText] = useState('');
@@ -345,10 +349,61 @@ export default function ProductManagement() {
     }
   };
 
+  const handleThumbDrop = (targetIdx: number) => {
+    if (draggedThumbIdx === null || draggedThumbIdx === targetIdx || !editingProduct) {
+      setDraggedThumbIdx(null);
+      setDragOverThumbIdx(null);
+      return;
+    }
+    const list = [...(editingProduct.images || [])];
+    const [moved] = list.splice(draggedThumbIdx, 1);
+    list.splice(targetIdx, 0, moved);
+
+    // 1번 위치(0번 인덱스) 이미지가 자동으로 대표 썸네일(editingProduct.image)이 되도록 설정
+    setEditingProduct({
+      ...editingProduct,
+      images: list,
+      image: list[0] || ''
+    });
+    setDraggedThumbIdx(null);
+    setDragOverThumbIdx(null);
+  };
+
+  const handleDetailDrop = (targetIdx: number) => {
+    if (draggedDetailIdx === null || draggedDetailIdx === targetIdx || !editingProduct) {
+      setDraggedDetailIdx(null);
+      setDragOverDetailIdx(null);
+      return;
+    }
+    const list = [...(editingProduct.detailImages || [])];
+    const [moved] = list.splice(draggedDetailIdx, 1);
+    list.splice(targetIdx, 0, moved);
+
+    setEditingProduct({
+      ...editingProduct,
+      detailImages: list
+    });
+    setDraggedDetailIdx(null);
+    setDragOverDetailIdx(null);
+  };
+
   const removeImage = (type: 'images' | 'detailImages', index: number) => {
     const updated = [...(editingProduct[type] || [])];
+    const removedItem = updated[index];
     updated.splice(index, 1);
-    setEditingProduct({ ...editingProduct, [type]: updated });
+
+    let newMainImage = editingProduct.image;
+    if (type === 'images') {
+      if (editingProduct.image === removedItem || !updated.includes(editingProduct.image)) {
+        newMainImage = updated[0] || '';
+      }
+    }
+
+    setEditingProduct({ 
+      ...editingProduct, 
+      [type]: updated,
+      ...(type === 'images' ? { image: newMainImage } : {})
+    });
   };
 
   const handleAddProduct = () => {
@@ -2045,7 +2100,12 @@ export default function ProductManagement() {
                     {/* Thumbnail Images */}
                     <div className="space-y-4">
                       <div className="flex justify-between items-center px-1">
-                        <label className="block text-[13px] font-bold text-[#4E5968]">썸네일 리스트 (여러 개 등록 가능)</label>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <label className="block text-[13px] font-bold text-[#4E5968]">썸네일 리스트 (여러 개 등록 가능)</label>
+                          <span className="text-[11px] text-[#3182F6] font-bold bg-[#E8F3FF] px-2.5 py-0.5 rounded-full border border-[#3182F6]/20">
+                            드래그하여 순서 변경 (1번이 대표)
+                          </span>
+                        </div>
                         <div className="flex gap-2">
                           <button 
                             onClick={() => addImageUrl('images')}
@@ -2064,16 +2124,51 @@ export default function ProductManagement() {
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                          {(editingProduct.images || []).map((img: string, idx: number) => {
                           const isRepresentative = (editingProduct.image ? editingProduct.image === img : idx === 0);
+                          const isDragging = draggedThumbIdx === idx;
+                          const isDragOver = dragOverThumbIdx === idx;
+
                           return (
                             <div 
                               key={idx} 
+                              draggable
+                              onDragStart={(e) => {
+                                setDraggedThumbIdx(idx);
+                                e.dataTransfer.setData('text/plain', String(idx));
+                                e.dataTransfer.effectAllowed = 'move';
+                              }}
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                e.dataTransfer.dropEffect = 'move';
+                                if (dragOverThumbIdx !== idx) setDragOverThumbIdx(idx);
+                              }}
+                              onDragLeave={() => {
+                                if (dragOverThumbIdx === idx) setDragOverThumbIdx(null);
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                handleThumbDrop(idx);
+                              }}
+                              onDragEnd={() => {
+                                setDraggedThumbIdx(null);
+                                setDragOverThumbIdx(null);
+                              }}
                               onClick={() => setEditingProduct({ ...editingProduct, image: img })}
-                              className={`aspect-square bg-[#F9FAFB] border rounded-[16px] overflow-hidden relative group cursor-pointer transition-all ${isRepresentative ? 'border-2 border-[#3182F6] shadow-sm' : 'border-[#E5E8EB] hover:border-[#3182F6]'}`}
+                              className={`aspect-square bg-[#F9FAFB] border rounded-[16px] overflow-hidden relative group cursor-grab active:cursor-grabbing transition-all select-none ${
+                                isDragging ? 'opacity-30 scale-95 border-dashed border-[#3182F6]' :
+                                isDragOver ? 'border-2 border-[#3182F6] ring-4 ring-[#3182F6]/20 scale-105 shadow-md' :
+                                isRepresentative ? 'border-2 border-[#3182F6] shadow-sm' : 'border-[#E5E8EB] hover:border-[#3182F6]'
+                              }`}
+                              title="드래그하여 위치 변경, 클릭 시 대표 썸네일 지정"
                             >
-                              <PreviewImage src={img} className="w-full h-full object-cover" />
+                              <PreviewImage src={img} className="w-full h-full object-cover pointer-events-none" />
+                              
+                              <div className="absolute top-1 left-1 bg-black/40 text-white/90 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                <GripVertical className="w-3.5 h-3.5" />
+                              </div>
+
                               <button 
                                 onClick={(e) => { e.stopPropagation(); removeImage('images', idx); }}
-                                className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80"
                                 title="이미지 삭제"
                               >
                                 <X className="w-3 h-3"/>
@@ -2097,7 +2192,12 @@ export default function ProductManagement() {
                     {/* Detail Images */}
                     <div className="space-y-4 pt-4 border-t border-[#F2F4F6]">
                       <div className="flex justify-between items-center px-1">
-                        <label className="block text-[13px] font-bold text-[#4E5968]">상세 이미지 리스트 (여러 개 등록 가능)</label>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <label className="block text-[13px] font-bold text-[#4E5968]">상세 이미지 리스트 (여러 개 등록 가능)</label>
+                          <span className="text-[11px] text-[#8B95A1] font-bold bg-[#F2F4F6] px-2.5 py-0.5 rounded-full">
+                            드래그하여 순서 변경
+                          </span>
+                        </div>
                         <div className="flex gap-2">
                           <button 
                             onClick={() => addImageUrl('detailImages')}
@@ -2114,17 +2214,61 @@ export default function ProductManagement() {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                         {(editingProduct.detailImages || []).map((img: string, idx: number) => (
-                          <div key={idx} className="aspect-square bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] overflow-hidden relative group">
-                            <PreviewImage src={img} className="w-full h-full object-cover" />
-                            <button 
-                              onClick={() => removeImage('detailImages', idx)}
-                              className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                         {(editingProduct.detailImages || []).map((img: string, idx: number) => {
+                          const isDragging = draggedDetailIdx === idx;
+                          const isDragOver = dragOverDetailIdx === idx;
+
+                          return (
+                            <div 
+                              key={idx} 
+                              draggable
+                              onDragStart={(e) => {
+                                setDraggedDetailIdx(idx);
+                                e.dataTransfer.setData('text/plain', String(idx));
+                                e.dataTransfer.effectAllowed = 'move';
+                              }}
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                e.dataTransfer.dropEffect = 'move';
+                                if (dragOverDetailIdx !== idx) setDragOverDetailIdx(idx);
+                              }}
+                              onDragLeave={() => {
+                                if (dragOverDetailIdx === idx) setDragOverDetailIdx(null);
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                handleDetailDrop(idx);
+                              }}
+                              onDragEnd={() => {
+                                setDraggedDetailIdx(null);
+                                setDragOverDetailIdx(null);
+                              }}
+                              className={`aspect-square bg-[#F9FAFB] border rounded-[16px] overflow-hidden relative group cursor-grab active:cursor-grabbing transition-all select-none ${
+                                isDragging ? 'opacity-30 scale-95 border-dashed border-[#3182F6]' :
+                                isDragOver ? 'border-2 border-[#3182F6] ring-4 ring-[#3182F6]/20 scale-105 shadow-md' :
+                                'border-[#E5E8EB] hover:border-[#3182F6]'
+                              }`}
+                              title="드래그하여 위치 변경"
                             >
-                              <X className="w-3 h-3"/>
-                            </button>
-                          </div>
-                        ))}
+                              <PreviewImage src={img} className="w-full h-full object-cover pointer-events-none" />
+                              
+                              <div className="absolute top-1 left-1 bg-black/40 text-white/90 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                <GripVertical className="w-3.5 h-3.5" />
+                              </div>
+
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); removeImage('detailImages', idx); }}
+                                className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80"
+                                title="이미지 삭제"
+                              >
+                                <X className="w-3 h-3"/>
+                              </button>
+                              <div className="absolute bottom-0 left-0 right-0 text-[10px] text-center py-0.5 font-bold bg-black/40 text-white/90">
+                                {idx + 1}번 상세이미지
+                              </div>
+                            </div>
+                          );
+                        })}
                         <div 
                           onClick={() => detailInputRef.current?.click()}
                           className="aspect-square bg-[#F9FAFB] border-2 border-dashed border-[#E5E8EB] rounded-[16px] flex flex-col items-center justify-center cursor-pointer hover:border-[#3182F6] hover:bg-[#F2F4F6] transition-all group"
