@@ -364,7 +364,11 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
       <SEO 
         title={landingInfo?.name ? `${landingInfo.name} - 프리미엄 가전 100% 소유 + 효원상조 혜택` : "가전상조 60패키지 - 프리미엄 가전 100% 소유 + 효원상조 혜택"}
         description={landingInfo?.description || "월 29,900원부터! 60회 만기 시 가전 완납 소유 및 상조 만기 시 가전 렌탈료 100% 전액 환급 지원!"}
-        image={landingInfo?.thumbnail || "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png"}
+        image={
+          landingPath === '/special60'
+            ? "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620540/Professional_hero_section_image_featuring_a_confid-1778653149667_owqlgb.png"
+            : (landingInfo?.thumbnail || "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png")
+        }
       />
 
       <header className="bg-white border-b border-[#E5E8EB] z-30 shadow-2xs">

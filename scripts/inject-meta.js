@@ -58,7 +58,7 @@ const pages = [
     name: 'special60',
     title: '가전상조 60패키지(new) - 프리미엄 가전 100% 소유 + 효원상조 혜택',
     description: '월 29,900원부터! 60회 만기 시 가전 완납 소유 및 상조 만기 시 가전 렌탈료 100% 전액 환급 지원!',
-    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=500'
+    image: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620540/Professional_hero_section_image_featuring_a_confid-1778653149667_owqlgb.png'
   },
   {
     name: 'care',

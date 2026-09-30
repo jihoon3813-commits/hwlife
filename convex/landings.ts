@@ -224,14 +224,20 @@ export const updateDefaultThumbnails = mutation({
       });
     }
 
-    // Ensure Special60 exists
-    if (!paths.includes("/special60")) {
+    // Ensure Special60 exists and has updated thumbnail
+    const special60Img = "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781620540/Professional_hero_section_image_featuring_a_confid-1778653149667_owqlgb.png";
+    const existingSpecial60 = landings.find(l => l.path === "/special60");
+    if (!existingSpecial60) {
       await ctx.db.insert("landings", {
         name: "가전상조 60패키지(new)",
         path: "/special60",
         description: "효원상조 최신가전 결합 프리미엄 쇼핑몰 랜딩페이지",
-        thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png",
+        thumbnail: special60Img,
         isActive: true,
+      });
+    } else if (existingSpecial60.thumbnail !== special60Img) {
+      await ctx.db.patch(existingSpecial60._id, {
+        thumbnail: special60Img,
       });
     }
   },
