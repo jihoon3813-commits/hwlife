@@ -229,7 +229,12 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
 
   const package60Products = useMemo(() => {
     return allProducts.filter(p => 
-      (p.landingPages && (p.landingPages.includes(landingPath) || p.landingPages.includes('/package60') || p.landingPages.includes('/package_up'))) ||
+      (p.landingPages && (
+        p.landingPages.includes(landingPath) || 
+        p.landingPages.includes('/package60') || 
+        p.landingPages.includes('/package_up') ||
+        p.landingPages.includes('/special60')
+      )) ||
       p.isSmartRegistered === true
     );
   }, [allProducts, landingPath]);

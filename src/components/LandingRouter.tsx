@@ -51,6 +51,13 @@ export default function LandingRouter() {
     return <Package60Page channelSubdomain={sub} landingPath="/package_up" />;
   }
 
+  // /special60 경로 → 가전상조 60패키지(new) 쇼핑몰 랜딩페이지 (/package60과 동일 구성)
+  if (path === '/special60' || path.startsWith('/special60/')) {
+    const parts = path.split('/').filter(Boolean);
+    const sub = parts.length >= 2 ? parts[1] : undefined;
+    return <Package60Page channelSubdomain={sub} landingPath="/special60" />;
+  }
+
   // /kcc 경로 → B2B 제휴 랜딩페이지
   if (path === '/kcc' || path.startsWith('/kcc/')) {
     return <KccPage channelSubdomain="kcc" />;
@@ -76,14 +83,15 @@ export default function LandingRouter() {
   const isCarePath = path.startsWith('/care') || path.startsWith('/care-solutions') || path.startsWith('/lg');
   const isPackageUpPath = path.startsWith('/package_up');
   const isPackage60Path = path.startsWith('/package60');
+  const isSpecial60Path = path.startsWith('/special60');
   const isLiving2Path = path.startsWith('/living2');
   const isLivingPath = !isLiving2Path && path.startsWith('/living');
   const isSpecial2Path = path.startsWith('/special2');
-  const isSpecialPath = !isSpecial2Path && path.startsWith('/special');
+  const isSpecialPath = !isSpecial2Path && !isSpecial60Path && path.startsWith('/special');
   const searchParams = new URLSearchParams(window.location.search);
   const queryChannel = Array.from(searchParams.keys())[0] || searchParams.get('channel');
   
-  const subdomainFromPath = (isCarePath || isLivingPath || isLiving2Path || isSpecialPath || isSpecial2Path || isPackage60Path || isPackageUpPath)
+  const subdomainFromPath = (isCarePath || isLivingPath || isLiving2Path || isSpecialPath || isSpecial2Path || isPackage60Path || isPackageUpPath || isSpecial60Path)
     ? (segments.length >= 2 ? segments[1] : (queryChannel || null)) 
     : (segments.length >= 1 && !isConsentPath ? segments[0] : (queryChannel || null));
 
@@ -120,6 +128,9 @@ export default function LandingRouter() {
   if (isPackage60Path) {
     return <Package60Page channelSubdomain={channel?.subdomain} landingPath="/package60" />;
   }
+  if (isSpecial60Path) {
+    return <Package60Page channelSubdomain={channel?.subdomain} landingPath="/special60" />;
+  }
   if (isLiving2Path) {
     return <LivingPage2 channelSubdomain={channel?.subdomain} />;
   }
@@ -147,6 +158,9 @@ export default function LandingRouter() {
     }
     if (primaryPath === '/package60') {
       return <Package60Page channelSubdomain={channel.subdomain} landingPath="/package60" />;
+    }
+    if (primaryPath === '/special60') {
+      return <Package60Page channelSubdomain={channel.subdomain} landingPath="/special60" />;
     }
     if (primaryPath === '/living') {
       return <LivingPage channelSubdomain={channel.subdomain} />;

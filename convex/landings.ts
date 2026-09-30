@@ -223,6 +223,17 @@ export const updateDefaultThumbnails = mutation({
         isActive: true,
       });
     }
+
+    // Ensure Special60 exists
+    if (!paths.includes("/special60")) {
+      await ctx.db.insert("landings", {
+        name: "가전상조 60패키지(new)",
+        path: "/special60",
+        description: "효원상조 최신가전 결합 프리미엄 쇼핑몰 랜딩페이지",
+        thumbnail: "https://res.cloudinary.com/dx7l09wwu/image/upload/v1778418168/A_photorealistic_cozy_family_scene_in_a_premium_Ko-1778416838228_lac7jp.png",
+        isActive: true,
+      });
+    }
   },
 });
 

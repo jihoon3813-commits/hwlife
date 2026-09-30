@@ -165,6 +165,7 @@ export const getDashboardStats = query({
         else if (path === '/lg' || path.startsWith('/lg/')) name = `LG가전 (${path})`;
         else if (path === '/package60' || path.startsWith('/package60/')) name = `가전상조 60패키지 (${path})`;
         else if (path === '/package_up' || path.startsWith('/package_up/')) name = `60패키지 UP가전 (${path})`;
+        else if (path === '/special60' || path.startsWith('/special60/')) name = `가전상조 60패키지(new) (${path})`;
         else if (path === '/living') name = '리빙144 (/living)';
         else if (path.startsWith('/living/')) name = `리빙144 (${path})`;
         else if (path === '/living2') name = '리빙144 v2 (/living2)';
