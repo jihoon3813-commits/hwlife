@@ -240,6 +240,19 @@ export const updateDefaultThumbnails = mutation({
         thumbnail: special60Img,
       });
     }
+
+    // Ensure LG Care New exists
+    const careNewThumb = "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=600";
+    const existingCareNew = landings.find(l => l.path === "/care_new" || l.name === "LG가전 구독 할인 전용 (new)");
+    if (!existingCareNew) {
+      await ctx.db.insert("landings", {
+        name: "LG가전 구독 할인 전용 (new)",
+        path: "/care_new",
+        description: "효원상조 × LG 가전구독 10% 결합할인 전용 프리미엄 랜딩페이지 (신규 디자인)",
+        thumbnail: careNewThumb,
+        isActive: true,
+      });
+    }
   },
 });
 

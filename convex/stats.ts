@@ -158,6 +158,7 @@ export const getDashboardStats = query({
       let name = landingNameMap.get(path);
       if (!name) {
         if (path === '/') name = '메인 랜딩 (/)';
+        else if (path === '/care_new' || path.startsWith('/care_new/') || path === '/care-new' || path.startsWith('/care-new/')) name = `LG가전구독(new) (${path})`;
         else if (path === '/care' || path.startsWith('/care/')) name = `LG가전구독 (${path})`;
         else if (path === '/care10' || path.startsWith('/care10/')) name = `LG구독 10%할인 (${path})`;
         else if (path === '/care-solutions' || path.startsWith('/care-solutions/')) name = `LG케어솔루션 (${path})`;

@@ -13,6 +13,7 @@ import LectureSpecialPage from '../pages/LectureSpecialPage';
 import KccPage from '../pages/KccPage';
 import Package60Page from '../pages/Package60Page';
 import LgCarePage from '../pages/LgCarePage';
+import LgCareNewPage from '../pages/LgCareNewPage';
 
 export default function LandingRouter() {
   const [currentPath, setCurrentPath] = React.useState(() => window.location.pathname.toLowerCase());
@@ -27,6 +28,18 @@ export default function LandingRouter() {
 
   const path = currentPath;
   
+  // /care_new, /care-new, /care2, /lg_new, /lg-new, /lgsub_new 경로 → LG가전 구독 할인 전용 (new) 랜딩페이지
+  if (path === '/care_new' || path.startsWith('/care_new') ||
+      path === '/care-new' || path.startsWith('/care-new') ||
+      path === '/care2' || path.startsWith('/care2') ||
+      path === '/lg_new' || path.startsWith('/lg_new') ||
+      path === '/lg-new' || path.startsWith('/lg-new') ||
+      path === '/lgsub_new' || path.startsWith('/lgsub_new')) {
+    const parts = path.split('/').filter(Boolean);
+    const sub = parts.length >= 2 ? parts[1] : undefined;
+    return <LgCareNewPage channelSubdomain={sub} landingPath={path} />;
+  }
+
   // /lgsub, /care, /care10, /care_copy, /care-solutions, /lg 경로 → LG가전 구독 할인 전용 랜딩페이지
   if (path === '/lgsub' || path.startsWith('/lgsub') ||
       path === '/care' || path.startsWith('/care') || 

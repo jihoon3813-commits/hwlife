@@ -73,6 +73,12 @@ const pages = [
     image: 'https://res.cloudinary.com/lyjyvy54/image/upload/v1787294543/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._13_crzmtj.png'
   },
   {
+    name: 'care_new',
+    title: '효원상조 × LG 가전구독 | 매일의 여유, 매월 10% 할인',
+    description: 'LG 가전 구독료 10% 결합 할인. 상조회비를 포함한 기간별 월 납입액을 직접 비교하고 맞춤 상담을 받아보세요.',
+    image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=600'
+  },
+  {
     name: 'lgsub',
     title: '효원상조 X LG가전구독 | 회원 특별할인 & 만기 100% 전액환급',
     description: 'LG전자 공식 가전구독에 효원상조 혜택을 더하다! 회원 특별할인 지원 + 만기 100% 전액환급 & 축하금 지원. 본사 100% 무상 케어 서비스까지.',
