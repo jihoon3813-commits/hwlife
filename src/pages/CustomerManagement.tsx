@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Search, Filter, History, RefreshCw, Trash2, Save, Plus, Smartphone, Send, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { X, Search, Filter, History, RefreshCw, Trash2, Save, Plus, Smartphone, Send, Loader2, RotateCcw } from 'lucide-react';
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
@@ -121,6 +121,189 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const landings = useQuery(api.landings.get);
   const allPlans = useQuery(api.plans.get);
 
+  // Column Resizing Setup
+  const DEFAULT_COLUMNS = useMemo(() => [
+    { id: 'index', label: '순번', minWidth: 45, defaultWidth: 55, align: 'center' as const },
+    { id: 'checkbox', label: '', minWidth: 40, defaultWidth: 45, align: 'center' as const },
+    { id: 'source', label: '구분', minWidth: 45, defaultWidth: 55, align: 'center' as const },
+    { id: 'createdAt', label: '등록일시', minWidth: 100, defaultWidth: 125, align: 'left' as const },
+    { id: 'channel', label: '채널명', minWidth: 80, defaultWidth: 100, align: 'left' as const },
+    { id: 'name', label: '고객명', minWidth: 70, defaultWidth: 90, align: 'left' as const },
+    { id: 'phone', label: '연락처', minWidth: 110, defaultWidth: 125, align: 'left' as const },
+    { id: 'address', label: '주소', minWidth: 140, defaultWidth: 200, align: 'left' as const },
+    { id: 'productName', label: '신청상품', minWidth: 140, defaultWidth: 220, align: 'left' as const },
+    { id: 'appliance', label: '결합제품', minWidth: 160, defaultWidth: 260, align: 'left' as const },
+    { id: 'supplier', label: '공급사', minWidth: 70, defaultWidth: 90, align: 'center' as const },
+    { id: 'status', label: '진행상태', minWidth: 75, defaultWidth: 95, align: 'center' as const },
+  ], []);
+
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem('customer_table_column_widths');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const initial: Record<string, number> = {};
+        [
+          { id: 'index', defaultWidth: 55 },
+          { id: 'checkbox', defaultWidth: 45 },
+          { id: 'source', defaultWidth: 55 },
+          { id: 'createdAt', defaultWidth: 125 },
+          { id: 'channel', defaultWidth: 100 },
+          { id: 'name', defaultWidth: 90 },
+          { id: 'phone', defaultWidth: 125 },
+          { id: 'address', defaultWidth: 200 },
+          { id: 'productName', defaultWidth: 220 },
+          { id: 'appliance', defaultWidth: 260 },
+          { id: 'supplier', defaultWidth: 90 },
+          { id: 'status', defaultWidth: 95 },
+        ].forEach(col => {
+          initial[col.id] = parsed[col.id] || col.defaultWidth;
+        });
+        return initial;
+      }
+    } catch (e) {}
+    return {
+      index: 55,
+      checkbox: 45,
+      source: 55,
+      createdAt: 125,
+      channel: 100,
+      name: 90,
+      phone: 125,
+      address: 200,
+      productName: 220,
+      appliance: 260,
+      supplier: 90,
+      status: 95,
+    };
+  });
+
+  const resizingRef = useRef<{ colId: string; startX: number; startWidth: number; minWidth: number } | null>(null);
+
+  const handleResizeStart = (colId: string, minWidth: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startWidth = columnWidths[colId] || 100;
+    resizingRef.current = { colId, startX, startWidth, minWidth };
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!resizingRef.current) return;
+      const { colId: currentColId, startX: cStartX, startWidth: cStartWidth, minWidth: cMinWidth } = resizingRef.current;
+      const delta = moveEvent.clientX - cStartX;
+      const newWidth = Math.max(cMinWidth, cStartWidth + delta);
+      setColumnWidths(prev => ({ ...prev, [currentColId]: newWidth }));
+    };
+
+    const handleMouseUp = () => {
+      if (resizingRef.current) {
+        setColumnWidths(current => {
+          try {
+            localStorage.setItem('customer_table_column_widths', JSON.stringify(current));
+          } catch (e) {}
+          return current;
+        });
+        resizingRef.current = null;
+      }
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleResetColumnWidths = () => {
+    const defaults = {
+      index: 55,
+      checkbox: 45,
+      source: 55,
+      createdAt: 125,
+      channel: 100,
+      name: 90,
+      phone: 125,
+      address: 200,
+      productName: 220,
+      appliance: 260,
+      supplier: 90,
+      status: 95,
+    };
+    setColumnWidths(defaults);
+    try {
+      localStorage.removeItem('customer_table_column_widths');
+    } catch (e) {}
+  };
+
+  // 공급사 계산 함수 (LG구독: TU / 결합상품: 제품관리에 입력된 공급사 매핑)
+  const getSupplier = (customer: any): string => {
+    const isLgCare = 
+      customer.source === 'lg_care' ||
+      customer.productName?.includes('LG구독') ||
+      customer.productName?.includes('LG가전구독') ||
+      customer.productName?.includes('LG가전 구독') ||
+      customer.productName?.includes('LG가전 구독 할인 전용') ||
+      customer.productName?.includes('할인코드') ||
+      customer.appliance?.includes('할인코드') ||
+      customer.appliance?.includes('퓨리케어') ||
+      customer.appliance?.includes('에어로타워');
+
+    const applianceText = (customer.appliance || '').trim();
+    const productNameText = (customer.productName || '').trim();
+
+    if (allProducts && allProducts.length > 0 && applianceText && applianceText !== '-') {
+      // 1. 모델명 매칭
+      let matched = allProducts.find(p => p.model && p.model.trim().length >= 3 && applianceText.includes(p.model.trim()));
+      
+      // 2. 제품명 매칭
+      if (!matched) {
+        matched = allProducts.find(p => p.name && p.name.trim().length >= 3 && (applianceText.includes(p.name.trim()) || p.name.trim().includes(applianceText)));
+      }
+
+      // 3. 브랜드 + 제품명 매칭
+      if (!matched) {
+        matched = allProducts.find(p => {
+          const fullTitle = `${p.brand} ${p.name}`.trim();
+          return fullTitle.length >= 3 && (applianceText.includes(fullTitle) || fullTitle.includes(applianceText));
+        });
+      }
+
+      // 4. 신청상품명 매칭 fallback
+      if (!matched && productNameText) {
+        matched = allProducts.find(p => 
+          (p.model && p.model.trim().length >= 3 && productNameText.includes(p.model.trim())) ||
+          (p.name && p.name.trim().length >= 3 && productNameText.includes(p.name.trim()))
+        );
+      }
+
+      if (matched) {
+        const supplierValue = (matched as any).supplier || matched.supplyPrice;
+        if (supplierValue && String(supplierValue).trim()) {
+          return String(supplierValue).trim();
+        }
+      }
+    }
+
+    if (isLgCare || (customer.productName && customer.productName.startsWith('LG'))) {
+      return 'TU';
+    }
+
+    return '-';
+  };
+
+  // Group LG Official Products by categoryName for intuitive cascading selection
+  const lgProductsByCategory = useMemo(() => {
+    const groups: Record<string, typeof LG_OFFICIAL_PRODUCTS> = {};
+    LG_OFFICIAL_PRODUCTS?.forEach(p => {
+      const cat = p.categoryName || '기타';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(p);
+    });
+    return groups;
+  }, []);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -174,6 +357,10 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
           // It's already a category name, ensure account is sync'd if missing
           if (!resolvedAccount) resolvedAccount = planByName.accountCount;
         }
+      }
+
+      if (!resolvedAccount && (resolvedCategoryName === 'LG구독할인(new)' || resolvedCategoryName?.includes('LG') || resolvedCategoryName?.includes('구독'))) {
+        resolvedAccount = '1구좌';
       }
 
       let initialAppliance = resolvedAppliance || selectedCustomer.appliance || '';
@@ -527,10 +714,15 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     
     // 3. Search Query Filter
     const search = searchQuery.toLowerCase();
+    const sup = getSupplier(inq).toLowerCase();
     return (
       (inq.name || '').toLowerCase().includes(search) || 
       (inq.phone || '').toLowerCase().includes(search) || 
-      (inq.productName || '').toLowerCase().includes(search)
+      (inq.address || '').toLowerCase().includes(search) || 
+      (inq.detailAddress || '').toLowerCase().includes(search) || 
+      (inq.productName || '').toLowerCase().includes(search) ||
+      (inq.appliance || '').toLowerCase().includes(search) ||
+      sup.includes(search)
     );
   });
 
@@ -673,35 +865,64 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
             />
           </div>
         )}
+
+        {/* 열 간격 초기화 버튼 */}
+        <button
+          onClick={handleResetColumnWidths}
+          className="px-2.5 py-1.5 rounded-[8px] text-[12px] font-medium text-[#8B95A1] hover:text-[#4E5968] hover:bg-[#F2F4F6] flex items-center gap-1 transition-colors border border-transparent hover:border-[#E5E8EB] shrink-0 self-end md:self-auto"
+          title="열 너비를 기본값으로 초기화합니다"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+          <span>열 간격 초기화</span>
+        </button>
       </div>
 
       <div className="bg-white rounded-[16px] shadow-sm border border-[#E5E8EB] overflow-x-auto custom-scrollbar">
-        <table className="w-full text-left min-w-max">
-          <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB] whitespace-nowrap">
+        <table 
+          className="text-left table-fixed min-w-full"
+          style={{ width: `${DEFAULT_COLUMNS.reduce((sum, col) => sum + (columnWidths[col.id] || col.defaultWidth), 0)}px` }}
+        >
+          <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB] select-none">
             <tr>
-              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968] w-16 text-center">순번</th>
-              <th className="px-6 py-4 w-12">
-                <input 
-                  type="checkbox" 
-                  checked={filteredInquiries.length > 0 && selectedIds.length === filteredInquiries.length}
-                  onChange={toggleSelectAll}
-                  className="w-4 h-4 rounded border-[#E5E8EB] text-[#3182F6] focus:ring-[#3182F6]"
-                />
-              </th>
-              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">구분</th>
-              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">등록일시</th>
-              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">채널명</th>
-              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">고객명</th>
-              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">연락처</th>
-              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">신청상품</th>
-              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">결합제품</th>
-              <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">진행상태</th>
+              {DEFAULT_COLUMNS.map((col) => {
+                const width = columnWidths[col.id] || col.defaultWidth;
+                return (
+                  <th
+                    key={col.id}
+                    style={{ width: `${width}px`, minWidth: `${col.minWidth}px` }}
+                    className={`relative group px-3 py-3.5 text-[13px] font-bold text-[#4E5968] ${
+                      col.align === 'center' ? 'text-center' : 'text-left'
+                    }`}
+                  >
+                    {col.id === 'checkbox' ? (
+                      <input 
+                        type="checkbox" 
+                        checked={filteredInquiries.length > 0 && selectedIds.length === filteredInquiries.length}
+                        onChange={toggleSelectAll}
+                        className="w-4 h-4 rounded border-[#E5E8EB] text-[#3182F6] focus:ring-[#3182F6] cursor-pointer"
+                      />
+                    ) : (
+                      <span className="truncate block">{col.label}</span>
+                    )}
+
+                    {/* 열 리사이저 핸들 */}
+                    <div
+                      onMouseDown={(e) => handleResizeStart(col.id, col.minWidth, e)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-0 top-0 bottom-0 w-2.5 cursor-col-resize select-none flex items-center justify-center hover:bg-[#3182F6]/20 transition-colors z-10 group/resizer"
+                      title="드래그하여 열 너비 조절"
+                    >
+                      <div className="w-[1.5px] h-3.5 bg-[#D1D6DB] group-hover:bg-[#3182F6]" />
+                    </div>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E5E8EB]">
             {filteredInquiries.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-6 py-20 text-center text-[#8B95A1] text-[14px]">
+                <td colSpan={12} className="px-6 py-20 text-center text-[#8B95A1] text-[14px]">
                   등록된 고객이 없습니다.
                 </td>
               </tr>
@@ -724,10 +945,10 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                   }
                 }
 
-                // LG 가전구독 랜딩 제출 건 처리
-                if (customer.source === 'lg_care') {
-                  const lgLanding = landings?.find(l => l.path === '/care');
-                  const baseLandingTitle = lgLanding?.name || 'LG전자 가전구독 X 효원라이프 144';
+                // LG 가전구독 랜딩 제출 건 또는 직접 등록 건 처리
+                if (customer.source === 'lg_care' || customer.productName?.includes('LG구독') || customer.productName?.includes('LG가전구독') || customer.productName?.startsWith('LG')) {
+                  const lgLanding = landings?.find(l => l.path === '/care_new' || l.path === '/care');
+                  const baseLandingTitle = lgLanding?.name || 'LG가전 구독 할인 전용 (new)';
                   
                   // 만약 productName에 기존처럼 가전 모델명이 들어가 있던 경우 랜딩 제목으로 교정
                   if (!customer.productName || customer.productName.startsWith('[')) {
@@ -772,16 +993,21 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                   }
                 }
 
+                const supplierName = getSupplier(customer);
+
                 return (
                   <tr 
                     key={customer._id} 
                     className={`hover:bg-[#F9FAFB] cursor-pointer transition-colors ${selectedIds.includes(customer._id) ? 'bg-[#F2F8FF]' : ''}`}
                     onClick={() => setSelectedCustomer(customer)}
                   >
-                    <td className="px-6 py-4 text-[13px] text-[#4E5968] font-medium text-center whitespace-nowrap">
+                    {/* 1. 순번 */}
+                    <td style={{ width: `${columnWidths.index}px` }} className="px-3 py-3 text-[13px] text-[#4E5968] font-medium text-center truncate">
                       {filteredInquiries.length - index}
                     </td>
-                    <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+
+                    {/* 2. 체크박스 */}
+                    <td style={{ width: `${columnWidths.checkbox}px` }} className="px-3 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                       <input 
                         type="checkbox" 
                         checked={selectedIds.includes(customer._id)}
@@ -789,32 +1015,96 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         className="w-4 h-4 rounded border-[#E5E8EB] text-[#3182F6] focus:ring-[#3182F6] cursor-pointer"
                       />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+
+                    {/* 3. 구분 */}
+                    <td style={{ width: `${columnWidths.source}px` }} className="px-3 py-3 text-center truncate">
                       <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${customer.source === 'direct' ? 'bg-[#F2F4F6] text-[#4E5968]' : 'bg-[#3182F6]/10 text-[#3182F6]'}`}>
                         {customer.source === 'direct' ? 'D' : 'H'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-[13px] text-[#191F28] font-medium inline-block mr-2">
-                        {new Date(customer.createdAt).toLocaleDateString()}
+
+                    {/* 4. 등록일시 (시간은 한 줄 내려서 표시) */}
+                    <td style={{ width: `${columnWidths.createdAt}px` }} className="px-3 py-3 truncate">
+                      <div className="text-[12px] text-[#191F28] font-medium leading-tight">
+                        {new Date(customer.createdAt).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '')}
                       </div>
-                      <div className="text-[11px] text-[#8B95A1] inline-block">
+                      <div className="text-[11px] text-[#8B95A1] leading-tight mt-1">
                         {new Date(customer.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`text-[12px] font-bold px-2 py-1 rounded-md ${(!customer.channelId || customer.channelId === '본사') ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-[#3182F6]'}`}>
+
+                    {/* 5. 채널명 */}
+                    <td style={{ width: `${columnWidths.channel}px` }} className="px-3 py-3 truncate">
+                      <span className={`inline-block max-w-full truncate text-[12px] font-bold px-2 py-0.5 rounded-md ${(!customer.channelId || customer.channelId === '본사') ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-[#3182F6]'}`} title={getChannelName(customer.channelId)}>
                         {getChannelName(customer.channelId)}
                       </span>
                     </td>
 
-                    <td className="px-6 py-4 whitespace-nowrap text-[14px] font-bold text-[#191F28]">{customer.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#4E5968]">{customer.phone}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#4E5968] font-medium">{finalOutput}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-[14px] text-[#4E5968]">{displayAppliance}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    {/* 6. 고객명 */}
+                    <td style={{ width: `${columnWidths.name}px` }} className="px-3 py-3 text-[13px] font-bold text-[#191F28] truncate" title={customer.name}>
+                      {customer.name}
+                    </td>
+
+                    {/* 7. 연락처 */}
+                    <td style={{ width: `${columnWidths.phone}px` }} className="px-3 py-3 text-[13px] text-[#4E5968] truncate" title={customer.phone}>
+                      {customer.phone}
+                    </td>
+
+                    {/* 8. 주소 (2줄 표시) */}
+                    <td style={{ width: `${columnWidths.address}px` }} className="px-3 py-3">
+                      {customer.address ? (
+                        <div className="text-[12px] leading-tight">
+                          <div className="truncate text-[#191F28] font-medium" title={customer.address}>
+                            {customer.address}
+                          </div>
+                          <div className="truncate text-[11px] text-[#8B95A1] mt-0.5" title={customer.detailAddress || ''}>
+                            {customer.detailAddress || '-'}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-[#8B95A1] text-[12px]">-</span>
+                      )}
+                    </td>
+
+                    {/* 9. 신청상품 */}
+                    <td style={{ width: `${columnWidths.productName}px` }} className="px-3 py-3 text-[13px] text-[#4E5968] font-medium truncate" title={finalOutput}>
+                      {finalOutput}
+                    </td>
+
+                    {/* 10. 결합제품 (길면 2줄로 표시) */}
+                    <td style={{ width: `${columnWidths.appliance}px` }} className="px-3 py-3 text-[13px] text-[#4E5968]">
+                      <div 
+                        className="line-clamp-2 leading-snug break-keep"
+                        title={displayAppliance}
+                        style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          wordBreak: 'break-all'
+                        }}
+                      >
+                        {displayAppliance}
+                      </div>
+                    </td>
+
+                    {/* 11. 공급사 (진행상태 왼쪽 옆) */}
+                    <td style={{ width: `${columnWidths.supplier}px` }} className="px-3 py-3 text-center truncate">
+                      <span className={`inline-block text-[11px] font-bold px-2 py-0.5 rounded ${
+                        supplierName === 'TU' 
+                          ? 'bg-red-50 text-red-600 border border-red-200' 
+                          : supplierName !== '-' 
+                            ? 'bg-blue-50 text-[#3182F6] border border-blue-200' 
+                            : 'text-[#8B95A1]'
+                      }`} title={supplierName}>
+                        {supplierName}
+                      </span>
+                    </td>
+
+                    {/* 12. 진행상태 */}
+                    <td style={{ width: `${columnWidths.status}px` }} className="px-3 py-3 text-center truncate">
                       <span 
-                        className="inline-block text-[12px] font-bold px-2.5 py-1 rounded-full"
+                        className="inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full"
                         style={{ 
                           backgroundColor: getStatusStyle(customer.status).bg, 
                           color: getStatusStyle(customer.status).text 
@@ -993,11 +1283,16 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                       <select 
                         value={editData.productName || ''} 
                         onChange={e => {
-                          const plan = allPlans?.find(p => p.name === e.target.value);
+                          const val = e.target.value;
+                          const plan = allPlans?.find(p => p.name === val);
+                          let resolvedAcc = plan ? plan.accountCount : '';
+                          if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독')) {
+                            resolvedAcc = '1구좌';
+                          }
                           setEditData({
                             ...editData, 
-                            productName: e.target.value,
-                            account: plan ? plan.accountCount : '',
+                            productName: val,
+                            account: resolvedAcc,
                             appliance: ''
                           });
                         }} 
@@ -1007,8 +1302,11 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         {allPlans?.map(plan => (
                           <option key={plan._id} value={plan.name}>{plan.name}</option>
                         ))}
+                        <option value="LG구독할인(new)">LG구독할인(new)</option>
                         {/* Ensure standardized name is shown if not in the plan list */}
-                        {editData.productName && !allPlans?.some(p => p.name === editData.productName) && (
+                        {editData.productName && 
+                         editData.productName !== 'LG구독할인(new)' && 
+                         !allPlans?.some(p => p.name === editData.productName) && (
                           <option value={editData.productName}>{editData.productName}</option>
                         )}
                       </select>
@@ -1055,17 +1353,22 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         )}
 
                         {/* 2. LG 가전구독 상품 목록 (LG 가전구독 접수 건 또는 관련 카테고리 시) */}
-                        {(selectedCustomer?.source === 'lg_care' || editData.productName?.includes('LG') || editData.productName?.includes('가전구독')) && (
-                          <optgroup label="LG 공식 가전구독 라인업">
-                            {LG_OFFICIAL_PRODUCTS?.map(p => {
-                              const itemText = `[${p.categoryName}] ${p.name} (${p.model})`;
-                              return (
-                                <option key={p.id} value={itemText}>
-                                  {itemText}
-                                </option>
-                              );
-                            })}
-                          </optgroup>
+                        {(selectedCustomer?.source === 'lg_care' || editData.productName?.includes('LG') || editData.productName?.includes('가전구독') || editData.productName?.includes('구독')) && (
+                          <>
+                            <option value="상담 시 제품선택 (전문 상담원 맞춤 추천)">상담 시 제품선택 (전문 상담원 맞춤 추천)</option>
+                            {Object.entries(lgProductsByCategory).map(([catName, prods]: [string, any]) => (
+                              <optgroup key={catName} label={`LG 가전구독 - ${catName} (${prods.length})`}>
+                                {prods.map((p: any) => {
+                                  const itemText = `[${p.categoryName}] ${p.name} (${p.model})`;
+                                  return (
+                                    <option key={p.id} value={itemText}>
+                                      {itemText}
+                                    </option>
+                                  );
+                                })}
+                              </optgroup>
+                            ))}
+                          </>
                         )}
 
                         {/* 3. 어드민 등록 결합가전 상품 목록 */}
@@ -1235,11 +1538,16 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                       <select 
                         value={registerForm.productName} 
                         onChange={e => {
-                          const plan = allPlans?.find(p => p.name === e.target.value);
+                          const val = e.target.value;
+                          const plan = allPlans?.find(p => p.name === val);
+                          let resolvedAccount = plan ? plan.accountCount : '';
+                          if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독')) {
+                            resolvedAccount = '1구좌';
+                          }
                           setRegisterForm({
                             ...registerForm, 
-                            productName: e.target.value,
-                            account: plan ? plan.accountCount : '',
+                            productName: val,
+                            account: resolvedAccount,
                             appliance: ''
                           });
                         }} 
@@ -1249,6 +1557,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         {allPlans?.map(plan => (
                           <option key={plan._id} value={plan.name}>{plan.name}</option>
                         ))}
+                        <option value="LG구독할인(new)">LG구독할인(new)</option>
                       </select>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -1270,14 +1579,32 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                           className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
                         >
                           <option value="">가전 선택</option>
-                          {allProducts?.filter(p => {
-                            if (!p.model) return false;
-                            if (!registerForm.productName) return true;
-                            const plan = allPlans?.find(pl => pl.name === registerForm.productName);
-                            return plan && p.planId === plan.numericId;
-                          }).map(p => (
-                            <option key={p._id} value={`${p.name} (${p.model})`}>{p.brand} {p.name} ({p.model})</option>
-                          ))}
+                          {(registerForm.productName === 'LG구독할인(new)' || registerForm.productName?.includes('LG') || registerForm.productName?.includes('구독')) ? (
+                            <>
+                              <option value="상담 시 제품선택 (전문 상담원 맞춤 추천)">상담 시 제품선택 (전문 상담원 맞춤 추천)</option>
+                              {Object.entries(lgProductsByCategory).map(([catName, prods]: [string, any]) => (
+                                <optgroup key={catName} label={`LG 가전구독 - ${catName} (${prods.length})`}>
+                                  {prods.map((p: any) => {
+                                    const itemText = `[${p.categoryName}] ${p.name} (${p.model})`;
+                                    return (
+                                      <option key={p.id} value={itemText}>
+                                        {itemText}
+                                      </option>
+                                    );
+                                  })}
+                                </optgroup>
+                              ))}
+                            </>
+                          ) : (
+                            allProducts?.filter(p => {
+                              if (!p.model) return false;
+                              if (!registerForm.productName) return true;
+                              const plan = allPlans?.find(pl => pl.name === registerForm.productName);
+                              return plan && p.planId === plan.numericId;
+                            }).map(p => (
+                              <option key={p._id} value={`${p.name} (${p.model})`}>{p.brand} {p.name} ({p.model})</option>
+                            ))
+                          )}
                         </select>
                       </div>
                     </div>
@@ -1313,6 +1640,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                           <div className="flex flex-wrap gap-1">
                             <span className="text-[10px] bg-white border border-[#E5E8EB] text-[#8B95A1] px-1.5 py-0.5 rounded">{getChannelName(item.channelId)}</span>
                             {item.productName && <span className="text-[10px] bg-blue-50 text-[#3182F6] px-1.5 py-0.5 rounded">{item.productName}</span>}
+                            {item.appliance && <span className="text-[10px] bg-emerald-50 text-[#059669] px-1.5 py-0.5 rounded truncate max-w-[180px]">{item.appliance}</span>}
                           </div>
                         </div>
                       ))

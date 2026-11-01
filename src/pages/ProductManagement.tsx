@@ -269,10 +269,16 @@ export default function ProductManagement() {
       if (sortConfig.key === 'order') {
         return (a.order ?? 99999) - (b.order ?? 99999);
       }
-      if (sortConfig.key === 'supplyPrice' || sortConfig.key === 'price') {
+      if (sortConfig.key === 'price') {
         const aNum = parseInt(String((a as any)[sortConfig.key] || '0').replace(/\D/g, ''), 10);
         const bNum = parseInt(String((b as any)[sortConfig.key] || '0').replace(/\D/g, ''), 10);
         return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
+      }
+      if (sortConfig.key === 'supplyPrice') {
+        const aVal = (a as any).supplier || (a as any).supplyPrice || "";
+        const bVal = (b as any).supplier || (b as any).supplyPrice || "";
+        if (sortConfig.direction === 'asc') return aVal.localeCompare(bVal);
+        return bVal.localeCompare(aVal);
       }
       const aVal = (a as any)[sortConfig.key] || "";
       const bVal = (b as any)[sortConfig.key] || "";
@@ -1522,7 +1528,7 @@ export default function ProductManagement() {
                           : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
                       }`}
                     >
-                      공급가 {sortConfig.key === 'supplyPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                      공급사 {sortConfig.key === 'supplyPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                     </button>
                   </div>
                 </div>
@@ -1651,7 +1657,7 @@ export default function ProductManagement() {
                       <th className="px-4 py-4 w-24 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">브랜드</th>
                       <th className="px-4 py-4 w-28 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">카테고리</th>
                       <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">제품명 / 모델명</th>
-                      <th className="px-4 py-4 w-32 text-[13px] font-bold text-[#4E5968] text-right whitespace-nowrap">공급가</th>
+                      <th className="px-4 py-4 w-28 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">공급사</th>
                       <th className="px-4 py-4 w-32 text-[13px] font-bold text-[#4E5968] text-right whitespace-nowrap">월납입금</th>
                       <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">노출</th>
                       <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">메인</th>
@@ -1734,7 +1740,7 @@ export default function ProductManagement() {
                               )}
                             </div>
                           </td>
-                          <td className="px-4 py-4 text-[14px] font-bold text-right text-[#191F28]">{p.supplyPrice ? formatNumber(p.supplyPrice) + '원' : '-'}</td>
+                          <td className="px-4 py-4 text-[13px] font-bold text-center text-[#191F28] whitespace-nowrap">{p.supplier || p.supplyPrice || '-'}</td>
                           <td className="px-4 py-4 text-[14px] font-bold text-right text-[#3182F6]">{formatNumber(selectedPlan?.basePrice || p.price)}원</td>
                           <td className="px-4 py-4 text-center">
                             <button onClick={(e) => { e.stopPropagation(); toggleVisibility(p._id, p.isVisible); }} className={`p-1.5 rounded-full transition-colors ${p.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-400'}`}>
@@ -1885,8 +1891,18 @@ export default function ProductManagement() {
                       <input type="text" value={editingProduct.model} onChange={(e) => setEditingProduct({...editingProduct, model: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none" placeholder="예: AS195DWWA" />
                     </div>
                     <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">공급가</label>
-                      <input type="text" value={formatNumber(editingProduct.supplyPrice || '')} onChange={(e) => setEditingProduct({...editingProduct, supplyPrice: e.target.value.replace(/\D/g, '')})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#191F28] text-right" placeholder="0" />
+                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">공급사</label>
+                      <input 
+                        type="text" 
+                        value={editingProduct.supplier ?? editingProduct.supplyPrice ?? ''} 
+                        onChange={(e) => setEditingProduct({
+                          ...editingProduct, 
+                          supplier: e.target.value, 
+                          supplyPrice: e.target.value 
+                        })} 
+                        className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#191F28]" 
+                        placeholder="예: TU, 쿠쿠, 위니아 등 공급사명 입력" 
+                      />
                     </div>
                     <div>
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">사은품 내역</label>
