@@ -313,3 +313,19 @@ export const seedProducts = mutation({
     return "Seeded successfully";
   },
 });
+
+export const bulkUpdateSupplier = mutation({
+  args: { supplier: v.string() },
+  handler: async (ctx, args) => {
+    const products = await ctx.db.query("products").collect();
+    let updatedCount = 0;
+    for (const p of products) {
+      await ctx.db.patch(p._id, {
+        supplier: args.supplier,
+        supplyPrice: args.supplier,
+      });
+      updatedCount++;
+    }
+    return { success: true, count: updatedCount };
+  },
+});
