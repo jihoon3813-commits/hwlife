@@ -18,19 +18,50 @@ export const create = mutation({
     appliance: v.optional(v.string()),
     status: v.optional(v.string()),
     source: v.optional(v.string()),
+    // Compatibility fields for various landing forms
+    subdomain: v.optional(v.string()),
+    callTime: v.optional(v.string()),
+    landingPath: v.optional(v.string()),
+    memo: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const id = await ctx.db.insert("inquiries", {
-      ...args,
+    const effectiveChannelId = args.channelId || args.subdomain;
+    
+    // Compose clean message if extra fields are provided
+    let combinedMessage = args.message || args.memo || "";
+    if (args.callTime && !combinedMessage.includes(args.callTime)) {
+      combinedMessage = combinedMessage ? `${combinedMessage} | 희망시간: ${args.callTime}` : `희망시간: ${args.callTime}`;
+    }
+    if (args.landingPath && !combinedMessage.includes(args.landingPath)) {
+      combinedMessage = combinedMessage ? `${combinedMessage} | 유입경로: ${args.landingPath}` : `유입경로: ${args.landingPath}`;
+    }
+
+    const insertData: Record<string, any> = {
+      name: args.name,
+      phone: args.phone,
+      productName: args.productName,
       status: "대기",
       createdAt: Date.now(),
-    });
+    };
+
+    if (combinedMessage) insertData.message = combinedMessage;
+    if (effectiveChannelId) insertData.channelId = effectiveChannelId;
+    if (args.gender) insertData.gender = args.gender;
+    if (args.birth) insertData.birth = args.birth;
+    if (args.address) insertData.address = args.address;
+    if (args.detailAddress) insertData.detailAddress = args.detailAddress;
+    if (args.account) insertData.account = args.account;
+    if (args.appliance) insertData.appliance = args.appliance;
+    if (args.source) insertData.source = args.source;
+
+    const id = await ctx.db.insert("inquiries", insertData as any);
+
     // Add channel name to discord notification if available
     let channelName = "기본";
-    if (args.channelId) {
+    if (effectiveChannelId) {
         const channel = await ctx.db
             .query("channels")
-            .filter((q) => q.eq(q.field("subdomain"), args.channelId))
+            .filter((q) => q.eq(q.field("subdomain"), effectiveChannelId))
             .first();
         if (channel) channelName = channel.channelName;
     }
@@ -39,7 +70,7 @@ export const create = mutation({
       name: args.name,
       phone: args.phone,
       productName: args.productName,
-      message: args.message,
+      message: combinedMessage || undefined,
       channelName: channelName,
     });
     return id;

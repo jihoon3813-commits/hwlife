@@ -241,15 +241,24 @@ export default function LgCareNewPage({ channelSubdomain, landingPath = '/care_n
 
     setIsSubmitting(true);
     try {
+      const consultDetails = [
+        `[상담견적] 관심가전: ${selectedAppliance}`,
+        `구독기간: ${months}개월`,
+        `할인전: ${won(price)} → 10%할인가: ${won(discountedPrice)} (총할인: ${won(totalDiscount)})`,
+        `상담 희망시간: ${callTime}`,
+        landingPath ? `유입경로: ${landingPath}` : ''
+      ].filter(Boolean).join(' | ');
+
       await createInquiry({
         name: name.trim(),
         phone: phone.trim(),
-        subdomain: channelSubdomain,
-        productName: `LG가전구독(new) [${selectedAppliance}] 월 ${won(price)} → 할인가 ${won(discountedPrice)} (${months}개월)`,
-        callTime: callTime,
-        landingPath: landingPath,
-        memo: `[상담견적] 관심가전: ${selectedAppliance} | 구독기간: ${months}개월 | 할인전: ${won(price)} | 10%할인가: ${won(discountedPrice)} | 총할인: ${won(totalDiscount)}`,
-        status: 'pending'
+        productName: `LG가전구독(new) (1구좌)`,
+        account: '1구좌',
+        appliance: selectedAppliance,
+        channelId: channel?.subdomain || channelSubdomain || undefined,
+        message: consultDetails,
+        source: 'lg_care',
+        status: '대기'
       });
       setIsSuccess(true);
     } catch (err) {
