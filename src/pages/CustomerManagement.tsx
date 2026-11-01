@@ -251,32 +251,35 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       customer.appliance?.includes('퓨리케어') ||
       customer.appliance?.includes('에어로타워');
 
-    const applianceText = (customer.appliance || '').trim();
-    const productNameText = (customer.productName || '').trim();
+    const applianceText = (customer.appliance && customer.appliance !== '-') ? customer.appliance.trim() : '';
+    const productNameText = (customer.productName && customer.productName !== '-') ? customer.productName.trim() : '';
+    const combinedText = `${applianceText} ${productNameText}`.trim();
 
-    if (allProducts && allProducts.length > 0 && applianceText && applianceText !== '-') {
-      // 1. 모델명 매칭
-      let matched = allProducts.find(p => p.model && p.model.trim().length >= 3 && applianceText.includes(p.model.trim()));
+    if (allProducts && allProducts.length > 0 && combinedText) {
+      const cleanCombined = combinedText.toUpperCase().replace(/\s+/g, '');
+
+      // 1. 모델명 매칭 (대소문자/공백 무시)
+      let matched = allProducts.find(p => {
+        if (!p.model) return false;
+        const cleanModel = p.model.toUpperCase().replace(/\s+/g, '');
+        return cleanModel.length >= 3 && cleanCombined.includes(cleanModel);
+      });
       
       // 2. 제품명 매칭
       if (!matched) {
-        matched = allProducts.find(p => p.name && p.name.trim().length >= 3 && (applianceText.includes(p.name.trim()) || p.name.trim().includes(applianceText)));
+        matched = allProducts.find(p => {
+          if (!p.name) return false;
+          const cleanName = p.name.trim();
+          return cleanName.length >= 3 && (combinedText.includes(cleanName) || cleanName.includes(combinedText));
+        });
       }
 
       // 3. 브랜드 + 제품명 매칭
       if (!matched) {
         matched = allProducts.find(p => {
           const fullTitle = `${p.brand} ${p.name}`.trim();
-          return fullTitle.length >= 3 && (applianceText.includes(fullTitle) || fullTitle.includes(applianceText));
+          return fullTitle.length >= 3 && (combinedText.includes(fullTitle) || fullTitle.includes(combinedText));
         });
-      }
-
-      // 4. 신청상품명 매칭 fallback
-      if (!matched && productNameText) {
-        matched = allProducts.find(p => 
-          (p.model && p.model.trim().length >= 3 && productNameText.includes(p.model.trim())) ||
-          (p.name && p.name.trim().length >= 3 && productNameText.includes(p.name.trim()))
-        );
       }
 
       if (matched) {
@@ -287,7 +290,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       }
     }
 
-    if (isLgCare || (customer.productName && customer.productName.startsWith('LG'))) {
+    if (isLgCare || (productNameText && productNameText.startsWith('LG') && !productNameText.includes('('))) {
       return 'TU';
     }
 
@@ -942,6 +945,17 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                   const matchedProduct = allProducts.find(p => p.model === displayAppliance);
                   if (matchedProduct) {
                     displayAppliance = `${matchedProduct.name} (${matchedProduct.model})`;
+                  }
+                }
+
+                // 만약 결합제품이 없는데 productName에 [1구좌] 제품명 (모델명) 형식으로 들어가 있는 경우 분리
+                if ((!customer.appliance || customer.appliance === '-') && customer.productName?.startsWith('[')) {
+                  const bracketMatch = customer.productName.match(/^\[(.*?)\]\s*(.*)$/);
+                  if (bracketMatch) {
+                    const acc = bracketMatch[1];
+                    const rest = bracketMatch[2];
+                    displayPlan = `가전상조 60패키지 (${acc})`;
+                    displayAppliance = rest;
                   }
                 }
 

@@ -337,11 +337,14 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
     try {
       const prodName = selectedProductForInquiry ? selectedProductForInquiry.name : '가전상조 60패키지 일반 상담';
       const prodModel = selectedProductForInquiry ? selectedProductForInquiry.model : '';
+      const isProductSelected = selectedProductForInquiry && prodName !== '가전상조 60패키지 일반 상담';
       
       await createInquiry({
         name,
         phone,
-        productName: `[${activePackageTab}] ${prodName} (${prodModel})`,
+        productName: `가전상조 60패키지 (${activePackageTab})`,
+        account: activePackageTab,
+        appliance: isProductSelected ? `${prodName}${prodModel ? ` (${prodModel})` : ''}` : undefined,
         message: `랜딩페이지: ${landingInfo?.name || landingPath} (${activePackageTab} 선택)\n채널: ${channel?.channelName || '본사'}`,
         channelId: channel?.subdomain
       });
