@@ -1457,7 +1457,6 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
                   <input 
                     type="tel"
                     inputMode="numeric"
-                    pattern="[0-9]*" 
                     placeholder="010-0000-0000"
                     value={phone}
                     onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
@@ -1532,7 +1531,6 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
             <input 
               type="tel"
               inputMode="numeric"
-              pattern="[0-9]*" 
               placeholder="010-0000-0000"
               value={phone}
               onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}

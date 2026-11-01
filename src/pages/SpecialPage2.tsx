@@ -886,7 +886,6 @@ export default function SpecialPage2({ channelSubdomain }: { channelSubdomain?: 
               <input 
                 type="tel" 
                 inputMode="numeric"
-                pattern="[0-9]*"
                 value={phoneNumber}
                 onChange={handlePhoneChange}
                 placeholder="010-0000-0000" 
@@ -1129,7 +1128,6 @@ export default function SpecialPage2({ channelSubdomain }: { channelSubdomain?: 
                     <input 
                       type="tel" 
                       inputMode="numeric"
-                      pattern="[0-9]*"
                       value={phoneNumber}
                       onChange={handlePhoneChange}
                       placeholder="010-0000-0000" 

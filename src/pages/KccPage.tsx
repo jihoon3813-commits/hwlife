@@ -1448,7 +1448,6 @@ export default function KccPage({ channelSubdomain }: { channelSubdomain?: strin
                       id="modal-phone"
                       type="tel"
                       inputMode="numeric"
-                      pattern="[0-9]*" 
                       placeholder="휴대폰 번호를 입력해주세요"
                       value={phone}
                       onChange={handlePhoneChange}

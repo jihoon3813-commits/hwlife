@@ -1198,7 +1198,6 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
               <input 
                 type="tel" 
                 inputMode="numeric"
-                pattern="[0-9]*"
                 value={phoneNumber}
                 onChange={handlePhoneChange}
                 placeholder="010-0000-0000" 
@@ -1435,7 +1434,6 @@ export default function LivingPage2({ channelSubdomain }: { channelSubdomain?: s
                     <input 
                       type="tel" 
                       inputMode="numeric"
-                      pattern="[0-9]*"
                       value={phoneNumber}
                       onChange={handlePhoneChange}
                       placeholder="010-0000-0000" 
