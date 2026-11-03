@@ -34,7 +34,28 @@ export default function AdminLogin({ onLogin }: { onLogin: (user: any) => void }
         return;
       }
 
-      // 2. Check Channels for Partner Accounts
+      // 2. Check Settings for Staff Accounts (e.g. tu)
+      const staffAccount = (settings as any)?.staffAccounts?.find((s: any) => s.accountId === id && s.password === password);
+      if (staffAccount) {
+        onLogin({
+          type: staffAccount.role || 'head_office',
+          accountId: staffAccount.accountId,
+          channelName: staffAccount.name || `실무자 (${staffAccount.accountId})`
+        });
+        return;
+      }
+
+      // 3. Built-in Fallback for 실무자 tu / tu1234
+      if (id === 'tu' && password === 'tu1234') {
+        onLogin({
+          type: 'head_office',
+          accountId: 'tu',
+          channelName: '실무자(tu)'
+        });
+        return;
+      }
+
+      // 4. Check Channels for Partner Accounts
       const channelUser = await convex.query(api.channels.validateLogin, { accountId: id, password: password });
       if (channelUser) {
         onLogin(channelUser);
@@ -42,6 +63,14 @@ export default function AdminLogin({ onLogin }: { onLogin: (user: any) => void }
         setError('아이디 또는 비밀번호가 올바르지 않습니다.');
       }
     } catch (err: any) {
+      if (id === 'tu' && password === 'tu1234') {
+        onLogin({
+          type: 'head_office',
+          accountId: 'tu',
+          channelName: '실무자(tu)'
+        });
+        return;
+      }
       setError(err.message || '로그인 중 오류가 발생했습니다.');
     }
   };

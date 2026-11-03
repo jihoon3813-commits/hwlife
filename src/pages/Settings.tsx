@@ -736,9 +736,15 @@ function AdminAccountSettings({ user }: { user: any }) {
   
   const [hoPassword, setHoPassword] = useState('');
   const [hoConfirmPassword, setHoConfirmPassword] = useState('');
+
+  const [staffId, setStaffId] = useState('');
+  const [staffPw, setStaffPw] = useState('');
+  const [staffName, setStaffName] = useState('');
   
   const updateChannel = useMutation(api.channels.update);
   const updateSettings = useMutation(api.settings.update);
+  const addOrUpdateStaff = useMutation(api.settings.addOrUpdateStaffAccount);
+  const removeStaff = useMutation(api.settings.removeStaffAccount);
   const settings = useQuery(api.settings.get);
   const channelData = useQuery(api.channels.getBySubdomain, { subdomain: user?.subdomain || '' });
 
@@ -904,6 +910,117 @@ function AdminAccountSettings({ user }: { user: any }) {
             >
               본사 계정 정보 업데이트
             </button>
+          </div>
+        </section>
+      )}
+
+      {/* 2-1. Staff Accounts Management (For Master Admin) */}
+      {user.type === 'admin' && (
+        <section className="pt-8 border-t border-[#F2F4F6]">
+          <div className="flex flex-col gap-2 mb-6">
+            <h3 className="text-[18px] font-bold">실무자 계정 관리 (고객관리 전용 접속)</h3>
+            <p className="text-[13px] text-[#8B95A1]">
+              고객관리 메뉴만 접근 가능한 실무자 계정 목록을 관리합니다.
+            </p>
+          </div>
+
+          <div className="space-y-4 max-w-2xl">
+            {/* List of current staff accounts */}
+            <div className="bg-white border border-[#E5E8EB] rounded-[20px] overflow-hidden">
+              <table className="w-full text-left text-[14px]">
+                <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB] text-[#4E5968] font-bold">
+                  <tr>
+                    <th className="py-3 px-4">아이디</th>
+                    <th className="py-3 px-4">이름 / 라벨</th>
+                    <th className="py-3 px-4">비밀번호</th>
+                    <th className="py-3 px-4 text-center">관리</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#F2F4F6]">
+                  {((settings as any)?.staffAccounts || []).length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="py-6 text-center text-[#8B95A1]">
+                        등록된 실무자 계정이 없습니다.
+                      </td>
+                    </tr>
+                  ) : (
+                    ((settings as any)?.staffAccounts || []).map((staff: any) => (
+                      <tr key={staff.accountId} className="hover:bg-[#F9FAFB]">
+                        <td className="py-3 px-4 font-bold text-[#191F28]">{staff.accountId}</td>
+                        <td className="py-3 px-4 text-[#4E5968]">{staff.name || '실무자'}</td>
+                        <td className="py-3 px-4 font-mono text-[13px] text-[#8B95A1]">••••••••</td>
+                        <td className="py-3 px-4 text-center">
+                          <button
+                            onClick={async () => {
+                              if (confirm(`'${staff.accountId}' 계정을 삭제하시겠습니까?`)) {
+                                await removeStaff({ accountId: staff.accountId });
+                                alert('계정이 삭제되었습니다.');
+                              }
+                            }}
+                            className="text-red-500 hover:text-red-700 text-[13px] font-bold px-2 py-1 rounded hover:bg-red-50"
+                          >
+                            삭제
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Add / Edit Staff Account Box */}
+            <div className="bg-[#F9FAFB] p-5 rounded-[20px] border border-[#E5E8EB]">
+              <h4 className="text-[14px] font-bold text-[#191F28] mb-3">실무자 계정 추가 / 비밀번호 변경</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input
+                  type="text"
+                  placeholder="아이디 (예: tu)"
+                  value={staffId}
+                  onChange={(e) => setStaffId(e.target.value)}
+                  className="bg-white border border-[#E5E8EB] px-3.5 py-2.5 rounded-[12px] text-[13px] font-bold focus:outline-none focus:border-[#3182F6]"
+                />
+                <input
+                  type="text"
+                  placeholder="이름 (예: 실무자(tu))"
+                  value={staffName}
+                  onChange={(e) => setStaffName(e.target.value)}
+                  className="bg-white border border-[#E5E8EB] px-3.5 py-2.5 rounded-[12px] text-[13px] focus:outline-none focus:border-[#3182F6]"
+                />
+                <input
+                  type="password"
+                  placeholder="비밀번호 (예: tu1234)"
+                  value={staffPw}
+                  onChange={(e) => setStaffPw(e.target.value)}
+                  className="bg-white border border-[#E5E8EB] px-3.5 py-2.5 rounded-[12px] text-[13px] focus:outline-none focus:border-[#3182F6]"
+                />
+              </div>
+              <button
+                onClick={async () => {
+                  if (!staffId.trim() || !staffPw.trim()) {
+                    alert('아이디와 비밀번호를 모두 입력해주세요.');
+                    return;
+                  }
+                  try {
+                    await addOrUpdateStaff({
+                      accountId: staffId.trim(),
+                      password: staffPw.trim(),
+                      name: staffName.trim() || `실무자(${staffId.trim()})`,
+                      role: 'head_office',
+                    });
+                    alert(`실무자 계정 '${staffId.trim()}'이(가) 저장되었습니다.`);
+                    setStaffId('');
+                    setStaffPw('');
+                    setStaffName('');
+                  } catch (err: any) {
+                    alert(err.message || '저장 중 오류가 발생했습니다.');
+                  }
+                }}
+                className="mt-3 px-5 py-2.5 bg-[#3182F6] hover:bg-[#1B64DA] text-white rounded-[12px] text-[13px] font-bold transition-transform active:scale-95"
+              >
+                계정 등록 / 업데이트
+              </button>
+            </div>
           </div>
         </section>
       )}

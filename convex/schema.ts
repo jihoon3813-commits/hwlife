@@ -181,6 +181,12 @@ export default defineSchema({
       accountId: v.string(),
       password: v.string(),
     })),
+    staffAccounts: v.optional(v.array(v.object({
+      accountId: v.string(),
+      password: v.string(),
+      name: v.optional(v.string()),
+      role: v.optional(v.string()),
+    }))),
   }),
   visits: defineTable({
     ip: v.string(),

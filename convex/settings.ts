@@ -60,6 +60,12 @@ export const update = mutation({
       accountId: v.string(),
       password: v.string(),
     })),
+    staffAccounts: v.optional(v.array(v.object({
+      accountId: v.string(),
+      password: v.string(),
+      name: v.optional(v.string()),
+      role: v.optional(v.string()),
+    }))),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db.query("settings").first();
@@ -71,6 +77,7 @@ export const update = mutation({
     if (args.footer !== undefined) data.footer = args.footer;
     if (args.sms !== undefined) data.sms = args.sms;
     if (args.headOfficeAccount !== undefined) data.headOfficeAccount = args.headOfficeAccount;
+    if (args.staffAccounts !== undefined) data.staffAccounts = args.staffAccounts;
 
     if (existing) {
       await ctx.db.patch(existing._id, data);
@@ -138,4 +145,55 @@ export const seedHeadOfficeAccount = mutation({
         });
     }
   }
+});
+
+export const addOrUpdateStaffAccount = mutation({
+  args: {
+    accountId: v.string(),
+    password: v.string(),
+    name: v.optional(v.string()),
+    role: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db.query("settings").first();
+    if (!existing) return false;
+    const currentStaff = (existing as any).staffAccounts || [];
+    const idx = currentStaff.findIndex((s: any) => s.accountId === args.accountId);
+    let updatedStaff;
+    if (idx >= 0) {
+      updatedStaff = [...currentStaff];
+      updatedStaff[idx] = {
+        accountId: args.accountId,
+        password: args.password,
+        name: args.name || updatedStaff[idx].name || args.accountId,
+        role: args.role || updatedStaff[idx].role || 'head_office',
+      };
+    } else {
+      updatedStaff = [
+        ...currentStaff,
+        {
+          accountId: args.accountId,
+          password: args.password,
+          name: args.name || args.accountId,
+          role: args.role || 'head_office',
+        },
+      ];
+    }
+    await ctx.db.patch(existing._id, { staffAccounts: updatedStaff });
+    return true;
+  },
+});
+
+export const removeStaffAccount = mutation({
+  args: {
+    accountId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db.query("settings").first();
+    if (!existing) return false;
+    const currentStaff = (existing as any).staffAccounts || [];
+    const updatedStaff = currentStaff.filter((s: any) => s.accountId !== args.accountId);
+    await ctx.db.patch(existing._id, { staffAccounts: updatedStaff });
+    return true;
+  },
 });
