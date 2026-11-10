@@ -12,6 +12,7 @@ import { api } from '../../convex/_generated/api';
 import { useTrackVisit } from '../hooks/useTrackVisit';
 import { formatPhoneNumber } from '../utils/phone';
 import { getOptimizedImageUrl } from '../utils/lgeUrl';
+import SEO from '../components/SEO';
 import './LivonCarePage.css';
 
 interface LivonCarePageProps {
@@ -471,6 +472,11 @@ export default function LivonCarePage({
 
   return (
     <div className="livon-page-wrapper">
+      <SEO 
+        title="효원상조 트리플케어 | 최신가전 & 최대 1개월 간병/헬스케어"
+        description="LG·삼성 대형가전 교체, 간병인 지원 최장 1개월, 프리미엄 헬스케어까지! 효원상조 3구좌 가입 특별 결합 상품 트리플케어."
+        image="https://res.cloudinary.com/lyjyvy54/image/upload/v1794287243/%EA%B0%80%EC%A0%84_%EB%8F%8C%EB%B4%84_%EA%B1%B4%EA%B0%95%EC%9D%84_%EC%9E%87%EB%8A%94_%EA%B0%80%EC%A1%B1_%EC%BC%80%EC%96%B4_klpbh5.png"
+      />
       <a className="skip" href="#main">본문 바로가기</a>
       
       {/* Top Banner */}

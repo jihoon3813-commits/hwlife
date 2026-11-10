@@ -142,7 +142,7 @@ export const seed = mutation({
         name: "효원상조 트리플케어",
         path: "/triplecare",
         description: "최신가전 + 간병/헬스케어 멤버십 결합 상품 (효원상조 3구좌 트리플케어)",
-        thumbnail: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600",
+        thumbnail: "https://res.cloudinary.com/lyjyvy54/image/upload/v1794287243/%EA%B0%80%EC%A0%84_%EB%8F%8C%EB%B4%84_%EA%B1%B4%EA%B0%95%EC%9D%84_%EC%9E%87%EB%8A%94_%EA%B0%80%EC%A1%B1_%EC%BC%80%EC%96%B4_klpbh5.png",
         isActive: true,
       });
     }
@@ -189,7 +189,7 @@ export const updateDefaultThumbnails = mutation({
         name: "효원상조 트리플케어",
         path: "/triplecare",
         description: "최신가전 + 간병/헬스케어 멤버십 결합 상품 (효원상조 3구좌 트리플케어)",
-        thumbnail: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600",
+        thumbnail: "https://res.cloudinary.com/lyjyvy54/image/upload/v1794287243/%EA%B0%80%EC%A0%84_%EB%8F%8C%EB%B4%84_%EA%B1%B4%EA%B0%95%EC%9D%84_%EC%9E%87%EB%8A%94_%EA%B0%80%EC%A1%B1_%EC%BC%80%EC%96%B4_klpbh5.png",
         isActive: true,
       });
     }
@@ -269,7 +269,7 @@ export const updateDefaultThumbnails = mutation({
     }
 
     // Ensure CarePlus / TripleCare (해피효원라이프 간병PLUS) exists & update path to /triplecare
-    const carePlusThumb = "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600";
+    const carePlusThumb = "https://res.cloudinary.com/lyjyvy54/image/upload/v1794287243/%EA%B0%80%EC%A0%84_%EB%8F%8C%EB%B4%84_%EA%B1%B4%EA%B0%95%EC%9D%84_%EC%9E%87%EB%8A%94_%EA%B0%80%EC%A1%B1_%EC%BC%80%EC%96%B4_klpbh5.png";
     const existingTripleCare = landings.find(l => l.path === "/triplecare" || l.path === "/careplus" || l.name.includes("간병PLUS") || l.name.includes("간병플러스") || l.name.includes("트리플케어"));
     if (!existingTripleCare) {
       await ctx.db.insert("landings", {
