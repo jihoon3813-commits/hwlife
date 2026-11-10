@@ -447,12 +447,12 @@ export default function LivonCarePage({
       await createInquiry({
         name: name.trim(),
         phone: phone.trim(),
-        productName: `해피효원라이프 간병PLUS (${interest})`,
+        productName: `효원상조 트리플케어 (${interest})`,
         account: "3구좌",
         callTime: time,
         landingPath: landingPath,
         channelId: channelSubdomain || undefined,
-        message: `[해피효원라이프 간병PLUS 신청]\n관심혜택: ${interest}\n상담희망시간: ${time}`,
+        message: `[효원상조 트리플케어 신청]\n관심혜택: ${interest}\n상담희망시간: ${time}`,
       });
       setSubmitted(true);
     } catch (err) {
@@ -524,7 +524,7 @@ export default function LivonCarePage({
           <div className="container hero-grid">
             <div className="hero-copy">
               <div className="hero-tag">
-                <span /> 해피효원라이프 간병PLUS × 리본케어
+                <span /> 효원상조 트리플케어 × 리본케어
               </div>
               <h1>
                 가전은 지금.<br />
@@ -595,7 +595,7 @@ export default function LivonCarePage({
                 가전을 바꾸는 선택에,<br />
                 <em>가족을 위한 케어</em>를 더했습니다.
               </h2>
-              <p>해피효원라이프 간병PLUS 3구좌 가입으로 만나는 세 가지 프리미엄 혜택</p>
+              <p>효원상조 트리플케어 3구좌 가입으로 만나는 세 가지 프리미엄 혜택</p>
             </div>
             <div ref={benefitsRef} className={`benefit-grid ${benefitsVisible ? 'is-visible' : ''}`}>
               <article>
@@ -1360,7 +1360,7 @@ export default function LivonCarePage({
             </button>
           </div>
           <p>상조·라이프서비스: 효원상조 · 간병서비스: 리본케어 · 헬스케어: 교보다솜케어 제휴 예정</p>
-          <p>본 상품은 해피효원라이프 간병PLUS 3구좌 결합 상품입니다. 전문 상담원을 통해 상세 조건을 확인하세요.</p>
+          <p>본 상품은 효원상조 트리플케어 3구좌 결합 상품입니다. 전문 상담원을 통해 상세 조건을 확인하세요.</p>
           <div className="footer-bottom">
             <span>© HYOWON × LIVON CARE. ALL RIGHTS RESERVED.</span>
             <a href="#notices">상품 이용 안내</a>
@@ -1550,7 +1550,7 @@ export default function LivonCarePage({
               </p>
               <p style={{ marginBottom: '12px' }}>
                 <strong>2. 개인정보 수집 및 이용 목적</strong><br />
-                - 해피효원라이프 간병PLUS 상품 가입 상담 및 혜택 안내, 본인 확인
+                - 효원상조 트리플케어 상품 가입 상담 및 혜택 안내, 본인 확인
               </p>
               <p style={{ marginBottom: '12px' }}>
                 <strong>3. 개인정보 보유 및 이용 기간</strong><br />

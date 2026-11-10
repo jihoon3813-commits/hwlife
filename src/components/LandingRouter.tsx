@@ -29,7 +29,7 @@ export default function LandingRouter() {
 
   const path = currentPath;
   
-  // /triplecare, /triple_care, /triple-care, /careplus, /care_plus, /care-plus, /livon, /livoncare 경로 → 해피효원라이프 간병PLUS (리본케어 결합) 랜딩페이지
+  // /triplecare, /triple_care, /triple-care, /careplus, /care_plus, /care-plus, /livon, /livoncare 경로 → 효원상조 트리플케어 (리본케어 결합) 랜딩페이지
   if (path === '/triplecare' || path.startsWith('/triplecare/') ||
       path === '/triple_care' || path.startsWith('/triple_care/') ||
       path === '/triple-care' || path.startsWith('/triple-care/') ||
