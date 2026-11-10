@@ -735,7 +735,6 @@ export default function LivonCarePage({
                         <h3 
                           className="product-name-title" 
                           title={p.name}
-                          style={{ fontSize: '15px', lineHeight: 1.45, minHeight: '66px' }}
                         >
                           {p.name}
                         </h3>
@@ -747,14 +746,16 @@ export default function LivonCarePage({
                             onClick={() => openSpecModal(p)}
                             title="상세 스펙 보기"
                           >
-                            <FileText size={13} /> 스펙 보기
+                            <FileText size={12} className="shrink-0" />
+                            <span>스펙보기</span>
                           </button>
                           <button 
                             type="button"
                             className="product-consult-btn" 
                             onClick={() => openConsult(`${brandName} ${p.name}`)}
                           >
-                            상담 신청 <ArrowUpRight size={13} />
+                            <span>상담신청</span>
+                            <ArrowUpRight size={12} className="shrink-0" />
                           </button>
                         </div>
                       </div>
