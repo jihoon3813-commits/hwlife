@@ -559,6 +559,7 @@ export default function LivonCarePage({
                 className="hero-photo" 
                 label="부모님과 함께하는 따뜻한 일상" 
                 ratio="4:5" 
+                src="https://res.cloudinary.com/lyjyvy54/image/upload/v1794287378/%EB%94%B0%EB%9C%BB%ED%95%9C_%EA%B0%80%EC%A1%B1_%ED%94%84%EB%A6%AC%EB%AF%B8%EC%97%84_%ED%99%88%EC%BC%80%EC%96%B4_%EA%B3%B5%EA%B0%84_ux3ghm.png"
               />
               <div className="care-float">
                 <span className="round-icon">
