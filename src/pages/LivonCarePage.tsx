@@ -55,6 +55,7 @@ const healthServices = [
     lead: "작은 궁금증부터,\n진료를 준비하는 순간까지.",
     desc: "혼자 검색하고 고민하던 건강 문제. 필요한 정보를 상담하고 병원 방문을 차근차근 준비하세요.",
     image: "간호사와 건강상담하는 모습",
+    src: "https://res.cloudinary.com/lyjyvy54/image/upload/v1794286339/%EB%94%B0%EB%9C%BB%ED%95%9C_%EA%B0%84%ED%98%B8%EC%82%AC%EC%9D%98_%EA%B1%B4%EA%B0%95_%EC%83%81%EB%8B%B4-2_q16uey.png",
     list: [
       ["간호사 건강상담", "건강에 대한 궁금증을 임상 경험을 갖춘 간호사와 상담합니다."],
       ["병원·의료진 정보 안내", "질환에 맞는 진료기관과 의료진 정보를 안내합니다."],
@@ -67,6 +68,7 @@ const healthServices = [
     lead: "우리 가족에게 맞는\n건강관리의 시작.",
     desc: "부모님부터 배우자까지. 어떤 검진을 받아야 할지, 어디로 가야 할지 함께 살펴봅니다.",
     image: "가족 건강검진 상담 모습",
+    src: "https://res.cloudinary.com/lyjyvy54/image/upload/v1794286340/%EA%B0%80%EC%A1%B1_%EB%A7%9E%EC%B6%A4_%EA%B1%B4%EA%B0%95%EA%B2%80%EC%A7%84_%EC%83%81%EB%8B%B4-3_r2thnd.png",
     list: [
       ["건강검진 맞춤 상담", "가족의 상황에 맞춰 필요한 검진 항목을 상담합니다."],
       ["제휴 검진 우대혜택", "제휴 기관의 검진 패키지와 우대혜택을 안내합니다."],
@@ -79,6 +81,7 @@ const healthServices = [
     lead: "중요한 진료 앞에서,\n든든한 동행이 있도록.",
     desc: "낯선 병원, 어려운 설명, 길게 느껴지는 치료 과정. 도움이 필요한 순간에 케어를 연결합니다.",
     image: "간호사가 부모님과 병원에 동행하는 모습",
+    src: "https://res.cloudinary.com/lyjyvy54/image/upload/v1794286340/%EC%95%88%EC%8B%AC%EC%9D%84_%EC%A0%84%ED%95%98%EB%8A%94_%EB%B3%91%EC%9B%90_%EB%8F%99%ED%96%89-1_pgfgvd.png",
     list: [
       ["간호사 외래 진료 동행", "대상 질병·이용 조건에 따라 간호사가 진료에 동행합니다."],
       ["치료 과정 이해 지원", "진료·수술·관리 과정에서 필요한 안내를 돕습니다."],
@@ -191,7 +194,7 @@ function Brand() {
 
 export default function LivonCarePage({ 
   channelSubdomain, 
-  landingPath = "/careplus" 
+  landingPath = "/triplecare" 
 }: LivonCarePageProps) {
   // Track visits Universal Hook
   useTrackVisit(channelSubdomain, landingPath);
@@ -692,7 +695,7 @@ export default function LivonCarePage({
 
                   return (
                     <article 
-                      className="product livon-product-card group cursor-pointer" 
+                      className="product livon-product-card group cursor-pointer h-full flex flex-col" 
                       key={p._id}
                       onClick={() => openSpecModal(p)}
                     >
@@ -723,17 +726,17 @@ export default function LivonCarePage({
                         </div>
                       </div>
 
-                      <div className="product-info-wrap">
+                      <div className="product-info-wrap flex-1 flex flex-col">
                         <small className="product-cat-label">{p.category || '가전'}</small>
                         <h3 
                           className="product-name-title" 
                           title={p.name}
-                          style={{ fontSize: '15px', lineHeight: 1.4 }}
+                          style={{ fontSize: '15px', lineHeight: 1.45, minHeight: '66px' }}
                         >
                           {p.name}
                         </h3>
 
-                        <div className="product-action-row" onClick={(e) => e.stopPropagation()}>
+                        <div className="product-action-row mt-auto" onClick={(e) => e.stopPropagation()}>
                           <button 
                             type="button"
                             className="product-spec-btn" 
@@ -799,6 +802,7 @@ export default function LivonCarePage({
                 id="caregiving" 
                 label="부모님의 곁을 지키는 간병인" 
                 ratio="4:5" 
+                src="https://res.cloudinary.com/lyjyvy54/image/upload/v1794286341/%EC%86%90%EC%9D%84_%EB%A7%9E%EC%9E%A1%EC%9D%80_%EB%94%B0%EB%9C%BB%ED%95%9C_%EB%8F%99%ED%96%89_vczc9t.png"
               />
               <div className="care-quote">
                 <Heart size={20} />
@@ -887,6 +891,7 @@ export default function LivonCarePage({
                   id={`health-${health + 1}`} 
                   label={hs.image} 
                   ratio="16:9" 
+                  src={hs.src}
                 />
               </div>
               <div className="health-details">
@@ -1066,12 +1071,33 @@ export default function LivonCarePage({
 
             <div className="life-grid">
               {[
-                { name: "품격 있는 장례", tag: "FUNERAL", icon: Flower2, id: "funeral", desc: "마지막 배웅을 정성스럽게" },
-                { name: "설레는 크루즈", tag: "CRUISE", icon: Ship, id: "cruise", desc: "소중한 사람과 특별한 추억" },
-                { name: "빛나는 웨딩", tag: "WEDDING", icon: Gem, id: "wedding", desc: "새로운 시작을 아름답게" }
+                { 
+                  name: "품격 있는 장례", 
+                  tag: "FUNERAL", 
+                  icon: Flower2, 
+                  id: "funeral", 
+                  desc: "마지막 배웅을 정성스럽게",
+                  image: "https://res.cloudinary.com/lyjyvy54/image/upload/v1794287243/%EC%95%84%EC%9D%B4%EB%B3%B4%EB%A6%AC_%EA%B5%AD%ED%99%94%EC%99%80_%EC%B4%9B%EB%B6%88%EC%9D%98_%EC%B6%94%EB%AA%A8_%EA%B3%B5%EA%B0%84-3_znbbhk.png"
+                },
+                { 
+                  name: "설레는 크루즈", 
+                  tag: "CRUISE", 
+                  icon: Ship, 
+                  id: "cruise", 
+                  desc: "소중한 사람과 특별한 추억",
+                  image: "https://res.cloudinary.com/lyjyvy54/image/upload/v1794287243/%EB%94%B0%EB%9C%BB%ED%95%9C_%ED%96%87%EC%82%B4_%EC%86%8D_%EC%A7%80%EC%A4%91%ED%95%B4_%ED%81%AC%EB%A3%A8%EC%A6%88-1_worf8c.png"
+                },
+                { 
+                  name: "빛나는 웨딩", 
+                  tag: "WEDDING", 
+                  icon: Gem, 
+                  id: "wedding", 
+                  desc: "새로운 시작을 아름답게",
+                  image: "https://res.cloudinary.com/lyjyvy54/image/upload/v1794287242/%ED%96%87%EC%82%B4_%EA%B0%80%EB%93%9D%ED%95%9C_%EC%A0%95%EC%9B%90_%EC%86%8D_%EC%8B%A0%ED%98%BC%EC%9D%98_%EB%AF%B8%EC%86%8C-2_ovetix.png"
+                }
               ].map((x) => (
                 <article key={x.id}>
-                  <PhotoSlot id={x.id} label={`${x.name} 이미지`} ratio="4:3" />
+                  <PhotoSlot id={x.id} label={`${x.name} 이미지`} ratio="4:3" src={x.image} />
                   <div className="life-caption">
                     <x.icon size={22} />
                     <small>{x.tag}</small>
@@ -1128,7 +1154,13 @@ export default function LivonCarePage({
             <div className="trust-grid">
               <article>
                 <span className="trust-role">상조 · 라이프서비스</span>
-                <h3>효원상조</h3>
+                <h3 className="trust-brand">
+                  <img 
+                    src="https://res.cloudinary.com/lyjyvy54/image/upload/v1786415950/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_opfls9.png" 
+                    alt="효원상조" 
+                    className="trust-brand-img"
+                  />
+                </h3>
                 <strong>20년 이상 이어온 경험</strong>
                 <ul>
                   <li><Check /> 선불식 할부거래업 등록</li>
@@ -1142,7 +1174,13 @@ export default function LivonCarePage({
 
               <article>
                 <span className="trust-role">간병서비스 직접 제공</span>
-                <h3 className="livon-word">LivOn <small>리본케어</small></h3>
+                <h3 className="trust-brand">
+                  <img 
+                    src="https://res.cloudinary.com/lyjyvy54/image/upload/v1792052606/LivOn_1_rptk5n.png" 
+                    alt="리본케어 LivOn" 
+                    className="trust-brand-img"
+                  />
+                </h3>
                 <strong>보험사 간병서비스 협력 경험</strong>
                 <ul>
                   <li><Check /> 현대해상 간병서비스 운영</li>
@@ -1156,7 +1194,13 @@ export default function LivonCarePage({
 
               <article>
                 <span className="trust-role">건강관리 · 치료지원</span>
-                <h3>교보다솜케어</h3>
+                <h3 className="trust-brand">
+                  <img 
+                    src="https://res.cloudinary.com/lyjyvy54/image/upload/v1794286941/logo-dasomcare_1_ayi1iz.png" 
+                    alt="교보다솜케어" 
+                    className="trust-brand-img"
+                  />
+                </h3>
                 <strong>건강상담부터 진료 동행까지</strong>
                 <ul>
                   <li><Check /> 평상시 건강관리</li>
@@ -1252,6 +1296,7 @@ export default function LivonCarePage({
                   id="closing-family" 
                   label="부모님과 자녀의 따뜻한 순간" 
                   ratio="4:3" 
+                  src="https://res.cloudinary.com/lyjyvy54/image/upload/v1794287243/%EA%B0%80%EC%A0%84_%EB%8F%8C%EB%B4%84_%EA%B1%B4%EA%B0%95%EC%9D%84_%EC%9E%87%EB%8A%94_%EA%B0%80%EC%A1%B1_%EC%BC%80%EC%96%B4_klpbh5.png"
                 />
                 <span className="closing-seal">
                   <Heart />CARE FOR<br />YOUR FAMILY

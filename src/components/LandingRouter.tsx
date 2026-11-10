@@ -29,8 +29,11 @@ export default function LandingRouter() {
 
   const path = currentPath;
   
-  // /careplus, /care_plus, /care-plus, /livon, /livoncare 경로 → 해피효원라이프 간병PLUS (리본케어 결합) 랜딩페이지
-  if (path === '/careplus' || path.startsWith('/careplus/') ||
+  // /triplecare, /triple_care, /triple-care, /careplus, /care_plus, /care-plus, /livon, /livoncare 경로 → 해피효원라이프 간병PLUS (리본케어 결합) 랜딩페이지
+  if (path === '/triplecare' || path.startsWith('/triplecare/') ||
+      path === '/triple_care' || path.startsWith('/triple_care/') ||
+      path === '/triple-care' || path.startsWith('/triple-care/') ||
+      path === '/careplus' || path.startsWith('/careplus/') ||
       path === '/care_plus' || path.startsWith('/care_plus/') ||
       path === '/care-plus' || path.startsWith('/care-plus/') ||
       path === '/livon' || path.startsWith('/livon/') ||
@@ -175,7 +178,7 @@ export default function LandingRouter() {
     const assignedPaths = channel.landingPages || (channel.landingPage ? [channel.landingPage] : []);
     const primaryPath = assignedPaths[0] || '/';
     
-    if (primaryPath === '/careplus' || primaryPath === '/care_plus' || primaryPath === '/livon') {
+    if (primaryPath === '/triplecare' || primaryPath === '/triple_care' || primaryPath === '/triple-care' || primaryPath === '/careplus' || primaryPath === '/care_plus' || primaryPath === '/livon') {
       return <LivonCarePage channelSubdomain={channel.subdomain} landingPath={primaryPath} />;
     }
     if (primaryPath === '/care_new' || primaryPath === '/care-new') {

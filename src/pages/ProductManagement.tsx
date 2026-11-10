@@ -428,7 +428,7 @@ export default function ProductManagement() {
     const planAccount = curPlan?.accountCount || (selectedPlanId ? `${selectedPlanId}구좌` : '1구좌');
     const is60 = [5, 6, 7, 8].includes(selectedPlanId ?? 0) || (curPlan?.name && curPlan.name.includes('60패키지'));
     
-    let defaultLandings = ['/package60', '/package_up', '/special60', '/careplus'];
+    let defaultLandings = ['/package60', '/package_up', '/special60', '/careplus', '/triplecare'];
     if (!is60) {
       if (curPlan?.name?.includes('리빙')) {
         defaultLandings = ['/living', '/living2'];
@@ -2381,7 +2381,7 @@ export default function ProductManagement() {
                           let defaultLandings = editingProduct.landingPages;
                           if (!defaultLandings || defaultLandings.length === 0) {
                             if (is60) {
-                              defaultLandings = ['/package60', '/package_up', '/special60', '/careplus'];
+                              defaultLandings = ['/package60', '/package_up', '/special60', '/careplus', '/triplecare'];
                             } else if (curPlan?.name?.includes('리빙')) {
                               defaultLandings = ['/living', '/living2'];
                             } else if (curPlan?.name?.includes('스페셜')) {

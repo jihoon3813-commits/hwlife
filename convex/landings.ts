@@ -139,8 +139,8 @@ export const seed = mutation({
         isActive: true,
       });
       await ctx.db.insert("landings", {
-        name: "해피효원라이프 간병PLUS",
-        path: "/careplus",
+        name: "해피효원라이프 간병PLUS (트리플케어)",
+        path: "/triplecare",
         description: "최신가전 + 리본케어 간병/헬스케어 멤버십 결합 상품 (효원상조 3구좌)",
         thumbnail: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600",
         isActive: true,
@@ -186,8 +186,8 @@ export const updateDefaultThumbnails = mutation({
         isActive: true,
       });
       await ctx.db.insert("landings", {
-        name: "해피효원라이프 간병PLUS",
-        path: "/careplus",
+        name: "해피효원라이프 간병PLUS (트리플케어)",
+        path: "/triplecare",
         description: "최신가전 + 리본케어 간병/헬스케어 멤버십 결합 상품 (효원상조 3구좌)",
         thumbnail: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600",
         isActive: true,
@@ -268,16 +268,21 @@ export const updateDefaultThumbnails = mutation({
       });
     }
 
-    // Ensure CarePlus (해피효원라이프 간병PLUS) exists
+    // Ensure CarePlus / TripleCare (해피효원라이프 간병PLUS) exists & update path to /triplecare
     const carePlusThumb = "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600";
-    const existingCarePlus = landings.find(l => l.path === "/careplus" || l.name.includes("간병PLUS") || l.name.includes("간병플러스"));
-    if (!existingCarePlus) {
+    const existingTripleCare = landings.find(l => l.path === "/triplecare" || l.path === "/careplus" || l.name.includes("간병PLUS") || l.name.includes("간병플러스") || l.name.includes("트리플케어"));
+    if (!existingTripleCare) {
       await ctx.db.insert("landings", {
-        name: "해피효원라이프 간병PLUS",
-        path: "/careplus",
+        name: "해피효원라이프 간병PLUS (트리플케어)",
+        path: "/triplecare",
         description: "최신가전 + 리본케어 간병/헬스케어 멤버십 결합 상품 (효원상조 3구좌)",
         thumbnail: carePlusThumb,
         isActive: true,
+      });
+    } else if (existingTripleCare.path !== "/triplecare") {
+      await ctx.db.patch(existingTripleCare._id, {
+        path: "/triplecare",
+        name: existingTripleCare.name.includes("트리플") ? existingTripleCare.name : "해피효원라이프 간병PLUS (트리플케어)",
       });
     }
   },
