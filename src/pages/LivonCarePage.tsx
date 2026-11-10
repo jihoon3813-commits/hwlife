@@ -524,7 +524,7 @@ export default function LivonCarePage({
           <div className="container hero-grid">
             <div className="hero-copy">
               <div className="hero-tag">
-                <span /> 효원상조 트리플케어 × 리본케어
+                <span /> 효원상조 트리플케어
               </div>
               <h1>
                 가전은 지금.<br />
