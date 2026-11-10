@@ -1,0 +1,3626 @@
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/brand-sans.woff') format('woff');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+.livon-page-wrapper {
+  --ink: #173e35;
+  --muted: #6a7870;
+  --mint: #e8f0e8;
+  --cream: #f8f8f2;
+  --coral: #eb6b58;
+  --line: #dce3db;
+  font-family: 'BrandSans', -apple-system, BlinkMacSystemFont, "Segoe UI", 'Noto Sans KR', sans-serif;
+  background: #fff;
+  color: var(--ink);
+  line-height: 1.6;
+  word-break: keep-all;
+  position: relative;
+  min-height: 100vh;
+}
+
+.livon-page-wrapper * {
+  box-sizing: border-box;
+}
+
+.livon-page-wrapper button,
+.livon-page-wrapper input,
+.livon-page-wrapper select {
+  font: inherit;
+}
+
+.livon-page-wrapper button,
+.livon-page-wrapper a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.livon-page-wrapper button {
+  cursor: pointer;
+  color: inherit;
+  border: 0;
+  background: none;
+}
+
+.livon-page-wrapper a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.livon-page-wrapper h1,
+.livon-page-wrapper h2,
+.livon-page-wrapper h3,
+.livon-page-wrapper h4,
+.livon-page-wrapper p {
+  margin: 0;
+}
+
+.livon-page-wrapper button:focus-visible,
+.livon-page-wrapper a:focus-visible,
+.livon-page-wrapper input:focus-visible,
+.livon-page-wrapper select:focus-visible,
+.livon-page-wrapper summary:focus-visible {
+  outline: 3px solid #e57848;
+  outline-offset: 4px;
+}
+
+.livon-page-wrapper em {
+  font-style: normal;
+  color: var(--coral);
+}
+
+.livon-page-wrapper .container {
+  width: min(1200px, calc(100% - 80px));
+  margin: auto;
+}
+
+.livon-page-wrapper .section {
+  padding: 105px 0;
+}
+
+/* Benefit Sticker Component - Bold & Vivid Marketing Sticker */
+.livon-page-wrapper .benefit-sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 22px 8px 10px;
+  border-radius: 999px;
+  border: 3px solid #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  transform: rotate(var(--sticker-rotate, -3deg));
+  transform-origin: center center;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  margin-bottom: 20px;
+  cursor: default;
+  user-select: none;
+  width: fit-content;
+}
+
+.livon-page-wrapper .section-head.centered .benefit-sticker {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.livon-page-wrapper .benefit-sticker:hover {
+  transform: rotate(0deg) scale(1.06);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22), 0 3px 8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.livon-page-wrapper .benefit-sticker .sticker-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ffe600;
+  color: #111111;
+  line-height: 1.2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.livon-page-wrapper .benefit-sticker .sticker-text {
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.livon-page-wrapper .benefit-sticker .sticker-sparkle {
+  flex-shrink: 0;
+  color: #ffe600;
+  animation: sticker-sparkle-pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
+@keyframes sticker-sparkle-pulse {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.25) rotate(12deg); }
+}
+
+/* Sticker Color Variants - Solid Vivid Palettes */
+.livon-page-wrapper .benefit-sticker.sticker-coral {
+  background: linear-gradient(135deg, #e83a23, #d42711);
+}
+
+.livon-page-wrapper .benefit-sticker.sticker-forest {
+  background: linear-gradient(135deg, #0f483a, #093328);
+}
+
+.livon-page-wrapper .benefit-sticker.sticker-mint {
+  background: linear-gradient(135deg, #0d735a, #075441);
+}
+
+.livon-page-wrapper .eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .17em;
+  margin-bottom: 20px;
+  color: #5c7d70;
+}
+
+.livon-page-wrapper .section-head {
+  margin-bottom: 48px;
+}
+
+.livon-page-wrapper .section-head h2,
+.livon-page-wrapper h2 {
+  font-size: 43px;
+  line-height: 1.35;
+  letter-spacing: -1.7px;
+  font-weight: 800;
+}
+
+.livon-page-wrapper .section-head p:not(.eyebrow) {
+  font-size: 17px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+.livon-page-wrapper .section-head.centered {
+  text-align: center;
+}
+
+.livon-page-wrapper .section-head.horizontal {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 30px;
+}
+
+.livon-page-wrapper .section-head.horizontal > p {
+  max-width: 450px;
+}
+
+.livon-page-wrapper .fine {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #758178;
+  margin-top: 18px;
+}
+
+.livon-page-wrapper .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: var(--ink);
+  color: white;
+  padding: 15px 23px;
+  border-radius: 7px;
+  font-weight: 700;
+  font-size: 14px;
+  transition: background .18s, transform .18s;
+  white-space: nowrap;
+}
+
+.livon-page-wrapper .button:hover {
+  background: #2a5a4c;
+  transform: translateY(-2px);
+}
+
+.livon-page-wrapper .button.coral {
+  background: var(--coral);
+}
+
+.livon-page-wrapper .button.coral:hover {
+  background: #d85b49;
+}
+
+.livon-page-wrapper .button.large {
+  padding: 21px 25px;
+  font-size: 17px;
+}
+
+.livon-page-wrapper .button.small {
+  padding: 12px 18px;
+  font-size: 13px;
+}
+
+.livon-page-wrapper .button.outline {
+  background: transparent;
+  border: 1px solid #a1b5a8;
+  color: var(--ink);
+}
+
+.livon-page-wrapper .text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.livon-page-wrapper .text-button:hover {
+  color: var(--coral);
+}
+
+.livon-page-wrapper .skip {
+  position: fixed;
+  top: -100px;
+  z-index: 100;
+  padding: 12px;
+  background: white;
+}
+
+.livon-page-wrapper .skip:focus {
+  top: 0;
+}
+
+.livon-page-wrapper .top-banner {
+  background: var(--ink);
+  color: #d6e5dc;
+  text-align: center;
+  font-size: 12px;
+  padding: 9px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+.livon-page-wrapper .top-banner span {
+  color: white;
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  font-weight: 600;
+}
+
+.livon-page-wrapper .header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(255,255,255,.96);
+  border-bottom: 1px solid #edf0e9;
+  backdrop-filter: blur(10px);
+}
+
+.livon-page-wrapper .nav-inner {
+  height: 83px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+
+.livon-page-wrapper .brand {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+
+.livon-page-wrapper .brand-logo-img {
+  height: 57px;
+  width: auto;
+  max-width: 300px;
+  object-fit: contain;
+  display: block;
+}
+
+.livon-page-wrapper .hyowon-logo {
+  font-size: 23px;
+  font-weight: 850;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: -1px;
+}
+
+.livon-page-wrapper .hyowon-logo svg {
+  width: 27px;
+  height: 27px;
+  color: #b7b787;
+}
+
+.livon-page-wrapper .brand-x {
+  font-size: 16px;
+  color: #b7beb8;
+  font-weight: 300;
+}
+
+.livon-page-wrapper .livon-logo {
+  font-size: 28px;
+  line-height: .9;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -1px;
+  color: #a7567e;
+}
+
+.livon-page-wrapper .livon-logo small {
+  font-size: 8px;
+  display: block;
+  letter-spacing: 1px;
+  font-weight: 600;
+  font-style: normal;
+  color: #6a6f69;
+  margin-top: 6px;
+}
+
+.livon-page-wrapper .nav {
+  display: flex;
+  gap: 28px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.livon-page-wrapper .nav a:hover {
+  color: var(--coral);
+}
+
+.livon-page-wrapper .menu-toggle {
+  display: none;
+  background: none;
+  padding: 5px;
+}
+
+.livon-page-wrapper .hero {
+  background: var(--cream);
+  overflow: hidden;
+  border-bottom: 1px solid #e7ebe1;
+}
+
+.livon-page-wrapper .hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  min-height: 766px;
+  padding-top: 70px;
+  padding-bottom: 65px;
+  align-items: center;
+}
+
+.livon-page-wrapper .hero-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 650;
+  margin-bottom: 23px;
+}
+
+.livon-page-wrapper .hero-tag > span {
+  width: 7px;
+  height: 7px;
+  background: var(--coral);
+  border-radius: 50%;
+}
+
+.livon-page-wrapper .hero h1 {
+  font-size: 66px;
+  line-height: 1.2;
+  letter-spacing: -3.4px;
+  font-weight: 850;
+}
+
+.livon-page-wrapper .hero-desc {
+  font-size: 18px;
+  line-height: 1.8;
+  margin-top: 27px;
+  color: #64766a;
+}
+
+.livon-page-wrapper .hero-desc b {
+  color: var(--ink);
+}
+
+.livon-page-wrapper .hero-chips {
+  display: flex;
+  gap: 15px;
+  margin: 24px 0;
+}
+
+.livon-page-wrapper .hero-chips span {
+  font-size: 12px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  font-weight: 600;
+}
+
+.livon-page-wrapper .hero-chips svg {
+  color: #729a78;
+}
+
+.livon-page-wrapper .hero-price {
+  font-size: 12px;
+  margin-top: 21px;
+  color: #6d7c72;
+}
+
+.livon-page-wrapper .hero-price strong {
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.livon-page-wrapper .hero .fine {
+  font-size: 11px;
+  margin-top: 13px;
+}
+
+.livon-page-wrapper .hero-art {
+  height: 580px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+}
+
+.livon-page-wrapper .photo-slot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 150px;
+  background: linear-gradient(145deg, #e4eae0, #d1dfd4);
+  border: 1px solid #b9ccc1;
+}
+
+.livon-page-wrapper .photo-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+.livon-page-wrapper .photo-slot img.contain {
+  object-fit: contain;
+  padding: 10px;
+}
+
+.livon-page-wrapper .slot-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  text-align: center;
+  padding: 24px;
+  color: #6f8b7a;
+  position: relative;
+  z-index: 1;
+}
+
+.livon-page-wrapper .slot-content strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.livon-page-wrapper .slot-content small {
+  font-size: 9px;
+  letter-spacing: .18em;
+  opacity: .8;
+}
+
+.livon-page-wrapper .slot-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: #9aafa1;
+  border-style: solid;
+  border-width: 0;
+}
+
+.livon-page-wrapper .slot-corner.tl {
+  top: 17px;
+  left: 17px;
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+
+.livon-page-wrapper .slot-corner.tr {
+  top: 17px;
+  right: 17px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+}
+
+.livon-page-wrapper .slot-corner.bl {
+  bottom: 17px;
+  left: 17px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+
+.livon-page-wrapper .slot-corner.br {
+  bottom: 17px;
+  right: 17px;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}
+
+.livon-page-wrapper .hero-photo {
+  height: 510px;
+  width: 420px;
+  border-radius: 200px 200px 22px 22px;
+  margin-left: 30px;
+  background: linear-gradient(160deg, #e3e9d8, #bacfc0);
+  border-color: #ccd9c9;
+}
+
+.livon-page-wrapper .hero-photo .slot-content {
+  transform: translateY(-25px);
+}
+
+.livon-page-wrapper .hero-photo .slot-corner {
+  display: none;
+}
+
+.livon-page-wrapper .orb {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+}
+
+.livon-page-wrapper .orb-one {
+  width: 340px;
+  height: 340px;
+  background: #eae0c6;
+  top: 0;
+  right: -50px;
+  opacity: .65;
+}
+
+.livon-page-wrapper .orb-two {
+  width: 180px;
+  height: 180px;
+  background: #eed5c7;
+  bottom: -10px;
+  left: -10px;
+  opacity: .7;
+}
+
+.livon-page-wrapper .care-float {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  position: absolute;
+  right: -14px;
+  top: 77px;
+  background: white;
+  padding: 15px 21px;
+  border-radius: 12px;
+  box-shadow: 0 10px 35px #20342b0e;
+  transform: rotate(3deg);
+}
+
+.livon-page-wrapper .round-icon {
+  width: 45px;
+  height: 45px;
+  background: #f6e8e3;
+  color: var(--coral);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.livon-page-wrapper .care-float small {
+  font-size: 10px;
+  color: #849185;
+  display: block;
+}
+
+.livon-page-wrapper .care-float strong {
+  font-size: 15px;
+  display: block;
+  margin-top: 3px;
+}
+
+.livon-page-wrapper .care-float b {
+  color: var(--coral);
+}
+
+.livon-page-wrapper .membership-card {
+  position: absolute;
+  bottom: 13px;
+  left: 0;
+  width: 300px;
+  border-radius: 12px;
+  padding: 23px 27px;
+  background: #244c40;
+  color: #eee9cb;
+  box-shadow: 0 18px 35px #15382928;
+  transform: rotate(-7deg);
+  overflow: hidden;
+}
+
+.livon-page-wrapper .membership-card > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.livon-page-wrapper .membership-card > div > span {
+  font-size: 27px;
+  letter-spacing: -1px;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.livon-page-wrapper .membership-card > small {
+  display: block;
+  letter-spacing: .16em;
+  font-size: 8px;
+  margin-top: 15px;
+  opacity: .6;
+}
+
+.livon-page-wrapper .membership-card > strong {
+  font-size: 28px;
+  font-weight: 450;
+  letter-spacing: .1em;
+  display: block;
+  margin: 4px 0 10px;
+}
+
+.livon-page-wrapper .membership-card p {
+  font-size: 9px;
+  color: #b2c0a9;
+  position: relative;
+  z-index: 1;
+}
+
+.livon-page-wrapper .card-edge {
+  position: absolute;
+  right: -70px;
+  bottom: -110px;
+  width: 270px;
+  height: 270px;
+  border: 1px solid #9da78050;
+  border-radius: 50%;
+}
+
+.livon-page-wrapper .card-edge:before {
+  content: "";
+  position: absolute;
+  inset: 15px;
+  border: 1px solid #9da78050;
+  border-radius: 50%;
+}
+
+.livon-page-wrapper .hero-art-caption {
+  position: absolute;
+  bottom: -25px;
+  right: 0;
+  font-size: 8px;
+  letter-spacing: .22em;
+  color: #90a28f;
+}
+
+.livon-page-wrapper .benefit-grid {
+  display: grid;
+  grid-template-columns: 1fr 32px 1fr 32px 1fr;
+  gap: 4px;
+  align-items: center;
+}
+
+.livon-page-wrapper .benefit-grid article {
+  position: relative;
+  border: 1px solid #e0e6db;
+  background: #f9faf6;
+  border-radius: 14px;
+  padding: 36px;
+  min-height: 300px;
+}
+
+.livon-page-wrapper .benefit-grid article > svg {
+  width: 38px;
+  height: 38px;
+  stroke-width: 1.2;
+  margin-bottom: 24px;
+  color: #6b8f76;
+}
+
+.livon-page-wrapper .benefit-grid .number {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  font-size: 12px;
+  color: #9aaa9a;
+  letter-spacing: .1em;
+}
+
+/* 형광펜 순차 자동 드로잉 애니메이션 (1번 -> 2번 -> 3번 반복 순환) */
+@keyframes markerSweepCard1 {
+  0% {
+    width: 0%;
+    opacity: 1;
+  }
+  15% {
+    width: calc(100% + 4px);
+    opacity: 1;
+  }
+  78% {
+    width: calc(100% + 4px);
+    opacity: 1;
+  }
+  86% {
+    width: calc(100% + 4px);
+    opacity: 0;
+  }
+  90% {
+    width: 0%;
+    opacity: 0;
+  }
+  100% {
+    width: 0%;
+    opacity: 1;
+  }
+}
+
+@keyframes markerSweepCard2 {
+  0%, 15% {
+    width: 0%;
+    opacity: 1;
+  }
+  30% {
+    width: calc(100% + 4px);
+    opacity: 1;
+  }
+  78% {
+    width: calc(100% + 4px);
+    opacity: 1;
+  }
+  86% {
+    width: calc(100% + 4px);
+    opacity: 0;
+  }
+  90% {
+    width: 0%;
+    opacity: 0;
+  }
+  100% {
+    width: 0%;
+    opacity: 1;
+  }
+}
+
+@keyframes markerSweepCard3 {
+  0%, 30% {
+    width: 0%;
+    opacity: 1;
+  }
+  45% {
+    width: calc(100% + 4px);
+    opacity: 1;
+  }
+  78% {
+    width: calc(100% + 4px);
+    opacity: 1;
+  }
+  86% {
+    width: calc(100% + 4px);
+    opacity: 0;
+  }
+  90% {
+    width: 0%;
+    opacity: 0;
+  }
+  100% {
+    width: 0%;
+    opacity: 1;
+  }
+}
+
+.livon-page-wrapper .benefit-grid h3 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  margin-bottom: 12px;
+  color: #112d26;
+  line-height: 1.35;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  padding: 0 2px;
+}
+
+/* 형광펜 마커 가상요소 */
+.livon-page-wrapper .benefit-grid h3::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  bottom: 2px;
+  height: 11px;
+  width: 0%;
+  background: rgba(79, 148, 107, 0.28);
+  border-radius: 3px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.livon-page-wrapper .benefit-grid .featured-benefit h3 {
+  color: #173e35;
+}
+
+.livon-page-wrapper .benefit-grid .featured-benefit h3::after {
+  background: rgba(235, 107, 88, 0.32);
+}
+
+/* 1번 -> 2번 -> 3번 순차적으로 자동으로 긋는 무한 반복 애니메이션 (총 5.5초 주기) */
+.livon-page-wrapper .benefit-grid.is-visible article:nth-of-type(1) h3::after {
+  animation: markerSweepCard1 5.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.livon-page-wrapper .benefit-grid.is-visible article:nth-of-type(2) h3::after,
+.livon-page-wrapper .benefit-grid.is-visible .featured-benefit h3::after {
+  animation: markerSweepCard2 5.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.livon-page-wrapper .benefit-grid.is-visible article:nth-of-type(3) h3::after {
+  animation: markerSweepCard3 5.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+/* 카드에 마우스 호버 시 항상 형광펜 활성화 */
+.livon-page-wrapper .benefit-grid article:hover h3::after {
+  animation: none !important;
+  width: calc(100% + 4px) !important;
+  opacity: 1 !important;
+  transition: width 0.3s ease;
+}
+
+.livon-page-wrapper .benefit-grid p {
+  font-size: 14px;
+  color: #7c877d;
+}
+
+.livon-page-wrapper .benefit-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  padding-top: 22px;
+  margin-top: 25px;
+  border-top: 1px solid #dce3d8;
+}
+
+.livon-page-wrapper .plus-sign {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  display: grid;
+  place-items: center;
+  margin-left: -2px;
+  z-index: 2;
+  border: 1px solid var(--line);
+}
+
+.livon-page-wrapper .plus-sign svg {
+  width: 16px;
+}
+
+.livon-page-wrapper .benefit-grid .featured-benefit {
+  background: #f9e8e2;
+  border-color: #f1d4cb;
+}
+
+.livon-page-wrapper .featured-benefit > svg {
+  color: var(--coral) !important;
+}
+
+
+.livon-page-wrapper .benefit-note {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #eff4ed;
+  padding: 19px 25px;
+  margin-top: 28px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.livon-page-wrapper .benefit-note > svg {
+  flex-shrink: 0;
+}
+
+.livon-page-wrapper .benefit-note a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.livon-page-wrapper .appliances {
+  background: #f5f6f1;
+}
+
+.livon-page-wrapper .brand-tabs {
+  display: inline-flex;
+  border-bottom: 1px solid #d5ded2;
+  gap: 35px;
+  margin-top: 24px;
+}
+
+.livon-page-wrapper .brand-tabs button {
+  padding: 10px 3px;
+  background: none;
+  color: #919a8e;
+  font-weight: 700;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.livon-page-wrapper .brand-tabs button.active {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.livon-page-wrapper .product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.livon-page-wrapper .product-visual {
+  height: 310px;
+  background: #e8ede4;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.livon-page-wrapper .product-visual .photo-slot {
+  height: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.livon-page-wrapper .product-brand {
+  position: absolute;
+  top: 23px;
+  left: 23px;
+  z-index: 2;
+  font-size: 12px;
+  color: #718370;
+  font-weight: 650;
+}
+
+.livon-page-wrapper .product-watermark {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  opacity: .13;
+}
+
+.livon-page-wrapper .product small {
+  font-size: 11px;
+  color: #84907f;
+}
+
+.livon-page-wrapper .product:not(.livon-product-card) h3 {
+  font-size: 21px;
+  margin: 5px 0 14px;
+}
+
+.livon-page-wrapper .product .text-button {
+  font-size: 12px;
+}
+
+.livon-page-wrapper .delivery-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 38px;
+  background: white;
+  border-radius: 10px;
+  padding: 25px 10px;
+}
+
+.livon-page-wrapper .delivery-row > div {
+  display: flex;
+  justify-content: center;
+  gap: 17px;
+  align-items: center;
+  border-right: 1px solid var(--line);
+}
+
+.livon-page-wrapper .delivery-row > div:last-child {
+  border: 0;
+}
+
+.livon-page-wrapper .delivery-row svg {
+  width: 28px;
+  height: 28px;
+  stroke-width: 1.3;
+  color: #6f8b77;
+}
+
+.livon-page-wrapper .delivery-row b {
+  display: block;
+  font-size: 14px;
+}
+
+.livon-page-wrapper .delivery-row small {
+  display: block;
+  color: #8a9488;
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+.livon-page-wrapper .caregiving {
+  background: #fdfbf7;
+}
+
+.livon-page-wrapper .care-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 90px;
+  align-items: center;
+}
+
+.livon-page-wrapper .care-photo-wrap {
+  position: relative;
+}
+
+.livon-page-wrapper .care-photo-wrap > .photo-slot {
+  height: 570px;
+  background: linear-gradient(145deg, #ebe6db, #dfd6c9);
+  border-color: #d7cebf;
+  border-radius: 180px 180px 10px 10px;
+}
+
+.livon-page-wrapper .care-photo-wrap .slot-corner {
+  display: none;
+}
+
+.livon-page-wrapper .care-photo-wrap .slot-content {
+  color: #a09583;
+}
+
+.livon-page-wrapper .care-quote {
+  position: absolute;
+  bottom: 35px;
+  left: 30px;
+  right: -28px;
+  background: white;
+  box-shadow: 0 12px 30px #332d2110;
+  border-radius: 8px;
+  padding: 23px 26px;
+  display: flex;
+  align-items: center;
+  gap: 19px;
+  font-size: 14px;
+}
+
+.livon-page-wrapper .care-quote svg {
+  color: var(--coral);
+}
+
+.livon-page-wrapper .care-copy h2 {
+  font-size: 35px;
+  letter-spacing: -1.5px;
+}
+
+.livon-page-wrapper .big-days {
+  margin: 25px 0 15px;
+}
+
+.livon-page-wrapper .big-days > span {
+  font-size: 14px;
+  display: block;
+  color: #79907c;
+}
+
+.livon-page-wrapper .big-days > div {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.livon-page-wrapper .big-days strong {
+  font-size: 126px;
+  line-height: 1.1;
+  font-weight: 650;
+  letter-spacing: -7px;
+  color: var(--coral);
+}
+
+.livon-page-wrapper .big-days b {
+  font-size: 35px;
+  font-weight: 600;
+  color: var(--coral);
+}
+
+.livon-page-wrapper .day-seal {
+  font-size: 9px;
+  letter-spacing: .18em;
+  color: #a9ad99;
+  margin-left: 15px;
+  align-self: center;
+  line-height: 1.6;
+}
+
+.livon-page-wrapper .body-copy {
+  font-size: 14px;
+  color: #798174;
+  line-height: 1.9;
+}
+
+.livon-page-wrapper .care-checks {
+  margin: 27px 0;
+}
+
+.livon-page-wrapper .care-checks p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  margin: 10px 0;
+}
+
+.livon-page-wrapper .care-checks svg {
+  width: 17px;
+  color: #8a9d79;
+}
+
+.livon-page-wrapper .care-terms {
+  display: flex;
+  gap: 10px;
+  padding: 17px 19px;
+  background: #f0f1e8;
+  border-radius: 7px;
+  color: #72836d;
+  margin: 0 0 20px;
+}
+
+.livon-page-wrapper .care-terms svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.livon-page-wrapper .care-terms p {
+  font-size: 11px;
+  line-height: 1.9;
+}
+
+.livon-page-wrapper .care-terms strong {
+  font-size: 12px;
+}
+
+.livon-page-wrapper .health {
+  background: #edf3ec;
+}
+
+.livon-page-wrapper .partner-label {
+  display: inline-block;
+  font-size: 11px;
+  color: #7c8c7b;
+  margin-top: 22px;
+  background: #e0e9dd;
+  padding: 7px 16px;
+  border-radius: 30px;
+}
+
+.livon-page-wrapper .health-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.livon-page-wrapper .health-tabs button {
+  background: #e1e9df;
+  padding: 22px 25px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #7c907d;
+  transition: .2s;
+}
+
+.livon-page-wrapper .health-tabs button > span {
+  font-size: 11px;
+  opacity: .6;
+}
+
+.livon-page-wrapper .health-tabs button > svg {
+  margin-left: auto;
+}
+
+.livon-page-wrapper .health-tabs button.active {
+  background: var(--ink);
+  color: white;
+}
+
+.livon-page-wrapper .health-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  background: #fff;
+  border-radius: 13px;
+  padding: 50px 55px;
+  min-height: 510px;
+}
+
+.livon-page-wrapper .mini-label {
+  font-size: 11px;
+  letter-spacing: .03em;
+  color: #8c9c83;
+  font-weight: 650;
+}
+
+.livon-page-wrapper .health-intro h3 {
+  font-size: 29px;
+  line-height: 1.4;
+  white-space: pre-line;
+  letter-spacing: -1.2px;
+  margin: 12px 0 15px;
+}
+
+.livon-page-wrapper .health-intro > p {
+  font-size: 13px;
+  color: #7f8a7b;
+  line-height: 1.9;
+}
+
+.livon-page-wrapper .health-intro .photo-slot {
+  height: 172px;
+  min-height: 0;
+  margin-top: 25px;
+  border: 0;
+  border-radius: 8px;
+  background: #eff0e8;
+}
+
+.livon-page-wrapper .health-intro .slot-content svg {
+  width: 23px;
+  height: 23px;
+}
+
+.livon-page-wrapper .health-intro .slot-content strong {
+  font-size: 11px;
+}
+
+.livon-page-wrapper .health-details {
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+}
+
+.livon-page-wrapper .health-details article {
+  display: flex;
+  align-items: center;
+  gap: 19px;
+  border-bottom: 1px solid #edf0e9;
+  padding: 18px 0;
+}
+
+.livon-page-wrapper .health-details article:last-child {
+  border: 0;
+}
+
+.livon-page-wrapper .health-details article > span {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f3f5ed;
+  flex-shrink: 0;
+  color: #88a17e;
+}
+
+.livon-page-wrapper .health-details h4 {
+  font-size: 17px;
+  margin-bottom: 7px;
+}
+
+.livon-page-wrapper .health-details p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #82907e;
+}
+
+.livon-page-wrapper .payment-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 65px;
+  align-items: center;
+}
+
+.livon-page-wrapper .price-box {
+  padding: 35px 40px;
+  border-radius: 12px;
+  background: #f5f5ee;
+}
+
+.livon-page-wrapper .pill {
+  display: inline-block;
+  background: #e6eadc;
+  font-size: 11px;
+  border-radius: 4px;
+  padding: 6px 12px;
+}
+
+.livon-page-wrapper .monthly {
+  font-size: 62px;
+  letter-spacing: -3px;
+  font-weight: 750;
+  margin: 23px 0 25px;
+}
+
+.livon-page-wrapper .monthly small {
+  font-size: 20px;
+  letter-spacing: 0;
+  font-weight: 500;
+}
+
+.livon-page-wrapper .monthly > span {
+  font-size: 24px;
+  margin-left: 5px;
+  letter-spacing: 0;
+}
+
+.livon-page-wrapper .price-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #dfe3d6;
+  padding: 15px 0;
+  font-size: 12px;
+}
+
+.livon-page-wrapper .price-line strong {
+  font-size: 18px;
+}
+
+.livon-page-wrapper .price-line.accent strong {
+  color: var(--coral);
+  font-size: 28px;
+}
+
+.livon-page-wrapper .price-box .fine {
+  margin: 0;
+  font-size: 10px;
+}
+
+.livon-page-wrapper .timeline {
+  padding: 5px 0;
+}
+
+.livon-page-wrapper .timeline-item {
+  position: relative;
+  display: flex;
+  gap: 25px;
+  padding-bottom: 27px;
+}
+
+.livon-page-wrapper .timeline-item:before {
+  content: "";
+  position: absolute;
+  height: 100%;
+  left: 5px;
+  top: 10px;
+  width: 1px;
+  background: #d2dfcf;
+}
+
+.livon-page-wrapper .timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.livon-page-wrapper .timeline-item:last-child:before {
+  display: none;
+}
+
+.livon-page-wrapper .timeline-dot {
+  width: 11px;
+  height: 11px;
+  background: #91ad86;
+  border: 3px solid #eef4e9;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #a3b59b;
+  flex-shrink: 0;
+  margin-top: 6px;
+  z-index: 1;
+}
+
+.livon-page-wrapper .timeline-tag {
+  font-size: 11px;
+  color: #7a9274;
+  font-weight: 600;
+}
+
+.livon-page-wrapper .timeline h3 {
+  font-size: 20px;
+  margin: 5px 0;
+}
+
+.livon-page-wrapper .timeline-item p {
+  color: #8c9687;
+  font-size: 11px;
+  margin-top: 7px;
+}
+
+.livon-page-wrapper .payment-split {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+  color: #82917c;
+}
+
+.livon-page-wrapper .payment-split b {
+  color: #526c4d;
+  font-weight: 600;
+}
+
+.livon-page-wrapper .credit-banner {
+  background: #eff4ed;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  padding: 35px 38px;
+  margin-top: 44px;
+}
+
+.livon-page-wrapper .credit-art {
+  width: 145px;
+  height: 90px;
+  background: #64816d;
+  border-radius: 7px;
+  transform: rotate(-7deg);
+  padding: 13px 16px;
+  color: #e9eee1;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.livon-page-wrapper .credit-art > span {
+  font-size: 13px;
+  letter-spacing: .1em;
+}
+
+.livon-page-wrapper .credit-art small {
+  position: absolute;
+  bottom: 13px;
+  left: 16px;
+  font-size: 6px;
+  letter-spacing: .19em;
+}
+
+.livon-page-wrapper .credit-banner h3 {
+  font-size: 22px;
+  letter-spacing: -.8px;
+  margin: 4px 0 8px;
+}
+
+.livon-page-wrapper .credit-banner p {
+  font-size: 12px;
+  color: #7b8a76;
+}
+
+.livon-page-wrapper .credit-banner > div > small {
+  font-size: 10px;
+  color: #909a88;
+  display: block;
+  margin-top: 9px;
+}
+
+.livon-page-wrapper .credit-banner .button {
+  margin-left: auto;
+}
+
+.livon-page-wrapper .refund {
+  background: var(--ink);
+  color: #eef3e8;
+  position: relative;
+  overflow: hidden;
+}
+
+.livon-page-wrapper .refund .eyebrow {
+  color: #a6b69a;
+}
+
+.livon-page-wrapper .refund-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 90px;
+  align-items: center;
+}
+
+.livon-page-wrapper .refund h2 {
+  font-size: 40px;
+}
+
+.livon-page-wrapper .refund-layout > div > p:not(.eyebrow):not(.refund-note) {
+  font-size: 14px;
+  color: #bbcbbb;
+  margin-top: 24px;
+  line-height: 1.9;
+}
+
+.livon-page-wrapper .refund-number {
+  display: flex;
+  align-items: center;
+  color: #e9c897;
+  margin: 18px 0;
+}
+
+.livon-page-wrapper .refund-number > strong {
+  font-size: 132px;
+  font-weight: 600;
+  letter-spacing: -7px;
+  line-height: 1.1;
+}
+
+.livon-page-wrapper .refund-number > span {
+  font-size: 65px;
+  line-height: 1;
+  margin-left: 12px;
+}
+
+.livon-page-wrapper .refund-number small {
+  display: block;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-top: 10px;
+}
+
+.livon-page-wrapper .refund-note {
+  font-size: 11px;
+  color: #98b09b;
+  line-height: 1.9;
+  max-width: 470px;
+}
+
+.livon-page-wrapper .refund-receipt {
+  background: #f9f9ee;
+  color: var(--ink);
+  padding: 38px 38px 30px;
+  border-radius: 10px;
+  transform: rotate(2deg);
+  position: relative;
+  box-shadow: 0 15px 30px #0d261c30;
+}
+
+.livon-page-wrapper .refund-receipt:before,
+.livon-page-wrapper .refund-receipt:after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 64%;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.livon-page-wrapper .refund-receipt:before {
+  left: -10px;
+}
+
+.livon-page-wrapper .refund-receipt:after {
+  right: -10px;
+}
+
+.livon-page-wrapper .receipt-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 10px;
+  color: #8e9c80;
+  border-bottom: 1px solid #e2e6d4;
+  padding-bottom: 20px;
+}
+
+.livon-page-wrapper .receipt-head svg {
+  width: 20px;
+}
+
+.livon-page-wrapper .refund-receipt h3 {
+  font-size: 25px;
+  margin-top: 24px;
+  letter-spacing: -1px;
+}
+
+.livon-page-wrapper .refund-receipt dl {
+  margin: 22px 0;
+}
+
+.livon-page-wrapper .refund-receipt dl > div {
+  display: flex;
+  justify-content: space-between;
+  margin: 14px 0;
+  font-size: 13px;
+}
+
+.livon-page-wrapper .refund-receipt dd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-weight: 650;
+}
+
+.livon-page-wrapper .refund-receipt dt {
+  color: #8a967c;
+}
+
+.livon-page-wrapper .refund-receipt dd svg {
+  color: #95a87e;
+}
+
+.livon-page-wrapper .receipt-total {
+  border-top: 1px dashed #c7d0b6;
+  padding-top: 25px;
+  display: flex;
+  flex-direction: column;
+}
+
+.livon-page-wrapper .receipt-total > span {
+  font-size: 12px;
+  color: #8e997f;
+}
+
+.livon-page-wrapper .receipt-total > strong {
+  font-size: 41px;
+  letter-spacing: -1.5px;
+  line-height: 1.5;
+}
+
+.livon-page-wrapper .receipt-total small {
+  font-size: 20px;
+  margin-left: 7px;
+}
+
+.livon-page-wrapper .refund-receipt > p {
+  font-size: 10px !important;
+  color: #8e9b82 !important;
+  margin-top: 18px !important;
+}
+
+.livon-page-wrapper .life-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.livon-page-wrapper .life-grid .photo-slot {
+  height: 235px;
+  border: 0;
+  border-radius: 8px 8px 0 0;
+  background: #edece3;
+}
+
+.livon-page-wrapper .life-grid article:nth-child(2) .photo-slot {
+  background: #e7eeef;
+}
+
+.livon-page-wrapper .life-grid article:nth-child(3) .photo-slot {
+  background: #f0e7e2;
+}
+
+.livon-page-wrapper .life-caption {
+  padding: 24px 23px;
+  background: #f9faf5;
+  border-radius: 0 0 8px 8px;
+  position: relative;
+}
+
+.livon-page-wrapper .life-caption > svg {
+  position: absolute;
+  right: 25px;
+  top: 28px;
+  color: #9aab8d;
+}
+
+.livon-page-wrapper .life-grid small {
+  font-size: 9px;
+  letter-spacing: .15em;
+  color: #9ca88d;
+}
+
+.livon-page-wrapper .life-grid h3 {
+  font-size: 22px;
+  margin: 7px 0;
+}
+
+.livon-page-wrapper .life-grid p {
+  font-size: 12px;
+  color: #849278;
+}
+
+.livon-page-wrapper .combination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 35px;
+  padding: 28px 32px;
+  background: #f1f4ec;
+  border-radius: 9px;
+  margin-top: 28px;
+}
+
+.livon-page-wrapper .combination strong {
+  font-size: 14px;
+}
+
+.livon-page-wrapper .combination p {
+  font-size: 11px;
+  color: #8d9983;
+  margin-top: 3px;
+}
+
+.livon-page-wrapper .combo-options {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.livon-page-wrapper .combo-options button {
+  background: transparent;
+  border: 1px solid #d3dccb;
+  padding: 8px 15px;
+  border-radius: 25px;
+  font-size: 11px;
+}
+
+.livon-page-wrapper .combo-options button.active {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+
+.livon-page-wrapper .combo-result {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border-top: 1px solid #dde4d5;
+  padding-top: 22px;
+}
+
+.livon-page-wrapper .combo-result > span {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  padding: 12px 25px;
+  font-weight: 650;
+}
+
+.livon-page-wrapper .combo-result small {
+  color: #9ca68f;
+  font-size: 10px;
+  font-weight: 450;
+}
+
+.livon-page-wrapper .combo-result > b {
+  font-size: 13px;
+  padding-left: 15px;
+  color: #6d8561;
+}
+
+.livon-page-wrapper .trust {
+  background: #f8f6f0;
+}
+
+.livon-page-wrapper .trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.livon-page-wrapper .trust-grid article {
+  background: white;
+  padding: 32px;
+  border: 1px solid #e7e7dc;
+  border-radius: 10px;
+}
+
+.livon-page-wrapper .trust-role {
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: #9a9f89;
+}
+
+.livon-page-wrapper .trust-grid h3 {
+  font-size: 27px;
+  margin: 18px 0 16px;
+  letter-spacing: -1px;
+}
+
+.livon-page-wrapper .trust-grid article > strong {
+  font-size: 14px;
+}
+
+.livon-page-wrapper .trust-grid .livon-word {
+  color: #9f5d80;
+  font-style: italic;
+  font-size: 30px;
+}
+
+.livon-page-wrapper .livon-word small {
+  font-size: 15px;
+  font-style: normal;
+  color: var(--ink);
+}
+
+.livon-page-wrapper .trust-grid ul {
+  padding: 0;
+  list-style: none;
+  margin: 20px 0 25px;
+}
+
+.livon-page-wrapper .trust-grid li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #8b9481;
+  margin: 9px 0;
+}
+
+.livon-page-wrapper .trust-grid li svg {
+  width: 14px;
+  color: #a2b592;
+}
+
+.livon-page-wrapper .trust-grid a {
+  font-size: 10px;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  border-top: 1px solid #edf0e6;
+  padding-top: 19px;
+  color: #738b65;
+}
+
+.livon-page-wrapper .status-chip {
+  display: block;
+  background: #f4f0df;
+  border-radius: 4px;
+  font-size: 10px;
+  padding: 8px 10px;
+  color: #938a68;
+}
+
+.livon-page-wrapper .faq-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 70px;
+}
+
+.livon-page-wrapper .faq .section-head h2 {
+  font-size: 35px;
+}
+
+.livon-page-wrapper .faq .section-head > svg {
+  color: #b7c5ad;
+  margin-top: 30px;
+}
+
+.livon-page-wrapper .faq-list details {
+  border-bottom: 1px solid var(--line);
+}
+
+.livon-page-wrapper .faq-list details:first-child {
+  border-top: 1px solid var(--line);
+}
+
+.livon-page-wrapper .faq-list summary {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 24px 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.livon-page-wrapper .faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.livon-page-wrapper .faq-list summary > span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a4b091;
+}
+
+.livon-page-wrapper .faq-list summary h3 {
+  font-size: 15px;
+  flex: 1;
+  line-height: 1.6;
+}
+
+.livon-page-wrapper .faq-list summary > svg {
+  flex-shrink: 0;
+  transition: transform .2s;
+  color: #a1ae92;
+}
+
+.livon-page-wrapper .faq-list details[open] summary > svg {
+  transform: rotate(45deg);
+}
+
+.livon-page-wrapper .faq-list details > p {
+  font-size: 13px;
+  color: #849179;
+  line-height: 1.95;
+  padding: 0 0 25px 36px;
+}
+
+.livon-page-wrapper .closing {
+  background: #f4e9e2;
+  padding-bottom: 60px;
+  overflow: hidden;
+}
+
+.livon-page-wrapper .closing-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.livon-page-wrapper .closing .eyebrow {
+  color: #ab8e79;
+}
+
+.livon-page-wrapper .closing h2 {
+  font-size: 45px;
+}
+
+.livon-page-wrapper .closing-top p:not(.eyebrow) {
+  color: #948b7c;
+  font-size: 16px;
+  margin: 22px 0 28px;
+}
+
+.livon-page-wrapper .closing-top > div > small {
+  display: block;
+  font-size: 10px;
+  color: #a79c8c;
+  margin-top: 15px;
+}
+
+.livon-page-wrapper .closing-visual {
+  position: relative;
+}
+
+.livon-page-wrapper .closing-visual .photo-slot {
+  height: 340px;
+  border-radius: 150px 150px 8px 8px;
+  background: #ebded2;
+  border-color: #d5c7b5;
+}
+
+.livon-page-wrapper .closing-visual .slot-corner {
+  display: none;
+}
+
+.livon-page-wrapper .closing-visual .slot-content {
+  color: #b09f8e;
+}
+
+.livon-page-wrapper .closing-seal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 110px;
+  height: 110px;
+  background: var(--ink);
+  color: #e4e7ce;
+  position: absolute;
+  right: -22px;
+  bottom: -18px;
+  font-size: 9px;
+  text-align: center;
+  letter-spacing: .1em;
+  transform: rotate(14deg);
+  gap: 8px;
+}
+
+.livon-page-wrapper .closing-seal svg {
+  width: 23px;
+  height: 23px;
+  stroke-width: 1;
+}
+
+.livon-page-wrapper .steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid #ddd0c3;
+  margin-top: 60px;
+  padding-top: 35px;
+  gap: 28px;
+}
+
+.livon-page-wrapper .steps span {
+  font-size: 10px;
+  color: #b2937e;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.livon-page-wrapper .steps strong {
+  font-size: 16px;
+}
+
+.livon-page-wrapper .steps p {
+  font-size: 11px;
+  color: #a29888;
+  margin-top: 6px;
+}
+
+.livon-page-wrapper .notices {
+  background: #f6f7f3;
+  padding: 65px 0;
+}
+
+.livon-page-wrapper .notice-heading {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.livon-page-wrapper .notice-heading h2 {
+  font-size: 21px;
+  letter-spacing: -.6px;
+}
+
+.livon-page-wrapper .notice-intro {
+  font-size: 10px;
+  color: #9aa38f;
+  margin: 12px 0 30px;
+}
+
+.livon-page-wrapper .notices dl > div {
+  display: grid;
+  grid-template-columns: 115px 1fr;
+  gap: 20px;
+  padding: 17px 0;
+  border-bottom: 1px solid #e4e8dc;
+}
+
+.livon-page-wrapper .notices dt {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.livon-page-wrapper .notices dd {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.9;
+  color: #65745f;
+}
+
+.livon-page-wrapper .source-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-top: 30px;
+  font-size: 11px;
+}
+
+.livon-page-wrapper .source-links > span {
+  color: #9ba78e;
+}
+
+.livon-page-wrapper .source-links a {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.livon-page-wrapper .source-links a:hover {
+  text-decoration: underline;
+}
+
+.livon-page-wrapper footer {
+  padding: 40px 0 125px;
+  background: white;
+}
+
+.livon-page-wrapper .footer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 27px;
+}
+
+.livon-page-wrapper .footer-top .brand-logo-img {
+  height: 48px;
+  max-width: 255px;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.livon-page-wrapper .footer-top .hyowon-logo {
+  font-size: 19px;
+}
+
+.livon-page-wrapper .footer-top .livon-logo {
+  font-size: 23px;
+}
+
+.livon-page-wrapper .to-top {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+
+.livon-page-wrapper footer p {
+  font-size: 10px;
+  color: #929c88;
+  margin: 6px 0;
+}
+
+.livon-page-wrapper .footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  font-size: 9px;
+  color: #a9b19e;
+  letter-spacing: .05em;
+}
+
+.livon-page-wrapper .sticky-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  width: 100%;
+  background: #fffefaf5;
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #e0e5d8;
+  box-shadow: 0 -5px 20px #23412a05;
+}
+
+.livon-page-wrapper .sticky-cta > .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80px;
+  gap: 20px;
+}
+
+.livon-page-wrapper .sticky-cta small {
+  font-size: 10px;
+  color: #8c9b80;
+  display: block;
+}
+
+.livon-page-wrapper .sticky-cta strong {
+  font-size: 15px;
+}
+
+.livon-page-wrapper .sticky-cta .button {
+  min-width: 230px;
+}
+
+.livon-page-wrapper .closing-copy {
+  min-width: 0;
+}
+
+.livon-page-wrapper .closing-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 26px 0;
+  display: grid;
+  gap: 13px;
+}
+
+.livon-page-wrapper .closing-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  color: #58634e;
+  line-height: 1.6;
+}
+
+.livon-page-wrapper .closing-benefits svg {
+  width: 21px;
+  height: 21px;
+  flex-shrink: 0;
+  stroke-width: 1.5;
+  color: #8b6c57;
+}
+
+.livon-page-wrapper .closing-benefits strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.livon-page-wrapper .closing-card-price {
+  padding: 22px 26px;
+  background: var(--ink);
+  border-radius: 12px;
+  color: #fffef7;
+  max-width: 440px;
+}
+
+.livon-page-wrapper .closing-card-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  color: #d8dfc5;
+}
+
+.livon-page-wrapper .closing-discount {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+  margin-top: 8px;
+}
+
+.livon-page-wrapper .closing-discount > span {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.livon-page-wrapper .closing-discount > strong {
+  font-size: 53px;
+  letter-spacing: -2px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.livon-page-wrapper .closing-discount > small {
+  font-size: 10px;
+  color: #d8dfc5;
+  margin-left: auto;
+}
+
+.livon-page-wrapper .closing-price-terms,
+.livon-page-wrapper .closing-care-terms {
+  font-size: 11px;
+  line-height: 1.85;
+  color: #7c7869;
+  word-break: keep-all;
+}
+
+.livon-page-wrapper .closing-price-terms {
+  margin: 12px 0;
+}
+
+.livon-page-wrapper .closing-care-terms {
+  margin: 0 0 24px;
+  color: #8b8174;
+}
+
+.livon-page-wrapper .closing h2 em {
+  white-space: nowrap;
+}
+
+/* Modal styling */
+.livon-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(16, 41, 31, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.livon-modal-container {
+  position: relative;
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  color: var(--ink);
+  background: #fffefb;
+  box-shadow: 0 20px 100px rgba(15, 37, 29, 0.4);
+  border-radius: 16px;
+  padding: 36px 32px;
+  overflow-y: auto;
+  border: 1px solid rgba(220, 227, 219, 0.6);
+}
+
+.livon-modal-close {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  background: transparent;
+  padding: 6px;
+  color: #6a7870;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s;
+}
+
+.livon-modal-close:hover {
+  background: #f0f3ee;
+  color: var(--ink);
+}
+
+.livon-modal-container .eyebrow {
+  font-size: 10px;
+  margin-bottom: 8px;
+}
+
+.livon-modal-container h2 {
+  font-size: 28px;
+  letter-spacing: -1px;
+  line-height: 1.3;
+}
+
+.livon-modal-description {
+  font-size: 13px;
+  color: #8c9682;
+  margin: 12px 0 18px;
+}
+
+.livon-modal-container form > label,
+.livon-modal-container .form-row label {
+  font-size: 12px;
+  font-weight: 700;
+  display: block;
+  margin: 16px 0 6px;
+}
+
+.livon-modal-container input:not([type=checkbox]),
+.livon-modal-container select {
+  border: 1px solid #dce3d5;
+  background: white;
+  border-radius: 8px;
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  font-size: 14px;
+  color: #2b3d34;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.livon-modal-container input:not([type=checkbox]):focus,
+.livon-modal-container select:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(23, 62, 53, 0.1);
+}
+
+.livon-modal-container .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 12px;
+}
+
+.livon-modal-container .consent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0;
+  font-size: 12px;
+  gap: 10px;
+}
+
+.livon-modal-container .consent label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.livon-modal-container .consent input {
+  accent-color: var(--ink);
+  width: 16px;
+  height: 16px;
+}
+
+.livon-modal-container .consent > button {
+  background: none;
+  text-decoration: underline;
+  font-size: 11px;
+  color: #8f9b81;
+  white-space: nowrap;
+}
+
+.livon-modal-container .form-submit {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.livon-modal-container .fine {
+  font-size: 11px;
+  text-align: center;
+  margin-top: 14px;
+}
+
+.livon-modal-container .form-result {
+  text-align: center;
+  padding: 40px 10px;
+}
+
+.livon-modal-container .form-result > svg {
+  color: #4a9e69;
+  margin: 0 auto 20px;
+}
+
+.livon-modal-container .form-result h2 {
+  font-size: 26px;
+}
+
+.livon-modal-container .form-result p {
+  font-size: 14px;
+  color: #72836f;
+  margin: 16px 0 28px;
+  line-height: 1.7;
+}
+
+/* Media Queries */
+@media (min-width: 1500px) {
+  .livon-page-wrapper .hero-grid { min-height: 810px; }
+  .livon-page-wrapper .container { width: min(1240px, calc(100% - 100px)); }
+  .livon-page-wrapper .hero h1 { font-size: 73px; }
+}
+
+@media (max-width: 1100px) {
+  .livon-page-wrapper .container { width: calc(100% - 56px); }
+  .livon-page-wrapper .nav { gap: 16px; }
+  .livon-page-wrapper .hyowon-logo { font-size: 20px; }
+  .livon-page-wrapper .brand { gap: 12px; }
+  .livon-page-wrapper .hero h1 { font-size: 56px; }
+  .livon-page-wrapper .hero-grid { gap: 20px; }
+  .livon-page-wrapper .hero-art { height: 540px; }
+  .livon-page-wrapper .hero-photo { width: 340px; height: 460px; }
+  .livon-page-wrapper .care-float { right: 0; top: 80px; padding: 12px 15px; }
+  .livon-page-wrapper .membership-card { width: 260px; bottom: 15px; }
+  .livon-page-wrapper .hero .button.large { font-size: 15px; padding: 19px; }
+  .livon-page-wrapper .hero-chips { gap: 10px; }
+  .livon-page-wrapper .benefit-grid article { padding: 25px; }
+  .livon-page-wrapper .benefit-grid h3 { font-size: 19px; }
+  .livon-page-wrapper .product-grid { gap: 17px; }
+  .livon-page-wrapper .product-visual { height: 265px; }
+  .livon-page-wrapper .care-layout { gap: 55px; }
+  .livon-page-wrapper .care-photo-wrap > .photo-slot { height: 530px; }
+  .livon-page-wrapper .care-copy h2 { font-size: 30px; }
+  .livon-page-wrapper .health-panel { gap: 35px; padding: 40px; }
+  .livon-page-wrapper .credit-banner { gap: 25px; padding: 30px; }
+  .livon-page-wrapper .credit-art { width: 115px; height: 76px; }
+  .livon-page-wrapper .credit-banner h3 { font-size: 19px; }
+  .livon-page-wrapper .refund-layout { gap: 55px; }
+  .livon-page-wrapper .refund h2 { font-size: 35px; }
+  .livon-page-wrapper .refund-receipt { padding: 30px; }
+  .livon-page-wrapper .trust-grid { gap: 15px; }
+  .livon-page-wrapper .trust-grid article { padding: 25px; }
+  .livon-page-wrapper .closing-top { gap: 45px; }
+}
+
+@media (max-width: 850px) {
+  .livon-page-wrapper .nav {
+    display: none;
+    position: absolute;
+    top: 74px;
+    left: 0;
+    width: 100%;
+    background: white;
+    border-bottom: 1px solid var(--line);
+    padding: 25px 28px;
+    flex-direction: column;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  }
+  .livon-page-wrapper .nav.open { display: flex; }
+  .livon-page-wrapper .nav-inner { height: 74px; gap: 20px; }
+  .livon-page-wrapper .nav-inner > .button { margin-left: auto; }
+  .livon-page-wrapper .menu-toggle { display: block; }
+  .livon-page-wrapper .hero-grid { grid-template-columns: 1.05fr 1fr; min-height: 650px; gap: 5px; }
+  .livon-page-wrapper .hero h1 { font-size: 48px; }
+  .livon-page-wrapper .hero-desc { font-size: 15px; }
+  .livon-page-wrapper .hero-art { height: 470px; }
+  .livon-page-wrapper .hero-photo { width: 280px; height: 390px; margin-left: 0; }
+  .livon-page-wrapper .care-float { top: 45px; right: -10px; padding: 11px; }
+  .livon-page-wrapper .care-float strong { font-size: 12px; }
+  .livon-page-wrapper .round-icon { width: 33px; height: 33px; }
+  .livon-page-wrapper .care-float small { font-size: 8px; }
+  .livon-page-wrapper .membership-card { width: 225px; left: 0; bottom: 15px; padding: 19px; }
+  .livon-page-wrapper .membership-card > strong { font-size: 23px; }
+  .livon-page-wrapper .membership-card p { font-size: 8px; }
+  .livon-page-wrapper .hero-chips { flex-direction: column; gap: 5px; }
+  .livon-page-wrapper .hero-price > span { display: block; }
+  .livon-page-wrapper .section { padding: 80px 0; }
+  .livon-page-wrapper .section-head h2, .livon-page-wrapper h2 { font-size: 35px; }
+  .livon-page-wrapper .benefit-grid { grid-template-columns: 1fr 22px 1fr 22px 1fr; }
+  .livon-page-wrapper .benefit-grid article { padding: 22px 20px; min-height: 290px; }
+  .livon-page-wrapper .benefit-grid h3 { font-size: 16px; }
+  .livon-page-wrapper .benefit-grid p { font-size: 12px; }
+  .livon-page-wrapper .benefit-bottom { font-size: 9px; }
+  .livon-page-wrapper .plus-sign { width: 27px; height: 27px; }
+  .livon-page-wrapper .benefit-note { font-size: 12px; flex-wrap: wrap; }
+  .livon-page-wrapper .product-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 24px; }
+  .livon-page-wrapper .product-visual { height: 310px; }
+  .livon-page-wrapper .care-layout { gap: 35px; grid-template-columns: 1fr 1.08fr; }
+  .livon-page-wrapper .care-copy h2 { font-size: 27px; }
+  .livon-page-wrapper .big-days strong { font-size: 100px; }
+  .livon-page-wrapper .body-copy { font-size: 12px; }
+  .livon-page-wrapper .care-quote { left: 15px; right: -15px; padding: 19px; font-size: 11px; }
+  .livon-page-wrapper .care-photo-wrap > .photo-slot { height: 500px; }
+  .livon-page-wrapper .care-checks p { font-size: 11px; gap: 7px; }
+  .livon-page-wrapper .health-tabs button { font-size: 13px; padding: 20px 18px; gap: 10px; }
+  .livon-page-wrapper .health-panel { gap: 30px; padding: 30px; }
+  .livon-page-wrapper .health-intro h3 { font-size: 25px; }
+  .livon-page-wrapper .health-details h4 { font-size: 15px; }
+  .livon-page-wrapper .health-details p { font-size: 11px; }
+  .livon-page-wrapper .health-details article { gap: 12px; }
+  .livon-page-wrapper .payment-layout { gap: 35px; }
+  .livon-page-wrapper .price-box { padding: 25px; }
+  .livon-page-wrapper .monthly { font-size: 48px; }
+  .livon-page-wrapper .price-line { font-size: 10px; }
+  .livon-page-wrapper .price-line strong { font-size: 16px; }
+  .livon-page-wrapper .timeline h3 { font-size: 17px; }
+  .livon-page-wrapper .payment-split { font-size: 10px; gap: 6px; }
+  .livon-page-wrapper .credit-banner { flex-wrap: wrap; }
+  .livon-page-wrapper .credit-banner .button { padding: 12px 18px; font-size: 12px; }
+  .livon-page-wrapper .refund-layout { gap: 35px; }
+  .livon-page-wrapper .refund h2 { font-size: 30px; }
+  .livon-page-wrapper .refund-number > strong { font-size: 110px; }
+  .livon-page-wrapper .refund-number > span { font-size: 48px; }
+  .livon-page-wrapper .refund-receipt { padding: 28px 25px; }
+  .livon-page-wrapper .refund-receipt h3 { font-size: 21px; }
+  .livon-page-wrapper .refund-receipt dl > div { font-size: 11px; }
+  .livon-page-wrapper .receipt-total > strong { font-size: 32px; }
+  .livon-page-wrapper .life-grid { gap: 16px; }
+  .livon-page-wrapper .life-grid .photo-slot { height: 200px; }
+  .livon-page-wrapper .life-grid h3 { font-size: 18px; }
+  .livon-page-wrapper .life-caption { padding: 20px; }
+  .livon-page-wrapper .trust-grid article { padding: 22px 18px; }
+  .livon-page-wrapper .trust-grid h3 { font-size: 24px; }
+  .livon-page-wrapper .trust-grid article > strong { font-size: 12px; }
+  .livon-page-wrapper .trust-grid li { font-size: 10px; gap: 3px; }
+  .livon-page-wrapper .status-chip { font-size: 8px; }
+  .livon-page-wrapper .trust-grid a { font-size: 9px; }
+  .livon-page-wrapper .faq-grid { gap: 35px; grid-template-columns: 1fr 1.4fr; }
+  .livon-page-wrapper .faq .section-head h2 { font-size: 29px; }
+  .livon-page-wrapper .faq-list summary h3 { font-size: 13px; }
+  .livon-page-wrapper .faq-list summary { gap: 10px; }
+  .livon-page-wrapper .closing h2 { font-size: 34px; }
+  .livon-page-wrapper .closing-visual .photo-slot { height: 300px; }
+  .livon-page-wrapper .closing-seal { width: 90px; height: 90px; right: -5px; }
+  .livon-page-wrapper .sticky-cta strong { font-size: 13px; }
+  .livon-page-wrapper .sticky-cta .button { min-width: 190px; }
+  .livon-page-wrapper .closing-top { grid-template-columns: 1.2fr 1fr; gap: 28px; }
+  .livon-page-wrapper .closing-card-price { padding: 20px; }
+  .livon-page-wrapper .closing-discount > strong { font-size: 43px; }
+  .livon-page-wrapper .closing-discount > small { font-size: 8px; }
+  .livon-page-wrapper .closing-benefits li { font-size: 13px; }
+  .livon-page-wrapper .closing-copy > .button { font-size: 13px; padding: 18px; }
+}
+
+@media (max-width: 600px) {
+  .livon-page-wrapper .benefit-sticker {
+    padding: 6px 16px 6px 8px;
+    margin-bottom: 14px;
+    gap: 8px;
+    border-width: 2.5px;
+  }
+  .livon-page-wrapper .benefit-sticker .sticker-pin {
+    font-size: 10.5px;
+    padding: 3px 8px;
+  }
+  .livon-page-wrapper .benefit-sticker .sticker-text {
+    font-size: 15px;
+  }
+  .livon-page-wrapper .container { width: calc(100% - 40px); }
+  .livon-page-wrapper .section { padding: 65px 0; }
+  .livon-page-wrapper .top-banner { font-size: 9px; padding: 8px 10px; gap: 8px; }
+  .livon-page-wrapper .top-banner span { font-size: 9px; gap: 3px; }
+  .livon-page-wrapper .top-banner svg { display: none; }
+  .livon-page-wrapper .nav-inner { height: 65px; gap: 12px; }
+  .livon-page-wrapper .brand { gap: 9px; }
+  .livon-page-wrapper .brand-logo-img { height: 45px; max-width: 210px; }
+  .livon-page-wrapper .footer-top .brand-logo-img { height: 39px; max-width: 180px; }
+  .livon-page-wrapper .hyowon-logo { font-size: 18px; }
+  .livon-page-wrapper .hyowon-logo svg { width: 23px; }
+  .livon-page-wrapper .livon-logo { font-size: 23px; }
+  .livon-page-wrapper .livon-logo small { font-size: 6px; }
+  .livon-page-wrapper .brand-x { font-size: 12px; }
+  .livon-page-wrapper .nav-inner > .button { font-size: 10px; padding: 9px 11px; gap: 5px; }
+  .livon-page-wrapper .nav-inner > .button > svg { width: 12px; }
+  .livon-page-wrapper .menu-toggle { padding: 0; }
+  .livon-page-wrapper .menu-toggle svg { width: 21px; }
+  .livon-page-wrapper .nav { top: 65px; }
+  .livon-page-wrapper .hero-grid { grid-template-columns: 1fr; gap: 0; padding-top: 37px; padding-bottom: 47px; }
+  .livon-page-wrapper .hero h1 { font-size: 51px; letter-spacing: -2.7px; line-height: 1.2; }
+  .livon-page-wrapper .hero-tag { font-size: 10px; margin-bottom: 18px; }
+  .livon-page-wrapper .hero-desc { font-size: 15px; margin-top: 21px; line-height: 1.9; }
+  .livon-page-wrapper .hero-chips { flex-direction: row; gap: 14px; margin: 20px 0; }
+  .livon-page-wrapper .hero-chips span { font-size: 10px; }
+  .livon-page-wrapper .hero-chips svg { width: 13px; }
+  .livon-page-wrapper .hero .button.large { width: 100%; padding: 18px 12px; font-size: 14px; gap: 10px; }
+  .livon-page-wrapper .hero-price { font-size: 10px; margin-top: 17px; }
+  .livon-page-wrapper .hero-price > span { display: inline; }
+  .livon-page-wrapper .hero-price strong { font-size: 15px; }
+  .livon-page-wrapper .hero .fine { font-size: 9px; margin-top: 11px; }
+  .livon-page-wrapper .hero-art { height: 440px; margin-top: 20px; max-width: 430px; width: 100%; justify-self: center; }
+  .livon-page-wrapper .hero-photo { width: 290px; height: 370px; margin-left: 20px; }
+  .livon-page-wrapper .care-float { top: 60px; right: 0; padding: 12px 15px; }
+  .livon-page-wrapper .care-float strong { font-size: 12px; }
+  .livon-page-wrapper .membership-card { width: 235px; left: 5px; bottom: 0; padding: 18px 22px; }
+  .livon-page-wrapper .membership-card > div > span { font-size: 24px; }
+  .livon-page-wrapper .membership-card > small { margin-top: 10px; font-size: 7px; }
+  .livon-page-wrapper .membership-card > strong { font-size: 23px; margin-bottom: 8px; }
+  .livon-page-wrapper .orb-one { width: 260px; height: 260px; right: -25px; top: 20px; }
+  .livon-page-wrapper .orb-two { width: 150px; height: 150px; left: -10px; bottom: 0; }
+  .livon-page-wrapper .hero-art-caption { bottom: -20px; font-size: 6px; }
+  .livon-page-wrapper .section-head { margin-bottom: 30px; }
+  .livon-page-wrapper .section-head h2, .livon-page-wrapper h2 { font-size: 30px; letter-spacing: -1.3px; line-height: 1.4; }
+  .livon-page-wrapper .eyebrow { font-size: 9px; letter-spacing: .13em; margin-bottom: 14px; }
+  .livon-page-wrapper .section-head p:not(.eyebrow) { font-size: 13px; margin-top: 16px; line-height: 1.8; }
+  .livon-page-wrapper .section-head.horizontal { display: block; }
+  .livon-page-wrapper .section-head.horizontal > div + div { margin-top: 20px; }
+  .livon-page-wrapper .section-head.horizontal > p { margin-top: 20px; }
+  .livon-page-wrapper .benefit-grid { grid-template-columns: 1fr; gap: 0; }
+  .livon-page-wrapper .benefit-grid article { padding: 24px 25px; min-height: 0; }
+  .livon-page-wrapper .benefit-grid article > svg { position: absolute; right: 25px; top: 47px; width: 43px; height: 43px; margin: 0; opacity: .6; }
+  .livon-page-wrapper .benefit-grid .number { position: static; font-size: 10px; display: block; margin-bottom: 10px; }
+  .livon-page-wrapper .benefit-grid h3 { font-size: 20px; font-weight: 800; }
+  .livon-page-wrapper .benefit-grid p { font-size: 12px; line-height: 1.8; }
+  .livon-page-wrapper .benefit-grid p br { display: none; }
+  .livon-page-wrapper .benefit-bottom { margin-top: 16px; padding-top: 14px; font-size: 11px; }
+  .livon-page-wrapper .plus-sign { margin: -6px auto; width: 28px; height: 28px; }
+  .livon-page-wrapper .benefit-note { padding: 18px; font-size: 11px; align-items: flex-start; gap: 9px; line-height: 1.9; margin-top: 20px; }
+  .livon-page-wrapper .benefit-note > svg { width: 18px; margin-top: 2px; }
+  .livon-page-wrapper .benefit-note p { flex: 1; }
+  .livon-page-wrapper .benefit-note a { width: 100%; margin-left: 27px; font-size: 10px; }
+  .livon-page-wrapper .brand-tabs { margin-top: 17px; }
+  .livon-page-wrapper .brand-tabs button { font-size: 13px; padding: 8px 2px; }
+  .livon-page-wrapper .product-grid { gap: 25px 14px; }
+  .livon-page-wrapper .product-visual { height: 205px; margin-bottom: 13px; }
+  .livon-page-wrapper .product-brand { font-size: 9px; left: 16px; top: 16px; }
+  .livon-page-wrapper .product-visual .slot-corner { width: 12px; height: 12px; }
+  .livon-page-wrapper .product-visual .slot-corner.tl, .livon-page-wrapper .product-visual .slot-corner.bl { left: 10px; }
+  .livon-page-wrapper .product-visual .slot-corner.tr, .livon-page-wrapper .product-visual .slot-corner.br { right: 10px; }
+  .livon-page-wrapper .product-visual .slot-content { padding: 15px; gap: 7px; }
+  .livon-page-wrapper .product-visual .slot-content strong { font-size: 10px; }
+  .livon-page-wrapper .product-visual .slot-content small { font-size: 6px; }
+  .livon-page-wrapper .product-visual .slot-content svg { width: 24px; height: 24px; }
+  .livon-page-wrapper .product-watermark { width: 40px; right: 12px; bottom: 12px; }
+  .livon-page-wrapper .product small { font-size: 9px; }
+  .livon-page-wrapper .product:not(.livon-product-card) h3 { font-size: 17px; letter-spacing: -.6px; margin: 4px 0 8px; }
+  .livon-page-wrapper .product .text-button { font-size: 10px; }
+  .livon-page-wrapper .delivery-row { padding: 6px 20px; grid-template-columns: 1fr; margin-top: 25px; }
+  .livon-page-wrapper .delivery-row > div { border-right: 0; border-bottom: 1px solid var(--line); justify-content: flex-start; padding: 18px 5px; gap: 20px; }
+  .livon-page-wrapper .delivery-row b { font-size: 13px; }
+  .livon-page-wrapper .delivery-row small { font-size: 10px; }
+  .livon-page-wrapper .delivery-row svg { width: 25px; height: 25px; }
+  .livon-page-wrapper .care-layout { display: flex; flex-direction: column-reverse; gap: 30px; align-items: stretch; }
+  .livon-page-wrapper .care-copy h2 { font-size: 29px; }
+  .livon-page-wrapper .big-days { margin-top: 18px; }
+  .livon-page-wrapper .big-days strong { font-size: 112px; letter-spacing: -6px; }
+  .livon-page-wrapper .big-days > span { font-size: 12px; }
+  .livon-page-wrapper .day-seal { font-size: 8px; }
+  .livon-page-wrapper .body-copy { font-size: 12px; }
+  .livon-page-wrapper .care-checks { margin: 23px 0; }
+  .livon-page-wrapper .care-checks p { font-size: 12px; }
+  .livon-page-wrapper .care-terms { padding: 16px; margin-bottom: 16px; }
+  .livon-page-wrapper .care-terms p { font-size: 10px; }
+  .livon-page-wrapper .care-terms strong { font-size: 12px; }
+  .livon-page-wrapper .care-copy .text-button { font-size: 12px; }
+  .livon-page-wrapper .care-photo-wrap > .photo-slot { height: 385px; border-radius: 150px 150px 8px 8px; }
+  .livon-page-wrapper .care-quote { bottom: 23px; left: 15px; right: 15px; font-size: 12px; padding: 17px; gap: 13px; }
+  .livon-page-wrapper .care-quote br { display: none; }
+  .livon-page-wrapper .partner-label { font-size: 8px; padding: 7px 10px; margin-top: 17px; }
+  .livon-page-wrapper .health-tabs { gap: 6px; margin-bottom: 15px; }
+  .livon-page-wrapper .health-tabs button { display: block; padding: 13px 7px; text-align: center; font-size: 11px; border-radius: 6px; }
+  .livon-page-wrapper .health-tabs button > span { display: block; font-size: 8px; margin-bottom: 4px; }
+  .livon-page-wrapper .health-tabs button > svg { display: none; }
+  .livon-page-wrapper .health-panel { display: block; padding: 24px; min-height: 0; }
+  .livon-page-wrapper .health-intro h3 { font-size: 26px; }
+  .livon-page-wrapper .health-intro > p { font-size: 11px; }
+  .livon-page-wrapper .health-intro .photo-slot { height: 160px; margin-top: 20px; }
+  .livon-page-wrapper .health-details { margin-top: 12px; }
+  .livon-page-wrapper .health-details article { padding: 19px 0; gap: 13px; }
+  .livon-page-wrapper .health-details h4 { font-size: 15px; }
+  .livon-page-wrapper .health-details p { font-size: 11px; }
+  .livon-page-wrapper .health-details article > span { width: 38px; height: 38px; }
+  .livon-page-wrapper .payment-layout { grid-template-columns: 1fr; gap: 30px; }
+  .livon-page-wrapper .price-box { padding: 27px; }
+  .livon-page-wrapper .pill { font-size: 10px; }
+  .livon-page-wrapper .monthly { font-size: 55px; margin: 20px 0; }
+  .livon-page-wrapper .monthly small { font-size: 17px; }
+  .livon-page-wrapper .monthly > span { font-size: 21px; }
+  .livon-page-wrapper .price-line { font-size: 11px; }
+  .livon-page-wrapper .price-line strong { font-size: 18px; }
+  .livon-page-wrapper .timeline { padding: 0 8px; }
+  .livon-page-wrapper .timeline-item { gap: 20px; }
+  .livon-page-wrapper .timeline h3 { font-size: 19px; }
+  .livon-page-wrapper .payment-split { font-size: 11px; gap: 10px; }
+  .livon-page-wrapper .timeline-item p { font-size: 10px; }
+  .livon-page-wrapper .credit-banner { padding: 23px; gap: 20px; align-items: flex-start; margin-top: 32px; }
+  .livon-page-wrapper .credit-art { width: 90px; height: 60px; padding: 10px; }
+  .livon-page-wrapper .credit-art > span { font-size: 9px; }
+  .livon-page-wrapper .credit-art svg { width: 19px; height: 19px; }
+  .livon-page-wrapper .credit-art small { font-size: 5px; bottom: 10px; left: 10px; }
+  .livon-page-wrapper .credit-banner > .credit-art + div { width: calc(100% - 110px); }
+  .livon-page-wrapper .credit-banner .mini-label { font-size: 8px; }
+  .livon-page-wrapper .credit-banner h3 { font-size: 17px; line-height: 1.5; margin-top: 4px; }
+  .livon-page-wrapper .credit-banner p { font-size: 10px; }
+  .livon-page-wrapper .credit-banner p br { display: none; }
+  .livon-page-wrapper .credit-banner > div > small { font-size: 8px; }
+  .livon-page-wrapper .credit-banner .button { width: 100%; font-size: 12px; }
+  .livon-page-wrapper .refund-layout { grid-template-columns: 1fr; gap: 35px; }
+  .livon-page-wrapper .refund h2 { font-size: 31px; }
+  .livon-page-wrapper .refund-layout > div > p:not(.eyebrow):not(.refund-note) { font-size: 13px; margin-top: 20px; }
+  .livon-page-wrapper .refund-number { margin: 15px 0; }
+  .livon-page-wrapper .refund-number > strong { font-size: 117px; }
+  .livon-page-wrapper .refund-number > span { font-size: 55px; }
+  .livon-page-wrapper .refund-number small { font-size: 12px; }
+  .livon-page-wrapper .refund-note { font-size: 9px; }
+  .livon-page-wrapper .refund-receipt { margin: 0 7px; padding: 29px; }
+  .livon-page-wrapper .refund-receipt h3 { font-size: 23px; }
+  .livon-page-wrapper .refund-receipt dl > div { font-size: 12px; }
+  .livon-page-wrapper .receipt-total > strong { font-size: 36px; }
+  .livon-page-wrapper .refund-receipt > p { font-size: 9px !important; }
+  .livon-page-wrapper .life-grid { gap: 10px; }
+  .livon-page-wrapper .life-grid .photo-slot { height: 150px; min-height: 0; }
+  .livon-page-wrapper .life-grid .slot-content { padding: 12px; gap: 8px; }
+  .livon-page-wrapper .life-grid .slot-content strong { font-size: 9px; }
+  .livon-page-wrapper .life-grid .slot-content svg { width: 25px; height: 25px; }
+  .livon-page-wrapper .life-grid .slot-content small { font-size: 6px; }
+  .livon-page-wrapper .life-grid .slot-corner { width: 10px; height: 10px; }
+  .livon-page-wrapper .life-grid .slot-corner.tl, .livon-page-wrapper .life-grid .slot-corner.bl { left: 10px; }
+  .livon-page-wrapper .life-grid .slot-corner.tr, .livon-page-wrapper .life-grid .slot-corner.br { right: 10px; }
+  .livon-page-wrapper .life-caption { padding: 16px 12px; }
+  .livon-page-wrapper .life-caption > svg { position: static; width: 19px; display: block; margin-bottom: 8px; }
+  .livon-page-wrapper .life-grid small { font-size: 7px; }
+  .livon-page-wrapper .life-grid h3 { font-size: 13px; margin: 4px 0 6px; }
+  .livon-page-wrapper .life-grid p { font-size: 9px; line-height: 1.8; }
+  .livon-page-wrapper .combination { padding: 22px 18px; gap: 15px; }
+  .livon-page-wrapper .combination strong { font-size: 13px; }
+  .livon-page-wrapper .combo-options { margin: 0; gap: 5px; width: 100%; }
+  .livon-page-wrapper .combo-options button { font-size: 9px; padding: 7px 10px; flex: 1; }
+  .livon-page-wrapper .combo-result { gap: 7px; flex-wrap: wrap; padding-top: 15px; }
+  .livon-page-wrapper .combo-result > span { padding: 10px 12px; font-size: 12px; gap: 5px; }
+  .livon-page-wrapper .combo-result small { font-size: 8px; }
+  .livon-page-wrapper .combo-result > b { width: 100%; text-align: center; padding: 5px 0 0; font-size: 11px; }
+  .livon-page-wrapper .trust-grid { grid-template-columns: 1fr; gap: 15px; }
+  .livon-page-wrapper .trust-grid article { padding: 27px 25px; }
+  .livon-page-wrapper .trust-role { font-size: 10px; }
+  .livon-page-wrapper .trust-grid h3 { font-size: 27px; margin: 13px 0 10px; }
+  .livon-page-wrapper .trust-grid article > strong { font-size: 14px; }
+  .livon-page-wrapper .trust-grid ul { margin: 17px 0; }
+  .livon-page-wrapper .trust-grid li { font-size: 12px; gap: 6px; }
+  .livon-page-wrapper .trust-grid a { font-size: 10px; padding-top: 15px; }
+  .livon-page-wrapper .status-chip { font-size: 10px; display: inline-block; }
+  .livon-page-wrapper .faq-grid { grid-template-columns: 1fr; gap: 0; }
+  .livon-page-wrapper .faq .section-head h2 { font-size: 30px; }
+  .livon-page-wrapper .faq .section-head > svg { display: none; }
+  .livon-page-wrapper .faq .section-head > p:not(.eyebrow) br { display: none; }
+  .livon-page-wrapper .faq-list summary { padding: 20px 0; gap: 10px; }
+  .livon-page-wrapper .faq-list summary h3 { font-size: 13px; }
+  .livon-page-wrapper .faq-list summary > span { font-size: 10px; }
+  .livon-page-wrapper .faq-list summary > svg { width: 16px; }
+  .livon-page-wrapper .faq-list details > p { font-size: 11px; padding: 0 0 20px 28px; }
+  .livon-page-wrapper .closing-top { grid-template-columns: 1fr; gap: 35px; }
+  .livon-page-wrapper .closing h2 { font-size: 34px; }
+  .livon-page-wrapper .closing-top p:not(.eyebrow) { font-size: 13px; margin: 18px 0 25px; }
+  .livon-page-wrapper .closing-top .button { width: 100%; font-size: 15px; padding: 19px; }
+  .livon-page-wrapper .closing-top > div > small { font-size: 9px; }
+  .livon-page-wrapper .closing-visual { margin: 0 10px; }
+  .livon-page-wrapper .closing-visual .photo-slot { height: 270px; }
+  .livon-page-wrapper .closing-seal { right: -10px; bottom: -15px; font-size: 8px; }
+  .livon-page-wrapper .steps { grid-template-columns: repeat(2, 1fr); gap: 25px; margin-top: 45px; padding-top: 25px; }
+  .livon-page-wrapper .steps strong { font-size: 14px; }
+  .livon-page-wrapper .steps p { font-size: 10px; }
+  .livon-page-wrapper .notices { padding: 45px 0; }
+  .livon-page-wrapper .notice-heading h2 { font-size: 19px; }
+  .livon-page-wrapper .notice-intro { font-size: 9px; line-height: 1.8; margin: 10px 0 20px; }
+  .livon-page-wrapper .notices dl > div { display: block; padding: 14px 0; }
+  .livon-page-wrapper .notices dt { font-size: 11px; margin-bottom: 6px; }
+  .livon-page-wrapper .notices dd { font-size: 11.5px; line-height: 1.9; }
+  .livon-page-wrapper .source-links { gap: 12px; flex-wrap: wrap; font-size: 10px; }
+  .livon-page-wrapper .source-links > span { width: 100%; }
+  .livon-page-wrapper footer { padding: 30px 0 110px; }
+  .livon-page-wrapper footer p { font-size: 9px; line-height: 1.9; }
+  .livon-page-wrapper .footer-top { margin-bottom: 20px; }
+  .livon-page-wrapper .footer-bottom { font-size: 7px; margin-top: 23px; }
+  .livon-page-wrapper .sticky-cta > .container { width: calc(100% - 30px); min-height: 75px; gap: 10px; }
+  .livon-page-wrapper .sticky-cta small { font-size: 8px; }
+  .livon-page-wrapper .sticky-cta strong { font-size: 11px; max-width: 170px; display: block; line-height: 1.5; margin-top: 3px; }
+  .livon-page-wrapper .sticky-cta .button { min-width: 140px; padding: 15px 14px; font-size: 12px; gap: 10px; }
+  .livon-page-wrapper .closing-benefits { margin: 22px 0; gap: 12px; }
+  .livon-page-wrapper .closing-benefits li { font-size: 13px; gap: 10px; }
+  .livon-page-wrapper .closing-benefits svg { width: 20px; height: 20px; }
+  .livon-page-wrapper .closing-card-price { padding: 20px 22px; max-width: none; }
+  .livon-page-wrapper .closing-card-label { font-size: 11px; gap: 8px; }
+  .livon-page-wrapper .closing-discount > strong { font-size: 47px; letter-spacing: -2px; }
+  .livon-page-wrapper .closing-discount > span { font-size: 18px; }
+  .livon-page-wrapper .closing-discount > small { font-size: 9px; }
+  .livon-page-wrapper .closing-price-terms, .livon-page-wrapper .closing-care-terms { font-size: 10px; }
+  .livon-page-wrapper .closing-care-terms { margin-bottom: 22px; }
+}
+
+@media (max-width: 370px) {
+  .livon-page-wrapper .container { width: calc(100% - 32px); }
+  .livon-page-wrapper .top-banner { font-size: 8px; gap: 5px; }
+  .livon-page-wrapper .top-banner span { font-size: 8px; }
+  .livon-page-wrapper .nav-inner { gap: 8px; }
+  .livon-page-wrapper .hyowon-logo { font-size: 16px; }
+  .livon-page-wrapper .hyowon-logo svg { width: 20px; }
+  .livon-page-wrapper .livon-logo { font-size: 21px; }
+  .livon-page-wrapper .brand { gap: 7px; }
+  .livon-page-wrapper .brand-logo-img { height: 39px; max-width: 180px; }
+  .livon-page-wrapper .nav-inner > .button { padding: 8px; font-size: 9px; }
+  .livon-page-wrapper .hero h1 { font-size: 47px; }
+  .livon-page-wrapper .hero-chips { gap: 8px; }
+  .livon-page-wrapper .hero-chips span { font-size: 9px; }
+  .livon-page-wrapper .hero-art { height: 410px; }
+  .livon-page-wrapper .hero-photo { width: 270px; height: 350px; }
+  .livon-page-wrapper .care-float { right: -4px; }
+  .livon-page-wrapper .hero-price { font-size: 9px; }
+  .livon-page-wrapper .product-visual { height: 185px; }
+  .livon-page-wrapper .life-grid h3 { font-size: 12px; }
+  .livon-page-wrapper .life-caption { padding: 13px 10px; }
+  .livon-page-wrapper .sticky-cta strong { font-size: 10px; }
+  .livon-page-wrapper .sticky-cta .button { min-width: 132px; font-size: 11px; }
+  .livon-page-wrapper .receipt-total > strong { font-size: 33px; }
+}
+
+@media (max-width: 360px) {
+  .livon-page-wrapper .closing-discount > strong { font-size: 42px; }
+  .livon-page-wrapper .closing-card-price { padding: 19px; }
+  .livon-page-wrapper .closing-discount > small { font-size: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .livon-page-wrapper * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ========================================================
+   리본케어 가전 상품 카드 & 상세 스펙 모달 (60패키지 연동)
+   ======================================================== */
+
+/* 브랜드 탭 카운트 뱃지 */
+.livon-page-wrapper .brand-count-badge {
+  font-size: 11px;
+  font-weight: 500;
+  margin-left: 4px;
+  opacity: 0.65;
+}
+.livon-page-wrapper .brand-tabs button.active .brand-count-badge {
+  color: var(--coral);
+  opacity: 1;
+  font-weight: 700;
+}
+
+/* 제품 카드 및 그리드 개선 */
+.livon-page-wrapper .livon-product-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e6ebe3;
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 16px;
+  text-align: left;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.livon-page-wrapper .livon-product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(23, 62, 53, 0.08);
+  border-color: #c7d4c2;
+}
+
+.livon-page-wrapper .livon-product-card .product-visual {
+  height: 250px;
+  background: #f7f9f5;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.livon-page-wrapper .product-model-chip {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(23, 62, 53, 0.08);
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  z-index: 2;
+  letter-spacing: 0.3px;
+}
+
+.livon-page-wrapper .product-img-box {
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.livon-page-wrapper .product-img-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+.livon-page-wrapper .livon-product-card:hover .product-img-box img {
+  transform: scale(1.06);
+}
+
+.livon-page-wrapper .product-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(23, 62, 53, 0.35);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+.livon-page-wrapper .livon-product-card:hover .product-hover-overlay {
+  opacity: 1;
+}
+.livon-page-wrapper .spec-view-pill {
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 8px 14px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.livon-page-wrapper .product-info-wrap {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.livon-page-wrapper .product-cat-label {
+  font-size: 11px;
+  color: #7a8a78;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.livon-page-wrapper .product .product-name-title,
+.livon-page-wrapper .livon-product-card h3.product-name-title,
+.livon-page-wrapper h3.product-name-title {
+  font-size: 15px !important;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.4 !important;
+  margin: 4px 0 10px !important;
+  min-height: 42px;
+  height: auto !important;
+  display: block !important;
+  overflow: visible !important;
+  word-break: keep-all;
+}
+
+.livon-page-wrapper .product-price-row {
+  display: none;
+}
+.livon-page-wrapper .product-monthly-price {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--coral);
+}
+.livon-page-wrapper .product-term-badge {
+  font-size: 11px;
+  color: #7a8a78;
+  font-weight: 600;
+}
+
+.livon-page-wrapper .product-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.livon-page-wrapper .product-spec-btn {
+  background: #f5f8f3;
+  color: var(--ink);
+  border: 1px solid #d5ded2;
+  padding: 8px 6px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.livon-page-wrapper .product-spec-btn:hover {
+  background: #e9f0e6;
+  border-color: #b7c7b3;
+}
+.livon-page-wrapper .product-consult-btn {
+  background: var(--ink);
+  color: #ffffff;
+  padding: 8px 6px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.livon-page-wrapper .product-consult-btn:hover {
+  background: #0f2c25;
+}
+
+/* 로딩 스켈레톤 & 빈 상태 */
+.livon-page-wrapper .product-skeleton-card {
+  background: #ffffff;
+  border: 1px solid #e6ebe3;
+  border-radius: 14px;
+  padding: 16px;
+}
+.livon-page-wrapper .product-skeleton-visual {
+  height: 250px;
+  background: #edf2ec;
+  border-radius: 10px;
+}
+.livon-page-wrapper .product-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: #ffffff;
+  border: 1px dashed #d5ded2;
+  border-radius: 14px;
+  color: #7a8a78;
+}
+
+/* --- 리본케어 상세 스펙 모달 (60패키지 연동) --- */
+.livon-spec-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(16, 41, 31, 0.72);
+  backdrop-filter: blur(4px);
+}
+.livon-spec-modal-card {
+  background: #ffffff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 660px;
+  max-height: 90vh;
+  box-shadow: 0 25px 50px -12px rgba(16, 41, 31, 0.4);
+  border: 1px solid #dce3db;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.livon-spec-modal-card::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.livon-spec-scroll-container {
+  overflow-y: auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.livon-spec-scroll-container::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.livon-spec-header {
+  background: #173e35;
+  color: #ffffff;
+  padding: 22px 24px;
+  position: relative;
+  flex-shrink: 0;
+  text-align: left;
+}
+.livon-spec-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 0;
+}
+.livon-spec-close-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.22);
+}
+.livon-spec-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.spec-badge-brand {
+  font-size: 10.5px;
+  font-weight: 800;
+  background: #eb6b58;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.spec-badge-account {
+  font-size: 10.5px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.16);
+  color: #d1ded6;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.livon-spec-title {
+  font-size: 21px;
+  font-weight: 900;
+  color: #ffffff;
+  padding-right: 32px;
+  line-height: 1.35;
+  margin: 0;
+}
+.livon-spec-subtitle {
+  font-size: 12.5px;
+  color: #a8b8ae;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.livon-spec-body {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: left;
+}
+
+.livon-spec-summary-card {
+  display: grid;
+  grid-template-columns: minmax(0, 240px) 1fr;
+  gap: 20px;
+  align-items: center;
+  background: #f7f9f5;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e1e8dd;
+}
+@media (max-width: 580px) {
+  .livon-spec-summary-card {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.livon-spec-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.livon-spec-main-preview {
+  width: 100%;
+  max-width: 240px;
+  height: 220px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #dce3db;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.livon-spec-img-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+.livon-spec-img-inner img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+.livon-spec-thumb-tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #eb6b58;
+  color: #ffffff;
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.livon-spec-thumb-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  max-width: 240px;
+  margin: 6px auto 0;
+}
+.livon-spec-thumb-nav-btn {
+  width: 22px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #edf2ec;
+  border: 1px solid #dce3db;
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+.livon-spec-thumb-nav-btn:hover {
+  background: #dce6db;
+  color: #000;
+}
+.livon-spec-thumb-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 3px 2px;
+  flex-grow: 1;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.livon-spec-thumb-list::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.livon-spec-thumb-btn {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 8px;
+  border: 2px solid #dce3db;
+  padding: 2px;
+  overflow: hidden;
+  background: #ffffff;
+  flex-shrink: 0;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.livon-spec-thumb-btn.active {
+  border-color: #eb6b58;
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 0 0 2px rgba(235, 107, 88, 0.25);
+}
+.livon-spec-thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.livon-spec-pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.livon-price-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #718370;
+  display: block;
+}
+.livon-price-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.livon-price-main {
+  font-size: 24px;
+  font-weight: 900;
+  color: #eb6b58;
+  letter-spacing: -0.5px;
+}
+.livon-price-sub {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #718370;
+}
+
+.livon-price-breakdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.livon-breakdown-card {
+  background: #ffffff;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid #dce3db;
+}
+.breakdown-label {
+  display: block;
+  font-size: 10.5px;
+  color: #718370;
+  font-weight: 700;
+}
+.breakdown-val {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-top: 2px;
+}
+.livon-gift-box {
+  background: #fdf2f0;
+  border: 1px solid #f9d5ce;
+  color: #c94432;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.livon-spec-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.livon-spec-section-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.livon-spec-table-wrapper {
+  background: #ffffff;
+  border: 1px solid #dce3db;
+  border-radius: 10px;
+  overflow: hidden;
+  max-height: 280px;
+  overflow-y: auto;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.livon-spec-table-wrapper::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.livon-spec-table-empty {
+  background: #f7f9f5;
+  border: 1px solid #dce3db;
+  border-radius: 10px;
+  padding: 12px;
+}
+.livon-spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+.livon-spec-table thead {
+  background: #eef3eb;
+  color: var(--ink);
+  border-bottom: 1px solid #dce3db;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.livon-spec-table th {
+  padding: 10px 14px;
+  font-weight: 800;
+}
+.livon-spec-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid #eef2ec;
+  vertical-align: middle;
+}
+.livon-spec-table tr:hover {
+  background: #f9fbf8;
+}
+.livon-spec-table .spec-label-col {
+  font-weight: 700;
+  color: #3b4e42;
+  background: #f7f9f5;
+  width: 35%;
+}
+.spec-category-tag {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #2d5a43;
+  margin-bottom: 1px;
+}
+.spec-name-text {
+  font-size: 12px;
+}
+.livon-spec-table .spec-value-col {
+  color: #4a5c50;
+  font-weight: 500;
+}
+
+.livon-spec-benefit-card {
+  background: #173e35;
+  color: #ffffff;
+  padding: 18px 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.spec-benefit-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.spec-benefit-badge {
+  background: #eb6b58;
+  color: #ffffff;
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.spec-benefit-head h5 {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+.spec-benefit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 11.5px;
+  color: #d1ded6;
+}
+.spec-benefit-list > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+.spec-benefit-list > div svg {
+  color: #eb6b58;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.spec-benefit-list strong {
+  color: #ffffff;
+}
+
+.livon-spec-footer {
+  padding: 14px 20px;
+  background: #ffffff;
+  border-top: 1px solid #dce3db;
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.03);
+}
+.livon-spec-btn-close {
+  background: #f0f3ee;
+  border: 1px solid #d5ded2;
+  color: #4a584e;
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.livon-spec-btn-close:hover {
+  background: #e4eae0;
+}
+.livon-spec-btn-consult {
+  flex-grow: 1;
+  background: #eb6b58;
+  color: #ffffff;
+  font-weight: 800;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 0;
+}
+.livon-spec-btn-consult:hover {
+  background: #d95846;
+}

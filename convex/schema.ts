@@ -130,6 +130,7 @@ export default defineSchema({
     // Product Details
     account: v.optional(v.string()),
     appliance: v.optional(v.string()),
+    supplier: v.optional(v.string()),
     
     // History
     memoHistory: v.optional(v.array(

@@ -138,6 +138,13 @@ export const seed = mutation({
         thumbnail: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=500",
         isActive: true,
       });
+      await ctx.db.insert("landings", {
+        name: "해피효원라이프 간병PLUS",
+        path: "/careplus",
+        description: "최신가전 + 리본케어 간병/헬스케어 멤버십 결합 상품 (효원상조 3구좌)",
+        thumbnail: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600",
+        isActive: true,
+      });
     }
   },
 });
@@ -176,6 +183,13 @@ export const updateDefaultThumbnails = mutation({
         path: "/kcc",
         description: "효원상조 X KCC홈씨씨 B2B 결합상품 랜딩페이지",
         thumbnail: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=500",
+        isActive: true,
+      });
+      await ctx.db.insert("landings", {
+        name: "해피효원라이프 간병PLUS",
+        path: "/careplus",
+        description: "최신가전 + 리본케어 간병/헬스케어 멤버십 결합 상품 (효원상조 3구좌)",
+        thumbnail: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600",
         isActive: true,
       });
     }
@@ -250,6 +264,19 @@ export const updateDefaultThumbnails = mutation({
         path: "/care_new",
         description: "효원상조 × LG 가전구독 10% 결합할인 전용 프리미엄 랜딩페이지 (신규 디자인)",
         thumbnail: careNewThumb,
+        isActive: true,
+      });
+    }
+
+    // Ensure CarePlus (해피효원라이프 간병PLUS) exists
+    const carePlusThumb = "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600";
+    const existingCarePlus = landings.find(l => l.path === "/careplus" || l.name.includes("간병PLUS") || l.name.includes("간병플러스"));
+    if (!existingCarePlus) {
+      await ctx.db.insert("landings", {
+        name: "해피효원라이프 간병PLUS",
+        path: "/careplus",
+        description: "최신가전 + 리본케어 간병/헬스케어 멤버십 결합 상품 (효원상조 3구좌)",
+        thumbnail: carePlusThumb,
         isActive: true,
       });
     }

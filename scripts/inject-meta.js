@@ -83,6 +83,12 @@ const pages = [
     title: '효원상조 X LG가전구독 | 회원 특별할인 & 만기 100% 전액환급',
     description: 'LG전자 공식 가전구독에 효원상조 혜택을 더하다! 회원 특별할인 지원 + 만기 100% 전액환급 & 축하금 지원. 본사 100% 무상 케어 서비스까지.',
     image: 'https://res.cloudinary.com/lyjyvy54/image/upload/v1787663880/%EC%A0%9C%EB%AA%A9%EC%9D%84_%EC%9E%85%EB%A0%A5%ED%95%B4%EC%A3%BC%EC%84%B8%EC%9A%94._14_x1xbix.png'
+  },
+  {
+    name: 'careplus',
+    title: '해피효원라이프 간병PLUS × 리본케어 | 최신가전 & 최대 1개월 간병/헬스케어',
+    description: 'LG·삼성 대형가전 교체, 간병인 지원 최장 1개월, 프리미엄 헬스케어까지! 효원상조 3구좌 가입 특별 결합 혜택.',
+    image: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=600'
   }
 ];
 

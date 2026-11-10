@@ -14,6 +14,7 @@ import KccPage from '../pages/KccPage';
 import Package60Page from '../pages/Package60Page';
 import LgCarePage from '../pages/LgCarePage';
 import LgCareNewPage from '../pages/LgCareNewPage';
+import LivonCarePage from '../pages/LivonCarePage';
 
 export default function LandingRouter() {
   const [currentPath, setCurrentPath] = React.useState(() => window.location.pathname.toLowerCase());
@@ -28,6 +29,17 @@ export default function LandingRouter() {
 
   const path = currentPath;
   
+  // /careplus, /care_plus, /care-plus, /livon, /livoncare 경로 → 해피효원라이프 간병PLUS (리본케어 결합) 랜딩페이지
+  if (path === '/careplus' || path.startsWith('/careplus/') ||
+      path === '/care_plus' || path.startsWith('/care_plus/') ||
+      path === '/care-plus' || path.startsWith('/care-plus/') ||
+      path === '/livon' || path.startsWith('/livon/') ||
+      path === '/livoncare' || path.startsWith('/livoncare/')) {
+    const parts = path.split('/').filter(Boolean);
+    const sub = parts.length >= 2 ? parts[1] : undefined;
+    return <LivonCarePage channelSubdomain={sub} landingPath={path} />;
+  }
+
   // /care_new, /care-new, /care2, /lg_new, /lg-new, /lgsub_new 경로 → LG가전 구독 할인 전용 (new) 랜딩페이지
   if (path === '/care_new' || path.startsWith('/care_new') ||
       path === '/care-new' || path.startsWith('/care-new') ||
@@ -163,6 +175,12 @@ export default function LandingRouter() {
     const assignedPaths = channel.landingPages || (channel.landingPage ? [channel.landingPage] : []);
     const primaryPath = assignedPaths[0] || '/';
     
+    if (primaryPath === '/careplus' || primaryPath === '/care_plus' || primaryPath === '/livon') {
+      return <LivonCarePage channelSubdomain={channel.subdomain} landingPath={primaryPath} />;
+    }
+    if (primaryPath === '/care_new' || primaryPath === '/care-new') {
+      return <LgCareNewPage channelSubdomain={channel.subdomain} landingPath={primaryPath} />;
+    }
     if (primaryPath === '/care' || primaryPath === '/care-solutions' || primaryPath === '/lg') {
       return <LgCarePage channelSubdomain={channel.subdomain} landingPath="/care" />;
     }

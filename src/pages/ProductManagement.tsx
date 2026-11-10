@@ -56,6 +56,7 @@ export default function ProductManagement() {
   const allProducts = useQuery(api.products.getAllProducts);
   const competitors = useQuery(api.competitors.get) || [];
   const settings = useQuery(api.settings.get);
+  const dbLandings = useQuery(api.landings.get) || [];
   
   const updateProduct = useMutation(api.products.update);
   const createProduct = useMutation(api.products.create);
@@ -308,9 +309,14 @@ export default function ProductManagement() {
           const { storageId } = await result.json();
           uploadedUrls.push(storageId);
         }
+        const nextImages = [...(editingProduct.images || []), ...uploadedUrls];
+        const nextMainImage = (!editingProduct.image || editingProduct.image.trim() === '')
+          ? (nextImages[0] || '')
+          : editingProduct.image;
         setEditingProduct({ 
           ...editingProduct, 
-          images: [...(editingProduct.images || []), ...uploadedUrls] 
+          images: nextImages,
+          image: nextMainImage
         });
       } catch (err) {
         console.error(err);
@@ -348,9 +354,14 @@ export default function ProductManagement() {
   const addImageUrl = (type: 'images' | 'detailImages') => {
     const url = window.prompt('이미지 URL을 입력해주세요.');
     if (url) {
+      const nextList = [...(editingProduct[type] || []), url];
+      const nextMainImage = (type === 'images' && (!editingProduct.image || editingProduct.image.trim() === ''))
+        ? (nextList[0] || '')
+        : editingProduct.image;
       setEditingProduct({
         ...editingProduct,
-        [type]: [...(editingProduct[type] || []), url]
+        [type]: nextList,
+        ...(type === 'images' ? { image: nextMainImage } : {})
       });
     }
   };
@@ -413,19 +424,36 @@ export default function ProductManagement() {
   };
 
   const handleAddProduct = () => {
+    const curPlan = plans.find(p => p.id === selectedPlanId) || selectedPlan;
+    const planAccount = curPlan?.accountCount || (selectedPlanId ? `${selectedPlanId}구좌` : '1구좌');
+    const is60 = [5, 6, 7, 8].includes(selectedPlanId ?? 0) || (curPlan?.name && curPlan.name.includes('60패키지'));
+    
+    let defaultLandings = ['/package60', '/package_up', '/special60', '/careplus'];
+    if (!is60) {
+      if (curPlan?.name?.includes('리빙')) {
+        defaultLandings = ['/living', '/living2'];
+      } else if (curPlan?.name?.includes('스페셜')) {
+        defaultLandings = ['/special', '/special2', '/'];
+      } else {
+        defaultLandings = ['/'];
+      }
+    }
+
     setEditingProduct({ 
       planId: selectedPlanId, 
+      accountCount: planAccount,
       brand: '삼성전자', 
       category: 'TV/시청각', 
       name: '', 
       model: '', 
-      price: '0', 
-      discountPrice: '0',
+      price: curPlan?.basePrice ? String(curPlan.basePrice).replace(/\D/g, '') : '0', 
+      discountPrice: curPlan?.benefitPrice ? String(curPlan.benefitPrice).replace(/\D/g, '') : '0',
       isVisible: true,
       image: '',
       images: [],
       detailImage: '',
       detailImages: [],
+      landingPages: defaultLandings,
       comparisons: [] 
     });
     setViewMode('edit_product');
@@ -1920,6 +1948,50 @@ export default function ProductManagement() {
                       <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">라벨 (태그)</label>
                       <input type="text" value={editingProduct.tag || ''} onChange={(e) => setEditingProduct({...editingProduct, tag: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none" placeholder="예: BEST, HOT, 특가" />
                     </div>
+                    <div>
+                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">구좌 구분</label>
+                      <select 
+                        value={editingProduct.accountCount || (plans.find(p => p.id === editingProduct.planId)?.accountCount) || '1구좌'} 
+                        onChange={(e) => setEditingProduct({...editingProduct, accountCount: e.target.value})} 
+                        className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold text-[#191F28]"
+                      >
+                        <option value="1구좌">1구좌 (싱글)</option>
+                        <option value="2구좌">2구좌 (더블)</option>
+                        <option value="3구좌">3구좌 (트리플)</option>
+                        <option value="4구좌">4구좌 (쿼드)</option>
+                      </select>
+                    </div>
+                    <div className="col-span-1 sm:col-span-2">
+                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">노출 랜딩페이지</label>
+                      <div className="flex flex-wrap gap-2 p-3 bg-[#F2F4F6] rounded-[16px]">
+                        {dbLandings.filter(l => l.isActive).map(landing => {
+                          const currentLandingPages = editingProduct.landingPages || [];
+                          const isChecked = currentLandingPages.includes(landing.path);
+                          return (
+                            <label 
+                              key={landing._id} 
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-[12px] font-bold cursor-pointer transition-colors select-none ${
+                                isChecked ? 'bg-[#3182F6] text-white shadow-xs' : 'bg-white text-[#4E5968] hover:bg-gray-100 border border-[#E5E8EB]'
+                              }`}
+                            >
+                              <input 
+                                type="checkbox" 
+                                className="hidden" 
+                                checked={isChecked} 
+                                onChange={(e) => {
+                                  const updated = e.target.checked 
+                                    ? [...currentLandingPages, landing.path] 
+                                    : currentLandingPages.filter((p: string) => p !== landing.path);
+                                  setEditingProduct({ ...editingProduct, landingPages: updated });
+                                }} 
+                              />
+                              <span>{landing.name}</span>
+                              <span className={`text-[10px] ${isChecked ? 'text-blue-100' : 'text-[#8B95A1]'}`}>({landing.path})</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
 
                   {/* 제품 스펙 정보 설정 (표 형태) */}
@@ -2302,8 +2374,36 @@ export default function ProductManagement() {
                       onClick={async () => {
                         if (!editingProduct) return;
                         try {
+                          const curPlan = plans.find(p => p.id === editingProduct.planId) || selectedPlan;
+                          const planAccount = editingProduct.accountCount || curPlan?.accountCount || (editingProduct.planId ? `${editingProduct.planId}구좌` : '1구좌');
+                          const is60 = [5, 6, 7, 8].includes(editingProduct.planId ?? 0) || (curPlan?.name && curPlan.name.includes('60패키지'));
+                          
+                          let defaultLandings = editingProduct.landingPages;
+                          if (!defaultLandings || defaultLandings.length === 0) {
+                            if (is60) {
+                              defaultLandings = ['/package60', '/package_up', '/special60', '/careplus'];
+                            } else if (curPlan?.name?.includes('리빙')) {
+                              defaultLandings = ['/living', '/living2'];
+                            } else if (curPlan?.name?.includes('스페셜')) {
+                              defaultLandings = ['/special', '/special2', '/'];
+                            } else {
+                              defaultLandings = ['/'];
+                            }
+                          }
+
+                          const images = editingProduct.images || [];
+                          const primaryImg = (editingProduct.image && editingProduct.image.trim() !== '') 
+                            ? editingProduct.image 
+                            : (images.length > 0 ? images[0] : '');
+
                           const sortedComparisons = [...(editingProduct.comparisons || [])].sort((a: any, b: any) => parseInt(a.price) - parseInt(b.price));
-                          const productData = { ...editingProduct, comparisons: sortedComparisons };
+                          const productData = { 
+                            ...editingProduct, 
+                            accountCount: planAccount,
+                            landingPages: defaultLandings,
+                            image: primaryImg,
+                            comparisons: sortedComparisons 
+                          };
 
                           if (editingProduct._id) {
                             const { _id, _creationTime, id, ...data } = productData;

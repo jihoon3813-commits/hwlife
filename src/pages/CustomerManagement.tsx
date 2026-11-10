@@ -93,6 +93,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     productName: '',
     account: '',
     appliance: '',
+    supplier: 'BSON',
     birth: '',
     gender: '',
     address: '',
@@ -238,8 +239,13 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     } catch (e) {}
   };
 
-  // 공급사 계산 함수 (LG구독: TU / 결합상품: 제품관리에 입력된 공급사 매핑)
+  // 공급사 계산 함수 (직접 저장된 공급사 우선 -> 결합가전 매핑 -> 플랜별 기본 공급사)
   const getSupplier = (customer: any): string => {
+    // 1. 고객 데이터에 직접 저장된 공급사가 있는 경우 최우선 적용
+    if (customer.supplier && String(customer.supplier).trim() !== '' && customer.supplier !== '-') {
+      return String(customer.supplier).trim();
+    }
+
     const isLgCare = 
       customer.source === 'lg_care' ||
       customer.productName?.includes('LG구독') ||
@@ -292,6 +298,17 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
 
     if (isLgCare || (productNameText && productNameText.startsWith('LG') && !productNameText.includes('('))) {
       return 'TU';
+    }
+
+    // 4. 결합가전이 미선택되었거나 일반상담인 경우 신청상품(플랜) 기본 공급사 자동 추론
+    if (productNameText.includes('BSON') || productNameText.includes('60패키지') || productNameText.includes('UP가전') || productNameText.includes('스페셜299')) {
+      return 'BSON';
+    }
+    if (productNameText.includes('리빙144') || productNameText.includes('신한')) {
+      return '신한48';
+    }
+    if (productNameText.includes('KCC')) {
+      return 'KCC';
     }
 
     return '-';
@@ -371,12 +388,20 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
         initialAppliance = initialAppliance.replace(/\s*\[효원상조\s*\d+구좌\s*결합[^\]]*\]/g, '').trim();
       }
 
+      const autoSupplier = getSupplier({
+        ...selectedCustomer,
+        productName: resolvedCategoryName || selectedCustomer.productName,
+        appliance: initialAppliance
+      });
+      const initialSupplier = selectedCustomer.supplier || (autoSupplier !== '-' ? autoSupplier : 'BSON');
+
       setEditData({
         ...selectedCustomer,
         newRegDate: selectedCustomer.newRegDate || new Date(selectedCustomer.createdAt + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
         productName: resolvedCategoryName || selectedCustomer.productName,
         account: resolvedAccount || selectedCustomer.account,
-        appliance: initialAppliance
+        appliance: initialAppliance,
+        supplier: initialSupplier
       });
       setStatus(selectedCustomer.status);
       setMemo('');
@@ -456,6 +481,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
         productName: '',
         account: '',
         appliance: '',
+        supplier: 'BSON',
         birth: '',
         gender: '',
         address: '',
@@ -1348,9 +1374,20 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         value={editData.appliance || ''} 
                         onChange={e => {
                           const val = e.target.value;
+                          let newSupplier = editData.supplier;
+                          if (val) {
+                            const found = allProducts?.find(p => `${p.name} (${p.model})` === val || p.model === val || `${p.brand} ${p.name} (${p.model})` === val);
+                            if (found) {
+                              const supp = (found as any).supplier || found.supplyPrice;
+                              if (supp) newSupplier = String(supp).trim();
+                            } else if (val.includes('LG') || editData.productName?.includes('LG')) {
+                              newSupplier = 'TU';
+                            }
+                          }
                           setEditData({
                             ...editData, 
                             appliance: val,
+                            supplier: newSupplier
                           });
                         }}
                         className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
@@ -1410,6 +1447,20 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                             <option key={p._id} value={`${p.name} (${p.model})`}>{p.brand} {p.name} ({p.model})</option>
                           ))}
                         </optgroup>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">공급사</label>
+                      <select 
+                        value={editData.supplier || 'BSON'} 
+                        onChange={e => setEditData({...editData, supplier: e.target.value})}
+                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+                      >
+                        <option value="BSON">BSON</option>
+                        <option value="TU">TU</option>
+                        <option value="신한48">신한48</option>
+                        <option value="KCC">KCC</option>
+                        <option value="기타">기타</option>
                       </select>
                     </div>
                   </div>
@@ -1558,10 +1609,19 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                           if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독')) {
                             resolvedAccount = '1구좌';
                           }
+                          let defaultSupplier = 'BSON';
+                          if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독') || val.includes('LG')) {
+                            defaultSupplier = 'TU';
+                          } else if (val.includes('리빙144') || val.includes('신한')) {
+                            defaultSupplier = '신한48';
+                          } else if (val.includes('KCC')) {
+                            defaultSupplier = 'KCC';
+                          }
                           setRegisterForm({
                             ...registerForm, 
                             productName: val,
                             account: resolvedAccount,
+                            supplier: defaultSupplier,
                             appliance: ''
                           });
                         }} 
@@ -1574,7 +1634,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         <option value="LG구독할인(new)">LG구독할인(new)</option>
                       </select>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
                         <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">구좌수</label>
                         <input 
@@ -1586,10 +1646,37 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         />
                       </div>
                       <div>
+                        <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">공급사</label>
+                        <select 
+                          value={registerForm.supplier || 'BSON'} 
+                          onChange={e => setRegisterForm({ ...registerForm, supplier: e.target.value })}
+                          className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+                        >
+                          <option value="BSON">BSON</option>
+                          <option value="TU">TU</option>
+                          <option value="신한48">신한48</option>
+                          <option value="KCC">KCC</option>
+                          <option value="기타">기타</option>
+                        </select>
+                      </div>
+                      <div>
                         <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">결합 가전제품</label>
                         <select 
                           value={registerForm.appliance} 
-                          onChange={e => setRegisterForm({...registerForm, appliance: e.target.value})}
+                          onChange={e => {
+                            const appVal = e.target.value;
+                            let newSupplier = registerForm.supplier;
+                            if (appVal) {
+                              const found = allProducts?.find(p => `${p.name} (${p.model})` === appVal || p.model === appVal || `${p.brand} ${p.name} (${p.model})` === appVal);
+                              if (found) {
+                                const supp = (found as any).supplier || found.supplyPrice;
+                                if (supp) newSupplier = String(supp).trim();
+                              } else if (appVal.includes('LG') || registerForm.productName?.includes('LG')) {
+                                newSupplier = 'TU';
+                              }
+                            }
+                            setRegisterForm({ ...registerForm, appliance: appVal, supplier: newSupplier });
+                          }}
                           className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
                         >
                           <option value="">가전 선택</option>

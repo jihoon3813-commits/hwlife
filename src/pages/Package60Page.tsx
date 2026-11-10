@@ -227,8 +227,16 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
 
   useTrackVisit(channelSubdomain, landingPath);
 
+  const PLAN_ID_TO_ACCOUNT: Record<number, string> = {
+    5: '1구좌',
+    6: '2구좌',
+    7: '3구좌',
+    8: '4구좌',
+  };
+
   const package60Products = useMemo(() => {
     return allProducts.filter(p => 
+      [5, 6, 7, 8].includes(p.planId) ||
       (p.landingPages && (
         p.landingPages.includes(landingPath) || 
         p.landingPages.includes('/package60') || 
@@ -275,7 +283,9 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
     const available = ALL_KEYS.filter(pkgKey => {
       const pkgData = PACKAGE_DATA[pkgKey];
       return package60Products.some(p => {
-        const pAccount = p.accountCount ? p.accountCount.replace(/\s/g, '') : `${p.planId}구좌`;
+        const pAccount = p.accountCount 
+          ? p.accountCount.replace(/\s/g, '') 
+          : (PLAN_ID_TO_ACCOUNT[p.planId] || `${p.planId}구좌`);
         return pAccount === pkgKey || pAccount.includes(pkgKey) || p.planId === pkgData.accountNum;
       });
     });
@@ -292,24 +302,54 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
 
   const filteredProducts = useMemo(() => {
     return package60Products.filter(p => {
-      const pAccount = p.accountCount ? p.accountCount.replace(/\s/g, '') : `${p.planId}구좌`;
+      const pAccount = p.accountCount 
+        ? p.accountCount.replace(/\s/g, '') 
+        : (PLAN_ID_TO_ACCOUNT[p.planId] || `${p.planId}구좌`);
       const matchesPackage = pAccount === activePackageTab || pAccount.includes(activePackageTab) || (p.planId === currentPkg.accountNum);
       if (!matchesPackage) return false;
 
-      const matchesCategory = selectedCategory === '전체' || 
-        (p.category && p.category.replace(/\s/g, '').includes(selectedCategory.replace(/\s/g, '')));
+      const matchesCategory = selectedCategory === '전체' || (() => {
+        if (!p.category) return false;
+        const cat = p.category.replace(/\s/g, '');
+        const target = selectedCategory.replace(/\s/g, '');
+        if (target === '세탁기/건조기') {
+          return cat.includes('세탁기') || cat.includes('건조기') || cat.includes('워시타워');
+        }
+        if (target === '가구') {
+          return cat.includes('가구') || cat.includes('매트리스') || cat.includes('침대');
+        }
+        return cat.includes(target) || target.includes(cat);
+      })();
       if (!matchesCategory) return false;
 
       const matchesSearch = !searchQuery.trim() || 
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
         p.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.brand.toLowerCase().includes(searchQuery.toLowerCase());
+        p.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase()));
 
       return matchesSearch;
     });
   }, [package60Products, activePackageTab, currentPkg.accountNum, selectedCategory, searchQuery]);
 
-  const categoryOptions = ['전체', '냉장고', '세탁기/건조기', 'TV', '에어컨', '청소기', '주방가전'];
+  const categoryOptions = useMemo(() => {
+    const base = ['전체', '냉장고', '세탁기/건조기', 'TV', '에어컨', '청소기', '주방가전', '가구'];
+    const additional: string[] = [];
+    package60Products.forEach(p => {
+      if (!p.category) return;
+      const c = p.category.trim();
+      const isHandled = base.some(b => {
+        if (b === '전체') return false;
+        if (b === '세탁기/건조기') return c.includes('세탁기') || c.includes('건조기');
+        if (b === '가구') return c.includes('가구') || c.includes('매트리스') || c.includes('침대');
+        return c.includes(b);
+      });
+      if (!isHandled && !additional.includes(c)) {
+        additional.push(c);
+      }
+    });
+    return [...base, ...additional];
+  }, [package60Products]);
 
   const scrollToInquiry = (prod?: any) => {
     if (prod) {

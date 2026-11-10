@@ -16,6 +16,7 @@ export const create = mutation({
     detailAddress: v.optional(v.string()),
     account: v.optional(v.string()),
     appliance: v.optional(v.string()),
+    supplier: v.optional(v.string()),
     status: v.optional(v.string()),
     source: v.optional(v.string()),
     // Compatibility fields for various landing forms
@@ -52,6 +53,7 @@ export const create = mutation({
     if (args.detailAddress) insertData.detailAddress = args.detailAddress;
     if (args.account) insertData.account = args.account;
     if (args.appliance) insertData.appliance = args.appliance;
+    if (args.supplier) insertData.supplier = args.supplier;
     if (args.source) insertData.source = args.source;
 
     const id = await ctx.db.insert("inquiries", insertData as any);
@@ -172,6 +174,7 @@ export const update = mutation({
     note: v.optional(v.string()),
     account: v.optional(v.string()),
     appliance: v.optional(v.string()),
+    supplier: v.optional(v.string()),
     memoHistory: v.optional(v.array(
       v.object({
         date: v.string(),
