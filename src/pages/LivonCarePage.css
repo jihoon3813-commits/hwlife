@@ -641,16 +641,24 @@
 
 .livon-page-wrapper .membership-card {
   position: absolute;
-  bottom: 13px;
-  left: 0;
-  width: 300px;
-  border-radius: 12px;
-  padding: 23px 27px;
-  background: #244c40;
-  color: #eee9cb;
-  box-shadow: 0 18px 35px #15382928;
-  transform: rotate(-7deg);
-  overflow: hidden;
+  bottom: 15px;
+  left: -10px;
+  width: 320px;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
+  overflow: visible;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.livon-page-wrapper .membership-card-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 16px 30px rgba(18, 32, 24, 0.28));
 }
 
 .livon-page-wrapper .membership-card > div {
@@ -2528,7 +2536,7 @@
   .livon-page-wrapper .hero-art { height: 540px; }
   .livon-page-wrapper .hero-photo { width: 340px; height: 460px; }
   .livon-page-wrapper .care-float { right: 0; top: 80px; padding: 12px 15px; }
-  .livon-page-wrapper .membership-card { width: 260px; bottom: 15px; }
+  .livon-page-wrapper .membership-card { width: 280px; bottom: 15px; left: -5px; }
   .livon-page-wrapper .hero .button.large { font-size: 15px; padding: 19px; }
   .livon-page-wrapper .hero-chips { gap: 10px; }
   .livon-page-wrapper .benefit-grid article { padding: 25px; }
@@ -2576,9 +2584,7 @@
   .livon-page-wrapper .care-float strong { font-size: 12px; }
   .livon-page-wrapper .round-icon { width: 33px; height: 33px; }
   .livon-page-wrapper .care-float small { font-size: 8px; }
-  .livon-page-wrapper .membership-card { width: 225px; left: 0; bottom: 15px; padding: 19px; }
-  .livon-page-wrapper .membership-card > strong { font-size: 23px; }
-  .livon-page-wrapper .membership-card p { font-size: 8px; }
+  .livon-page-wrapper .membership-card { width: 235px; left: -5px; bottom: 15px; padding: 0; }
   .livon-page-wrapper .hero-chips { flex-direction: column; gap: 5px; }
   .livon-page-wrapper .hero-price > span { display: block; }
   .livon-page-wrapper .section { padding: 80px 0; }
@@ -2712,11 +2718,7 @@
   .livon-page-wrapper .care-float small { font-size: 7.5px; }
   .livon-page-wrapper .round-icon { width: 28px; height: 28px; }
   .livon-page-wrapper .round-icon svg { width: 16px; height: 16px; }
-  .livon-page-wrapper .membership-card { width: 200px; left: 0; bottom: 0; padding: 14px 16px; }
-  .livon-page-wrapper .membership-card > div > span { font-size: 20px; }
-  .livon-page-wrapper .membership-card > small { margin-top: 6px; font-size: 6.5px; }
-  .livon-page-wrapper .membership-card > strong { font-size: 19px; margin-bottom: 4px; }
-  .livon-page-wrapper .membership-card p { font-size: 7.5px; }
+  .livon-page-wrapper .membership-card { width: 200px; left: -4px; bottom: -5px; padding: 0; }
   .livon-page-wrapper .orb-one { width: 200px; height: 200px; right: -20px; top: 10px; }
   .livon-page-wrapper .orb-two { width: 120px; height: 120px; left: -10px; bottom: 0; }
   .livon-page-wrapper .hero-art-caption { bottom: -18px; font-size: 6px; }

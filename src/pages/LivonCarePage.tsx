@@ -574,14 +574,12 @@ export default function LivonCarePage({
                 </div>
               </div>
               <div className="membership-card">
-                <div>
-                  <span>LivOn</span>
-                  <Sparkles size={20} />
-                </div>
-                <small>CARE MEMBERSHIP</small>
-                <strong>PREMIUM</strong>
-                <p>소중한 가족을 위한 한 단계 더 깊은 케어</p>
-                <span className="card-edge" />
+                <img 
+                  src="https://res.cloudinary.com/lyjyvy54/image/upload/v1794290632/LivOn_%EB%94%A5_%ED%94%8C%EB%9F%BC_%ED%94%84%EB%A6%AC%EB%AF%B8%EC%97%84_%EC%B9%B4%EB%93%9C_dkk9yc.png" 
+                  alt="LivOn Care Membership Premium 카드" 
+                  className="membership-card-img" 
+                  loading="eager"
+                />
               </div>
               <div className="hero-art-caption">EVERYDAY COMFORT. LIFELONG CARE.</div>
             </div>
