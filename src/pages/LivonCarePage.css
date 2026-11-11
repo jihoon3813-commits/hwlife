@@ -2718,16 +2718,16 @@
   }
   .livon-page-wrapper .hero-mobile-arch-frame {
     position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 24px);
-    max-width: 420px;
-    height: 380px;
-    border-radius: 170px 170px 24px 24px;
-    overflow: hidden;
-    border: 1px solid rgba(220, 228, 217, 0.7);
-    box-shadow: 0 12px 32px rgba(23, 62, 53, 0.08);
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    top: 0;
+    left: 0;
+    transform: none;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
     background: #eef3ec;
   }
   .livon-page-wrapper .hero-mobile-arch-img {
@@ -3302,7 +3302,6 @@
   .livon-page-wrapper .brand-logo-img { height: 32px; max-width: 150px; }
   .livon-page-wrapper .nav-inner > .button { padding: 6px 8px; font-size: 8.5px; }
   .livon-page-wrapper .hero h1 { font-size: 29px !important; }
-  .livon-page-wrapper .hero-mobile-arch-frame { height: 350px; border-radius: 140px 140px 20px 20px; }
   .livon-page-wrapper .section-head h2, .livon-page-wrapper h2 { font-size: 25px !important; }
   .livon-page-wrapper .hero-chips { gap: 6px; }
   .livon-page-wrapper .hero-chips span { font-size: 8.5px; }
