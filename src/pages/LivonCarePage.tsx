@@ -818,6 +818,19 @@ export default function LivonCarePage({
 
         {/* Caregiving Section */}
         <section id="care" className="section caregiving">
+          {/* 모바일 전용 아치형 배경 이미지 레이어 */}
+          <div className="care-mobile-arch-backdrop" aria-hidden="true">
+            <div className="care-mobile-arch-frame">
+              <img 
+                src="https://res.cloudinary.com/lyjyvy54/image/upload/v1794286341/%EC%86%90%EC%9D%84_%EB%A7%9E%EC%9E%A1%EC%9D%80_%EB%94%B0%EB%9C%BB%ED%95%9C_%EB%8F%99%ED%96%89_vczc9t.png" 
+                alt="" 
+                className="care-mobile-arch-img" 
+                loading="lazy"
+              />
+              <div className="care-mobile-arch-scrim" />
+            </div>
+          </div>
+
           <div className="container care-layout">
             <div className="care-photo-wrap">
               <PhotoSlot 
