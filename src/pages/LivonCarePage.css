@@ -465,6 +465,10 @@
   margin-top: 13px;
 }
 
+.livon-page-wrapper .hero-mobile-arch-backdrop {
+  display: none;
+}
+
 .livon-page-wrapper .hero-art {
   height: 580px;
   position: relative;
@@ -994,7 +998,7 @@
 
 .livon-page-wrapper .product-visual {
   height: 310px;
-  background: #e8ede4;
+  background: #ffffff;
   border-radius: 10px;
   position: relative;
   overflow: hidden;
@@ -2699,29 +2703,107 @@
   .livon-page-wrapper .nav { top: 60px; }
 
   /* Hero Section */
-  .livon-page-wrapper .hero-grid { grid-template-columns: 1fr; gap: 0; padding-top: 18px; padding-bottom: 24px; }
-  .livon-page-wrapper .hero h1 { font-size: 36px !important; letter-spacing: -1.2px; line-height: 1.28; }
-  .livon-page-wrapper .hero-tag { font-size: 9.5px; margin-bottom: 12px; }
-  .livon-page-wrapper .hero-desc { font-size: 13.5px; margin-top: 12px; line-height: 1.65; }
-  .livon-page-wrapper .hero-chips { flex-direction: row; flex-wrap: wrap; gap: 8px 12px; margin: 14px 0; }
-  .livon-page-wrapper .hero-chips span { font-size: 9.5px; }
+  .livon-page-wrapper .hero {
+    position: relative;
+    overflow: hidden;
+  }
+  .livon-page-wrapper .hero-mobile-arch-backdrop {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .livon-page-wrapper .hero-mobile-arch-frame {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    max-width: 420px;
+    height: 380px;
+    border-radius: 170px 170px 24px 24px;
+    overflow: hidden;
+    border: 1px solid rgba(220, 228, 217, 0.7);
+    box-shadow: 0 12px 32px rgba(23, 62, 53, 0.08);
+    background: #eef3ec;
+  }
+  .livon-page-wrapper .hero-mobile-arch-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+    display: block;
+  }
+  .livon-page-wrapper .hero-mobile-arch-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg, 
+      rgba(248, 248, 242, 0.42) 0%, 
+      rgba(248, 248, 242, 0.72) 35%, 
+      rgba(248, 248, 242, 0.94) 70%, 
+      #f8f8f2 100%
+    );
+  }
+
+  .livon-page-wrapper .hero-grid { 
+    grid-template-columns: 1fr; 
+    gap: 0; 
+    padding-top: 26px; 
+    padding-bottom: 28px; 
+    position: relative;
+    z-index: 1;
+  }
+  .livon-page-wrapper .hero-copy {
+    position: relative;
+    z-index: 2;
+  }
+  .livon-page-wrapper .hero h1 { 
+    font-size: 34px !important; 
+    letter-spacing: -1.3px; 
+    line-height: 1.25; 
+    text-shadow: 0 1px 2px rgba(248, 248, 242, 0.8);
+  }
+  .livon-page-wrapper .hero-tag { 
+    font-size: 10px; 
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
+    width: fit-content;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(220, 228, 217, 0.8);
+  }
+  .livon-page-wrapper .hero-desc { 
+    font-size: 14px; 
+    margin-top: 14px; 
+    line-height: 1.65; 
+  }
+  .livon-page-wrapper .hero-chips { 
+    flex-direction: row; 
+    flex-wrap: wrap; 
+    gap: 8px 12px; 
+    margin: 14px 0 18px; 
+  }
+  .livon-page-wrapper .hero-chips span { 
+    font-size: 9.5px; 
+    background: rgba(255, 255, 255, 0.8);
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
   .livon-page-wrapper .hero-chips svg { width: 12px; }
-  .livon-page-wrapper .hero .button.large { width: 100%; padding: 15px 12px; font-size: 13.5px; gap: 8px; }
+  .livon-page-wrapper .hero .button.large { 
+    width: 100%; 
+    padding: 15px 12px; 
+    font-size: 13.5px; 
+    gap: 8px; 
+  }
   .livon-page-wrapper .hero-price { font-size: 9.5px; margin-top: 12px; }
   .livon-page-wrapper .hero-price > span { display: inline; }
   .livon-page-wrapper .hero-price strong { font-size: 14px; }
   .livon-page-wrapper .hero .fine { font-size: 8.5px; margin-top: 8px; line-height: 1.5; }
-  .livon-page-wrapper .hero-art { height: 320px; margin-top: 16px; max-width: 360px; width: 100%; justify-self: center; }
-  .livon-page-wrapper .hero-photo { width: 230px; height: 290px; margin-left: 10px; }
-  .livon-page-wrapper .care-float { top: 35px; right: 0; padding: 9px 12px; }
-  .livon-page-wrapper .care-float strong { font-size: 11px; }
-  .livon-page-wrapper .care-float small { font-size: 7.5px; }
-  .livon-page-wrapper .round-icon { width: 28px; height: 28px; }
-  .livon-page-wrapper .round-icon svg { width: 16px; height: 16px; }
-  .livon-page-wrapper .membership-card { width: 200px; left: -4px; bottom: -5px; padding: 0; }
-  .livon-page-wrapper .orb-one { width: 200px; height: 200px; right: -20px; top: 10px; }
-  .livon-page-wrapper .orb-two { width: 120px; height: 120px; left: -10px; bottom: 0; }
-  .livon-page-wrapper .hero-art-caption { bottom: -18px; font-size: 6px; }
+  .livon-page-wrapper .hero-art { display: none !important; }
 
   /* Section Headings */
   .livon-page-wrapper .section-head { margin-bottom: 20px; }
@@ -2773,13 +2855,18 @@
   .livon-page-wrapper .product small { font-size: 8.5px; }
   .livon-page-wrapper .product:not(.livon-product-card) h3 { font-size: 14px; letter-spacing: -.4px; margin: 3px 0 6px; }
   .livon-page-wrapper .product .text-button { font-size: 9.5px; }
+  .livon-page-wrapper .product-name-box {
+    padding: 5px 6px !important;
+    border-radius: 6px !important;
+    margin-bottom: 5px !important;
+  }
   .livon-page-wrapper .product-cat-label { font-size: 8px !important; margin-bottom: 1px !important; }
   .livon-page-wrapper .product-name-title,
   .livon-page-wrapper .livon-product-card h3.product-name-title {
     font-size: 9.1px !important;
     line-height: 1.35 !important;
     min-height: 33px !important;
-    margin: 2px 0 5px !important;
+    margin: 0 !important;
     letter-spacing: -0.3px;
   }
   .livon-page-wrapper .product-action-row {
@@ -2992,12 +3079,11 @@
   .livon-page-wrapper .brand { gap: 6px; }
   .livon-page-wrapper .brand-logo-img { height: 32px; max-width: 150px; }
   .livon-page-wrapper .nav-inner > .button { padding: 6px 8px; font-size: 8.5px; }
-  .livon-page-wrapper .hero h1 { font-size: 31px !important; }
+  .livon-page-wrapper .hero h1 { font-size: 29px !important; }
+  .livon-page-wrapper .hero-mobile-arch-frame { height: 350px; border-radius: 140px 140px 20px 20px; }
   .livon-page-wrapper .section-head h2, .livon-page-wrapper h2 { font-size: 25px !important; }
   .livon-page-wrapper .hero-chips { gap: 6px; }
   .livon-page-wrapper .hero-chips span { font-size: 8.5px; }
-  .livon-page-wrapper .hero-art { height: 280px; }
-  .livon-page-wrapper .hero-photo { width: 210px; height: 250px; }
   .livon-page-wrapper .care-float { right: -2px; }
   .livon-page-wrapper .hero-price { font-size: 8.5px; }
   .livon-page-wrapper .livon-product-card .product-visual,
@@ -3064,7 +3150,8 @@
 
 .livon-page-wrapper .livon-product-card .product-visual {
   height: 200px;
-  background: #f7f9f5;
+  background: #ffffff;
+  border: 1px solid #edf1eb;
   border-radius: 10px;
   position: relative;
   overflow: hidden;
@@ -3140,22 +3227,39 @@
   flex-grow: 1;
 }
 
+.livon-page-wrapper .product-name-box {
+  background: #f4f7f2;
+  border: 1px solid #e2ebd0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.livon-page-wrapper .livon-product-card:hover .product-name-box {
+  background: #edf3ea;
+  border-color: #d6e2d3;
+}
+
 .livon-page-wrapper .product-cat-label {
   font-size: 11px;
-  color: #7a8a78;
-  font-weight: 600;
-  margin-bottom: 2px;
+  color: #4b6654;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.2px;
 }
 
 .livon-page-wrapper .product .product-name-title,
 .livon-page-wrapper .livon-product-card h3.product-name-title,
 .livon-page-wrapper h3.product-name-title {
-  font-size: 15px !important;
+  font-size: 14.5px !important;
   font-weight: 800;
   color: var(--ink);
   line-height: 1.45 !important;
-  margin: 4px 0 10px !important;
-  min-height: 66px !important;
+  margin: 0 !important;
+  min-height: 64px !important;
   height: auto !important;
   display: block !important;
   overflow: visible !important;

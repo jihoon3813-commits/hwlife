@@ -527,6 +527,19 @@ export default function LivonCarePage({
       <main id="main">
         {/* Hero Section */}
         <section className="hero">
+          {/* 모바일 전용 아치형 배경 이미지 레이어 */}
+          <div className="hero-mobile-arch-backdrop" aria-hidden="true">
+            <div className="hero-mobile-arch-frame">
+              <img 
+                src="https://res.cloudinary.com/lyjyvy54/image/upload/v1794287378/%EB%94%B0%EB%9C%BB%ED%95%9C_%EA%B0%80%EC%A1%B1_%ED%94%84%EB%A6%AC%EB%AF%B8%EC%97%84_%ED%99%88%EC%BC%80%EC%96%B4_%EA%B3%B5%EA%B0%84_ux3ghm.png" 
+                alt="" 
+                className="hero-mobile-arch-img" 
+                loading="eager"
+              />
+              <div className="hero-mobile-arch-scrim" />
+            </div>
+          </div>
+
           <div className="container hero-grid">
             <div className="hero-copy">
               <div className="hero-tag">
@@ -704,7 +717,6 @@ export default function LivonCarePage({
                       onClick={() => openSpecModal(p)}
                     >
                       <div className="product-visual relative overflow-hidden">
-                        <span className="product-brand">{brandName}</span>
                         {p.model && (
                           <span className="product-model-chip">
                             {p.model}
@@ -731,13 +743,15 @@ export default function LivonCarePage({
                       </div>
 
                       <div className="product-info-wrap flex-1 flex flex-col">
-                        <small className="product-cat-label">{p.category || '가전'}</small>
-                        <h3 
-                          className="product-name-title" 
-                          title={p.name}
-                        >
-                          {p.name}
-                        </h3>
+                        <div className="product-name-box">
+                          <small className="product-cat-label">{p.category || '가전'}</small>
+                          <h3 
+                            className="product-name-title" 
+                            title={p.name}
+                          >
+                            {p.name}
+                          </h3>
+                        </div>
 
                         <div className="product-action-row mt-auto" onClick={(e) => e.stopPropagation()}>
                           <button 
