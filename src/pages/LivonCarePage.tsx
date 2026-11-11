@@ -717,11 +717,6 @@ export default function LivonCarePage({
                       onClick={() => openSpecModal(p)}
                     >
                       <div className="product-visual relative overflow-hidden">
-                        {p.model && (
-                          <span className="product-model-chip">
-                            {p.model}
-                          </span>
-                        )}
                         <div className="product-img-box">
                           <img 
                             src={optImg} 
@@ -744,7 +739,15 @@ export default function LivonCarePage({
 
                       <div className="product-info-wrap flex-1 flex flex-col">
                         <div className="product-name-box">
-                          <small className="product-cat-label">{p.category || '가전'}</small>
+                          <div className="product-cat-model-row">
+                            <span className="product-cat-label">{p.category || '가전'}</span>
+                            {p.model && (
+                              <>
+                                <span className="product-cat-sep">·</span>
+                                <span className="product-model-label">{p.model}</span>
+                              </>
+                            )}
+                          </div>
                           <h3 
                             className="product-name-title" 
                             title={p.name}
