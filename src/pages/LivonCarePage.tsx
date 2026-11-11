@@ -1188,61 +1188,73 @@ export default function LivonCarePage({
 
             <div className="trust-grid">
               <article>
-                <span className="trust-role">상조 · 라이프서비스</span>
-                <h3 className="trust-brand">
-                  <img 
-                    src="https://res.cloudinary.com/lyjyvy54/image/upload/v1786415950/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_opfls9.png" 
-                    alt="효원상조" 
-                    className="trust-brand-img"
-                  />
-                </h3>
-                <strong>20년 이상 이어온 경험</strong>
-                <ul>
-                  <li><Check /> 선불식 할부거래업 등록</li>
-                  <li><Check /> 상조보증공제조합 보전기관</li>
-                  <li><Check /> ‘내상조그대로’ 참여업체</li>
-                </ul>
-                <a href="https://www.kmaca.or.kr/mysangjo/guide.do" target="_blank" rel="noreferrer">
-                  참여업체 안내 확인 <ArrowUpRight size={15} />
-                </a>
+                <div className="trust-col-brand">
+                  <span className="trust-role">상조 · 라이프서비스</span>
+                  <h3 className="trust-brand">
+                    <img 
+                      src="https://res.cloudinary.com/lyjyvy54/image/upload/v1786415950/%ED%9A%A8%EC%9B%90%EC%83%81%EC%A1%B0_%EB%A1%9C%EA%B3%A0_%EA%B0%80%EB%A1%9C_opfls9.png" 
+                      alt="효원상조" 
+                      className="trust-brand-img"
+                    />
+                  </h3>
+                </div>
+                <div className="trust-col-content">
+                  <strong>20년 이상 이어온 경험</strong>
+                  <ul>
+                    <li><Check /> 선불식 할부거래업 등록</li>
+                    <li><Check /> 상조보증공제조합 보전기관</li>
+                    <li><Check /> ‘내상조그대로’ 참여업체</li>
+                  </ul>
+                  <a href="https://www.kmaca.or.kr/mysangjo/guide.do" target="_blank" rel="noreferrer">
+                    참여업체 안내 확인 <ArrowUpRight size={15} />
+                  </a>
+                </div>
               </article>
 
               <article>
-                <span className="trust-role">간병서비스 직접 제공</span>
-                <h3 className="trust-brand">
-                  <img 
-                    src="https://res.cloudinary.com/lyjyvy54/image/upload/v1792052606/LivOn_1_rptk5n.png" 
-                    alt="리본케어 LivOn" 
-                    className="trust-brand-img"
-                  />
-                </h3>
-                <strong>보험사 간병서비스 협력 경험</strong>
-                <ul>
-                  <li><Check /> 현대해상 간병서비스 운영</li>
-                  <li><Check /> 삼성화재 간병서비스 파트너*</li>
-                  <li><Check /> 실제 간병인 연계·운영 지원</li>
-                </ul>
-                <a href="https://www.hankyung.com/article/202604061504O" target="_blank" rel="noreferrer">
-                  현대해상 협력 기사 보기 <ArrowUpRight size={15} />
-                </a>
+                <div className="trust-col-brand">
+                  <span className="trust-role">간병서비스 직접 제공</span>
+                  <h3 className="trust-brand">
+                    <img 
+                      src="https://res.cloudinary.com/lyjyvy54/image/upload/v1792052606/LivOn_1_rptk5n.png" 
+                      alt="리본케어 LivOn" 
+                      className="trust-brand-img"
+                    />
+                  </h3>
+                </div>
+                <div className="trust-col-content">
+                  <strong>보험사 간병서비스 협력 경험</strong>
+                  <ul>
+                    <li><Check /> 현대해상 간병서비스 운영</li>
+                    <li><Check /> 삼성화재 간병서비스 파트너*</li>
+                    <li><Check /> 실제 간병인 연계·운영 지원</li>
+                  </ul>
+                  <a href="https://www.hankyung.com/article/202604061504O" target="_blank" rel="noreferrer">
+                    현대해상 협력 기사 보기 <ArrowUpRight size={15} />
+                  </a>
+                </div>
               </article>
 
               <article>
-                <span className="trust-role">건강관리 · 치료지원</span>
-                <h3 className="trust-brand">
-                  <img 
-                    src="https://res.cloudinary.com/lyjyvy54/image/upload/v1794286941/logo-dasomcare_1_ayi1iz.png" 
-                    alt="교보다솜케어" 
-                    className="trust-brand-img"
-                  />
-                </h3>
-                <strong>건강상담부터 진료 동행까지</strong>
-                <ul>
-                  <li><Check /> 평상시 건강관리</li>
-                  <li><Check /> 가족건강관리</li>
-                  <li><Check /> 주요질병 치료지원</li>
-                </ul>
-                <span className="status-chip">제휴 예정 · 세부 범위 확정 후 적용</span>
+                <div className="trust-col-brand">
+                  <span className="trust-role">건강관리 · 치료지원</span>
+                  <h3 className="trust-brand">
+                    <img 
+                      src="https://res.cloudinary.com/lyjyvy54/image/upload/v1794286941/logo-dasomcare_1_ayi1iz.png" 
+                      alt="교보다솜케어" 
+                      className="trust-brand-img"
+                    />
+                  </h3>
+                </div>
+                <div className="trust-col-content">
+                  <strong>건강상담부터 진료 동행까지</strong>
+                  <ul>
+                    <li><Check /> 평상시 건강관리</li>
+                    <li><Check /> 가족건강관리</li>
+                    <li><Check /> 주요질병 치료지원</li>
+                  </ul>
+                  <span className="status-chip">제휴 예정 · 세부 범위 확정 후 적용</span>
+                </div>
               </article>
             </div>
 

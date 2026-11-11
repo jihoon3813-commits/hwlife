@@ -3096,16 +3096,94 @@
   .livon-page-wrapper .combo-result small { font-size: 7.5px; }
   .livon-page-wrapper .combo-result > b { width: 100%; text-align: center; padding: 4px 0 0; font-size: 10.5px; }
 
-  /* Trust Section */
-  .livon-page-wrapper .trust-grid { grid-template-columns: 1fr; gap: 10px; }
-  .livon-page-wrapper .trust-grid article { padding: 16px 14px; border-radius: 10px; }
-  .livon-page-wrapper .trust-role { font-size: 9px; }
-  .livon-page-wrapper .trust-grid h3 { font-size: 20px; margin: 8px 0 6px; }
-  .livon-page-wrapper .trust-grid article > strong { font-size: 12.5px; }
-  .livon-page-wrapper .trust-grid ul { margin: 10px 0; gap: 5px; }
-  .livon-page-wrapper .trust-grid li { font-size: 11px; gap: 5px; }
-  .livon-page-wrapper .trust-grid a { font-size: 9.5px; padding-top: 10px; }
-  .livon-page-wrapper .status-chip { font-size: 9px; display: inline-block; padding: 3px 8px; }
+  /* Trust Section (모바일: 로고 왼쪽, 세부내용 오른쪽 2열 배치) */
+  .livon-page-wrapper .trust-grid { 
+    grid-template-columns: 1fr; 
+    gap: 12px; 
+  }
+  .livon-page-wrapper .trust-grid article { 
+    display: grid; 
+    grid-template-columns: 105px 1fr; 
+    gap: 0 14px; 
+    padding: 16px 14px; 
+    border-radius: 12px; 
+    align-items: start;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(23, 62, 53, 0.04);
+  }
+  .livon-page-wrapper .trust-col-brand {
+    display: flex;
+    flex-direction: column;
+    padding-right: 12px;
+    border-right: 1px solid #edf0e6;
+    height: 100%;
+    justify-content: flex-start;
+  }
+  .livon-page-wrapper .trust-role { 
+    font-size: 8.5px; 
+    letter-spacing: .02em;
+    color: #8b9983;
+    line-height: 1.35;
+    word-break: keep-all;
+    margin-bottom: 6px;
+  }
+  .livon-page-wrapper .trust-grid .trust-brand { 
+    height: auto; 
+    margin: 4px 0 0; 
+  }
+  .livon-page-wrapper .trust-grid .trust-brand-img {
+    max-height: 28px;
+    max-width: 100%;
+    width: auto;
+    object-fit: contain;
+    object-position: left center;
+  }
+  .livon-page-wrapper .trust-col-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .livon-page-wrapper .trust-grid article > strong,
+  .livon-page-wrapper .trust-col-content > strong { 
+    font-size: 13px; 
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.35;
+    word-break: keep-all;
+  }
+  .livon-page-wrapper .trust-grid ul { 
+    margin: 2px 0 6px; 
+    gap: 4px; 
+    padding: 0;
+    list-style: none;
+  }
+  .livon-page-wrapper .trust-grid li { 
+    font-size: 10.5px; 
+    gap: 5px; 
+    margin: 3px 0;
+    line-height: 1.35;
+    color: #6a7866;
+  }
+  .livon-page-wrapper .trust-grid li svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+  .livon-page-wrapper .trust-grid a { 
+    font-size: 9.5px; 
+    padding-top: 8px; 
+    margin-top: 2px;
+    border-top: 1px dashed #edf0e6;
+  }
+  .livon-page-wrapper .status-chip { 
+    font-size: 8.5px; 
+    display: inline-block; 
+    padding: 3px 6px; 
+    margin-top: 4px;
+    border-radius: 4px;
+    width: fit-content;
+  }
 
   /* FAQ */
   .livon-page-wrapper .faq-grid { grid-template-columns: 1fr; gap: 0; }
@@ -3187,6 +3265,10 @@
   .livon-page-wrapper .livon-product-card .product-visual,
   .livon-page-wrapper .product-visual { height: 100px !important; }
   .livon-page-wrapper .product-name-title { font-size: 10px !important; min-height: 38px !important; }
+  .livon-page-wrapper .trust-grid article { grid-template-columns: 92px 1fr; gap: 0 10px; padding: 14px 10px; }
+  .livon-page-wrapper .trust-col-brand { padding-right: 8px; }
+  .livon-page-wrapper .trust-col-content > strong { font-size: 12px; }
+  .livon-page-wrapper .trust-grid li { font-size: 9.5px; }
   .livon-page-wrapper .life-grid h3 { font-size: 11px; }
   .livon-page-wrapper .life-caption { padding: 8px 6px; }
   .livon-page-wrapper .sticky-cta strong { font-size: 9px; }
