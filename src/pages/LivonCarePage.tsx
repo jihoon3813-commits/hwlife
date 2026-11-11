@@ -1290,6 +1290,19 @@ export default function LivonCarePage({
 
         {/* Closing Offer & Consultation Section */}
         <section id="consult" className="section closing">
+          {/* 모바일 전용 풀 배경 이미지 레이어 */}
+          <div className="closing-mobile-backdrop" aria-hidden="true">
+            <div className="closing-mobile-frame">
+              <img 
+                src="https://res.cloudinary.com/lyjyvy54/image/upload/v1794287243/%EA%B0%80%EC%A0%84_%EB%8F%8C%EB%B4%84_%EA%B1%B4%EA%B0%95%EC%9D%84_%EC%9E%87%EB%8A%94_%EA%B0%80%EC%A1%B1_%EC%BC%80%EC%96%B4_klpbh5.png" 
+                alt="" 
+                className="closing-mobile-img" 
+                loading="lazy"
+              />
+              <div className="closing-mobile-scrim" />
+            </div>
+          </div>
+
           <div className="container">
             <div className="closing-top">
               <div className="closing-copy">
