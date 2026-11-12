@@ -15,6 +15,7 @@ import Package60Page from '../pages/Package60Page';
 import LgCarePage from '../pages/LgCarePage';
 import LgCareNewPage from '../pages/LgCareNewPage';
 import LivonCarePage from '../pages/LivonCarePage';
+import Special299NewPage from '../pages/Special299NewPage';
 
 export default function LandingRouter() {
   const [currentPath, setCurrentPath] = React.useState(() => window.location.pathname.toLowerCase());
@@ -28,6 +29,19 @@ export default function LandingRouter() {
   }, []);
 
   const path = currentPath;
+
+  // /special_new, /special-new, /special299, /special299_new, /special_299 경로 → 해피효원 스페셜299(new) 랜딩페이지
+  if (path === '/special_new' || path.startsWith('/special_new/') ||
+      path === '/special-new' || path.startsWith('/special-new/') ||
+      path === '/special299' || path.startsWith('/special299/') ||
+      path === '/special299_new' || path.startsWith('/special299_new/') ||
+      path === '/special_299' || path.startsWith('/special_299/')) {
+    const parts = path.split('/').filter(Boolean);
+    const sp = new URLSearchParams(window.location.search);
+    const queryCh = sp.get('channel') || Array.from(sp.keys())[0];
+    const sub = parts.length >= 2 ? parts[1] : (queryCh || undefined);
+    return <Special299NewPage channelSubdomain={sub} landingPath="/special_new" />;
+  }
   
   // /triplecare, /triple_care, /triple-care, /careplus, /care_plus, /care-plus, /livon, /livoncare 경로 → 효원상조 트리플케어 (리본케어 결합) 랜딩페이지
   if (path === '/triplecare' || path.startsWith('/triplecare/') ||
@@ -178,6 +192,9 @@ export default function LandingRouter() {
     const assignedPaths = channel.landingPages || (channel.landingPage ? [channel.landingPage] : []);
     const primaryPath = assignedPaths[0] || '/';
     
+    if (primaryPath === '/special_new' || primaryPath === '/special-new' || primaryPath === '/special299') {
+      return <Special299NewPage channelSubdomain={channel.subdomain} landingPath="/special_new" />;
+    }
     if (primaryPath === '/triplecare' || primaryPath === '/triple_care' || primaryPath === '/triple-care' || primaryPath === '/careplus' || primaryPath === '/care_plus' || primaryPath === '/livon') {
       return <LivonCarePage channelSubdomain={channel.subdomain} landingPath={primaryPath} />;
     }

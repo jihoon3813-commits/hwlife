@@ -145,6 +145,13 @@ export const seed = mutation({
         thumbnail: "https://res.cloudinary.com/lyjyvy54/image/upload/v1794287243/%EA%B0%80%EC%A0%84_%EB%8F%8C%EB%B4%84_%EA%B1%B4%EA%B0%95%EC%9D%84_%EC%9E%87%EB%8A%94_%EA%B0%80%EC%A1%B1_%EC%BC%80%EC%96%B4_klpbh5.png",
         isActive: true,
       });
+      await ctx.db.insert("landings", {
+        name: "해피효원 스페셜299(new)",
+        path: "/special_new",
+        description: "해피효원라이프 스페셜299 가전결합상품 최신 랜딩페이지 (1~4구좌 60패키지 연동)",
+        thumbnail: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png",
+        isActive: true,
+      });
     }
   },
 });
@@ -285,6 +292,43 @@ export const updateDefaultThumbnails = mutation({
         name: "효원상조 트리플케어",
         description: "최신가전 + 간병/헬스케어 멤버십 결합 상품 (효원상조 3구좌 트리플케어)",
       });
+    }
+
+    // Ensure Special299 New (해피효원 스페셜299(new)) exists
+    const specialNewThumb = "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png";
+    const existingSpecialNew = landings.find(l => l.path === "/special_new" || l.name === "해피효원 스페셜299(new)");
+    if (!existingSpecialNew) {
+      await ctx.db.insert("landings", {
+        name: "해피효원 스페셜299(new)",
+        path: "/special_new",
+        description: "해피효원라이프 스페셜299 가전결합상품 최신 랜딩페이지 (1~4구좌 60패키지 연동)",
+        thumbnail: specialNewThumb,
+        isActive: true,
+      });
+    } else if (existingSpecialNew.name !== "해피효원 스페셜299(new)" || existingSpecialNew.path !== "/special_new" || existingSpecialNew.thumbnail === "/special299/hero.webp") {
+      await ctx.db.patch(existingSpecialNew._id, {
+        name: "해피효원 스페셜299(new)",
+        path: "/special_new",
+        description: "해피효원라이프 스페셜299 가전결합상품 최신 랜딩페이지 (1~4구좌 60패키지 연동)",
+        thumbnail: specialNewThumb,
+      });
+    }
+
+    // Ensure 60패키지 products also include /special_new in landingPages
+    const allProducts = await ctx.db.query("products").collect();
+    for (const prod of allProducts) {
+      const is60Prod =
+        [5, 6, 7, 8].includes(prod.planId) ||
+        (prod.landingPages && prod.landingPages.includes("/package60")) ||
+        prod.isSmartRegistered === true;
+      if (is60Prod) {
+        const currentPages = prod.landingPages || ["/package60"];
+        if (!currentPages.includes("/special_new")) {
+          await ctx.db.patch(prod._id, {
+            landingPages: [...currentPages, "/special_new"],
+          });
+        }
+      }
     }
   },
 });
