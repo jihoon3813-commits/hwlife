@@ -44,9 +44,9 @@ const pages = [
   },
   {
     name: 'package60',
-    title: '가전상조 60패키지 (쇼핑몰) - 프리미엄 가전 100% 소유 + 효원상조 혜택',
-    description: '월 29,900원부터! 60회 만기 시 가전 완납 소유 및 상조 만기 시 가전 렌탈료 100% 전액 환급 지원!',
-    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=500'
+    title: '해피효원 스페셜299(new) | 최신 가전과 미래 준비를 함께',
+    description: '효원상조 해피효원라이프 스페셜299 가전결합상품 안내. 삼성·LG·바디프랜드 등 가전 혜택, 1~4구좌 납입 구조, 만기 환급 조건과 상담 신청을 한눈에 확인하세요.',
+    image: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676343/special299_og_image_j7024p.png'
   },
   {
     name: 'package_up',
@@ -98,9 +98,9 @@ const pages = [
   },
   {
     name: 'special_new',
-    title: '해피효원 스페셜299(new) | 최신 가전과 미래 준비를 함께',
-    description: '효원상조 해피효원라이프 스페셜299 가전결합상품 안내. 삼성·LG·바디프랜드 등 가전 혜택, 1~4구좌 납입 구조, 만기 환급 조건과 상담 신청을 한눈에 확인하세요.',
-    image: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676343/special299_og_image_j7024p.png'
+    title: '가전상조 60패키지 (쇼핑몰) - 프리미엄 가전 100% 소유 + 효원상조 혜택',
+    description: '월 29,900원부터! 60회 만기 시 가전 완납 소유 및 상조 만기 시 가전 렌탈료 100% 전액 환급 지원!',
+    image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=500'
   }
 ];
 
