@@ -224,8 +224,16 @@
 }
 
 .s299-page-wrapper .brand img {
-  width: 111px;
-  height: auto;
+  width: auto;
+  object-fit: contain;
+}
+
+.s299-page-wrapper .brand .brand-hyowon-img {
+  height: 32px;
+}
+
+.s299-page-wrapper .brand .brand-special-img {
+  height: 34px;
 }
 
 .s299-page-wrapper .brand > span:last-child {
@@ -235,9 +243,10 @@
 }
 
 .s299-page-wrapper .brand-divider {
-  height: 18px;
+  height: 20px;
   width: 1px;
   background: var(--line);
+  flex-shrink: 0;
 }
 
 .s299-page-wrapper .desktop-nav {
@@ -2015,12 +2024,21 @@
 .s299-page-wrapper .footer-top > div {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
   margin-right: auto;
 }
 
 .s299-page-wrapper .footer-top img {
-  width: 106px;
+  width: auto;
+  object-fit: contain;
+}
+
+.s299-page-wrapper .footer-top .brand-hyowon-img {
+  height: 30px;
+}
+
+.s299-page-wrapper .footer-top .brand-special-img {
+  height: 32px;
 }
 
 .s299-page-wrapper .footer-top span {
@@ -2627,8 +2645,19 @@
     gap: 18px;
     font-size: 12px;
   }
-  .s299-page-wrapper .brand > span:last-child,
+  .s299-page-wrapper .brand {
+    gap: 10px;
+  }
+  .s299-page-wrapper .brand .brand-hyowon-img {
+    height: 26px;
+  }
+  .s299-page-wrapper .brand .brand-special-img {
+    height: 28px;
+  }
   .s299-page-wrapper .brand-divider {
+    height: 17px;
+  }
+  .s299-page-wrapper .brand > span:last-child {
     display: none;
   }
   .s299-page-wrapper .hero {
@@ -2732,8 +2761,17 @@
     font-size: 11px;
     gap: 20px;
   }
-  .s299-page-wrapper .brand img {
-    width: 100px;
+  .s299-page-wrapper .brand {
+    gap: 12px;
+  }
+  .s299-page-wrapper .brand .brand-hyowon-img {
+    height: 29px;
+  }
+  .s299-page-wrapper .brand .brand-special-img {
+    height: 31px;
+  }
+  .s299-page-wrapper .brand-divider {
+    height: 18px;
   }
   .s299-page-wrapper .brand > span:last-child,
   .s299-page-wrapper .brand-divider {
@@ -2956,7 +2994,7 @@
     font-size: 10px;
   }
   .s299-page-wrapper .footer-top > div {
-    gap: 15px;
+    gap: 12px;
   }
   .s299-page-wrapper .footer-top span {
     font-size: 10px;
@@ -2975,25 +3013,29 @@
     width: calc(100% - 32px);
   }
   .s299-page-wrapper .brand {
-    gap: 9px;
+    gap: 8px;
   }
-  .s299-page-wrapper .brand img {
-    width: 87px;
+  .s299-page-wrapper .brand .brand-hyowon-img {
+    height: 23px;
+  }
+  .s299-page-wrapper .brand .brand-special-img {
+    height: 25px;
   }
   .s299-page-wrapper .brand > span:last-child {
     font-size: 9px;
   }
   .s299-page-wrapper .brand-divider {
-    height: 14px;
+    height: 15px;
   }
   .s299-page-wrapper .nav {
     height: 62px;
     gap: 10px;
   }
-  .s299-page-wrapper .nav > .btn {
-    padding: 8px 12px;
-    gap: 10px;
-    font-size: 10px;
+  .s299-page-wrapper .nav > .btn,
+  .s299-page-wrapper .nav .btn.small {
+    padding: 9px 13px;
+    gap: 12px;
+    font-size: 11px;
     white-space: nowrap;
   }
   .s299-page-wrapper .nav > .btn span {
@@ -3632,9 +3674,16 @@
   .s299-page-wrapper .footer-top > div {
     width: 100%;
     margin-bottom: 5px;
+    gap: 10px;
   }
-  .s299-page-wrapper .footer-top img {
-    width: 95px;
+  .s299-page-wrapper .footer-top .brand-hyowon-img {
+    height: 26px;
+  }
+  .s299-page-wrapper .footer-top .brand-special-img {
+    height: 28px;
+  }
+  .s299-page-wrapper .footer-top .brand-divider {
+    height: 16px;
   }
   .s299-page-wrapper .footer-top > div span {
     font-size: 10px;
@@ -3725,7 +3774,18 @@
 }
 
 @media (max-width: 370px) {
-  .s299-page-wrapper .brand-divider,
+  .s299-page-wrapper .brand {
+    gap: 6px;
+  }
+  .s299-page-wrapper .brand .brand-hyowon-img {
+    height: 19px;
+  }
+  .s299-page-wrapper .brand .brand-special-img {
+    height: 21px;
+  }
+  .s299-page-wrapper .brand-divider {
+    height: 13px;
+  }
   .s299-page-wrapper .brand > span:last-child {
     display: none;
   }

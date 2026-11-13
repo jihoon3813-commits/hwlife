@@ -29,6 +29,9 @@ interface PackageTierInfo {
   tabSubtext: string;
 }
 
+const SPECIAL299_LOGO_URL =
+  'https://res.cloudinary.com/lyjyvy54/image/upload/v1794530184/%ED%95%B4%ED%94%BC%ED%9A%A8%EC%9B%90%EB%9D%BC%EC%9D%B4%ED%94%84_%EB%A1%9C%EA%B3%A0_new_%EB%8D%94%EB%B8%94UP_1_qgrcpp.png';
+
 const PACKAGE_TIERS: Record<AccountKey, PackageTierInfo> = {
   '1구좌': {
     key: '1구좌',
@@ -750,11 +753,19 @@ export default function Special299NewPage({
           <a
             className="brand"
             href="#"
-            aria-label="효원상조 스페셜299 홈"
+            aria-label="효원상조 해피효원라이프 스페셜299 홈"
           >
-            <img src="/special299/logo.png" alt="효원상조" />
+            <img
+              src="/special299/logo.png"
+              alt="효원상조"
+              className="brand-hyowon-img"
+            />
             <span className="brand-divider"></span>
-            <span>해피효원라이프</span>
+            <img
+              src={SPECIAL299_LOGO_URL}
+              alt="해피효원라이프 스페셜299"
+              className="brand-special-img"
+            />
           </a>
 
           <nav className="desktop-nav" aria-label="주요 메뉴">
@@ -2078,8 +2089,19 @@ export default function Special299NewPage({
         <div className="wrap">
           <div className="footer-top">
             <div>
-              <img src="/special299/logo.png" alt="효원상조" loading="lazy" />
-              <span>해피효원라이프 스페셜299</span>
+              <img
+                src="/special299/logo.png"
+                alt="효원상조"
+                className="brand-hyowon-img"
+                loading="lazy"
+              />
+              <span className="brand-divider"></span>
+              <img
+                src={SPECIAL299_LOGO_URL}
+                alt="해피효원라이프 스페셜299"
+                className="brand-special-img"
+                loading="lazy"
+              />
             </div>
             <button
               type="button"
