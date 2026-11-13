@@ -48,7 +48,7 @@ const PACKAGE_TIERS: Record<AccountKey, PackageTierInfo> = {
   },
   '2구좌': {
     key: '2구좌',
-    shortName: '2구좌 (더블 · 인기)',
+    shortName: '2구좌 (더블·인기)',
     name: '2구좌 패키지 (더블)',
     badgeLabel: '2구좌(더블) 전용',
     accountNum: 2,
@@ -232,7 +232,7 @@ const getProductImageList = (p: any): string[] => {
 
 export default function Special299NewPage({
   channelSubdomain,
-  landingPath = '/special_new',
+  landingPath = '/package60',
 }: Special299NewPageProps) {
   useTrackVisit(channelSubdomain, landingPath);
 
@@ -258,6 +258,7 @@ export default function Special299NewPage({
   const [activePackageTab, setActivePackageTab] = useState<AccountKey | '전체'>('1구좌');
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [mobileProductCols, setMobileProductCols] = useState<1 | 2>(1);
 
   // Right-Side Full-Height Drawer State
   const [drawerMode, setDrawerMode] = useState<
@@ -776,18 +777,9 @@ export default function Special299NewPage({
             <a href="#faq">자주 묻는 질문</a>
           </nav>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="s299-header-actions">
             {channel?.channelName && (
-              <span
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  background: '#eaf0e6',
-                  color: '#214d3e',
-                  padding: '4px 9px',
-                  borderRadius: '4px',
-                }}
-              >
+              <span className="s299-channel-badge">
                 {channel.channelName}
               </span>
             )}
@@ -1174,28 +1166,52 @@ export default function Special299NewPage({
                 ))}
               </div>
 
-              <label className="search-box">
-                <span aria-hidden="true">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+              <div className="s299-toolbar-right">
+                <label className="search-box">
+                  <span aria-hidden="true">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="10.5" cy="10.5" r="6.5" />
+                      <path d="m16 16 5 5" />
+                    </svg>
+                  </span>
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="제품명·모델명·브랜드 검색"
+                    aria-label="원하는 가전 검색"
+                  />
+                </label>
+                <div
+                  className="s299-mobile-view-toggle"
+                  role="group"
+                  aria-label="모바일 상품 보기 방식"
+                >
+                  <button
+                    type="button"
+                    className={mobileProductCols === 1 ? 'active' : ''}
+                    aria-pressed={mobileProductCols === 1}
+                    onClick={() => setMobileProductCols(1)}
                   >
-                    <circle cx="10.5" cy="10.5" r="6.5" />
-                    <path d="m16 16 5 5" />
-                  </svg>
-                </span>
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="제품명·모델명·브랜드 검색"
-                  aria-label="원하는 가전 검색"
-                />
-              </label>
+                    리스트
+                  </button>
+                  <button
+                    type="button"
+                    className={mobileProductCols === 2 ? 'active' : ''}
+                    aria-pressed={mobileProductCols === 2}
+                    onClick={() => setMobileProductCols(2)}
+                  >
+                    2열
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="product-meta">
@@ -1206,7 +1222,7 @@ export default function Special299NewPage({
                 <b>{filteredProducts.length}</b>가지
               </span>
               <span>
-                제품을 클릭하시면 우측 전체 패널에서 실시간 세부 스펙과 구좌별 조건을 확인하실 수 있습니다.
+                제품 선택 시 실시간 세부 스펙과 구좌별 납입 조건을 확인하실 수 있습니다.
               </span>
             </div>
 
@@ -1221,7 +1237,7 @@ export default function Special299NewPage({
                 </p>
               </div>
             ) : (
-              <div className="product-grid">
+              <div className={`product-grid mobile-cols-${mobileProductCols}`}>
                 {filteredProducts.map((p: any) => {
                   const pAccountKey = getProductAccountKey(p);
                   const pkg = PACKAGE_TIERS[pAccountKey] || PACKAGE_TIERS['1구좌'];
@@ -1233,48 +1249,71 @@ export default function Special299NewPage({
 
                   return (
                     <article key={p._id} className="product-card">
-                      <div
-                        className="product-picture"
-                        onClick={() => openProductDrawer(p)}
-                      >
-                        <span className="product-tag">
-                          {p.category || 'SPECIAL 299'}
-                        </span>
-                        <span className="s299-product-account-tag">
-                          {pkg.badgeLabel}
-                        </span>
-                        <img
-                          src={mainImg}
-                          alt={p.name}
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                          decoding="async"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.onerror = null;
-                            target.src = '/special299/fridge.jpg';
-                          }}
-                        />
+                      <div className="s299-card-top">
+                        <div
+                          className="product-picture"
+                          onClick={() => openProductDrawer(p)}
+                        >
+                          <span className="product-tag">
+                            {p.category || 'SPECIAL 299'}
+                          </span>
+                          <span className="s299-product-account-tag">
+                            {pkg.badgeLabel}
+                          </span>
+                          <img
+                            src={mainImg}
+                            alt={p.name}
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                            decoding="async"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.onerror = null;
+                              target.src = '/special299/fridge.jpg';
+                            }}
+                          />
+                        </div>
+
+                        <div className="s299-card-title-block">
+                          <div className="s299-card-inline-tags">
+                            <span className="s299-inline-cat-tag">
+                              {p.category || 'SPECIAL 299'}
+                            </span>
+                            <span className="s299-inline-acc-tag">
+                              {pkg.badgeLabel}
+                            </span>
+                          </div>
+
+                          {p.giftText && (
+                            <div className="s299-product-gift-badge">
+                              <Gift size={11} className="shrink-0" />
+                              <span>사은품: {p.giftText}</span>
+                            </div>
+                          )}
+
+                          <span className="product-brand">
+                            {p.brand || 'LG전자'} {p.model || ''}
+                          </span>
+                          <h3
+                            onClick={() => openProductDrawer(p)}
+                            title={p.name}
+                          >
+                            {p.name}
+                          </h3>
+
+                          <div
+                            className="s299-card-inline-price"
+                            onClick={() => openProductDrawer(p)}
+                          >
+                            <span className="s299-card-inline-price-label">월 납입금</span>
+                            <strong>
+                              월 {pkg.monthlyPrice}원<small>(60회)</small>
+                            </strong>
+                          </div>
+                        </div>
                       </div>
 
                       <div className="product-card-copy">
-                        {p.giftText && (
-                          <div className="s299-product-gift-badge">
-                            <Gift size={12} className="shrink-0" />
-                            <span>사은품: {p.giftText}</span>
-                          </div>
-                        )}
-
-                        <span className="product-brand">
-                          {p.brand || 'LG전자'} {p.model || ''}
-                        </span>
-                        <h3
-                          onClick={() => openProductDrawer(p)}
-                          title={p.name}
-                        >
-                          {p.name}
-                        </h3>
-
                         {/* 구좌별 금액(간략) 박스 */}
                         <div className="s299-card-price-box">
                           <div className="s299-card-price-main">
@@ -2263,7 +2302,7 @@ export default function Special299NewPage({
                   <div className="s299-drawer-price-card">
                     <div className="s299-drawer-price-head">
                       <span>{pkg.name} 월 납입금</span>
-                      <div>
+                      <div className="s299-drawer-price-head-val">
                         <strong>월 {pkg.monthlyPrice}원</strong>
                         <small>(1~60회)</small>
                       </div>
@@ -2311,13 +2350,7 @@ export default function Special299NewPage({
                       <h3>
                         <FileText size={17} /> 세부 스펙 정보
                       </h3>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                        }}
-                      >
+                      <div className="s299-drawer-spec-status-wrap">
                         {isScrapingSpec ? (
                           <span className="s299-spec-status-badge">
                             <Loader2 size={12} className="animate-spin" />
@@ -2357,7 +2390,7 @@ export default function Special299NewPage({
                             <td>{selectedProduct.model || '-'}</td>
                           </tr>
                           <tr>
-                            <th>제조사 / 브랜드</th>
+                            <th>제조사/브랜드</th>
                             <td>{selectedProduct.brand || 'LG전자'}</td>
                           </tr>
                           <tr>

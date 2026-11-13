@@ -152,7 +152,7 @@ const PACKAGE_DATA: Record<string, {
   }
 };
 
-export default function Package60Page({ channelSubdomain, landingPath = '/package60' }: Package60PageProps) {
+export default function Package60Page({ channelSubdomain, landingPath = '/special_new' }: Package60PageProps) {
   const allProducts = useQuery(api.products.getVisibleProducts) || [];
   const settings = useQuery(api.settings.get);
   const landingInfo = useQuery(api.landings.getByPath, { path: landingPath });
@@ -240,6 +240,7 @@ export default function Package60Page({ channelSubdomain, landingPath = '/packag
       (p.landingPages && (
         p.landingPages.includes(landingPath) || 
         p.landingPages.includes('/package60') || 
+        p.landingPages.includes('/special_new') ||
         p.landingPages.includes('/package_up') ||
         p.landingPages.includes('/special60')
       )) ||

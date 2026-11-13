@@ -147,9 +147,16 @@ export const seed = mutation({
       });
       await ctx.db.insert("landings", {
         name: "해피효원 스페셜299(new)",
-        path: "/special_new",
-        description: "해피효원라이프 스페셜299 가전결합상품 최신 랜딩페이지 (1~4구좌 60패키지 연동)",
+        path: "/package60",
+        description: "해피효원라이프 스페셜299 가전결합상품 최신 랜딩페이지 (영업자 공식 60패키지 연동)",
         thumbnail: "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png",
+        isActive: true,
+      });
+      await ctx.db.insert("landings", {
+        name: "가전상조 60패키지 (기존)",
+        path: "/special_new",
+        description: "가전 & 효원상조 60회 결합 쇼핑몰 랜딩페이지 (기존 버전 보관용)",
+        thumbnail: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=500",
         isActive: true,
       });
     }
@@ -201,15 +208,59 @@ export const updateDefaultThumbnails = mutation({
       });
     }
 
-    // Ensure Package60 exists
-    if (!paths.includes("/package60")) {
-      await ctx.db.insert("landings", {
-        name: "가전상조 60패키지 (쇼핑몰)",
-        path: "/package60",
-        description: "가전 & 효원상조 60회 결합 프리미엄 쇼핑몰 랜딩페이지",
-        thumbnail: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=500",
-        isActive: true,
-      });
+    // Ensure /package60 and /special_new exist and are swapped according to current requirements:
+    // /package60 -> 해피효원 스페셜299(new) (영업자 공식 최신 디자인)
+    // /special_new -> 가전상조 60패키지 (기존 쇼핑몰 보관용)
+    const specialNewThumb = "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png";
+    const package60OldThumb = "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=500";
+
+    const existingPkg60 = landings.find(l => l.path === "/package60");
+    const existingSpecialNew = landings.find(l => l.path === "/special_new");
+
+    // Case 1: Both exist but need swapping
+    if (existingPkg60 && existingSpecialNew) {
+      if (existingPkg60.name.includes("60패키지") && existingSpecialNew.name.includes("스페셜299")) {
+        // Swap them
+        await ctx.db.patch(existingPkg60._id, { path: "/_temp_swap_path" });
+        await ctx.db.patch(existingSpecialNew._id, {
+          name: "해피효원 스페셜299(new)",
+          path: "/package60",
+          description: "해피효원라이프 스페셜299 가전결합상품 최신 랜딩페이지 (영업자 공식 60패키지 연동)",
+          thumbnail: specialNewThumb,
+          isActive: true,
+        });
+        await ctx.db.patch(existingPkg60._id, {
+          name: "가전상조 60패키지 (기존)",
+          path: "/special_new",
+          description: "가전 및 효원상조 60회 결합 쇼핑몰 랜딩페이지 (기존 버전 보관용)",
+          thumbnail: package60OldThumb,
+          isActive: true,
+        });
+      } else {
+        // Enforce names and descriptions
+        if (existingPkg60.name.includes("스페셜299") && existingPkg60.thumbnail === "/special299/hero.webp") {
+          await ctx.db.patch(existingPkg60._id, { thumbnail: specialNewThumb });
+        }
+      }
+    } else {
+      if (!existingPkg60) {
+        await ctx.db.insert("landings", {
+          name: "해피효원 스페셜299(new)",
+          path: "/package60",
+          description: "해피효원라이프 스페셜299 가전결합상품 최신 랜딩페이지 (영업자 공식 60패키지 연동)",
+          thumbnail: specialNewThumb,
+          isActive: true,
+        });
+      }
+      if (!existingSpecialNew) {
+        await ctx.db.insert("landings", {
+          name: "가전상조 60패키지 (기존)",
+          path: "/special_new",
+          description: "가전 및 효원상조 60회 결합 쇼핑몰 랜딩페이지 (기존 버전 보관용)",
+          thumbnail: package60OldThumb,
+          isActive: true,
+        });
+      }
     }
 
     // Ensure LG Care Solutions exists
@@ -294,42 +345,68 @@ export const updateDefaultThumbnails = mutation({
       });
     }
 
-    // Ensure Special299 New (해피효원 스페셜299(new)) exists
-    const specialNewThumb = "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png";
-    const existingSpecialNew = landings.find(l => l.path === "/special_new" || l.name === "해피효원 스페셜299(new)");
-    if (!existingSpecialNew) {
-      await ctx.db.insert("landings", {
-        name: "해피효원 스페셜299(new)",
-        path: "/special_new",
-        description: "해피효원라이프 스페셜299 가전결합상품 최신 랜딩페이지 (1~4구좌 60패키지 연동)",
-        thumbnail: specialNewThumb,
-        isActive: true,
-      });
-    } else if (existingSpecialNew.name !== "해피효원 스페셜299(new)" || existingSpecialNew.path !== "/special_new" || existingSpecialNew.thumbnail === "/special299/hero.webp") {
-      await ctx.db.patch(existingSpecialNew._id, {
-        name: "해피효원 스페셜299(new)",
-        path: "/special_new",
-        description: "해피효원라이프 스페셜299 가전결합상품 최신 랜딩페이지 (1~4구좌 60패키지 연동)",
-        thumbnail: specialNewThumb,
-      });
-    }
-
-    // Ensure 60패키지 products also include /special_new in landingPages
+    // Ensure 60패키지 products also include /package60 and /special_new in landingPages
     const allProducts = await ctx.db.query("products").collect();
     for (const prod of allProducts) {
       const is60Prod =
         [5, 6, 7, 8].includes(prod.planId) ||
-        (prod.landingPages && prod.landingPages.includes("/package60")) ||
+        (prod.landingPages && (prod.landingPages.includes("/package60") || prod.landingPages.includes("/special_new"))) ||
         prod.isSmartRegistered === true;
       if (is60Prod) {
         const currentPages = prod.landingPages || ["/package60"];
-        if (!currentPages.includes("/special_new")) {
+        let updated = false;
+        let newPages = [...currentPages];
+        if (!newPages.includes("/package60")) {
+          newPages.push("/package60");
+          updated = true;
+        }
+        if (!newPages.includes("/special_new")) {
+          newPages.push("/special_new");
+          updated = true;
+        }
+        if (updated) {
           await ctx.db.patch(prod._id, {
-            landingPages: [...currentPages, "/special_new"],
+            landingPages: newPages,
           });
         }
       }
     }
+  },
+});
+
+export const swapPackage60AndSpecialNew = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const landings = await ctx.db.query("landings").collect();
+    const specialNewThumb = "https://res.cloudinary.com/dfkntvpmv/image/upload/v1781674558/IMG_3521-1_v2su84.png";
+    const package60OldThumb = "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=500";
+
+    const itemPkg60 = landings.find(l => l.path === "/package60");
+    const itemSpecialNew = landings.find(l => l.path === "/special_new");
+
+    if (itemPkg60 && itemSpecialNew) {
+      // Check if itemPkg60 is the old one or if they need swapping
+      if (itemPkg60.name.includes("60패키지") && itemSpecialNew.name.includes("스페셜299")) {
+        await ctx.db.patch(itemPkg60._id, { path: "/_temp_swap_path" });
+        await ctx.db.patch(itemSpecialNew._id, {
+          name: "해피효원 스페셜299(new)",
+          path: "/package60",
+          description: "해피효원라이프 스페셜299 가전결합상품 최신 랜딩페이지 (영업자 공식 60패키지 연동)",
+          thumbnail: specialNewThumb,
+          isActive: true,
+        });
+        await ctx.db.patch(itemPkg60._id, {
+          name: "가전상조 60패키지 (기존)",
+          path: "/special_new",
+          description: "가전 & 효원상조 60회 결합 쇼핑몰 랜딩페이지 (기존 버전 보관용)",
+          thumbnail: package60OldThumb,
+          isActive: true,
+        });
+        return { success: true, swapped: true, message: "Swapped /package60 and /special_new successfully" };
+      }
+      return { success: true, swapped: false, message: "Already swapped or structured correctly" };
+    }
+    return { success: false, message: "Could not find both landings" };
   },
 });
 
