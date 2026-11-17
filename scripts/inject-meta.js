@@ -46,7 +46,7 @@ const pages = [
     name: 'package60',
     title: '해피효원 스페셜299(new) | 최신 가전과 미래 준비를 함께',
     description: '효원상조 해피효원라이프 스페셜299 가전결합상품 안내. 삼성·LG·바디프랜드 등 가전 혜택, 1~4구좌 납입 구조, 만기 환급 조건과 상담 신청을 한눈에 확인하세요.',
-    image: 'https://res.cloudinary.com/dfkntvpmv/image/upload/v1781676343/special299_og_image_j7024p.png'
+    image: 'https://res.cloudinary.com/lyjyvy54/image/upload/v1794886099/Group_1_15_llwhjk.png'
   },
   {
     name: 'package_up',

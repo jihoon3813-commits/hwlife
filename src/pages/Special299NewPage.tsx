@@ -736,7 +736,11 @@ export default function Special299NewPage({
           landingInfo?.description ||
           '원하는 가전과 효원상조의 라이프서비스를 함께. 해피효원라이프 스페셜299의 가전 구성, 구좌별 납입금과 만기 환급 조건을 확인하세요.'
         }
-        image={landingInfo?.thumbnail || '/special299/hero.webp'}
+        image={
+          landingPath === '/package60'
+            ? 'https://res.cloudinary.com/lyjyvy54/image/upload/v1794886099/Group_1_15_llwhjk.png'
+            : (landingInfo?.thumbnail || '/special299/hero.webp')
+        }
       />
 
       <a className="skip" href="#main">
