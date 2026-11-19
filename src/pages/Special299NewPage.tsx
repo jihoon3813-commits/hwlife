@@ -1264,6 +1264,11 @@ export default function Special299NewPage({
                           <span className="s299-product-account-tag">
                             {pkg.badgeLabel}
                           </span>
+                          {p.tag && (
+                            <span className="s299-product-label-tag">
+                              {p.tag}
+                            </span>
+                          )}
                           <img
                             src={mainImg}
                             alt={p.name}
@@ -1286,6 +1291,11 @@ export default function Special299NewPage({
                             <span className="s299-inline-acc-tag">
                               {pkg.badgeLabel}
                             </span>
+                            {p.tag && (
+                              <span className="s299-inline-label-tag">
+                                {p.tag}
+                              </span>
+                            )}
                           </div>
 
                           {p.giftText && (

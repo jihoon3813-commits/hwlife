@@ -717,6 +717,11 @@ export default function LivonCarePage({
                       onClick={() => openSpecModal(p)}
                     >
                       <div className="product-visual relative overflow-hidden">
+                        {p.tag && (
+                          <span className="livon-product-label-tag">
+                            {p.tag}
+                          </span>
+                        )}
                         <div className="product-img-box">
                           <img 
                             src={optImg} 

@@ -50,12 +50,14 @@ function ProductCardThumbnail({
   productName,
   accountCount,
   tagColor,
+  tag,
   onClick,
 }: {
   image: string;
   productName: string;
   accountCount: string;
   tagColor: string;
+  tag?: string;
   onClick?: () => void;
 }) {
   const mainImg = image ? getOptimizedImageUrl(image, 'modal') : 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?q=80&w=400';
@@ -73,6 +75,14 @@ function ProductCardThumbnail({
           {accountCount ? accountCount.replace('지원', '').trim() + ' 전용' : '1구좌 전용'}
         </span>
       </div>
+
+      {tag && (
+        <div className="absolute top-1.5 right-1.5 z-20 pointer-events-none">
+          <span className="text-[8.5px] xs:text-[9px] sm:text-[11px] font-extrabold bg-[#FF5A36] text-white px-1.5 sm:px-2 py-0.5 rounded-xs shadow-xs whitespace-nowrap">
+            {tag}
+          </span>
+        </div>
+      )}
 
       <div className="w-full h-full flex items-center justify-center pt-5 px-2 pb-1 sm:pt-7 sm:px-5 sm:pb-1.5">
         <div className="w-[82%] h-[82%] flex items-center justify-center">
@@ -940,6 +950,7 @@ export default function Package60Page({ channelSubdomain, landingPath = '/specia
                       productName={p.name}
                       accountCount={currentPkg.accountCount}
                       tagColor={currentPkg.tagColor}
+                      tag={p.tag}
                       onClick={() => {
                         setSelectedSpecProduct(p);
                         setSelectedSpecImageIdx(0);

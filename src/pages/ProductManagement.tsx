@@ -73,7 +73,7 @@ export default function ProductManagement() {
   const [sortConfig, setSortConfig] = useState<{ 
     key: 'createdAt' | 'brand' | 'category' | 'supplyPrice' | 'price' | 'order' | null; 
     direction: 'asc' | 'desc'; 
-  }>({ key: 'createdAt', direction: 'desc' });
+  }>({ key: 'order', direction: 'asc' });
 
   const thumbInputRef = useRef<HTMLInputElement>(null);
   const detailInputRef = useRef<HTMLInputElement>(null);
@@ -268,7 +268,9 @@ export default function ProductManagement() {
         return sortConfig.direction === 'desc' ? bTime - aTime : aTime - bTime;
       }
       if (sortConfig.key === 'order') {
-        return (a.order ?? 99999) - (b.order ?? 99999);
+        const orderDiff = (a.order ?? 99999) - (b.order ?? 99999);
+        if (orderDiff !== 0) return orderDiff;
+        return (b._creationTime || 0) - (a._creationTime || 0);
       }
       if (sortConfig.key === 'price') {
         const aNum = parseInt(String((a as any)[sortConfig.key] || '0').replace(/\D/g, ''), 10);
@@ -707,13 +709,14 @@ export default function ProductManagement() {
       order: index,
     }));
 
+    setDraggedItemIndex(null);
+    setSortConfig({ key: 'order', direction: 'asc' });
+
     try {
       await updateProductOrder({ orders });
     } catch (e) {
       console.error('Failed to update product order:', e);
     }
-
-    setDraggedItemIndex(null);
   };
 
   const [draggedPlanIndex, setDraggedPlanIndex] = useState<number | null>(null);
@@ -1509,6 +1512,16 @@ export default function ProductManagement() {
                   </div>
                   <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <button 
+                      onClick={() => setSortConfig({ key: 'order', direction: 'asc' })} 
+                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
+                        sortConfig.key === 'order' 
+                          ? 'bg-[#3182F6] text-white border-[#3182F6] shadow-sm' 
+                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
+                      }`}
+                    >
+                      노출순
+                    </button>
+                    <button 
                       onClick={() => setSortConfig({ key: 'createdAt', direction: 'desc' })} 
                       className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
                         sortConfig.key === 'createdAt' && sortConfig.direction === 'desc' 
@@ -1708,6 +1721,7 @@ export default function ProductManagement() {
                           onDragStart={() => onDragStart(index)}
                           onDragOver={onDragOver}
                           onDrop={() => onDrop(index)}
+                          onDragEnd={() => setDraggedItemIndex(null)}
                           className={`hover:bg-[#F9FAFB] cursor-move group ${draggedItemIndex === index ? 'opacity-50 border-dashed border-[#3182F6] bg-[#F2F4F6]' : 'transition-colors'} ${selectedIds.includes(p._id) ? 'bg-[#E8F3FF]/30' : ''}`}
                         >
                           <td className="px-4 py-4 text-center">
