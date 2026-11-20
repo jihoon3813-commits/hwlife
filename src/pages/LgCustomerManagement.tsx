@@ -369,7 +369,7 @@ function LgApplianceOptionFields({
           <div>
             <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">공급사</label>
             <select
-              value={value.supplier || 'TU'}
+              value={value.supplier || '라이프앤조이'}
               onChange={e => onChange({ supplier: e.target.value })}
               className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
             >
@@ -480,7 +480,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     productName: 'LG구독할인(new)',
     account: '1구좌',
     appliance: '',
-    supplier: 'TU',
+    supplier: '라이프앤조이',
     subscriptionPeriod: '',
     careCycle: '',
     careType: '',
@@ -642,7 +642,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     if (customer.supplier && String(customer.supplier).trim() !== '' && customer.supplier !== '-') {
       return String(customer.supplier).trim();
     }
-    return 'TU';
+    return '라이프앤조이';
   };
 
   // Group LG Official Products by categoryName
@@ -674,7 +674,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       if (initialAppliance) {
         initialAppliance = initialAppliance.replace(/\s*\[효원상조\s*\d+구좌\s*결합[^\]]*\]/g, '').trim();
       }
-      const initialSupplier = selectedCustomer.supplier || getSupplier(selectedCustomer) || 'TU';
+      const initialSupplier = selectedCustomer.supplier || getSupplier(selectedCustomer) || '라이프앤조이';
 
       setEditData({
         ...selectedCustomer,
@@ -765,7 +765,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
         productName: 'LG구독할인(new)',
         account: '1구좌',
         appliance: '',
-        supplier: 'TU',
+        supplier: '라이프앤조이',
         subscriptionPeriod: '',
         careCycle: '',
         careType: '',
@@ -809,7 +809,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       productName: 'LG구독할인(new)',
       account: '1구좌',
       appliance: '',
-      supplier: 'TU',
+      supplier: '라이프앤조이',
       subscriptionPeriod: '',
       careCycle: '',
       careType: '',
@@ -1661,7 +1661,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                         subscriptionPeriod: editData.subscriptionPeriod || '',
                         careCycle: editData.careCycle || '',
                         careType: editData.careType || '',
-                        supplier: editData.supplier || 'TU',
+                        supplier: editData.supplier || '라이프앤조이',
                       }}
                       onChange={(patch) => setEditData((prev: any) => ({ ...prev, ...patch }))}
                       lgProductsByCategory={lgProductsByCategory}
@@ -1814,7 +1814,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                             ...registerForm,
                             productName: val,
                             account: '1구좌',
-                            supplier: 'TU',
+                            supplier: '라이프앤조이',
                           });
                         }}
                         className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold"
@@ -1831,7 +1831,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                         subscriptionPeriod: registerForm.subscriptionPeriod || '',
                         careCycle: registerForm.careCycle || '',
                         careType: registerForm.careType || '',
-                        supplier: registerForm.supplier || 'TU',
+                        supplier: registerForm.supplier || '라이프앤조이',
                       }}
                       onChange={(patch) => setRegisterForm((prev: any) => ({ ...prev, ...patch }))}
                       lgProductsByCategory={lgProductsByCategory}

@@ -2,6 +2,29 @@ import { action, internalAction, internalMutation, mutation, query } from "./_ge
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
+const isLgCareInquiry = (fields: {
+  source?: string;
+  productName?: string;
+  appliance?: string;
+  isLgCare?: boolean;
+}) => {
+  const productName = fields.productName || "";
+  const appliance = fields.appliance || "";
+  return (
+    Boolean(fields.isLgCare) ||
+    fields.source === "lg_care" ||
+    productName.includes("LG구독") ||
+    productName.includes("LG가전구독") ||
+    productName.includes("LG가전 구독") ||
+    productName.includes("LG가전 구독 할인 전용") ||
+    productName.includes("할인코드") ||
+    appliance.includes("할인코드") ||
+    appliance.includes("퓨리케어") ||
+    appliance.includes("에어로타워") ||
+    (productName.startsWith("LG") && !productName.includes("("))
+  );
+};
+
 // Create a new inquiry
 export const create = mutation({
   args: {
@@ -57,7 +80,11 @@ export const create = mutation({
     if (args.detailAddress) insertData.detailAddress = args.detailAddress;
     if (args.account) insertData.account = args.account;
     if (args.appliance) insertData.appliance = args.appliance;
-    if (args.supplier) insertData.supplier = args.supplier;
+    if (isLgCareInquiry({ source: args.source, productName: args.productName, appliance: args.appliance })) {
+      insertData.supplier = "라이프앤조이";
+    } else if (args.supplier) {
+      insertData.supplier = args.supplier;
+    }
     if (args.subscriptionPeriod) insertData.subscriptionPeriod = args.subscriptionPeriod;
     if (args.careCycle) insertData.careCycle = args.careCycle;
     if (args.careType) insertData.careType = args.careType;
@@ -281,11 +308,13 @@ export const createDaangnLead = internalMutation({
     const productText = args.productName || "당근 리드폼 상담 신청";
     const combinedText = `${productText} ${args.appliance || ""} ${args.message || ""}`;
     const isLg =
-      Boolean(args.isLgCare) ||
+      isLgCareInquiry({
+        isLgCare: args.isLgCare,
+        productName: args.productName,
+        appliance: args.appliance,
+      }) ||
       combinedText.includes("LG") ||
-      combinedText.includes("구독") ||
-      combinedText.includes("퓨리케어") ||
-      combinedText.includes("에어로타워");
+      combinedText.includes("구독");
 
     const insertData: Record<string, any> = {
       name: args.name,
@@ -300,8 +329,8 @@ export const createDaangnLead = internalMutation({
 
     if (args.appliance) insertData.appliance = args.appliance;
     if (args.account) insertData.account = args.account;
-    if (args.supplier) insertData.supplier = args.supplier;
-    else if (isLg) insertData.supplier = "TU";
+    if (isLg) insertData.supplier = "라이프앤조이";
+    else if (args.supplier) insertData.supplier = args.supplier;
     if (args.subscriptionPeriod) insertData.subscriptionPeriod = args.subscriptionPeriod;
     if (args.careCycle) insertData.careCycle = args.careCycle;
     if (args.careType) insertData.careType = args.careType;
