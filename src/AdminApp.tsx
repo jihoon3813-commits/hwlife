@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import AdminLogin from './components/AdminLogin';
 import AdminLayout from './components/AdminLayout';
 import CustomerManagement from './pages/CustomerManagement';
+import LgCustomerManagement from './pages/LgCustomerManagement';
 import ProductManagement from './pages/ProductManagement';
 import ChannelManagement from './pages/ChannelManagement';
 import Statistics from './pages/Statistics';
@@ -106,6 +107,8 @@ export default function AdminApp() {
     switch (activeMenu) {
       case 'customers':
         return <CustomerManagement channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
+      case 'lg_customers':
+        return <LgCustomerManagement channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
       case 'consent':
         return <ConsentManagement channelId={user.type === 'channel' ? (user.subdomain || user.accountId) : undefined} />;
       case 'products':

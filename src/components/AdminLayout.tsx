@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutGrid, Users, Box, BarChart3, Settings as SettingsIcon, LogOut, Menu, X, Globe, ShieldCheck, ExternalLink, Shield, Sparkles, KeyRound } from 'lucide-react';
+import { LayoutGrid, Users, UserCheck, Box, BarChart3, Settings as SettingsIcon, LogOut, Menu, X, Globe, ShieldCheck, ExternalLink, Shield, Sparkles, KeyRound } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -23,6 +23,7 @@ export default function AdminLayout({
 
   const allMenuItems = [
     { id: 'customers', label: '고객관리', icon: Users },
+    { id: 'lg_customers', label: '고객관리(LG구독)', icon: UserCheck },
     { id: 'products', label: '제품관리', icon: Box },
     { id: 'lg_products', label: 'LG구독제품관리', icon: Sparkles },
     { id: 'discount_codes', label: '할인코드 관리', icon: KeyRound },
@@ -38,10 +39,10 @@ export default function AdminLayout({
 
   const menuItems = allMenuItems.filter(item => {
     if (userType === 'head_office' as any) {
-      return ['customers'].includes(item.id);
+      return ['customers', 'lg_customers'].includes(item.id);
     }
     if (userType === 'channel') {
-      return ['customers', 'landings', 'channels', 'statistics', 'consent', 'shinhan48', 'bson', 'sangjo', 'settings'].includes(item.id);
+      return ['customers', 'lg_customers', 'landings', 'channels', 'statistics', 'consent', 'shinhan48', 'bson', 'sangjo', 'settings'].includes(item.id);
     }
 
     return true;
