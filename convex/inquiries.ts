@@ -1,4 +1,4 @@
-import { action, internalAction, mutation, query } from "./_generated/server";
+import { action, internalAction, internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
@@ -22,6 +22,7 @@ export const create = mutation({
     careType: v.optional(v.string()),
     status: v.optional(v.string()),
     source: v.optional(v.string()),
+    inflow: v.optional(v.string()),
     // Compatibility fields for various landing forms
     subdomain: v.optional(v.string()),
     callTime: v.optional(v.string()),
@@ -61,6 +62,15 @@ export const create = mutation({
     if (args.careCycle) insertData.careCycle = args.careCycle;
     if (args.careType) insertData.careType = args.careType;
     if (args.source) insertData.source = args.source;
+    if (args.inflow) {
+      insertData.inflow = args.inflow;
+    } else if (args.source === "direct") {
+      insertData.inflow = "direct";
+    } else if (args.source === "daangn") {
+      insertData.inflow = "daangn";
+    } else {
+      insertData.inflow = "landing";
+    }
 
     const id = await ctx.db.insert("inquiries", insertData as any);
 
@@ -195,6 +205,7 @@ export const update = mutation({
     productName: v.optional(v.string()),
     channelId: v.optional(v.string()),
     source: v.optional(v.string()),
+    inflow: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
@@ -245,5 +256,70 @@ export const completeConsent = mutation({
       purchaseConsentDate: dateStr,
       consentFileUrl: args.signatureData || undefined,
     });
+  },
+});
+
+// 당근 리드폼 외부 연동 접수용
+export const createDaangnLead = internalMutation({
+  args: {
+    name: v.string(),
+    phone: v.string(),
+    productName: v.optional(v.string()),
+    appliance: v.optional(v.string()),
+    account: v.optional(v.string()),
+    supplier: v.optional(v.string()),
+    subscriptionPeriod: v.optional(v.string()),
+    careCycle: v.optional(v.string()),
+    careType: v.optional(v.string()),
+    address: v.optional(v.string()),
+    detailAddress: v.optional(v.string()),
+    message: v.optional(v.string()),
+    channelId: v.optional(v.string()),
+    isLgCare: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const productText = args.productName || "당근 리드폼 상담 신청";
+    const combinedText = `${productText} ${args.appliance || ""} ${args.message || ""}`;
+    const isLg =
+      Boolean(args.isLgCare) ||
+      combinedText.includes("LG") ||
+      combinedText.includes("구독") ||
+      combinedText.includes("퓨리케어") ||
+      combinedText.includes("에어로타워");
+
+    const insertData: Record<string, any> = {
+      name: args.name,
+      phone: args.phone,
+      productName: isLg && !args.productName ? "LG구독할인(new)" : productText,
+      status: "대기",
+      createdAt: Date.now(),
+      source: isLg ? "lg_care" : "daangn",
+      inflow: "daangn",
+      channelId: args.channelId || "본사",
+    };
+
+    if (args.appliance) insertData.appliance = args.appliance;
+    if (args.account) insertData.account = args.account;
+    if (args.supplier) insertData.supplier = args.supplier;
+    else if (isLg) insertData.supplier = "TU";
+    if (args.subscriptionPeriod) insertData.subscriptionPeriod = args.subscriptionPeriod;
+    if (args.careCycle) insertData.careCycle = args.careCycle;
+    if (args.careType) insertData.careType = args.careType;
+    if (args.address) insertData.address = args.address;
+    if (args.detailAddress) insertData.detailAddress = args.detailAddress;
+    if (args.message) insertData.message = `[당근리드폼] ${args.message}`;
+    else insertData.message = "[당근리드폼 외부연동 접수]";
+
+    const id = await ctx.db.insert("inquiries", insertData as any);
+
+    await ctx.scheduler.runAfter(0, internal.inquiries.sendDiscordNotification, {
+      name: args.name,
+      phone: args.phone,
+      productName: `[당근리드폼] ${insertData.productName}`,
+      message: insertData.message,
+      channelName: args.channelId || "본사",
+    });
+
+    return id;
   },
 });

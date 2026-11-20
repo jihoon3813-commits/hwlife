@@ -145,7 +145,8 @@ export default defineSchema({
       })
     )),
     channelId: v.optional(v.string()),
-    source: v.optional(v.string()), // "homepage", "direct"
+    source: v.optional(v.string()), // "homepage", "direct", "lg_care", "daangn"
+    inflow: v.optional(v.string()), // "landing", "direct", "daangn"
   }),
   shorts: defineTable({
     title: v.string(),

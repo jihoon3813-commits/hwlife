@@ -3,6 +3,8 @@ import { X, Search, Filter, History, RefreshCw, Trash2, Save, Plus, Smartphone, 
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
+import { getCustomerInflow, INFLOW_META, InflowType } from '../utils/inflow';
+import DaangnLeadModal from '../components/DaangnLeadModal';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
   const now = new Date();
@@ -65,6 +67,8 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const [memo, setMemo] = useState('');
   const [status, setStatus] = useState('대기');
   const [searchQuery, setSearchQuery] = useState('');
+  const [inflowFilter, setInflowFilter] = useState<'all' | InflowType>('all');
+  const [isDaangnModalOpen, setIsDaangnModalOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isSendingSms, setIsSendingSms] = useState(false);
   
@@ -126,7 +130,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const DEFAULT_COLUMNS = useMemo(() => [
     { id: 'index', label: '순번', minWidth: 45, defaultWidth: 55, align: 'center' as const },
     { id: 'checkbox', label: '', minWidth: 40, defaultWidth: 45, align: 'center' as const },
-    { id: 'source', label: '구분', minWidth: 45, defaultWidth: 55, align: 'center' as const },
+    { id: 'source', label: '유입경로', minWidth: 65, defaultWidth: 85, align: 'center' as const },
     { id: 'createdAt', label: '등록일시', minWidth: 100, defaultWidth: 125, align: 'left' as const },
     { id: 'channel', label: '채널명', minWidth: 80, defaultWidth: 100, align: 'left' as const },
     { id: 'name', label: '고객명', minWidth: 70, defaultWidth: 90, align: 'left' as const },
@@ -473,7 +477,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
 
   const handleAddToList = () => {
     if (registerForm.name && registerForm.phone) {
-      setRegisterList([...registerList, { ...registerForm, id: Date.now(), source: 'direct' }]);
+      setRegisterList([...registerList, { ...registerForm, id: Date.now(), source: 'direct', inflow: 'direct' }]);
       setRegisterForm({
         channelId: channelId || '본사',
         name: '',
@@ -696,7 +700,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
 
     const counts: { [key: string]: number } = {};
     inquiries.forEach(inq => {
-      let cid = inq.channelId || 'default';
+      let cid = (!inq.channelId || inq.channelId === '본사' || inq.channelId === 'default') ? 'default' : inq.channelId;
       // If cid is a path (like 'living'), map it to the subdomain
       if (pathMap[cid]) {
         cid = pathMap[cid];
@@ -710,7 +714,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       count: counts[c.subdomain] || 0
     }));
     
-    result.unshift({ name: '본사', id: 'default', count: counts['default'] || counts['본사'] || 0 });
+    result.unshift({ name: '본사', id: 'default', count: counts['default'] || 0 });
     return result;
   };
 
@@ -739,6 +743,11 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       const range = getFilterDateRange(dateFilter, startDate, endDate);
       const time = inq.createdAt;
       if (time < range.start || time > range.end) return false;
+    }
+
+    // 2.5 Inflow Filter
+    if (inflowFilter !== 'all' && getCustomerInflow(inq) !== inflowFilter) {
+      return false;
     }
     
     // 3. Search Query Filter
@@ -801,6 +810,12 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
               </button>
             )}
             <button 
+              onClick={() => setIsDaangnModalOpen(true)}
+              className="flex-1 lg:flex-none bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100 px-3.5 py-2 rounded-[8px] flex items-center justify-center gap-1.5 text-[13px] font-bold transition-colors shrink-0"
+            >
+              당근 리드폼 연동
+            </button>
+            <button 
               onClick={handleOpenRegisterModal}
               className="flex-1 lg:flex-none bg-[#191F28] text-white px-4 py-2 rounded-[8px] flex items-center justify-center gap-2 text-[14px] font-bold hover:bg-[#2D3644] transition-colors"
             >
@@ -846,6 +861,33 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
             </div>
           </div>
         </div>
+      </div>
+
+      {/* 유입경로 필터 탭 */}
+      <div className="flex items-center gap-2 mb-3 overflow-x-auto no-scrollbar pb-1">
+        <span className="text-[12px] font-bold text-[#8B95A1] shrink-0 mr-1">유입경로</span>
+        {(['all', 'landing', 'direct', 'daangn'] as const).map((type) => {
+          const count = type === 'all'
+            ? inquiries.length
+            : inquiries.filter(i => getCustomerInflow(i) === type).length;
+          const label = type === 'all' ? '전체' : INFLOW_META[type].label;
+          const isActive = inflowFilter === type;
+          return (
+            <button
+              key={type}
+              onClick={() => setInflowFilter(type)}
+              className={`px-3 py-1 rounded-full text-[12px] font-bold transition-all shrink-0 border ${
+                isActive
+                  ? type === 'daangn'
+                    ? 'bg-orange-500 text-white border-orange-500 shadow-sm'
+                    : 'bg-[#191F28] text-white border-[#191F28]'
+                  : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
+              }`}
+            >
+              {label} ({count})
+            </button>
+          );
+        })}
       </div>
 
       {/* 기간 필터링 바 */}
@@ -1056,11 +1098,17 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                       />
                     </td>
 
-                    {/* 3. 구분 */}
-                    <td style={{ width: `${columnWidths.source}px` }} className="px-3 py-3 text-center truncate">
-                      <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${customer.source === 'direct' ? 'bg-[#F2F4F6] text-[#4E5968]' : 'bg-[#3182F6]/10 text-[#3182F6]'}`}>
-                        {customer.source === 'direct' ? 'D' : 'H'}
-                      </span>
+                    {/* 3. 유입경로 */}
+                    <td style={{ width: `${Math.max(columnWidths.source, 70)}px` }} className="px-2 py-3 text-center truncate">
+                      {(() => {
+                        const inflow = getCustomerInflow(customer);
+                        const meta = INFLOW_META[inflow];
+                        return (
+                          <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${meta.badgeClass}`}>
+                            {meta.label}
+                          </span>
+                        );
+                      })()}
                     </td>
 
                     {/* 4. 등록일시 (시간은 한 줄 내려서 표시) */}
@@ -1460,6 +1508,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         <option value="TU">TU</option>
                         <option value="신한48">신한48</option>
                         <option value="KCC">KCC</option>
+                        <option value="라이프앤조이">라이프앤조이</option>
                         <option value="기타">기타</option>
                       </select>
                     </div>
@@ -1656,6 +1705,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                           <option value="TU">TU</option>
                           <option value="신한48">신한48</option>
                           <option value="KCC">KCC</option>
+                          <option value="라이프앤조이">라이프앤조이</option>
                           <option value="기타">기타</option>
                         </select>
                       </div>
@@ -1761,6 +1811,11 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
           </div>
         </div>
       )}
+      <DaangnLeadModal
+        isOpen={isDaangnModalOpen}
+        onClose={() => setIsDaangnModalOpen(false)}
+        defaultIsLgCare={false}
+      />
     </div>
   );
 }
