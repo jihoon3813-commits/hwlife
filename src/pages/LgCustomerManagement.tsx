@@ -76,6 +76,371 @@ export const isLgCareCustomer = (customer: any): boolean => {
   );
 };
 
+interface ResolvedLgOptions {
+  periods: string[];
+  cycles: string[];
+  types: string[];
+}
+
+const isOfficialLgApplianceText = (val: string, lgDbProducts?: any[]): boolean => {
+  if (!val) return false;
+  if (val === '상담 시 제품선택 (전문 상담원 맞춤 추천)') return true;
+  if (LG_OFFICIAL_PRODUCTS.some(p => `[${p.categoryName}] ${p.name} (${p.model})` === val || p.model === val)) {
+    return true;
+  }
+  if (lgDbProducts?.some(p => `[${p.category}] ${p.name} (${p.model})` === val || p.model === val)) {
+    return true;
+  }
+  return false;
+};
+
+const resolveLgProductOptions = (applianceVal: string, lgDbProducts?: any[]): ResolvedLgOptions | null => {
+  if (!applianceVal || applianceVal === '상담 시 제품선택 (전문 상담원 맞춤 추천)') return null;
+
+  const dbMatch = lgDbProducts?.find(
+    p => `[${p.category}] ${p.name} (${p.model})` === applianceVal || p.model === applianceVal
+  );
+  const officialMatch = LG_OFFICIAL_PRODUCTS.find(
+    p => `[${p.categoryName}] ${p.name} (${p.model})` === applianceVal || p.model === applianceVal
+  );
+
+  const matched: any = dbMatch || officialMatch;
+  if (!matched) return null;
+
+  const subOpts = matched.subscriptionOptions;
+
+  const periods: string[] = [];
+  if (subOpts?.contractTerms?.length) {
+    subOpts.contractTerms.forEach((t: any) => {
+      const label = t.label || (t.value === '60' ? '5년' : t.value === '72' ? '6년' : t.value);
+      if (label && !periods.includes(label)) periods.push(label);
+    });
+  }
+  if (periods.length === 0) {
+    periods.push('5년', '6년');
+  }
+
+  const cycles: string[] = [];
+  if (subOpts?.careServiceCycles?.length) {
+    subOpts.careServiceCycles.forEach((c: any) => {
+      const label = c.label || c.value;
+      if (label && !cycles.includes(label)) cycles.push(label);
+    });
+  } else if (matched.careCycles?.length) {
+    matched.careCycles.forEach((c: string) => {
+      if (c && !cycles.includes(c)) cycles.push(c);
+    });
+  } else if (matched.careCycle) {
+    cycles.push(matched.careCycle);
+  }
+
+  const types: string[] = [];
+  if (subOpts?.careServiceTypes?.length) {
+    subOpts.careServiceTypes.forEach((t: any) => {
+      const label = t.accentLabel ? `[${t.accentLabel}] ${t.label}` : (t.label || t.value);
+      if (label && !types.includes(label)) types.push(label);
+    });
+  } else if (matched.careTypes?.length) {
+    matched.careTypes.forEach((t: string) => {
+      if (t && !types.includes(t)) types.push(t);
+    });
+  }
+
+  return { periods, cycles, types };
+};
+
+interface LgOptionValues {
+  appliance: string;
+  account: string;
+  subscriptionPeriod: string;
+  careCycle: string;
+  careType: string;
+  supplier?: string;
+}
+
+interface LgApplianceOptionFieldsProps {
+  value: LgOptionValues;
+  onChange: (patch: Partial<LgOptionValues>) => void;
+  lgProductsByCategory: Record<string, typeof LG_OFFICIAL_PRODUCTS>;
+  lgDbProducts?: any[];
+  showSupplier?: boolean;
+}
+
+const ACCOUNT_PRESETS = ['1구좌', '2구좌', '3구좌', '4구좌'];
+const PERIOD_PRESETS = ['5년', '6년'];
+
+function LgApplianceOptionFields({
+  value,
+  onChange,
+  lgProductsByCategory,
+  lgDbProducts,
+  showSupplier = true,
+}: LgApplianceOptionFieldsProps) {
+  const isCatalogMatch = isOfficialLgApplianceText(value.appliance, lgDbProducts);
+  const [forceDirectAppliance, setForceDirectAppliance] = useState<boolean>(
+    () => Boolean(value.appliance) && !isCatalogMatch
+  );
+  const [forceDirectAccount, setForceDirectAccount] = useState<boolean>(
+    () => Boolean(value.account) && !ACCOUNT_PRESETS.includes(value.account)
+  );
+
+  // Sync direct mode when switching selectedCustomer
+  useEffect(() => {
+    const matched = isOfficialLgApplianceText(value.appliance, lgDbProducts);
+    setForceDirectAppliance(Boolean(value.appliance) && !matched);
+  }, [value.appliance, lgDbProducts]);
+
+  useEffect(() => {
+    setForceDirectAccount(Boolean(value.account) && !ACCOUNT_PRESETS.includes(value.account));
+  }, [value.account]);
+
+  const resolvedOpts = useMemo(
+    () => (forceDirectAppliance ? null : resolveLgProductOptions(value.appliance, lgDbProducts)),
+    [forceDirectAppliance, value.appliance, lgDbProducts]
+  );
+
+  const handleSelectApplianceChange = (selected: string) => {
+    if (selected === '__DIRECT__') {
+      setForceDirectAppliance(true);
+      onChange({
+        appliance: '',
+        subscriptionPeriod: value.subscriptionPeriod || '5년',
+      });
+      return;
+    }
+
+    setForceDirectAppliance(false);
+    const opts = resolveLgProductOptions(selected, lgDbProducts);
+    if (opts) {
+      onChange({
+        appliance: selected,
+        supplier: value.supplier || 'TU',
+        subscriptionPeriod: opts.periods[0] || '',
+        careCycle: opts.cycles[0] || '',
+        careType: opts.types[0] || '',
+      });
+    } else {
+      onChange({
+        appliance: selected,
+        supplier: value.supplier || 'TU',
+      });
+    }
+  };
+
+  const selectValue = forceDirectAppliance ? '__DIRECT__' : (value.appliance || '');
+  const accountSelectValue = forceDirectAccount
+    ? '__DIRECT__'
+    : (ACCOUNT_PRESETS.includes(value.account) ? value.account : (value.account ? '__DIRECT__' : '1구좌'));
+
+  return (
+    <div className="space-y-3">
+      {/* 결합 가전명 */}
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-[12px] font-medium text-[#8B95A1]">결합 가전명 (제품명, 모델명)</label>
+          {forceDirectAppliance && (
+            <button
+              type="button"
+              onClick={() => {
+                setForceDirectAppliance(false);
+                onChange({ appliance: '' });
+              }}
+              className="text-[11px] font-bold text-[#3182F6] hover:underline"
+            >
+              목록에서 선택하기
+            </button>
+          )}
+        </div>
+        <select
+          value={selectValue}
+          onChange={e => handleSelectApplianceChange(e.target.value)}
+          className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+        >
+          <option value="">가전 선택</option>
+          <option value="__DIRECT__">✏️ 직접 입력</option>
+          <option value="상담 시 제품선택 (전문 상담원 맞춤 추천)">상담 시 제품선택 (전문 상담원 맞춤 추천)</option>
+          {Object.entries(lgProductsByCategory).map(([catName, prods]) => (
+            <optgroup key={catName} label={`LG 가전구독 - ${catName} (${prods.length})`}>
+              {prods.map(p => {
+                const itemText = `[${p.categoryName}] ${p.name} (${p.model})`;
+                return (
+                  <option key={p.id} value={itemText}>
+                    {itemText}
+                  </option>
+                );
+              })}
+            </optgroup>
+          ))}
+        </select>
+
+        {forceDirectAppliance && (
+          <input
+            type="text"
+            value={value.appliance || ''}
+            onChange={e => onChange({ appliance: e.target.value })}
+            placeholder="예: LG 퓨리케어 오브제컬렉션 정수기 (WD507ACB)"
+            className="mt-2 w-full bg-white border border-[#3182F6]/40 px-3 py-2 rounded-[8px] text-[13px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20"
+          />
+        )}
+      </div>
+
+      {/* 상조 구좌수 / 구독기간(5년/6년) / 공급사 */}
+      <div className={`grid grid-cols-1 ${showSupplier ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-3`}>
+        <div>
+          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">상조 구좌수</label>
+          <select
+            value={accountSelectValue}
+            onChange={e => {
+              const val = e.target.value;
+              if (val === '__DIRECT__') {
+                setForceDirectAccount(true);
+                onChange({ account: '' });
+              } else {
+                setForceDirectAccount(false);
+                onChange({ account: val });
+              }
+            }}
+            className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+          >
+            {ACCOUNT_PRESETS.map(acc => (
+              <option key={acc} value={acc}>{acc}</option>
+            ))}
+            <option value="__DIRECT__">직접 입력</option>
+          </select>
+          {forceDirectAccount && (
+            <input
+              type="text"
+              value={value.account || ''}
+              onChange={e => onChange({ account: e.target.value })}
+              placeholder="예: 2구좌"
+              className="mt-1.5 w-full bg-white border border-[#3182F6]/40 px-3 py-1.5 rounded-[8px] text-[13px]"
+            />
+          )}
+        </div>
+
+        <div>
+          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">구독 기간 (5년/6년)</label>
+          {resolvedOpts && resolvedOpts.periods.length > 0 ? (
+            <select
+              value={value.subscriptionPeriod || ''}
+              onChange={e => onChange({ subscriptionPeriod: e.target.value })}
+              className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+            >
+              <option value="">기간 선택</option>
+              {resolvedOpts.periods.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+              {value.subscriptionPeriod && !resolvedOpts.periods.includes(value.subscriptionPeriod) && (
+                <option value={value.subscriptionPeriod}>{value.subscriptionPeriod}</option>
+              )}
+            </select>
+          ) : (
+            <div className="space-y-1.5">
+              <div className="flex gap-1.5">
+                {PERIOD_PRESETS.map(p => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => onChange({ subscriptionPeriod: p })}
+                    className={`flex-1 py-1.5 rounded-[8px] text-[12px] font-bold border transition-colors ${
+                      value.subscriptionPeriod === p
+                        ? 'bg-[#191F28] text-white border-[#191F28]'
+                        : 'bg-[#F9FAFB] text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="text"
+                value={value.subscriptionPeriod || ''}
+                onChange={e => onChange({ subscriptionPeriod: e.target.value })}
+                placeholder="직접 입력 (예: 5년, 6년)"
+                className="w-full bg-white border border-[#E5E8EB] px-3 py-1.5 rounded-[8px] text-[12px]"
+              />
+            </div>
+          )}
+        </div>
+
+        {showSupplier && (
+          <div>
+            <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">공급사</label>
+            <select
+              value={value.supplier || 'TU'}
+              onChange={e => onChange({ supplier: e.target.value })}
+              className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+            >
+              <option value="TU">TU</option>
+              <option value="BSON">BSON</option>
+              <option value="신한48">신한48</option>
+              <option value="KCC">KCC</option>
+              <option value="기타">기타</option>
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* 케어서비스 주기 & 유형 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">케어서비스 주기</label>
+          {resolvedOpts && resolvedOpts.cycles.length > 0 ? (
+            <select
+              value={value.careCycle || ''}
+              onChange={e => onChange({ careCycle: e.target.value })}
+              className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+            >
+              <option value="">주기 선택</option>
+              {resolvedOpts.cycles.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+              {value.careCycle && !resolvedOpts.cycles.includes(value.careCycle) && (
+                <option value={value.careCycle}>{value.careCycle}</option>
+              )}
+            </select>
+          ) : (
+            <input
+              type="text"
+              value={value.careCycle || ''}
+              onChange={e => onChange({ careCycle: e.target.value })}
+              placeholder="직접 입력 (예: 1회 / 12개월, 방문없음)"
+              className="w-full bg-white border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+            />
+          )}
+        </div>
+
+        <div>
+          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">케어서비스 유형</label>
+          {resolvedOpts && resolvedOpts.types.length > 0 ? (
+            <select
+              value={value.careType || ''}
+              onChange={e => onChange({ careType: e.target.value })}
+              className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+            >
+              <option value="">유형 선택</option>
+              {resolvedOpts.types.map(t => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+              {value.careType && !resolvedOpts.types.includes(value.careType) && (
+                <option value={value.careType}>{value.careType}</option>
+              )}
+            </select>
+          ) : (
+            <input
+              type="text"
+              value={value.careType || ''}
+              onChange={e => onChange({ careType: e.target.value })}
+              placeholder="직접 입력 (예: 방문관리, 자가관리)"
+              className="w-full bg-white border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function LgCustomerManagement({ channelId }: { channelId?: string }) {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [memo, setMemo] = useState('');
@@ -111,6 +476,9 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     account: '1구좌',
     appliance: '',
     supplier: 'TU',
+    subscriptionPeriod: '',
+    careCycle: '',
+    careType: '',
     birth: '',
     gender: '',
     address: '',
@@ -136,6 +504,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const removeInquiry = useMutation(api.inquiries.remove);
   const createInquiry = useMutation(api.inquiries.create);
   const allProducts = useQuery(api.products.getAllProducts);
+  const lgDbProducts = useQuery(api.lgProducts.getAll);
   const sendConsentSms = useAction(api.sms.sendConsentSms);
   const landings = useQuery(api.landings.get);
   const allPlans = useQuery(api.plans.get);
@@ -308,7 +677,10 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
         productName: resolvedCategoryName,
         account: resolvedAccount,
         appliance: initialAppliance,
-        supplier: initialSupplier
+        supplier: initialSupplier,
+        subscriptionPeriod: selectedCustomer.subscriptionPeriod || '',
+        careCycle: selectedCustomer.careCycle || '',
+        careType: selectedCustomer.careType || '',
       });
       setStatus(selectedCustomer.status);
       setMemo('');
@@ -389,6 +761,9 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
         account: '1구좌',
         appliance: '',
         supplier: 'TU',
+        subscriptionPeriod: '',
+        careCycle: '',
+        careType: '',
         birth: '',
         gender: '',
         address: '',
@@ -430,6 +805,9 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       account: '1구좌',
       appliance: '',
       supplier: 'TU',
+      subscriptionPeriod: '',
+      careCycle: '',
+      careType: '',
       birth: '',
       gender: '',
       address: '',
@@ -1017,6 +1395,25 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                       >
                         {displayAppliance}
                       </div>
+                      {(customer.subscriptionPeriod || customer.careCycle || customer.careType) && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {customer.subscriptionPeriod && (
+                            <span className="text-[10px] font-bold bg-[#F2F4F6] text-[#4E5968] px-1.5 py-0.5 rounded">
+                              {customer.subscriptionPeriod}
+                            </span>
+                          )}
+                          {customer.careCycle && (
+                            <span className="text-[10px] font-medium bg-blue-50 text-[#3182F6] px-1.5 py-0.5 rounded">
+                              {customer.careCycle}
+                            </span>
+                          )}
+                          {customer.careType && (
+                            <span className="text-[10px] font-medium bg-emerald-50 text-[#059669] px-1.5 py-0.5 rounded truncate max-w-[140px]" title={customer.careType}>
+                              {customer.careType}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </td>
 
                     {/* 11. 공급사 */}
@@ -1214,66 +1611,20 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                     )}
                   </div>
                   <div className="space-y-3">
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">구좌수</label>
-                      <input
-                        type="text"
-                        value={editData.account || ''}
-                        onChange={e => setEditData({ ...editData, account: e.target.value })}
-                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#4E5968]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">결합 가전명 (제품명, 모델명)</label>
-                      <select
-                        value={editData.appliance || ''}
-                        onChange={e => {
-                          const val = e.target.value;
-                          setEditData({
-                            ...editData,
-                            appliance: val,
-                            supplier: editData.supplier || 'TU'
-                          });
-                        }}
-                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
-                      >
-                        <option value="">가전 선택</option>
-                        {editData.appliance &&
-                          editData.appliance !== '상담 시 제품선택 (전문 상담원 맞춤 추천)' &&
-                          !LG_OFFICIAL_PRODUCTS?.some(p => `[${p.categoryName}] ${p.name} (${p.model})` === editData.appliance || p.model === editData.appliance) && (
-                            <option value={editData.appliance}>
-                              {editData.appliance} (접수 가전)
-                            </option>
-                          )}
-                        <option value="상담 시 제품선택 (전문 상담원 맞춤 추천)">상담 시 제품선택 (전문 상담원 맞춤 추천)</option>
-                        {Object.entries(lgProductsByCategory).map(([catName, prods]: [string, any]) => (
-                          <optgroup key={catName} label={`LG 가전구독 - ${catName} (${prods.length})`}>
-                            {prods.map((p: any) => {
-                              const itemText = `[${p.categoryName}] ${p.name} (${p.model})`;
-                              return (
-                                <option key={p.id} value={itemText}>
-                                  {itemText}
-                                </option>
-                              );
-                            })}
-                          </optgroup>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">공급사</label>
-                      <select
-                        value={editData.supplier || 'TU'}
-                        onChange={e => setEditData({ ...editData, supplier: e.target.value })}
-                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
-                      >
-                        <option value="TU">TU</option>
-                        <option value="BSON">BSON</option>
-                        <option value="신한48">신한48</option>
-                        <option value="KCC">KCC</option>
-                        <option value="기타">기타</option>
-                      </select>
-                    </div>
+                    <LgApplianceOptionFields
+                      value={{
+                        appliance: editData.appliance || '',
+                        account: editData.account || '1구좌',
+                        subscriptionPeriod: editData.subscriptionPeriod || '',
+                        careCycle: editData.careCycle || '',
+                        careType: editData.careType || '',
+                        supplier: editData.supplier || 'TU',
+                      }}
+                      onChange={(patch) => setEditData((prev: any) => ({ ...prev, ...patch }))}
+                      lgProductsByCategory={lgProductsByCategory}
+                      lgDbProducts={lgDbProducts}
+                      showSupplier={true}
+                    />
                   </div>
                 </div>
               </section>
@@ -1430,54 +1781,20 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                         <option value="LG전자 가전구독 X 효원라이프 144 (1구좌)">LG전자 가전구독 X 효원라이프 144 (1구좌)</option>
                       </select>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">구좌수</label>
-                        <input
-                          type="text"
-                          value={registerForm.account}
-                          onChange={e => setRegisterForm({ ...registerForm, account: e.target.value })}
-                          className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#4E5968]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">공급사</label>
-                        <select
-                          value={registerForm.supplier || 'TU'}
-                          onChange={e => setRegisterForm({ ...registerForm, supplier: e.target.value })}
-                          className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
-                        >
-                          <option value="TU">TU</option>
-                          <option value="BSON">BSON</option>
-                          <option value="신한48">신한48</option>
-                          <option value="KCC">KCC</option>
-                          <option value="기타">기타</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">결합 가전제품</label>
-                        <select
-                          value={registerForm.appliance}
-                          onChange={e => setRegisterForm({ ...registerForm, appliance: e.target.value })}
-                          className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
-                        >
-                          <option value="">가전 선택</option>
-                          <option value="상담 시 제품선택 (전문 상담원 맞춤 추천)">상담 시 제품선택 (전문 상담원 맞춤 추천)</option>
-                          {Object.entries(lgProductsByCategory).map(([catName, prods]: [string, any]) => (
-                            <optgroup key={catName} label={`LG 가전구독 - ${catName} (${prods.length})`}>
-                              {prods.map((p: any) => {
-                                const itemText = `[${p.categoryName}] ${p.name} (${p.model})`;
-                                return (
-                                  <option key={p.id} value={itemText}>
-                                    {itemText}
-                                  </option>
-                                );
-                              })}
-                            </optgroup>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
+                    <LgApplianceOptionFields
+                      value={{
+                        appliance: registerForm.appliance || '',
+                        account: registerForm.account || '1구좌',
+                        subscriptionPeriod: registerForm.subscriptionPeriod || '',
+                        careCycle: registerForm.careCycle || '',
+                        careType: registerForm.careType || '',
+                        supplier: registerForm.supplier || 'TU',
+                      }}
+                      onChange={(patch) => setRegisterForm((prev: any) => ({ ...prev, ...patch }))}
+                      lgProductsByCategory={lgProductsByCategory}
+                      lgDbProducts={lgDbProducts}
+                      showSupplier={true}
+                    />
                     <button onClick={handleAddToList} className="w-full bg-[#3182F6] text-white py-3 rounded-[12px] font-bold text-[14px] hover:bg-[#1B64DA] mt-2 shadow-sm transition-all active:scale-[0.98]">등록대기 목록에 추가</button>
                   </div>
                 </section>
@@ -1510,6 +1827,10 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                           <div className="flex flex-wrap gap-1">
                             <span className="text-[10px] bg-white border border-[#E5E8EB] text-[#8B95A1] px-1.5 py-0.5 rounded">{getChannelName(item.channelId)}</span>
                             {item.productName && <span className="text-[10px] bg-blue-50 text-[#3182F6] px-1.5 py-0.5 rounded">{item.productName}</span>}
+                            {item.account && <span className="text-[10px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded">{item.account}</span>}
+                            {item.subscriptionPeriod && <span className="text-[10px] bg-gray-100 text-[#4E5968] px-1.5 py-0.5 rounded">{item.subscriptionPeriod}</span>}
+                            {item.careCycle && <span className="text-[10px] bg-blue-50 text-[#3182F6] px-1.5 py-0.5 rounded">{item.careCycle}</span>}
+                            {item.careType && <span className="text-[10px] bg-emerald-50 text-[#059669] px-1.5 py-0.5 rounded truncate max-w-[180px]">{item.careType}</span>}
                             {item.appliance && <span className="text-[10px] bg-emerald-50 text-[#059669] px-1.5 py-0.5 rounded truncate max-w-[180px]">{item.appliance}</span>}
                           </div>
                         </div>

@@ -17,6 +17,9 @@ export const create = mutation({
     account: v.optional(v.string()),
     appliance: v.optional(v.string()),
     supplier: v.optional(v.string()),
+    subscriptionPeriod: v.optional(v.string()),
+    careCycle: v.optional(v.string()),
+    careType: v.optional(v.string()),
     status: v.optional(v.string()),
     source: v.optional(v.string()),
     // Compatibility fields for various landing forms
@@ -54,6 +57,9 @@ export const create = mutation({
     if (args.account) insertData.account = args.account;
     if (args.appliance) insertData.appliance = args.appliance;
     if (args.supplier) insertData.supplier = args.supplier;
+    if (args.subscriptionPeriod) insertData.subscriptionPeriod = args.subscriptionPeriod;
+    if (args.careCycle) insertData.careCycle = args.careCycle;
+    if (args.careType) insertData.careType = args.careType;
     if (args.source) insertData.source = args.source;
 
     const id = await ctx.db.insert("inquiries", insertData as any);
@@ -175,6 +181,9 @@ export const update = mutation({
     account: v.optional(v.string()),
     appliance: v.optional(v.string()),
     supplier: v.optional(v.string()),
+    subscriptionPeriod: v.optional(v.string()),
+    careCycle: v.optional(v.string()),
+    careType: v.optional(v.string()),
     memoHistory: v.optional(v.array(
       v.object({
         date: v.string(),

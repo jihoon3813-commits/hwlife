@@ -131,6 +131,9 @@ export default defineSchema({
     account: v.optional(v.string()),
     appliance: v.optional(v.string()),
     supplier: v.optional(v.string()),
+    subscriptionPeriod: v.optional(v.string()),
+    careCycle: v.optional(v.string()),
+    careType: v.optional(v.string()),
     
     // History
     memoHistory: v.optional(v.array(
