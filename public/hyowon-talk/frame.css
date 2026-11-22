@@ -1,6 +1,8 @@
 *{box-sizing:border-box}
 :root{font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;color:#1c3228;background:white;font-size:16px;line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
 body{margin:0}
+html{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar{display:none}
 h2,p{margin:0}
 button,select,input,textarea{font:inherit}
 button,a,select{touch-action:manipulation}

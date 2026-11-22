@@ -1,4 +1,4 @@
-dialog[data-lg144-guide]{box-sizing:border-box;padding:0;border:0;border-radius:22px;width:min(900px,calc(100% - 32px));max-width:none;height:min(720px,88dvh);max-height:96dvh;margin:auto;overflow:hidden;background:#fff;color:#203d30;box-shadow:0 20px 80px #10291e3d}
+dialog[data-lg144-guide]{box-sizing:border-box;padding:0;border:0;border-radius:22px;width:min(940px,calc(100% - 32px));max-width:none;height:min(780px,92dvh);max-height:96dvh;margin:auto;overflow:hidden;background:#fff;color:#203d30;box-shadow:0 20px 80px #10291e3d}
 dialog[data-lg144-guide]::backdrop{background:rgb(11 27 19 / 56%)}
 dialog[data-lg144-guide][open]{display:flex;flex-direction:column}
 dialog[data-lg144-guide] iframe{display:block;width:100%;min-height:0;flex:1;border:0}
