@@ -5,6 +5,7 @@ import { api } from '../../convex/_generated/api';
 import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
 import { getCustomerInflow, getCustomerTrafficDetail, INFLOW_META, InflowType } from '../utils/inflow';
 import DaangnLeadModal from '../components/DaangnLeadModal';
+import { isLgCareCustomer } from './LgCustomerManagement';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
   const now = new Date();
@@ -117,6 +118,12 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       ? (subChannelIds ? { channelIds: subChannelIds } : 'skip') 
       : {}
   );
+
+  // 고객관리(LG구독) 대상 고객은 일반 고객관리에서 제외
+  const nonLgInquiries = useMemo(() => {
+    if (!inquiries) return undefined;
+    return inquiries.filter((inq) => !isLgCareCustomer(inq));
+  }, [inquiries]);
 
   const updateInquiry = useMutation(api.inquiries.update);
   const removeInquiry = useMutation(api.inquiries.remove);
@@ -687,7 +694,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
 
 
   const getInquiryCountsByChannel = () => {
-    if (!inquiries || !channels || channelId) return [];
+    if (!nonLgInquiries || !channels || channelId) return [];
     
     // Create a mapping from subdomain and landingPage to channel subdomain
     const pathMap: { [key: string]: string } = {};
@@ -699,7 +706,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     });
 
     const counts: { [key: string]: number } = {};
-    inquiries.forEach(inq => {
+    nonLgInquiries.forEach(inq => {
       let cid = (!inq.channelId || inq.channelId === '본사' || inq.channelId === 'default') ? 'default' : inq.channelId;
       // If cid is a path (like 'living'), map it to the subdomain
       if (pathMap[cid]) {
@@ -721,7 +728,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
 
 
 
-  if (!inquiries) {
+  if (!nonLgInquiries) {
     return (
       <div className="p-8 flex flex-col items-center justify-center h-full">
         <RefreshCw className="w-8 h-8 text-[#3182F6] animate-spin mb-4" />
@@ -730,7 +737,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     );
   }
 
-  const filteredInquiries = inquiries.filter(inq => {
+  const filteredInquiries = nonLgInquiries.filter(inq => {
     // 1. Channel Filter
     if (selectedChannelId !== 'all') {
       const targetCid = (selectedChannelId === 'default' || selectedChannelId === '본사') ? undefined : selectedChannelId;
@@ -774,7 +781,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
             className={`p-4 rounded-[16px] border cursor-pointer transition-all ${selectedChannelId === 'all' ? 'bg-[#3182F6] border-[#3182F6] text-white shadow-lg shadow-blue-500/20' : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:border-[#3182F6]'}`}
           >
             <p className="text-[12px] font-bold opacity-80 mb-1">전체 채널</p>
-            <p className="text-[18px] font-black">{inquiries?.length || 0}건</p>
+            <p className="text-[18px] font-black">{nonLgInquiries?.length || 0}건</p>
           </div>
           {getInquiryCountsByChannel().filter(c => c.count > 0 || c.id === 'default').map(c => (
             <div 
@@ -868,8 +875,8 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
         <span className="text-[12px] font-bold text-[#8B95A1] shrink-0 mr-1">유입경로</span>
         {(['all', 'landing', 'direct', 'daangn'] as const).map((type) => {
           const count = type === 'all'
-            ? inquiries.length
-            : inquiries.filter(i => getCustomerInflow(i) === type).length;
+            ? nonLgInquiries.length
+            : nonLgInquiries.filter(i => getCustomerInflow(i) === type).length;
           const label = type === 'all' ? '전체' : INFLOW_META[type].label;
           const isActive = inflowFilter === type;
           return (
