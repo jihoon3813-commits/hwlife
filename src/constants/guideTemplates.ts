@@ -51,10 +51,14 @@ https://hyowon-life.com/hyowon-talk/index.html#faq`,
 
 export function formatGuideMessage(template: string, customerName?: string, modelName?: string): string {
   const safeName = (customerName || '고객').trim() || '고객';
-  const safeModel =
-    modelName && modelName !== '아직 고민 중'
-      ? modelName.trim()
-      : 'LG 가전구독 결합상품';
+  const trimmedModel = (modelName || '').trim();
+  const hasSpecificModel =
+    Boolean(trimmedModel) &&
+    trimmedModel !== '-' &&
+    trimmedModel !== '아직 고민 중' &&
+    trimmedModel !== '가전 선택 전' &&
+    !trimmedModel.includes('제품선택');
+  const safeModel = hasSpecificModel ? trimmedModel : 'LG 가전구독';
   return template
     .replaceAll('{고객명}', safeName)
     .replaceAll('{모델명}', safeModel);

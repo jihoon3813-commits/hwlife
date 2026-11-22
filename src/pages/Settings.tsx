@@ -27,6 +27,8 @@ export default function Settings({ user }: { user?: any }) {
   const [localFooter, setLocalFooter] = useState<any>(null);
   const [localSms, setLocalSms] = useState<any>({ apiKey: '', userId: '', sender: '', consentMessage: '', consentPageUrl: '' });
   const [localGuideTemplates, setLocalGuideTemplates] = useState<GuideTemplate[]>(DEFAULT_GUIDE_TEMPLATES);
+  const [isSavingGuide, setIsSavingGuide] = useState(false);
+  const [guideSaved, setGuideSaved] = useState(false);
   const [smsTestPhone, setSmsTestPhone] = useState('');
   const [smsTestResult, setSmsTestResult] = useState<any>(null);
 
@@ -760,10 +762,27 @@ export default function Settings({ user }: { user?: any }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => saveSettings({ guideTemplates: localGuideTemplates })}
-                  className="bg-[#3182F6] text-white px-5 py-2 rounded-[10px] text-[14px] font-bold hover:bg-[#1B64DA] flex items-center gap-2 shadow-sm transition-all"
+                  disabled={isSavingGuide}
+                  onClick={async () => {
+                    setIsSavingGuide(true);
+                    try {
+                      await updateSettings({ guideTemplates: localGuideTemplates });
+                      setGuideSaved(true);
+                      setTimeout(() => setGuideSaved(false), 2500);
+                    } catch {
+                      alert('안내 문구 저장 중 오류가 발생했습니다.');
+                    } finally {
+                      setIsSavingGuide(false);
+                    }
+                  }}
+                  className={`px-5 py-2 rounded-[10px] text-[14px] font-bold flex items-center gap-2 shadow-sm transition-all disabled:opacity-60 ${
+                    guideSaved
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-[#3182F6] text-white hover:bg-[#1B64DA]'
+                  }`}
                 >
-                  <Save className="w-4 h-4" /> 문구 저장
+                  {guideSaved ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+                  {isSavingGuide ? '저장 중...' : guideSaved ? '저장되었습니다!' : '문구 저장'}
                 </button>
               </div>
             </div>
