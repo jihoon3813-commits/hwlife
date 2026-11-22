@@ -87,6 +87,10 @@ export default function LgCareTalkChoiceModal({
     }
 
     setIsSubmitting(true);
+    // 팝업 차단을 피하기 위해 submit 이벤트 동기 흐름에서 먼저 창을 열고, 저장 성공 후 카카오 채널 채팅으로 이동
+    const kakaoWindow =
+      contactMethod === 'kakao' && kakaoChatUrl ? window.open('about:blank', '_blank') : null;
+
     try {
       const methodLabel = contactMethod === 'kakao' ? '카카오톡 안내' : '전화 상담 예약';
       const consultDetails = [
@@ -116,8 +120,13 @@ export default function LgCareTalkChoiceModal({
         trafficChannel: contactMethod === 'kakao' ? 'kakao_choice' : 'phone_choice',
         trafficLabel: contactMethod === 'kakao' ? '카톡 안내' : '전화 상담',
       });
+      if (kakaoWindow && kakaoChatUrl) {
+        kakaoWindow.opener = null;
+        kakaoWindow.location.href = kakaoChatUrl;
+      }
       setIsSuccess(true);
     } catch (err) {
+      kakaoWindow?.close();
       console.error(err);
       alert('상담 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
