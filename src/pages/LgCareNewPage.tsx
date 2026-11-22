@@ -368,7 +368,7 @@ export default function LgCareNewPage({ channelSubdomain, landingPath = '/care_n
           aria-haspopup="dialog"
           className="text-[13px] max-[800px]:text-[11px] bg-[#173f35] text-white rounded-[5px] px-[18px] py-[10px] max-[800px]:px-3 max-[800px]:py-2 font-semibold hover:bg-[#285447] transition-all flex items-center gap-1 shadow-sm active:scale-95"
         >
-          카톡으로 안내받기
+          맞춤안내 받기
         </button>
       </header>
 
