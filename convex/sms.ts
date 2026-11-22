@@ -161,3 +161,46 @@ export const getRemainCount = action({
     }
   },
 });
+
+export const sendCustomGuideSms = action({
+  args: {
+    customerPhone: v.string(),
+    title: v.string(),
+    message: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const settings = await ctx.runQuery(api.settings.get);
+    const smsConfig = (settings as any)?.sms;
+
+    if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
+      throw new Error("SMS 설정이 완료되지 않았습니다. 환경설정 > SMS 설정에서 알리고 API 정보를 입력해주세요.");
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("key", smsConfig.apiKey);
+    formData.append("user_id", smsConfig.userId);
+    formData.append("sender", smsConfig.sender);
+    formData.append("receiver", args.customerPhone.replace(/-/g, ""));
+    formData.append("msg", args.message);
+    formData.append("msg_type", "LMS");
+    formData.append("title", args.title || "[효원상조] 상품 안내");
+
+    try {
+      const response = await fetch("https://apis.aligo.in/send/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+
+      const result = await response.json();
+      if (result.result_code === "1") {
+        return { success: true, message: "안내 문자 발송이 완료되었습니다." };
+      }
+      throw new Error(`알리고 발송 실패: ${result.message || "알 수 없는 오류"}`);
+    } catch (error: any) {
+      throw new Error(`SMS 발송 중 오류: ${error.message}`);
+    }
+  },
+});

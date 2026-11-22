@@ -205,6 +205,11 @@ export default defineSchema({
       name: v.optional(v.string()),
       role: v.optional(v.string()),
     }))),
+    guideTemplates: v.optional(v.array(v.object({
+      id: v.string(),
+      title: v.string(),
+      content: v.string(),
+    }))),
   }),
   visits: defineTable({
     ip: v.string(),

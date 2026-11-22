@@ -3,6 +3,7 @@ import { Plus, Trash2, MoveVertical, Upload as UploadIcon, ImageIcon, Save, Mess
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import VideoManagement from '../components/VideoManagement';
+import { DEFAULT_GUIDE_TEMPLATES, GuideTemplate } from '../constants/guideTemplates';
 
 export default function Settings({ user }: { user?: any }) {
   const [activeTab, setActiveTab] = useState(user?.type === 'channel' ? 'admin' : 'status'); // status, competitor, category, admin, footer
@@ -25,6 +26,7 @@ export default function Settings({ user }: { user?: any }) {
   const [localCategories, setLocalCategories] = useState<string[]>([]);
   const [localFooter, setLocalFooter] = useState<any>(null);
   const [localSms, setLocalSms] = useState<any>({ apiKey: '', userId: '', sender: '', consentMessage: '', consentPageUrl: '' });
+  const [localGuideTemplates, setLocalGuideTemplates] = useState<GuideTemplate[]>(DEFAULT_GUIDE_TEMPLATES);
   const [smsTestPhone, setSmsTestPhone] = useState('');
   const [smsTestResult, setSmsTestResult] = useState<any>(null);
 
@@ -40,6 +42,11 @@ export default function Settings({ user }: { user?: any }) {
       if ((settings as any).sms) {
         setLocalSms((settings as any).sms);
       }
+      if ((settings as any).guideTemplates?.length) {
+        setLocalGuideTemplates((settings as any).guideTemplates);
+      } else {
+        setLocalGuideTemplates(DEFAULT_GUIDE_TEMPLATES);
+      }
     }
   }, [settings]);
 
@@ -48,6 +55,7 @@ export default function Settings({ user }: { user?: any }) {
     { id: 'competitor', label: '타사(렌탈/상조) 설정' },
     { id: 'category', label: '브랜드/카테고리 설정' },
     { id: 'video', label: '랜딩 영상 관리' },
+    { id: 'guide', label: '안내 문구 설정' },
     { id: 'sms', label: 'SMS 설정' },
     { id: 'footer', label: '푸터 정보 설정' },
     { id: 'admin', label: '계정 설정' },
@@ -718,6 +726,83 @@ export default function Settings({ user }: { user?: any }) {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'guide' && (
+          <div className="p-6 max-w-4xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+              <div>
+                <h3 className="text-[18px] font-bold flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-[#3182F6]" />
+                  카톡 · 문자 상품 안내 문구 설정
+                </h3>
+                <p className="text-[13px] text-[#8B95A1] mt-1">
+                  고객관리(LG구독) 상세창에서 상담 신청 고객에게 카톡 복사 또는 문자로 보낼 안내 문구 3종입니다.
+                  <span className="ml-1.5 font-bold text-[#3182F6]">
+                    {'{고객명}'}, {'{모델명}'}
+                  </span>
+                  은 고객 정보로 자동 치환됩니다.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm('안내 문구 3종을 기본 추천 문구로 초기화하시겠습니까?')) {
+                      setLocalGuideTemplates(DEFAULT_GUIDE_TEMPLATES);
+                    }
+                  }}
+                  className="px-3.5 py-2 rounded-[10px] border border-[#E5E8EB] text-[13px] font-bold text-[#4E5968] hover:bg-[#F2F4F6] transition-colors"
+                >
+                  기본 문구 초기화
+                </button>
+                <button
+                  type="button"
+                  onClick={() => saveSettings({ guideTemplates: localGuideTemplates })}
+                  className="bg-[#3182F6] text-white px-5 py-2 rounded-[10px] text-[14px] font-bold hover:bg-[#1B64DA] flex items-center gap-2 shadow-sm transition-all"
+                >
+                  <Save className="w-4 h-4" /> 문구 저장
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              {localGuideTemplates.map((tpl, idx) => (
+                <div key={tpl.id || idx} className="bg-[#F9FAFB] border border-[#E5E8EB] rounded-[16px] p-5 space-y-3">
+                  <div>
+                    <label className="block text-[12px] font-bold text-[#4E5968] mb-1">
+                      문구 {idx + 1} 제목
+                    </label>
+                    <input
+                      type="text"
+                      value={tpl.title}
+                      onChange={(e) => {
+                        const next = [...localGuideTemplates];
+                        next[idx] = { ...tpl, title: e.target.value };
+                        setLocalGuideTemplates(next);
+                      }}
+                      className="w-full bg-white border border-[#E5E8EB] px-3.5 py-2.5 rounded-[10px] text-[14px] font-bold outline-none focus:border-[#3182F6]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[12px] font-bold text-[#4E5968] mb-1">
+                      안내 본문
+                    </label>
+                    <textarea
+                      rows={7}
+                      value={tpl.content}
+                      onChange={(e) => {
+                        const next = [...localGuideTemplates];
+                        next[idx] = { ...tpl, content: e.target.value };
+                        setLocalGuideTemplates(next);
+                      }}
+                      className="w-full bg-white border border-[#E5E8EB] px-3.5 py-3 rounded-[10px] text-[13px] leading-relaxed outline-none focus:border-[#3182F6]"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { X, Search, History, RefreshCw, Trash2, Save, Plus, Smartphone, Send, Loader2, RotateCcw, Sparkles } from 'lucide-react';
+import { X, Search, History, RefreshCw, Trash2, Save, Plus, Smartphone, Send, Loader2, RotateCcw, Sparkles, Copy, MessageCircle } from 'lucide-react';
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
 import { getCustomerInflow, getCustomerTrafficDetail, INFLOW_META, InflowType } from '../utils/inflow';
 import DaangnLeadModal from '../components/DaangnLeadModal';
+import { DEFAULT_GUIDE_TEMPLATES, formatGuideMessage, GuideTemplate } from '../constants/guideTemplates';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
   const now = new Date();
@@ -527,8 +528,26 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const allProducts = useQuery(api.products.getAllProducts);
   const lgDbProducts = useQuery(api.lgProducts.getAll);
   const sendConsentSms = useAction(api.sms.sendConsentSms);
+  const sendCustomGuideSms = useAction(api.sms.sendCustomGuideSms);
   const landings = useQuery(api.landings.get);
   const allPlans = useQuery(api.plans.get);
+
+  const guideTemplates: GuideTemplate[] =
+    (settings as any)?.guideTemplates?.length
+      ? (settings as any).guideTemplates
+      : DEFAULT_GUIDE_TEMPLATES;
+  const [selectedGuideIdx, setSelectedGuideIdx] = useState(0);
+  const [guideDraft, setGuideDraft] = useState('');
+  const [guideCopied, setGuideCopied] = useState(false);
+  const [isSendingGuideSms, setIsSendingGuideSms] = useState(false);
+
+  useEffect(() => {
+    if (!selectedCustomer) return;
+    const tpl = guideTemplates[selectedGuideIdx] || guideTemplates[0];
+    if (tpl) {
+      setGuideDraft(formatGuideMessage(tpl.content, selectedCustomer.name, selectedCustomer.appliance));
+    }
+  }, [selectedCustomer?._id, selectedGuideIdx, (settings as any)?.guideTemplates]);
 
   // LG구독 고객만 필터링
   const lgInquiries = useMemo(() => {
@@ -1606,6 +1625,88 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-6 bg-[#F9FAFB] hide-scrollbar">
+              {/* 카톡 · 문자 상품 안내 발송 */}
+              <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <h4 className="text-[15px] font-bold flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#EAB308]"></span>
+                    카톡 · 문자 상품 안내
+                    <span className="text-[12px] font-normal text-[#8B95A1]">(문구는 설정 &gt; 안내 문구 설정에서 변경 가능)</span>
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(guideDraft);
+                          setGuideCopied(true);
+                          setTimeout(() => setGuideCopied(false), 2000);
+                        } catch {
+                          alert('복사에 실패했습니다. 직접 드래그해 복사해 주세요.');
+                        }
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#FEE500] hover:bg-[#f5dc00] text-[#191919] text-[12px] font-bold transition-colors"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      {guideCopied ? '복사됨!' : '문구 복사 (카톡용)'}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isSendingGuideSms}
+                      onClick={async () => {
+                        const targetPhone = editData.phone || selectedCustomer.phone;
+                        if (!targetPhone) {
+                          alert('고객 연락처가 없습니다.');
+                          return;
+                        }
+                        if (!confirm(`${selectedCustomer.name}님(${targetPhone})에게 안내 문자를 발송하시겠습니까?`)) return;
+                        setIsSendingGuideSms(true);
+                        try {
+                          const res = await sendCustomGuideSms({
+                            customerPhone: targetPhone,
+                            title: '[효원상조 × LG가전구독] 상품 안내',
+                            message: guideDraft,
+                          });
+                          alert(res?.message || '문자 발송이 완료되었습니다.');
+                        } catch (err: any) {
+                          alert(err?.message || '문자 발송에 실패했습니다.');
+                        } finally {
+                          setIsSendingGuideSms(false);
+                        }
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[12px] font-bold transition-colors disabled:opacity-50"
+                    >
+                      {isSendingGuideSms ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MessageCircle className="w-3.5 h-3.5" />}
+                      문자 발송
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {guideTemplates.map((tpl, idx) => (
+                    <button
+                      key={tpl.id || idx}
+                      type="button"
+                      onClick={() => setSelectedGuideIdx(idx)}
+                      className={`px-3 py-1.5 rounded-[8px] text-[12px] font-bold border transition-colors ${
+                        selectedGuideIdx === idx
+                          ? 'bg-[#191F28] text-white border-[#191F28]'
+                          : 'bg-[#F9FAFB] text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
+                      }`}
+                    >
+                      {tpl.title}
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  rows={6}
+                  value={guideDraft}
+                  onChange={(e) => setGuideDraft(e.target.value)}
+                  className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[10px] p-3.5 text-[13px] leading-relaxed outline-none focus:border-[#3182F6]"
+                />
+              </section>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* 1. 기본 고객 정보 */}
                 <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
