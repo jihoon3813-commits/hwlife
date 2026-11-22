@@ -39,6 +39,13 @@
     else window.dispatchEvent(new CustomEvent('hyowon-lg144:application-saved',{detail:{receipt}}));
   }
   const fmt = n => n.toLocaleString('ko-KR')+'원';
+  const formatPhone = v => {
+    const d = String(v || '').replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 3) return d;
+    if (d.length <= 7) return d.slice(0, 3) + '-' + d.slice(3);
+    if (d.length <= 10) return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+    return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+  };
   const clean = value => String(value ?? '').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const flat = s => s.toLowerCase().replace(/[\s·.,\-]/g,'');
   const button = (label,action,kind='') => '<button type="button" class="act '+kind+'" data-action="'+clean(action)+'">'+clean(label)+'</button>';
@@ -150,10 +157,11 @@
     if(!selected){catalog();return;}const p=selected,o=choice();
     body('apply','가입 신청',askLink('선택 조건 다시 보기','detail')+'<h3>'+clean(p.name)+'</h3><p class="model-no">'+clean(p.model)+' · '+(o?clean(optionLabel(o)):'약정·관리 조건 확인 요청')+'</p>'+quoteHtml()+
     '<form id="application-form"><p>가입 신청 후 전문상담사의 안내 전화를 꼭 받아주세요. 전화로 모델과 최종 월 구독료를 확인해 드립니다. 이후 효원상조 모바일 청약과 LG전자 고객센터 전화 녹취 계약을 각각 진행합니다.</p>'+(preview?'<p class="note">개발용 신청서입니다. 가상의 이름과 전화번호로 테스트해 주세요. 상담 전화와 알림톡은 발송하지 않습니다.</p>':'')+
-    '<label class="form-field">신청자 이름<input id="app-name" autocomplete="off" maxlength="40" placeholder="이름" required></label><label class="form-field">휴대폰 번호<input id="app-phone" type="tel" inputmode="tel" autocomplete="off" maxlength="13" placeholder="010-0000-0000" required></label><label class="form-field">추가 문의 (선택)<textarea id="app-note" rows="2" maxlength="300" placeholder="예: 설치 가능일이 궁금해요"></textarea></label>'+
+    '<label class="form-field">신청자 이름<input id="app-name" autocomplete="off" maxlength="40" placeholder="이름" required></label><label class="form-field">휴대폰 번호<input id="app-phone" type="tel" inputmode="numeric" pattern="[0-9-]*" autocomplete="tel" maxlength="13" placeholder="010-0000-0000" required></label><label class="form-field">추가 문의 (선택)<textarea id="app-note" rows="2" maxlength="300" placeholder="예: 설치 가능일이 궁금해요"></textarea></label>'+
     '<details class="info-disclosure"><summary>접수 정보 이용 안내</summary><p class="privacy-copy">'+clean(preview?'입력한 테스트 정보는 이 컴퓨터의 미리보기 서버 메모리에만 저장되며 서버를 종료하면 지워집니다.':config.consentText)+'</p></details>'+
     '<label class="agree"><input id="app-agree" type="checkbox" required><span>[필수] 가입 상담을 위한 개인정보 수집·이용에 동의하며, 가전 구독과 상조가 별도 계약임을 확인했습니다.</span></label><p id="app-error" class="error" role="alert"></p><button type="submit" class="act primary" id="send-application">가입 신청 접수하기</button></form>');
-    el('app-name').value=name;el('app-phone').value=phone;el('app-note').value=note;
+    el('app-name').value=name;el('app-phone').value=formatPhone(phone);el('app-note').value=note;
+    el('app-phone').addEventListener('input',()=>{el('app-phone').value=formatPhone(el('app-phone').value);});
     el('application-form').oninput=()=>{name=el('app-name').value;phone=el('app-phone').value;note=el('app-note').value;};
     el('application-form').onsubmit=submit;
   }

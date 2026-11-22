@@ -33,6 +33,10 @@
     window.addEventListener('message', event => {
       if (event.origin !== location.origin || event.source !== frame.contentWindow) return;
       if (event.data?.type === 'hyowon-lg144-close' && dialog.open) dialog.close();
+      if (event.data?.type === 'hyowon-lg144-resize' && typeof event.data.height === 'number') {
+        const maxH = Math.max(320, Math.floor(window.innerHeight * 0.94) - 52);
+        frame.style.height = Math.min(Math.ceil(event.data.height), maxH) + 'px';
+      }
       if (event.data?.type === 'hyowon-lg144-receipt' && typeof event.data.receipt === 'string') {
         window.dispatchEvent(new CustomEvent('hyowon-lg144:application-saved', {detail: {receipt: event.data.receipt}}));
       }

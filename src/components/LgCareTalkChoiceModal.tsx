@@ -351,7 +351,8 @@ export default function LgCareTalkChoiceModal({
                   </label>
                   <input
                     type="tel"
-                    inputMode="tel"
+                    inputMode="numeric"
+                    pattern="[0-9-]*"
                     value={phone}
                     onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
                     placeholder="010-0000-0000"
