@@ -88,7 +88,7 @@
   function welcome(){
     const channel = channelURL();
     const kakao = channel ? '<a class="channel-action" href="'+clean(channel)+'" target="_blank" rel="noopener">카카오톡 채널에서 상담하기</a>' : '';
-    body('home','카톡 상담 안내','<div class="welcome"><div class="welcome-main with-art"><img aria-hidden="true" src="assets/appliances.svg" alt=""><span class="eyelabel">LG 가전구독 × 효원상조</span><h3>어떤 가전을 찾으세요?</h3><p>모델을 고르면 가전 구독료와 상조회비를 함께 확인할 수 있어요.</p>'+button('가전 목록 보기','catalog','primary')+'</div><div class="welcome-faq"><h4>먼저 궁금한 점이 있나요?</h4>'+['cost','fee','after','sign'].map(id=>'<button data-action="ask:'+id+'">'+faq.find(f=>f[0]===id)[1]+'</button>').join('')+'</div></div><div class="assist-line">'+kakao+button('직접 질문하기','faq')+(selected?button('선택한 '+selected.model+' 보기','detail'):'')+'</div>');}
+    body('home','카톡 상담 안내','<div class="welcome"><div class="welcome-main with-art"><img aria-hidden="true" src="assets/appliances.svg" alt=""><span class="eyelabel">LG 가전구독 × 효원상조</span><h3>어떤 가전을 찾으세요?</h3><p>모델을 고르면 가전 구독료와 상조회비를 함께 확인할 수 있어요.</p>'+button('가전 목록 보기','catalog','primary')+'</div><div class="welcome-faq"><h4>먼저 궁금한 점이 있나요?</h4>'+['cost','fee','after','sign'].map(id=>'<button data-action="ask:'+id+'">'+faq.find(f=>f[0]===id)[1]+'</button>').join('')+'</div></div><div class="assist-line">'+kakao+button('자주하는 질문','faq')+(selected?button('선택한 '+selected.model+' 보기','detail'):'')+'</div>');}
   async function loadProducts(){
     if(items.length)return;
     if(!loading)loading=fetch('catalog.json').then(r=>{if(!r.ok)throw Error();return r.json();}).then(data=>{items=data.products;selectedCatalogDate=data.asOf;if(!items.length)throw Error();}).finally(()=>{loading=null;});
@@ -131,20 +131,20 @@
   function detail(){
     if(!selected){catalog();return;}const p=selected;
     const opts=p.options?.length?'<label class="form-field">구독 조건<select id="rate-option">'+p.options.map((o,i)=>'<option value="'+i+'"'+(i===variant?' selected':'')+'>'+clean(optionLabel(o))+' · 가전 월 '+fmt(o.sale)+'</option>').join('')+'</select></label>':'';
-    body('detail','모델과 납입액',askLink('가전 목록으로','catalog')+'<div class="product-detail">'+photo(p,false)+'<div><div class="model-no">'+clean(p.category)+' · '+clean(p.model)+'</div><h3>'+clean(p.name)+'</h3><p>'+clean(p.spec)+'</p></div></div>'+opts+'<div id="quote-content">'+quoteHtml()+'</div><div class="assist-line">'+button('궁금한 점 물어보기','faq')+button(p.options?.length?'이 모델로 가입 신청':'조건 확인 후 가입 신청','apply','primary')+'</div><p class="note">판매 목록 '+clean(selectedCatalogDate.replaceAll('-','.'))+' 기준'+(p.tariffDate?' · 옵션 요금표 '+clean(p.tariffDate):'')+'. 최종 요금과 설치 가능 여부는 계약 전 확인합니다.'+(p.needsCheck?' 이 항목의 정확한 모델번호도 함께 확인합니다.':'')+'</p>');
+    body('detail','모델과 납입액',askLink('가전 목록으로','catalog')+'<div class="product-detail">'+photo(p,false)+'<div><div class="model-no">'+clean(p.category)+' · '+clean(p.model)+'</div><h3>'+clean(p.name)+'</h3><p>'+clean(p.spec)+'</p></div></div>'+opts+'<div id="quote-content">'+quoteHtml()+'</div><div class="assist-line">'+button('자주하는 질문','faq')+button(p.options?.length?'이 모델로 가입 신청':'조건 확인 후 가입 신청','apply','primary')+'</div><p class="note">판매 목록 '+clean(selectedCatalogDate.replaceAll('-','.'))+' 기준'+(p.tariffDate?' · 옵션 요금표 '+clean(p.tariffDate):'')+'. 최종 요금과 설치 가능 여부는 계약 전 확인합니다.'+(p.needsCheck?' 이 항목의 정확한 모델번호도 함께 확인합니다.':'')+'</p>');
     if(opts)el('rate-option').onchange=e=>{variant=Number(e.target.value);lastReceipt=null;el('quote-content').innerHTML=quoteHtml();};
   }
   function questions(ids=[],unknown=false){const picks=ids.map(id=>faq.find(f=>f[0]===id)).filter(Boolean);
     let top=selected?'<div class="context"><b>'+clean(selected.model)+'</b>'+askLink('내 모델 보기','detail')+'</div>':'';
-    body('faq','궁금한 점 물어보기',top+'<form id="question-form" class="question-box"><input id="question-input" aria-label="궁금한 내용" placeholder="예: 48개월 뒤에는 얼마예요?" maxlength="180"><button class="act" type="submit">질문하기</button></form>'+
+    body('faq','자주하는 질문',top+'<form id="question-form" class="question-box"><input id="question-input" aria-label="질문 검색" placeholder="키워드 검색 (예: 48개월, 해지, 제휴카드)" maxlength="180"><button class="act" type="submit">검색</button></form>'+
     (picks.length?picks.map(f=>'<div class="answer"><b>'+clean(f[1])+'</b><p>'+clean(answer(f[0]))+'</p>'+(['benefit','fee','existing'].includes(f[0])?button('할인 대상 가전 목록 보기','catalog'):'')+'</div>').join(''):'')+
-    (unknown?'<div class="answer"><b>이 질문은 개별 확인이 필요해요.</b><p>질문을 추가 문의에 담아주세요. 가입 신청 후 전문상담사가 선택하신 가전과 함께 확인해 드려요.</p>'+button('추가 문의에 담기','savenote')+'</div>':'')+
-    (picks.length&&question?'<div class="assist-line">'+button('이 질문도 신청서에 담기','savenote')+'</div>':'')+'<div class="faq-list">'+faq.map(f=>'<button data-action="ask:'+f[0]+'">'+clean(f[1])+'</button>').join('')+'</div><div class="assist-line">'+button(selected?'선택한 모델로 가입 신청':'가전 고르기',selected?'apply':'catalog','primary')+'</div>');
+    (unknown?'<div class="answer"><b>일치하는 자주하는 질문이 없어요.</b><p>가전을 선택해 가입 신청하시거나 카카오톡 채널로 문의해 주시면 전문상담사가 자세히 안내해 드립니다.</p></div>':'')+
+    '<div class="faq-list">'+faq.map(f=>'<button data-action="ask:'+f[0]+'">'+clean(f[1])+'</button>').join('')+'</div><div class="assist-line">'+button(selected?'선택한 모델로 가입 신청':'가전 고르기',selected?'apply':'catalog','primary')+'</div>');
     el('question-form').onsubmit=e=>{e.preventDefault();question=el('question-input').value.trim();if(!question)return;const term=flat(question);const scores=faq.map(([id,,tags])=>[id,tags.reduce((n,t)=>n+(term.includes(flat(t))?1:0),0)]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]);const ids=scores.slice(0,2).map(x=>x[0]);if(ids.length===2&&ids.includes('cost')&&(ids.includes('after')||ids.includes('install')||ids.includes('bonus')))ids.splice(ids.indexOf('cost'),1);questions(ids,!ids.length);el('question-input').value=question;};
   }
   function apply(){
     if (!submissionURL()) {
-      body('unavailable','가입 신청','<p role="status">현재 가입 신청을 준비 중입니다.</p>'+button('가전 목록 보기','catalog')+' '+button('궁금한 점 물어보기','faq'));
+      body('unavailable','가입 신청','<p role="status">현재 가입 신청을 준비 중입니다.</p>'+button('가전 목록 보기','catalog')+' '+button('자주하는 질문','faq'));
       return;
     }
     if(!selected){catalog();return;}const p=selected,o=choice();

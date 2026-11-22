@@ -292,7 +292,7 @@ export default function LgCareTalkChoiceModal({
                   className="w-full py-3 px-4 rounded-xl bg-[#FEE500] hover:bg-[#f5dc00] text-[#191919] font-bold text-[14px] flex items-center justify-center gap-2 transition-colors shadow-xs mb-5"
                 >
                   <MessageCircle className="w-4 h-4 fill-[#191919]" />
-                  가전 목록과 질문 먼저 보기
+                  가전 목록 · 자주하는 질문 보기
                 </button>
               )}
 
