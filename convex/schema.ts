@@ -156,7 +156,11 @@ export default defineSchema({
     utmTerm: v.optional(v.string()),
     referrer: v.optional(v.string()),
     deviceType: v.optional(v.string()),
-  }),
+    requestKey: v.optional(v.string()),
+    receipt: v.optional(v.string()),
+    payloadHash: v.optional(v.string()),
+    consentVersion: v.optional(v.string()),
+  }).index("by_requestKey", ["requestKey"]),
   shorts: defineTable({
     title: v.string(),
     length: v.string(),

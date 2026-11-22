@@ -384,3 +384,119 @@ export const createDaangnLead = internalMutation({
     return id;
   },
 });
+
+export const createLg144Application = internalMutation({
+  args: {
+    name: v.string(),
+    phone: v.string(),
+    note: v.optional(v.string()),
+    productId: v.string(),
+    model: v.string(),
+    applianceName: v.optional(v.string()),
+    optionIndex: v.number(),
+    subscriptionPeriod: v.optional(v.string()),
+    careCycle: v.optional(v.string()),
+    careType: v.optional(v.string()),
+    monthlySale: v.optional(v.number()),
+    catalogDate: v.optional(v.string()),
+    consentVersion: v.optional(v.string()),
+    requestKey: v.string(),
+    payloadHash: v.string(),
+    receipt: v.string(),
+    channelId: v.optional(v.string()),
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
+    utmContent: v.optional(v.string()),
+    utmTerm: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("inquiries")
+      .withIndex("by_requestKey", (q) => q.eq("requestKey", args.requestKey))
+      .first();
+
+    if (existing) {
+      if (existing.payloadHash && existing.payloadHash !== args.payloadHash) {
+        return { ok: false as const, status: 409, error: "접수 내용이 바뀌었습니다. 다시 신청해 주세요." };
+      }
+      return { ok: true as const, status: 200, receipt: existing.receipt || args.receipt };
+    }
+
+    const applianceLabel = args.applianceName
+      ? `${args.applianceName} (${args.model})`
+      : args.model;
+
+    const optionSummary = [
+      args.subscriptionPeriod,
+      args.careType,
+      args.careCycle,
+      args.monthlySale ? `월 ${args.monthlySale.toLocaleString("ko-KR")}원` : undefined,
+    ]
+      .filter(Boolean)
+      .join(" / ");
+
+    const messageParts = [
+      `[카톡안내창] 접수번호: ${args.receipt}`,
+      `모델: ${applianceLabel}`,
+      optionSummary ? `조건: ${optionSummary}` : "조건: 전화로 상세 조건 확인",
+      args.note ? `문의: ${args.note}` : undefined,
+      args.catalogDate ? `카탈로그: ${args.catalogDate}` : undefined,
+      args.consentVersion ? `동의버전: ${args.consentVersion}` : undefined,
+    ].filter(Boolean);
+
+    const combinedMessage = messageParts.join(" | ");
+
+    const insertData: Record<string, any> = {
+      name: args.name,
+      phone: args.phone,
+      productName: "LG가전구독(new) (1구좌)",
+      account: "1구좌",
+      appliance: applianceLabel,
+      supplier: "라이프앤조이",
+      status: "대기",
+      createdAt: Date.now(),
+      message: combinedMessage,
+      source: "lg_care",
+      inflow: "landing",
+      trafficChannel: "kakao_guide",
+      trafficLabel: "카톡 안내창 (LG구독144)",
+      requestKey: args.requestKey,
+      receipt: args.receipt,
+      payloadHash: args.payloadHash,
+    };
+
+    if (args.subscriptionPeriod) insertData.subscriptionPeriod = args.subscriptionPeriod;
+    if (args.careCycle) insertData.careCycle = args.careCycle;
+    if (args.careType) insertData.careType = args.careType;
+    if (args.consentVersion) insertData.consentVersion = args.consentVersion;
+    if (args.channelId) insertData.channelId = args.channelId;
+    if (args.utmSource) insertData.utmSource = args.utmSource;
+    if (args.utmMedium) insertData.utmMedium = args.utmMedium;
+    if (args.utmCampaign) insertData.utmCampaign = args.utmCampaign;
+    if (args.utmContent) insertData.utmContent = args.utmContent;
+    if (args.utmTerm) insertData.utmTerm = args.utmTerm;
+
+    await ctx.db.insert("inquiries", insertData as any);
+
+    let channelName = "기본";
+    if (args.channelId) {
+      const channel = await ctx.db
+        .query("channels")
+        .withIndex("by_subdomain", (q) => q.eq("subdomain", args.channelId!))
+        .first();
+      if (channel) channelName = channel.channelName;
+    }
+
+    await ctx.scheduler.runAfter(0, internal.inquiries.sendDiscordNotification, {
+      name: args.name,
+      phone: args.phone,
+      productName: "LG가전구독(new) (1구좌) [카톡안내창]",
+      message: combinedMessage,
+      channelName,
+      trafficLabel: "카톡 안내창 (LG구독144)",
+    });
+
+    return { ok: true as const, status: 201, receipt: args.receipt };
+  },
+});

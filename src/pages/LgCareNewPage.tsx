@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useTrackVisit } from '../hooks/useTrackVisit';
@@ -6,6 +6,7 @@ import { getInquiryAttribution } from '../utils/attribution';
 import SEO from '../components/SEO';
 import PrivacyModal from '../components/PrivacyModal';
 import LgCareCatalogModal, { SelectedProductPlan } from '../components/LgCareCatalogModal';
+import LgCareTalkChoiceModal from '../components/LgCareTalkChoiceModal';
 import { formatPhoneNumber } from '../utils/phone';
 import { Check, X, Phone, User, CheckCircle2, ChevronRight, Copy, ArrowUpRight, Sparkles, SlidersHorizontal } from 'lucide-react';
 
@@ -119,6 +120,27 @@ export default function LgCareNewPage({ channelSubdomain, landingPath = '/care_n
   // Real-time visit analytics tracking
   useTrackVisit(channelSubdomain, landingPath);
 
+  useEffect(() => {
+    if (!document.querySelector('link[href="/hyowon-talk/trigger.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/hyowon-talk/trigger.css';
+      document.head.appendChild(link);
+    }
+    if (!document.querySelector('script[src="/hyowon-talk/settings.js"]')) {
+      const settingsScript = document.createElement('script');
+      settingsScript.src = '/hyowon-talk/settings.js';
+      settingsScript.defer = true;
+      document.body.appendChild(settingsScript);
+    }
+    if (!document.querySelector('script[src="/hyowon-talk/trigger.js"]')) {
+      const script = document.createElement('script');
+      script.src = '/hyowon-talk/trigger.js';
+      script.defer = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
   // Queries & Mutations
   const channel = useQuery(api.channels.getBySubdomain, channelSubdomain ? { subdomain: channelSubdomain } : "skip");
   const createInquiry = useMutation(api.inquiries.create);
@@ -137,6 +159,7 @@ export default function LgCareNewPage({ channelSubdomain, landingPath = '/care_n
 
   // Inquiry Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTalkChoiceModalOpen, setIsTalkChoiceModalOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -341,10 +364,11 @@ export default function LgCareNewPage({ channelSubdomain, landingPath = '/care_n
         </nav>
         <button 
           type="button"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsTalkChoiceModalOpen(true)}
+          aria-haspopup="dialog"
           className="text-[13px] max-[800px]:text-[11px] bg-[#173f35] text-white rounded-[5px] px-[18px] py-[10px] max-[800px]:px-3 max-[800px]:py-2 font-semibold hover:bg-[#285447] transition-all flex items-center gap-1 shadow-sm active:scale-95"
         >
-          맞춤 상담 <span className="text-[14px]">↗</span>
+          카톡으로 안내받기
         </button>
       </header>
 
@@ -1393,6 +1417,24 @@ export default function LgCareNewPage({ channelSubdomain, landingPath = '/care_n
         initialCategory={catalogInitialCategory}
         onApplyToCalculator={handleApplyCatalogPlan}
         onDirectConsult={handleDirectConsultCatalogPlan}
+      />
+
+      {/* Top-Right Kakao / Phone Choice Modal */}
+      <LgCareTalkChoiceModal
+        isOpen={isTalkChoiceModalOpen}
+        onClose={() => setIsTalkChoiceModalOpen(false)}
+        onOpenPrivacy={() => setIsPrivacyOpen(true)}
+        onOpenCatalogGuide={() => {
+          setIsTalkChoiceModalOpen(false);
+          (window as any).HyowonLG144Trigger?.open();
+        }}
+        selectedAppliance={selectedAppliance}
+        months={months}
+        price={price}
+        discountedPrice={discountedPrice}
+        totalDiscount={totalDiscount}
+        channelSubdomain={channel?.subdomain || channelSubdomain}
+        landingPath={landingPath}
       />
 
       {/* Privacy Modal */}
