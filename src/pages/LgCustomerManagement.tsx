@@ -3,7 +3,7 @@ import { X, Search, History, RefreshCw, Trash2, Save, Plus, Smartphone, Send, Lo
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
-import { getCustomerInflow, INFLOW_META, InflowType } from '../utils/inflow';
+import { getCustomerInflow, getCustomerTrafficDetail, INFLOW_META, InflowType } from '../utils/inflow';
 import DaangnLeadModal from '../components/DaangnLeadModal';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
@@ -1367,10 +1367,21 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                       {(() => {
                         const inflow = getCustomerInflow(customer);
                         const meta = INFLOW_META[inflow];
+                        const detail = getCustomerTrafficDetail(customer);
                         return (
-                          <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${meta.badgeClass}`}>
-                            {meta.label}
-                          </span>
+                          <div className="flex flex-col items-center gap-0.5">
+                            <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${meta.badgeClass}`}>
+                              {meta.label}
+                            </span>
+                            {detail && (
+                              <span
+                                title={detail.tooltip}
+                                className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold max-w-full truncate ${detail.badgeClass}`}
+                              >
+                                {detail.label}
+                              </span>
+                            )}
+                          </div>
                         );
                       })()}
                     </td>

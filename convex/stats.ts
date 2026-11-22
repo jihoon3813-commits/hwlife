@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { classifyTrafficSource } from "./trafficSource";
 
 export const logVisit = mutation({
   args: {
@@ -8,11 +9,37 @@ export const logVisit = mutation({
     referrer: v.optional(v.string()),
     path: v.string(),
     channelId: v.optional(v.string()),
+    trafficChannel: v.optional(v.string()),
+    trafficLabel: v.optional(v.string()),
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
+    utmContent: v.optional(v.string()),
+    utmTerm: v.optional(v.string()),
+    deviceType: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const classified = classifyTrafficSource({
+      path: args.path,
+      referrer: args.referrer,
+      userAgent: args.userAgent,
+    });
+
     await ctx.db.insert("visits", {
-      ...args,
+      ip: args.ip,
+      userAgent: args.userAgent,
+      referrer: args.referrer,
+      path: args.path,
+      channelId: args.channelId,
       timestamp: Date.now(),
+      trafficChannel: args.trafficChannel || classified.channel,
+      trafficLabel: args.trafficLabel || classified.label,
+      utmSource: args.utmSource || classified.utmSource,
+      utmMedium: args.utmMedium || classified.utmMedium,
+      utmCampaign: args.utmCampaign || classified.utmCampaign,
+      utmContent: args.utmContent || classified.utmContent,
+      utmTerm: args.utmTerm || classified.utmTerm,
+      deviceType: args.deviceType || classified.deviceType,
     });
   },
 });
@@ -122,14 +149,272 @@ export const getDashboardStats = query({
       return (change >= 0 ? "+" : "") + change.toFixed(0) + "%";
     };
 
-    // Referrers (Top 10) - based on current period
-    const referrerMap = new Map<string, number>();
+    // Classify every visit in current period
+    const channelStatsMap = new Map<string, {
+      channel: string;
+      label: string;
+      category: string;
+      isPaidAd: boolean;
+      ips: Set<string>;
+      pv: number;
+      inquiries: number;
+      matchReasons: Set<string>;
+    }>();
+
+    const categoryStatsMap = new Map<string, {
+      category: string;
+      ips: Set<string>;
+      pv: number;
+      inquiries: number;
+    }>();
+
+    const utmMap = new Map<string, {
+      utmSource: string;
+      utmMedium: string;
+      utmCampaign: string;
+      utmContent: string;
+      ips: Set<string>;
+      pv: number;
+      inquiries: number;
+    }>();
+
+    const deviceMap = new Map<string, number>();
+    const browserMap = new Map<string, number>();
+    const referrerMap = new Map<string, { count: number; channel: string; label: string; category: string }>();
+
+    let botVisitsCount = 0;
+    let realUserPV = 0;
+
     currentVisits.forEach(v => {
-      const ref = v.referrer || "직접 유입 (Direct)";
-      referrerMap.set(ref, (referrerMap.get(ref) || 0) + 1);
+      const classified = classifyTrafficSource({
+        path: v.path,
+        referrer: v.referrer,
+        userAgent: v.userAgent,
+      });
+
+      const chKey = v.trafficChannel || classified.channel;
+      const chLabel = v.trafficLabel || classified.label;
+      const category = classified.category;
+
+      if (chKey === 'bot' || classified.deviceType === '봇') {
+        botVisitsCount += 1;
+        return;
+      }
+
+      realUserPV += 1;
+
+      // Channel stats
+      if (!channelStatsMap.has(chKey)) {
+        channelStatsMap.set(chKey, {
+          channel: chKey,
+          label: chLabel,
+          category,
+          isPaidAd: classified.isPaidAd,
+          ips: new Set(),
+          pv: 0,
+          inquiries: 0,
+          matchReasons: new Set(),
+        });
+      }
+      const chEntry = channelStatsMap.get(chKey)!;
+      chEntry.ips.add(v.ip);
+      chEntry.pv += 1;
+      chEntry.matchReasons.add(classified.matchReason);
+
+      // Category stats
+      if (!categoryStatsMap.has(category)) {
+        categoryStatsMap.set(category, {
+          category,
+          ips: new Set(),
+          pv: 0,
+          inquiries: 0,
+        });
+      }
+      const catEntry = categoryStatsMap.get(category)!;
+      catEntry.ips.add(v.ip);
+      catEntry.pv += 1;
+
+      // UTM campaign stats
+      const uSource = v.utmSource || classified.utmSource;
+      const uMedium = v.utmMedium || classified.utmMedium;
+      const uCampaign = v.utmCampaign || classified.utmCampaign;
+      const uContent = v.utmContent || classified.utmContent;
+      if (uSource || uCampaign) {
+        const utmKey = `${uSource || '-'}|${uMedium || '-'}|${uCampaign || '-'}|${uContent || '-'}`;
+        if (!utmMap.has(utmKey)) {
+          utmMap.set(utmKey, {
+            utmSource: uSource || '-',
+            utmMedium: uMedium || '-',
+            utmCampaign: uCampaign || '-',
+            utmContent: uContent || '-',
+            ips: new Set(),
+            pv: 0,
+            inquiries: 0,
+          });
+        }
+        const utmEntry = utmMap.get(utmKey)!;
+        utmEntry.ips.add(v.ip);
+        utmEntry.pv += 1;
+      }
+
+      // Device & Browser
+      const dev = v.deviceType || classified.deviceType;
+      deviceMap.set(dev, (deviceMap.get(dev) || 0) + 1);
+      browserMap.set(classified.browser, (browserMap.get(classified.browser) || 0) + 1);
+
+      // Referrer Top 10
+      const refUrl = v.referrer && v.referrer !== '직접 유입' ? v.referrer : '직접 유입 (Direct)';
+      const existingRef = referrerMap.get(refUrl);
+      if (existingRef) {
+        existingRef.count += 1;
+      } else {
+        referrerMap.set(refUrl, {
+          count: 1,
+          channel: chKey,
+          label: chLabel,
+          category,
+        });
+      }
     });
+
+    // Attribute inquiries in current period to channels/categories/UTM
+    currentInquiriesFiltered.forEach(inq => {
+      let chKey = inq.trafficChannel;
+      let chLabel = inq.trafficLabel;
+      let category = '직접/기타';
+
+      if (!chKey) {
+        if (inq.inflow === 'daangn' || inq.source === 'daangn') {
+          chKey = 'daangn_ad';
+          chLabel = '당근 광고';
+          category = '당근';
+        } else if (inq.inflow === 'direct' || inq.source === 'direct') {
+          chKey = 'direct_admin';
+          chLabel = '관리자 직접등록';
+          category = '직접/기타';
+        } else {
+          chKey = 'landing_untracked';
+          chLabel = '랜딩 (경로 미식별)';
+          category = '직접/기타';
+        }
+      } else {
+        const mapped = channelStatsMap.get(chKey);
+        if (mapped) {
+          category = mapped.category;
+        } else if (chKey.startsWith('kakao') || chKey === 'sms' || chKey === 'line') {
+          category = '메신저/문자';
+        } else if (chKey.startsWith('daangn')) {
+          category = '당근';
+        } else if (chKey.startsWith('naver')) {
+          category = '네이버';
+        } else if (['instagram', 'instagram_ad', 'facebook', 'meta_ad', 'youtube', 'band', 'threads', 'tiktok', 'x'].includes(chKey)) {
+          category = 'SNS';
+        } else if (chKey.startsWith('google') || chKey === 'daum') {
+          category = '구글/포털';
+        }
+      }
+
+      if (!channelStatsMap.has(chKey)) {
+        channelStatsMap.set(chKey, {
+          channel: chKey,
+          label: chLabel || chKey,
+          category,
+          isPaidAd: chKey.includes('_ad'),
+          ips: new Set(),
+          pv: 0,
+          inquiries: 0,
+          matchReasons: new Set(['상담 신청']),
+        });
+      }
+      channelStatsMap.get(chKey)!.inquiries += 1;
+
+      if (!categoryStatsMap.has(category)) {
+        categoryStatsMap.set(category, { category, ips: new Set(), pv: 0, inquiries: 0 });
+      }
+      categoryStatsMap.get(category)!.inquiries += 1;
+
+      if (inq.utmSource || inq.utmCampaign) {
+        const utmKey = `${inq.utmSource || '-'}|${inq.utmMedium || '-'}|${inq.utmCampaign || '-'}|${inq.utmContent || '-'}`;
+        if (!utmMap.has(utmKey)) {
+          utmMap.set(utmKey, {
+            utmSource: inq.utmSource || '-',
+            utmMedium: inq.utmMedium || '-',
+            utmCampaign: inq.utmCampaign || '-',
+            utmContent: inq.utmContent || '-',
+            ips: new Set(),
+            pv: 0,
+            inquiries: 0,
+          });
+        }
+        utmMap.get(utmKey)!.inquiries += 1;
+      }
+    });
+
+    const trafficChannels = Array.from(channelStatsMap.values())
+      .map(item => {
+        const uv = item.ips.size;
+        return {
+          channel: item.channel,
+          label: item.label,
+          category: item.category,
+          isPaidAd: item.isPaidAd,
+          uv,
+          pv: item.pv,
+          inquiries: item.inquiries,
+          conversionRate: uv > 0 ? Number(((item.inquiries / uv) * 100).toFixed(1)) : 0,
+          share: realUserPV > 0 ? Number(((item.pv / realUserPV) * 100).toFixed(1)) : 0,
+          matchReasons: Array.from(item.matchReasons),
+        };
+      })
+      .sort((a, b) => (b.pv - a.pv) || (b.inquiries - a.inquiries));
+
+    const categorySummary = Array.from(categoryStatsMap.values())
+      .map(item => ({
+        category: item.category,
+        uv: item.ips.size,
+        pv: item.pv,
+        inquiries: item.inquiries,
+        share: realUserPV > 0 ? Number(((item.pv / realUserPV) * 100).toFixed(1)) : 0,
+      }))
+      .sort((a, b) => (b.pv - a.pv) || (b.inquiries - a.inquiries));
+
+    const utmCampaigns = Array.from(utmMap.values())
+      .map(item => ({
+        utmSource: item.utmSource,
+        utmMedium: item.utmMedium,
+        utmCampaign: item.utmCampaign,
+        utmContent: item.utmContent,
+        uv: item.ips.size,
+        pv: item.pv,
+        inquiries: item.inquiries,
+      }))
+      .sort((a, b) => (b.pv - a.pv) || (b.inquiries - a.inquiries))
+      .slice(0, 20);
+
+    const deviceBreakdown = Array.from(deviceMap.entries())
+      .map(([deviceType, count]) => ({
+        deviceType,
+        count,
+        share: realUserPV > 0 ? Number(((count / realUserPV) * 100).toFixed(1)) : 0,
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    const browserBreakdown = Array.from(browserMap.entries())
+      .map(([browser, count]) => ({
+        browser,
+        count,
+        share: realUserPV > 0 ? Number(((count / realUserPV) * 100).toFixed(1)) : 0,
+      }))
+      .sort((a, b) => b.count - a.count);
+
     const topReferrers = Array.from(referrerMap.entries())
-      .map(([url, count]) => ({ url, count }))
+      .map(([url, data]) => ({
+        url,
+        count: data.count,
+        channel: data.channel,
+        label: data.label,
+        category: data.category,
+      }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
@@ -264,6 +549,12 @@ export const getDashboardStats = query({
         inquiryChange: getChange(currentInquiriesFiltered.length, previousInquiriesFiltered.length),
       },
       referrers: topReferrers,
+      trafficChannels,
+      categorySummary,
+      utmCampaigns,
+      deviceBreakdown,
+      browserBreakdown,
+      botVisitsCount,
       landingStats,
       ipLogs: ipLogs.map(({ip, count, lastVisit}) => ({ ip, count, lastVisit, location: '확인중' })),
       dailyStats

@@ -10,6 +10,7 @@ import {
 import { useMutation, useQuery, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useTrackVisit } from '../hooks/useTrackVisit';
+import { getInquiryAttribution } from '../utils/attribution';
 import { formatPhoneNumber } from '../utils/phone';
 import { getOptimizedImageUrl } from '../utils/lgeUrl';
 import SEO from '../components/SEO';
@@ -454,6 +455,7 @@ export default function LivonCarePage({
         landingPath: landingPath,
         channelId: channelSubdomain || undefined,
         message: `[효원상조 트리플케어 신청]\n관심혜택: ${interest}\n상담희망시간: ${time}`,
+        ...getInquiryAttribution(),
       });
       setSubmitted(true);
     } catch (err) {

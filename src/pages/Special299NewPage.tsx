@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useTrackVisit } from '../hooks/useTrackVisit';
+import { getInquiryAttribution } from '../utils/attribution';
 import { formatPhoneNumber } from '../utils/phone';
 import { getOptimizedImageUrl } from '../utils/lgeUrl';
 import SEO from '../components/SEO';
@@ -702,6 +703,7 @@ export default function Special299NewPage({
         landingPath,
         channelId: channel?.subdomain || channelSubdomain,
         message: detailMsg,
+        ...getInquiryAttribution(),
       });
 
       setSubmittedData({

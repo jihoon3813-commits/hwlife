@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useTrackVisit } from '../hooks/useTrackVisit';
+import { getInquiryAttribution } from '../utils/attribution';
 import SEO from '../components/SEO';
 import PrivacyModal from '../components/PrivacyModal';
 import LgCareCatalogModal, { SelectedProductPlan } from '../components/LgCareCatalogModal';
@@ -258,7 +259,8 @@ export default function LgCareNewPage({ channelSubdomain, landingPath = '/care_n
         channelId: channel?.subdomain || channelSubdomain || undefined,
         message: consultDetails,
         source: 'lg_care',
-        status: '대기'
+        status: '대기',
+        ...getInquiryAttribution(),
       });
       setIsSuccess(true);
     } catch (err) {

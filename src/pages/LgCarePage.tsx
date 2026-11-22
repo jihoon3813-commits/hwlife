@@ -15,6 +15,7 @@ import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import SEO from '../components/SEO';
 import { useTrackVisit } from '../hooks/useTrackVisit';
+import { getInquiryAttribution } from '../utils/attribution';
 
 interface LgCarePageProps {
   channelSubdomain?: string;
@@ -1067,6 +1068,7 @@ export default function LgCarePage({ channelSubdomain, landingPath = '/care' }: 
         message: formMessage ? `[LG가전구독] ${formMessage}` : '[LG가전구독 할인 전용 상담 접수]',
         channelId: channel?.subdomain || channelSubdomain || undefined,
         source: 'lg_care',
+        ...getInquiryAttribution(),
       });
 
       setIsConsultModalOpen(false);

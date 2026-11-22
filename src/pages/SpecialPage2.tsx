@@ -11,6 +11,8 @@ import { useEffect } from 'react';
 import SEO from '../components/SEO';
 import { formatPhoneNumber } from '../utils/phone';
 import PrivacyModal from '../components/PrivacyModal';
+import { useTrackVisit } from '../hooks/useTrackVisit';
+import { getInquiryAttribution } from '../utils/attribution';
 
 
 export default function SpecialPage2({ channelSubdomain }: { channelSubdomain?: string }) {
@@ -42,31 +44,7 @@ export default function SpecialPage2({ channelSubdomain }: { channelSubdomain?: 
   const channelId = channelSubdomain || 
                    (segments.length >= 2 ? segments[1] : (queryChannel || '본사'));
 
-  const logVisit = useMutation(api.stats.logVisit);
-
-  useEffect(() => {
-    const trackVisit = async () => {
-      try {
-        let ip = "0.0.0.0";
-        try {
-          const response = await fetch("https://api.ipify.org?format=json");
-          const data = await response.json();
-          ip = data.ip;
-        } catch (e) {}
-
-        await logVisit({
-          ip,
-          userAgent: navigator.userAgent,
-          referrer: document.referrer || "직접 유입",
-          path: window.location.pathname + window.location.search,
-          channelId: channelId === '본사' ? undefined : channelId,
-        });
-      } catch (e) {
-        console.error("Visit tracking failed", e);
-      }
-    };
-    trackVisit();
-  }, [logVisit, channelId]);
+  useTrackVisit(channelId);
 
   // Browser Back Button Modal Handling
   useEffect(() => {
@@ -128,7 +106,8 @@ export default function SpecialPage2({ channelSubdomain }: { channelSubdomain?: 
         account: accountType,
         appliance: selectedProduct ? `${selectedProduct.name} (${selectedProduct.model})` : undefined,
         channelId: channelId,
-        source: 'homepage'
+        source: 'homepage',
+        ...getInquiryAttribution(),
       });
       alert('상담 신청이 접수되었습니다. 빠르게 연락드리겠습니다.');
       setName('');

@@ -46,6 +46,15 @@ export const create = mutation({
     status: v.optional(v.string()),
     source: v.optional(v.string()),
     inflow: v.optional(v.string()),
+    trafficChannel: v.optional(v.string()),
+    trafficLabel: v.optional(v.string()),
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
+    utmContent: v.optional(v.string()),
+    utmTerm: v.optional(v.string()),
+    referrer: v.optional(v.string()),
+    deviceType: v.optional(v.string()),
     // Compatibility fields for various landing forms
     subdomain: v.optional(v.string()),
     callTime: v.optional(v.string()),
@@ -99,6 +108,20 @@ export const create = mutation({
       insertData.inflow = "landing";
     }
 
+    if (args.trafficChannel) insertData.trafficChannel = args.trafficChannel;
+    if (args.trafficLabel) insertData.trafficLabel = args.trafficLabel;
+    else if (insertData.inflow === "daangn") {
+      insertData.trafficChannel = "daangn_ad";
+      insertData.trafficLabel = "당근 리드폼";
+    }
+    if (args.utmSource) insertData.utmSource = args.utmSource;
+    if (args.utmMedium) insertData.utmMedium = args.utmMedium;
+    if (args.utmCampaign) insertData.utmCampaign = args.utmCampaign;
+    if (args.utmContent) insertData.utmContent = args.utmContent;
+    if (args.utmTerm) insertData.utmTerm = args.utmTerm;
+    if (args.referrer) insertData.referrer = args.referrer;
+    if (args.deviceType) insertData.deviceType = args.deviceType;
+
     const id = await ctx.db.insert("inquiries", insertData as any);
 
     // Add channel name to discord notification if available
@@ -117,6 +140,7 @@ export const create = mutation({
       productName: args.productName,
       message: combinedMessage || undefined,
       channelName: channelName,
+      trafficLabel: insertData.trafficLabel || undefined,
     });
     return id;
   },
@@ -129,22 +153,30 @@ export const sendDiscordNotification = internalAction({
     productName: v.string(),
     message: v.optional(v.string()),
     channelName: v.optional(v.string()),
+    trafficLabel: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
     if (!webhookUrl) return;
 
+    const fields = [
+      { name: "👤 성함", value: args.name, inline: true },
+      { name: "📞 연락처", value: args.phone, inline: true },
+      { name: "🏢 유입 채널", value: args.channelName || "기본", inline: true },
+    ];
+    if (args.trafficLabel) {
+      fields.push({ name: "🧭 상세 유입경로", value: args.trafficLabel, inline: true });
+    }
+    fields.push(
+      { name: "📦 신청 상품", value: args.productName, inline: false },
+      { name: "💬 문의 내용", value: args.message || "내용 없음", inline: false },
+    );
+
     const discordMessage = {
       embeds: [{
         title: "🔔 새로운 상담 신청이 접수되었습니다!",
         color: 0x3182F6,
-        fields: [
-          { name: "👤 성함", value: args.name, inline: true },
-          { name: "📞 연락처", value: args.phone, inline: true },
-          { name: "🏢 유입 채널", value: args.channelName || "기본", inline: true },
-          { name: "📦 신청 상품", value: args.productName },
-          { name: "💬 문의 내용", value: args.message || "내용 없음" },
-        ],
+        fields,
         footer: { text: `효원결합 상담 관리 시스템 | 접수시간: ${new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().replace('T', ' ').slice(0, 19)} (KST)` },
         timestamp: new Date().toISOString(),
       }]

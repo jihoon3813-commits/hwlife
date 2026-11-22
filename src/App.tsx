@@ -9,6 +9,8 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { formatPhoneNumber } from "./utils/phone";
 import PrivacyModal from "./components/PrivacyModal";
+import { useTrackVisit } from "./hooks/useTrackVisit";
+import { getInquiryAttribution } from "./utils/attribution";
 
 export default function App() {
   const landingInfo = useQuery(api.landings.getByPath, { path: "/" });
@@ -38,34 +40,7 @@ export default function App() {
   
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const productScrollRef = useRef<HTMLDivElement>(null);
-  const logVisit = useMutation(api.stats.logVisit);
-
-  useEffect(() => {
-    const trackVisit = async () => {
-      try {
-        let ip = "0.0.0.0";
-        try {
-          const response = await fetch("https://api.ipify.org?format=json");
-          const data = await response.json();
-          ip = data.ip;
-        } catch (e) {
-          // Fallback if IP API fails
-        }
-
-        await logVisit({
-          ip,
-          userAgent: navigator.userAgent,
-          referrer: document.referrer || "직접 유입",
-          path: window.location.pathname + window.location.search,
-          channelId: channelId === '본사' ? undefined : channelId,
-        });
-      } catch (e) {
-        console.error("Visit tracking failed", e);
-      }
-    };
-
-    trackVisit();
-  }, [logVisit, channelId]);
+  useTrackVisit(channelId);
 
   const isFullViewRef = useRef(isProductFullView);
 
@@ -1368,7 +1343,8 @@ export default function App() {
                 phone,
                 productName: "랜딩 하단 상담",
                 message: finalMessage || undefined,
-                source: 'homepage'
+                source: 'homepage',
+                ...getInquiryAttribution(),
               });
               
               // Google Ads Conversion Tracking
@@ -1898,7 +1874,8 @@ export default function App() {
                       appliance: inquiryProduct ? `${inquiryProduct.name} (${inquiryProduct.model})` : undefined,
                       message: finalMessage || undefined,
                       channelId: channelId,
-                      source: 'homepage'
+                      source: 'homepage',
+                      ...getInquiryAttribution(),
                     });
                     
                     // Google Ads Conversion Tracking

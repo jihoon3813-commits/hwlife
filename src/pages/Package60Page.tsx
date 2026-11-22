@@ -13,6 +13,7 @@ import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import SEO from '../components/SEO';
 import { useTrackVisit } from '../hooks/useTrackVisit';
+import { getInquiryAttribution } from '../utils/attribution';
 import FuneralDetailModal from '../components/FuneralDetailModal';
 
 interface Package60PageProps {
@@ -397,7 +398,8 @@ export default function Package60Page({ channelSubdomain, landingPath = '/specia
         account: activePackageTab,
         appliance: isProductSelected ? `${prodName}${prodModel ? ` (${prodModel})` : ''}` : undefined,
         message: `랜딩페이지: ${landingInfo?.name || landingPath} (${activePackageTab} 선택)\n채널: ${channel?.channelName || '본사'}`,
-        channelId: channel?.subdomain
+        channelId: channel?.subdomain,
+        ...getInquiryAttribution(),
       });
 
       alert('⚡ 상담 신청이 성공적으로 완료되었습니다!\n담당 전문 상담사가 빠르게 연락드리겠습니다.');

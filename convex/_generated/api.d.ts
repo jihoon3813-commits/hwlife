@@ -30,6 +30,7 @@ import type * as sms from "../sms.js";
 import type * as stats from "../stats.js";
 import type * as test from "../test.js";
 import type * as test_data from "../test_data.js";
+import type * as trafficSource from "../trafficSource.js";
 
 import type {
   ApiFromModules,
@@ -60,6 +61,7 @@ declare const fullApi: ApiFromModules<{
   stats: typeof stats;
   test: typeof test;
   test_data: typeof test_data;
+  trafficSource: typeof trafficSource;
 }>;
 
 /**

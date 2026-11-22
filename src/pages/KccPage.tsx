@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { useTrackVisit } from '../hooks/useTrackVisit';
+import { getInquiryAttribution } from '../utils/attribution';
 import SEO from '../components/SEO';
 import { formatPhoneNumber } from '../utils/phone';
 import PrivacyModal from '../components/PrivacyModal';
@@ -19,7 +21,7 @@ export default function KccPage({ channelSubdomain }: { channelSubdomain?: strin
   const categories = ["전체", ...(settings?.categories || [])];
 
   const createInquiry = useMutation(api.inquiries.create);
-  const logVisit = useMutation(api.stats.logVisit);
+  useTrackVisit(channelId);
 
   const formRef = useRef<HTMLDivElement>(null);
   
@@ -123,31 +125,6 @@ export default function KccPage({ channelSubdomain }: { channelSubdomain?: strin
 
   const channelId = channelSubdomain || "kcc";
 
-  // Visit tracking
-  useEffect(() => {
-    const trackVisit = async () => {
-      try {
-        let ip = "0.0.0.0";
-        try {
-          const response = await fetch("https://api.ipify.org?format=json");
-          const data = await response.json();
-          ip = data.ip;
-        } catch (e) {}
-
-        await logVisit({
-          ip,
-          userAgent: navigator.userAgent,
-          referrer: document.referrer || "직접 유입",
-          path: window.location.pathname + window.location.search,
-          channelId: channelId,
-        });
-      } catch (e) {
-        console.error("Visit tracking failed", e);
-      }
-    };
-    trackVisit();
-  }, [logVisit, channelId]);
-
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -186,7 +163,8 @@ export default function KccPage({ channelSubdomain }: { channelSubdomain?: strin
         appliance: preferredAppliance,
         message: message,
         channelId: channelId,
-        source: 'homepage'
+        source: 'homepage',
+        ...getInquiryAttribution(),
       });
 
       alert('상담 신청이 정상적으로 접수되었습니다. 담당 상담원이 곧 연락드리겠습니다.');

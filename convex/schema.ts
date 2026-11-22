@@ -147,6 +147,15 @@ export default defineSchema({
     channelId: v.optional(v.string()),
     source: v.optional(v.string()), // "homepage", "direct", "lg_care", "daangn"
     inflow: v.optional(v.string()), // "landing", "direct", "daangn"
+    trafficChannel: v.optional(v.string()),
+    trafficLabel: v.optional(v.string()),
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
+    utmContent: v.optional(v.string()),
+    utmTerm: v.optional(v.string()),
+    referrer: v.optional(v.string()),
+    deviceType: v.optional(v.string()),
   }),
   shorts: defineTable({
     title: v.string(),
@@ -200,6 +209,14 @@ export default defineSchema({
     path: v.string(),
     channelId: v.optional(v.string()),
     timestamp: v.number(),
+    trafficChannel: v.optional(v.string()),
+    trafficLabel: v.optional(v.string()),
+    utmSource: v.optional(v.string()),
+    utmMedium: v.optional(v.string()),
+    utmCampaign: v.optional(v.string()),
+    utmContent: v.optional(v.string()),
+    utmTerm: v.optional(v.string()),
+    deviceType: v.optional(v.string()),
   }).index("by_timestamp", ["timestamp"]),
 
   plans: defineTable({

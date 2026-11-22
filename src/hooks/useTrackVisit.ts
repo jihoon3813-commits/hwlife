@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { captureVisitAttribution } from '../utils/attribution';
 
 /**
  * Universal Visit Tracking Hook
- * Tracks page views (PV), unique visitors (UV via real IP), referrers, and channel attribution.
- * 
+ * Tracks page views (PV), unique visitors (UV via real IP), referrers,
+ * UTM/ad click attribution, in-app browsers, and channel attribution.
+ *
  * @param channelId Optional channel / partner identifier (subdomain or channel name)
  * @param customPath Optional explicit path (defaults to window.location.pathname + search)
  */
@@ -32,9 +34,12 @@ export function useTrackVisit(channelId?: string, customPath?: string) {
 
         if (!isMounted) return;
 
-        const path = customPath || (typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '/');
-        const referrer = (typeof document !== 'undefined' && document.referrer) ? document.referrer : '직접 유입';
-        const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'browser';
+        const search = typeof window !== 'undefined' ? window.location.search : '';
+        const resolvedPath = customPath
+          ? (customPath.includes('?') || !search ? customPath : `${customPath}${search}`)
+          : undefined;
+
+        const { classified, path, referrer, userAgent } = captureVisitAttribution(resolvedPath);
         const finalChannelId = channelId === '본사' ? undefined : (channelId || undefined);
 
         await logVisit({
@@ -43,6 +48,14 @@ export function useTrackVisit(channelId?: string, customPath?: string) {
           referrer,
           path,
           channelId: finalChannelId,
+          trafficChannel: classified.channel,
+          trafficLabel: classified.label,
+          utmSource: classified.utmSource,
+          utmMedium: classified.utmMedium,
+          utmCampaign: classified.utmCampaign,
+          utmContent: classified.utmContent,
+          utmTerm: classified.utmTerm,
+          deviceType: classified.deviceType,
         });
       } catch (e) {
         console.error('Visit tracking failed:', e);
