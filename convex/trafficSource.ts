@@ -105,7 +105,8 @@ export function detectDeviceAndEnv(userAgent = ''): {
   }
 
   let browser = '기타';
-  if (/kakaotalk/i.test(ua)) browser = '카카오톡 인앱';
+  if (/adfitsdk/i.test(ua)) browser = '카카오 애드핏 인앱';
+  else if (/kakaotalk/i.test(ua)) browser = '카카오톡 인앱';
   else if (/instagram/i.test(ua)) browser = '인스타그램 인앱';
   else if (/daangn|karrot/i.test(ua)) browser = '당근 인앱';
   else if (/naver\(/i.test(ua)) browser = '네이버 앱';
@@ -183,7 +184,7 @@ export function classifyTrafficSource(input: TrafficSignalInput): ClassifiedTraf
   const hasMetaClickId = params.has('fbclid');
   const hasInstaShareId = params.has('igshid') || params.has('igsh');
   const hasKakaoClickId = params.has('kclid') || params.has('kakao_campaign') || params.has('kakao_adgrp');
-  const hasDaangnParam = params.has('daangn_ad') || params.has('karrot_ad');
+  const hasDaangnParam = params.has('daangn_ad') || params.has('karrot_ad') || params.has('kmckid');
   const hasTiktokClickId = params.has('ttclid');
 
   // 1. Explicit UTM Source / Medium / Custom Source Param
@@ -342,6 +343,9 @@ export function classifyTrafficSource(input: TrafficSignalInput): ClassifiedTraf
   }
 
   // 4. In-App Browser User-Agent (crucial when referrer is stripped)
+  if (ua.includes('adfitsdk')) {
+    return { ...baseEnv, channel: 'kakao_ad', label: '카카오 애드핏 광고', category: '메신저/문자', isPaidAd: true, matchReason: '애드핏 SDK(UA)' };
+  }
   if (ua.includes('kakaotalk')) {
     return { ...baseEnv, channel: 'kakao', label: '카카오톡 링크', category: '메신저/문자', isPaidAd: false, matchReason: '인앱 브라우저(UA)' };
   }
