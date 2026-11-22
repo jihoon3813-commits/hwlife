@@ -131,7 +131,7 @@
     const p=selected,o=choice(),sale=o?o.sale:p.sale,base=o?o.base:p.base;
     const applianceLabel=o?'할인 적용 가전 구독료':'목록 기준 결합 구독료';
     const initial=o?'<p><strong>처음 4년 월 합계 '+fmt(sale+5000)+'</strong></p>':'<p>약정과 관리 옵션별 최종 월 구독료는 전문상담사가 전화로 확인해 드립니다.</p>';
-    return '<div class="chosen-rate"><p>'+applianceLabel+' <strong>월 '+fmt(sale)+'</strong> <small>기본료 '+fmt(base)+'</small></p><p>처음 4년 상조회비 · 1구좌 월 5,000원</p>'+initial+
+    return '<div class="chosen-rate"><p>'+applianceLabel+' <strong>월 '+fmt(sale)+'</strong> <small>정상가(할인전) '+fmt(base)+'</small></p><p>처음 4년 상조회비 · 1구좌 월 5,000원</p>'+initial+
       '<p>48회를 납입한 뒤에는 상조회비를 계속 내거나 유예하실 수 있어요.</p>'+
       '<details class="info-disclosure"><summary>49회 이후 회비와 만기 조건 보기</summary><p>납입을 이어가시면 49~200회 상조회비는 회당 28,000원이며, 200회 총납입금은 4,496,000원입니다. 유예한 회차는 남아 있고 만기도 그만큼 늦어집니다.</p><p>'+clean(productAnswers.bonus)+'</p></details></div>';
   }
