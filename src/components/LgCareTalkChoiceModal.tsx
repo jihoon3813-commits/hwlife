@@ -49,10 +49,12 @@ export default function LgCareTalkChoiceModal({
   const first48Total = discountedPrice + 5000;
   const isDefaultQuote = selectedAppliance === '아직 고민 중';
 
-  const kakaoChatUrl = (() => {
+  const kakaoChannelUrl = (() => {
     try {
       const url = new URL((window as any).HyowonLG144?.kakaoChannelChatURL || '');
-      return url.origin === 'https://pf.kakao.com' ? url.href : '';
+      if (url.origin !== 'https://pf.kakao.com') return '';
+      const basePath = url.pathname.replace(/\/chat\/?$/, '').replace(/\/$/, '');
+      return `${url.origin}${basePath}/friend`;
     } catch {
       return '';
     }
@@ -87,9 +89,9 @@ export default function LgCareTalkChoiceModal({
     }
 
     setIsSubmitting(true);
-    // 팝업 차단을 피하기 위해 submit 이벤트 동기 흐름에서 먼저 창을 열고, 저장 성공 후 카카오 채널 채팅으로 이동
+    // 팝업 차단을 피하기 위해 submit 이벤트 동기 흐름에서 먼저 창을 열고, 저장 성공 후 카카오 채널 추가(/friend)로 이동
     const kakaoWindow =
-      contactMethod === 'kakao' && kakaoChatUrl ? window.open('about:blank', '_blank') : null;
+      contactMethod === 'kakao' && kakaoChannelUrl ? window.open('about:blank', '_blank') : null;
 
     try {
       const methodLabel = contactMethod === 'kakao' ? '카카오톡 안내' : '전화 상담 예약';
@@ -120,9 +122,9 @@ export default function LgCareTalkChoiceModal({
         trafficChannel: contactMethod === 'kakao' ? 'kakao_choice' : 'phone_choice',
         trafficLabel: contactMethod === 'kakao' ? '카톡 안내' : '전화 상담',
       });
-      if (kakaoWindow && kakaoChatUrl) {
+      if (kakaoWindow && kakaoChannelUrl) {
         kakaoWindow.opener = null;
-        kakaoWindow.location.href = kakaoChatUrl;
+        kakaoWindow.location.href = kakaoChannelUrl;
       }
       setIsSuccess(true);
     } catch (err) {
@@ -240,15 +242,15 @@ export default function LgCareTalkChoiceModal({
                 </p>
               )}
               <div className="space-y-2.5">
-                {kakaoChatUrl && contactMethod === 'kakao' && (
+                {kakaoChannelUrl && contactMethod === 'kakao' && (
                   <a
-                    href={kakaoChatUrl}
+                    href={kakaoChannelUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full py-3.5 px-4 rounded-xl bg-[#FEE500] hover:bg-[#f5dc00] text-[#191919] font-bold text-[14px] flex items-center justify-center gap-2 transition-colors"
                   >
                     <MessageCircle className="w-4 h-4" />
-                    카카오톡 채널에서 바로 상담하기
+                    카카오톡 채널 추가 · 홈 열기
                   </a>
                 )}
                 <button
