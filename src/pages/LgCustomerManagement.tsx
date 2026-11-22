@@ -78,6 +78,21 @@ export const isLgCareCustomer = (customer: any): boolean => {
   );
 };
 
+const getLgConsultType = (customer: any): 'kakao' | 'phone' => {
+  const tc = String(customer?.trafficChannel || '');
+  const tl = String(customer?.trafficLabel || '');
+  const msg = String(customer?.message || '');
+  if (
+    tc.startsWith('kakao') ||
+    tl.includes('카톡') ||
+    msg.includes('[카톡안내창]') ||
+    msg.includes('카카오톡 안내')
+  ) {
+    return 'kakao';
+  }
+  return 'phone';
+};
+
 interface ResolvedLgOptions {
   periods: string[];
   cycles: string[];
@@ -451,6 +466,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [inflowFilter, setInflowFilter] = useState<'all' | InflowType>('all');
+  const [consultTypeFilter, setConsultTypeFilter] = useState<'all' | 'kakao' | 'phone'>('all');
   const [isDaangnModalOpen, setIsDaangnModalOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isSendingSms, setIsSendingSms] = useState(false);
@@ -1005,6 +1021,11 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       return false;
     }
 
+    // 2.6 Consult Type Filter (카톡 안내 / 전화 상담)
+    if (consultTypeFilter !== 'all' && getLgConsultType(inq) !== consultTypeFilter) {
+      return false;
+    }
+
     // 3. Date Filter
     if (dateFilter !== 'all') {
       const range = getFilterDateRange(dateFilter, startDate, endDate);
@@ -1175,6 +1196,39 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
               }`}
             >
               {label} ({count})
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 상담방식 필터 탭 (카톡 안내 / 전화 상담) */}
+      <div className="flex items-center gap-2 mb-3 overflow-x-auto no-scrollbar pb-1">
+        <span className="text-[12px] font-bold text-[#8B95A1] shrink-0 mr-1">상담방식</span>
+        {([
+          { id: 'all', label: '전체' },
+          { id: 'kakao', label: '카톡 안내' },
+          { id: 'phone', label: '전화 상담' },
+        ] as const).map((item) => {
+          const count =
+            item.id === 'all'
+              ? lgInquiries.length
+              : lgInquiries.filter((i) => getLgConsultType(i) === item.id).length;
+          const isActive = consultTypeFilter === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setConsultTypeFilter(item.id)}
+              className={`px-3 py-1 rounded-full text-[12px] font-bold transition-all shrink-0 border ${
+                isActive
+                  ? item.id === 'kakao'
+                    ? 'bg-[#FEE500] text-[#191919] border-[#EAB308] shadow-sm'
+                    : item.id === 'phone'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                      : 'bg-[#191F28] text-white border-[#191F28]'
+                  : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
+              }`}
+            >
+              {item.label} ({count})
             </button>
           );
         })}
@@ -1368,12 +1422,22 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                         const inflow = getCustomerInflow(customer);
                         const meta = INFLOW_META[inflow];
                         const detail = getCustomerTrafficDetail(customer);
+                        const consultType = getLgConsultType(customer);
                         return (
                           <div className="flex flex-col items-center gap-0.5">
                             <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${meta.badgeClass}`}>
                               {meta.label}
                             </span>
-                            {detail && (
+                            <span
+                              className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold border ${
+                                consultType === 'kakao'
+                                  ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                                  : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              }`}
+                            >
+                              {consultType === 'kakao' ? '카톡 안내' : '전화 상담'}
+                            </span>
+                            {detail && !detail.label?.includes('카톡') && !detail.label?.includes('전화') && (
                               <span
                                 title={detail.tooltip}
                                 className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold max-w-full truncate ${detail.badgeClass}`}

@@ -32,7 +32,7 @@ export const INFLOW_META: Record<InflowType, { label: string; shortLabel: string
 export function getTrafficBadgeClass(channel?: string): string {
   if (!channel) return 'bg-gray-50 text-gray-600 border border-gray-200';
   if (channel.startsWith('kakao')) return 'bg-yellow-50 text-yellow-800 border border-yellow-200';
-  if (channel === 'sms') return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+  if (channel.startsWith('phone') || channel === 'sms') return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
   if (channel.startsWith('daangn')) return 'bg-orange-50 text-orange-600 border border-orange-200';
   if (channel.startsWith('instagram')) return 'bg-pink-50 text-pink-600 border border-pink-200';
   if (channel.startsWith('facebook') || channel === 'meta_ad') return 'bg-indigo-50 text-indigo-600 border border-indigo-200';

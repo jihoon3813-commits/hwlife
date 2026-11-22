@@ -102,6 +102,7 @@ export default function LgCareTalkChoiceModal({
         .join(' | ');
 
       await createInquiry({
+        ...getInquiryAttribution(),
         name: name.trim(),
         phone: phone.trim(),
         productName: 'LG가전구독(new) (1구좌)',
@@ -113,8 +114,7 @@ export default function LgCareTalkChoiceModal({
         message: consultDetails,
         source: 'lg_care',
         trafficChannel: contactMethod === 'kakao' ? 'kakao_choice' : 'phone_choice',
-        trafficLabel: contactMethod === 'kakao' ? '상단 선택형(카카오톡)' : '상단 선택형(전화상담)',
-        ...getInquiryAttribution(),
+        trafficLabel: contactMethod === 'kakao' ? '카톡 안내' : '전화 상담',
       });
       setIsSuccess(true);
     } catch (err) {
