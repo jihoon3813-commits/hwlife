@@ -142,6 +142,17 @@ export const create = mutation({
       channelName: channelName,
       trafficLabel: insertData.trafficLabel || undefined,
     });
+
+    if (
+      insertData.inflow !== "direct" &&
+      isLgCareInquiry({ source: args.source, productName: args.productName, appliance: args.appliance })
+    ) {
+      await ctx.scheduler.runAfter(0, internal.sms.sendLgAutoGuideSms, {
+        customerName: args.name,
+        customerPhone: args.phone,
+        appliance: args.appliance,
+      });
+    }
     return id;
   },
 });
@@ -381,6 +392,14 @@ export const createDaangnLead = internalMutation({
       channelName: args.channelId || "본사",
     });
 
+    if (isLg) {
+      await ctx.scheduler.runAfter(0, internal.sms.sendLgAutoGuideSms, {
+        customerName: args.name,
+        customerPhone: args.phone,
+        appliance: args.appliance,
+      });
+    }
+
     return id;
   },
 });
@@ -495,6 +514,12 @@ export const createLg144Application = internalMutation({
       message: combinedMessage,
       channelName,
       trafficLabel: "카톡 안내창 (LG구독144)",
+    });
+
+    await ctx.scheduler.runAfter(0, internal.sms.sendLgAutoGuideSms, {
+      customerName: args.name,
+      customerPhone: args.phone,
+      appliance: applianceLabel,
     });
 
     return { ok: true as const, status: 201, receipt: args.receipt };

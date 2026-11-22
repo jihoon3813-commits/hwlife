@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { action, internalAction } from "./_generated/server";
-import { api, internal } from "./_generated/api";
+import { api } from "./_generated/api";
+import { DEFAULT_GUIDE_TEMPLATES } from "./settings";
 
 // 알리고 SMS 발송 Action
 // fetch()는 Convex 기본 런타임에서 사용 가능하므로 "use node" 불필요
@@ -201,6 +202,74 @@ export const sendCustomGuideSms = action({
       throw new Error(`알리고 발송 실패: ${result.message || "알 수 없는 오류"}`);
     } catch (error: any) {
       throw new Error(`SMS 발송 중 오류: ${error.message}`);
+    }
+  },
+});
+
+export const sendLgAutoGuideSms = internalAction({
+  args: {
+    customerName: v.string(),
+    customerPhone: v.string(),
+    appliance: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const settings = await ctx.runQuery(api.settings.get);
+    const smsConfig = (settings as any)?.sms;
+    if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
+      return { success: false, skipped: true };
+    }
+
+    const receiver = args.customerPhone.replace(/[^0-9]/g, "");
+    if (receiver.length < 10) {
+      return { success: false, skipped: true };
+    }
+
+    const templates = (settings as any)?.guideTemplates;
+    const firstTemplate =
+      Array.isArray(templates) && templates.length > 0
+        ? templates[0]
+        : DEFAULT_GUIDE_TEMPLATES[0];
+
+    const safeName = args.customerName.trim() || "고객";
+    const trimmedModel = (args.appliance || "").trim();
+    const hasSpecificModel =
+      Boolean(trimmedModel) &&
+      trimmedModel !== "-" &&
+      trimmedModel !== "아직 고민 중" &&
+      trimmedModel !== "가전 선택 전" &&
+      !trimmedModel.includes("제품선택");
+    const safeModel = hasSpecificModel ? trimmedModel : "LG 가전구독";
+
+    const message = String(firstTemplate.content || "")
+      .replaceAll("{고객명}", safeName)
+      .replaceAll("{모델명}", safeModel);
+
+    if (!message.trim()) {
+      return { success: false, skipped: true };
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("key", smsConfig.apiKey);
+    formData.append("user_id", smsConfig.userId);
+    formData.append("sender", smsConfig.sender);
+    formData.append("receiver", receiver);
+    formData.append("msg", message);
+    formData.append("msg_type", "LMS");
+    formData.append("title", "[효원상조 × LG가전구독] 상품 안내");
+
+    try {
+      const response = await fetch("https://apis.aligo.in/send/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+      const result = await response.json();
+      return { success: result.result_code === "1", result };
+    } catch (error: any) {
+      console.error("sendLgAutoGuideSms failed:", error);
+      return { success: false, error: error?.message };
     }
   },
 });
