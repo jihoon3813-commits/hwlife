@@ -1,9 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { 
-  KeyRound, Plus, Trash2, Copy, Check, Search, User, Phone, 
-  Clock, AlertTriangle, Sparkles, CheckCircle2, XCircle, RefreshCw
+import {
+  KeyRound,
+  Plus,
+  Trash2,
+  Copy,
+  Check,
+  Search,
+  Clock,
+  Sparkles,
+  CheckCircle2,
+  XCircle,
+  RefreshCw,
+  X,
 } from 'lucide-react';
 import { formatPhoneNumber } from '../utils/phone';
 
@@ -17,18 +27,15 @@ export default function DiscountCodeManagement() {
   const resetAuth = useMutation(api.discountCodes.resetAuth);
   const batchResetAuth = useMutation(api.discountCodes.batchResetAuth);
 
-  // States
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'expired'>('all');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [createMode, setCreateMode] = useState<'single' | 'batch'>('single');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Single Form State
   const [singleForm, setSingleForm] = useState({
     code: '',
     customerName: '',
@@ -39,7 +46,6 @@ export default function DiscountCodeManagement() {
     isActive: true,
   });
 
-  // Batch Form State
   const [batchForm, setBatchForm] = useState({
     count: 10,
     prefix: 'LG',
@@ -50,14 +56,12 @@ export default function DiscountCodeManagement() {
     customExpiryDate: '',
   });
 
-  // Copy helper
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 1800);
   };
 
-  // Filtered Codes
   const filteredCodes = useMemo(() => {
     const now = Date.now();
     return discountCodes.filter((item) => {
@@ -80,12 +84,13 @@ export default function DiscountCodeManagement() {
     });
   }, [discountCodes, searchTerm, statusFilter]);
 
-  // Statistics
   const stats = useMemo(() => {
     const now = Date.now();
     let active = 0;
     let expired = 0;
+    let totalUses = 0;
     for (const c of discountCodes) {
+      totalUses += c.useCount || 0;
       if (c.expiresAt && c.expiresAt < now) {
         expired++;
       } else if (c.isActive) {
@@ -96,6 +101,7 @@ export default function DiscountCodeManagement() {
       total: discountCodes.length,
       active,
       expired,
+      totalUses,
     };
   }, [discountCodes]);
 
@@ -128,7 +134,12 @@ export default function DiscountCodeManagement() {
 
   const handleBatchResetAuth = async () => {
     if (selectedIds.length === 0) return;
-    if (!window.confirm(`선택한 ${selectedIds.length}개 할인코드의 모든 사용자 인증을 리셋하시겠습니까?\n\n이 코드로 인증했던 사용자의 화면에서 특가가 즉시 다시 잠깁니다.`)) return;
+    if (
+      !window.confirm(
+        `선택한 ${selectedIds.length}개 할인코드의 모든 사용자 인증을 리셋하시겠습니까?\n\n이 코드로 인증했던 사용자의 화면에서 특가가 즉시 다시 잠깁니다.`
+      )
+    )
+      return;
     try {
       await batchResetAuth({ ids: selectedIds as any });
       alert(`선택한 ${selectedIds.length}개 할인코드의 사용자 인증이 리셋되었습니다.`);
@@ -149,7 +160,12 @@ export default function DiscountCodeManagement() {
   };
 
   const handleResetAuth = async (id: any, code: string) => {
-    if (!window.confirm(`할인코드 [${code}]의 사용자 인증을 리셋하시겠습니까?\n\n이 코드로 접속 중이던 사용자의 화면에서 특가가 즉시 다시 잠기며, 코드를 다시 입력해야 합니다.`)) return;
+    if (
+      !window.confirm(
+        `할인코드 [${code}]의 사용자 인증을 리셋하시겠습니까?\n\n이 코드로 접속 중이던 사용자의 화면에서 특가가 즉시 다시 잠기며, 코드를 다시 입력해야 합니다.`
+      )
+    )
+      return;
     try {
       await resetAuth({ id });
       alert(`[${code}] 할인코드의 사용자 인증이 리셋되었습니다.\n접속 중인 사용자의 특가가 즉시 잠겼습니다.`);
@@ -157,6 +173,7 @@ export default function DiscountCodeManagement() {
       alert(err.message || '인증 리셋 중 오류가 발생했습니다.');
     }
   };
+
   const calculateExpiry = (preset: string, customDate: string): number | undefined => {
     if (preset === 'unlimited') return undefined;
     if (preset === 'custom') {
@@ -173,7 +190,7 @@ export default function DiscountCodeManagement() {
     for (let i = 0; i < 6; i++) {
       rand += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    setSingleForm(prev => ({ ...prev, code: rand }));
+    setSingleForm((prev) => ({ ...prev, code: rand }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -243,11 +260,7 @@ export default function DiscountCodeManagement() {
 
   const renderExpireBadge = (expiresAt?: number) => {
     if (!expiresAt) {
-      return (
-        <span className="inline-flex items-center gap-1 text-[11.5px] font-bold text-[#4E5968] bg-[#F2F4F6] px-2 py-0.5 rounded-md">
-          무제한
-        </span>
-      );
+      return <span className="adm-pill gray">무제한</span>;
     }
 
     const now = Date.now();
@@ -257,282 +270,280 @@ export default function DiscountCodeManagement() {
     if (isExpired) {
       return (
         <div className="space-y-0.5">
-          <span className="inline-flex items-center gap-1 text-[11px] font-black text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md">
-            <XCircle className="w-3 h-3 text-rose-500" /> 만료됨
+          <span className="adm-pill red">
+            <XCircle className="w-3 h-3" /> 만료됨
           </span>
-          <p className="text-[10.5px] font-mono text-[#8B95A1]">{formatDateTime(expiresAt)}</p>
+          <p className="text-[10.5px] font-mono text-[#86918a]">{formatDateTime(expiresAt)}</p>
         </div>
       );
     }
 
     return (
       <div className="space-y-0.5">
-        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-          <Clock className="w-3 h-3 text-emerald-600" /> D-{diffDays}일 남음
+        <span className="adm-pill green">
+          <Clock className="w-3 h-3" /> D-{diffDays}일 남음
         </span>
-        <p className="text-[10.5px] font-mono text-[#4E5968]">{formatDateTime(expiresAt)} 까지</p>
+        <p className="text-[10.5px] font-mono text-[#6d786c]">{formatDateTime(expiresAt)} 까지</p>
       </div>
     );
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      {/* Page Heading */}
+      <div className="adm-page-heading">
         <div>
-          <div className="flex items-center gap-2.5">
-            <div className="p-2.5 bg-[#EA1D2C]/10 text-[#EA1D2C] rounded-2xl">
-              <KeyRound className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-black text-[#191F28] tracking-tight">
-                할인코드 관리
-              </h1>
-              <p className="text-[13px] text-[#6B7684] mt-0.5">
-                LG 가전 결합 시크릿 특별할인을 잠금 해제할 수 있는 할인코드를 발급하고 관리합니다.
-              </p>
-            </div>
-          </div>
+          <div className="adm-eyebrow">OPERATIONS · PROMOTION CODES</div>
+          <h1>할인코드 관리</h1>
+          <p>
+            LG 가전 결합 시크릿 특별할인을 잠금 해제할 수 있는 인증 할인코드를 단건 또는 대량 발급하고 관리합니다.
+          </p>
         </div>
 
-        <button
-          onClick={() => {
-            handleGenerateRandomCode();
-            setIsModalOpen(true);
-          }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#EA1D2C] hover:bg-[#D41423] text-white font-extrabold text-[13.5px] rounded-xl shadow-sm shadow-[#EA1D2C]/30 active:scale-95 transition-all cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>신규 할인코드 발급</span>
-        </button>
+        <div className="adm-heading-buttons">
+          <button
+            type="button"
+            onClick={() => {
+              handleGenerateRandomCode();
+              setIsModalOpen(true);
+            }}
+            className="adm-btn primary"
+          >
+            <Plus />
+            <span>신규 할인코드 발급</span>
+          </button>
+        </div>
       </div>
 
-      {/* Summary Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5E8EB] shadow-2xs">
-          <div className="flex items-center justify-between text-[#8B95A1] text-[12px] font-bold">
+      {/* 4-Column Metric Cards */}
+      <div className="adm-metrics-grid">
+        <div className="adm-metric clickable" onClick={() => setStatusFilter('all')}>
+          <div className="adm-metric-head">
             <span>전체 발급 코드</span>
-            <KeyRound className="w-4 h-4 text-[#4E5968]" />
+            <div className="adm-metric-icon"><KeyRound /></div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-[#191F28] mt-2">
-            {stats.total}<span className="text-base font-bold ml-1 text-[#8B95A1]">개</span>
-          </p>
+          <div className="adm-metric-value">
+            {stats.total.toLocaleString()}<span>개</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">누적 발급</span>
+            <span>시크릿 특가 인증키</span>
+          </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5E8EB] shadow-2xs">
-          <div className="flex items-center justify-between text-[#00B074] text-[12px] font-bold">
+        <div className="adm-metric clickable" onClick={() => setStatusFilter('active')}>
+          <div className="adm-metric-head">
             <span>사용 가능 (활성)</span>
-            <CheckCircle2 className="w-4 h-4 text-[#00B074]" />
+            <div className="adm-metric-icon"><CheckCircle2 /></div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-[#00B074] mt-2">
-            {stats.active}<span className="text-base font-bold ml-1 text-[#8B95A1]">개</span>
-          </p>
+          <div className="adm-metric-value">
+            {stats.active.toLocaleString()}<span>개</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">즉시 인증 가능</span>
+            <span>유효기간 내 코드</span>
+          </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5E8EB] shadow-2xs">
-          <div className="flex items-center justify-between text-[#F04452] text-[12px] font-bold">
-            <span>만료/비활성</span>
-            <XCircle className="w-4 h-4 text-[#F04452]" />
+        <div className="adm-metric clickable" onClick={() => setStatusFilter('expired')}>
+          <div className="adm-metric-head">
+            <span>기간 만료 코드</span>
+            <div className="adm-metric-icon"><XCircle /></div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-[#F04452] mt-2">
-            {stats.expired}<span className="text-base font-bold ml-1 text-[#8B95A1]">개</span>
-          </p>
+          <div className="adm-metric-value">
+            {stats.expired.toLocaleString()}<span>개</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend warning">자동 잠금</span>
+            <span>유효기간 경과</span>
+          </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-[#E5E8EB] shadow-2xs">
-          <div className="flex items-center justify-between text-[#3182F6] text-[12px] font-bold">
-            <span>총 발급 이력</span>
-            <Sparkles className="w-4 h-4 text-[#3182F6]" />
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>누적 고객 인증 횟수</span>
+            <div className="adm-metric-icon"><Sparkles /></div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-[#3182F6] mt-2">
-            {discountCodes.length}<span className="text-base font-bold ml-1 text-[#8B95A1]">건</span>
-          </p>
+          <div className="adm-metric-value">
+            {stats.totalUses.toLocaleString()}<span>회</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">잠금 해제 이력</span>
+            <span>실시간 집계</span>
+          </div>
         </div>
       </div>
 
-      {/* Filter & Action Toolbar */}
-      <div className="bg-white p-4 rounded-2xl border border-[#E5E8EB] shadow-2xs flex flex-col md:flex-row gap-3 items-center justify-between">
-        {/* Status Filter Tabs */}
-        <div className="flex items-center gap-1.5 w-full md:w-auto bg-[#F2F4F6] p-1 rounded-xl">
+      {/* Bulk Action Bar */}
+      {selectedIds.length > 0 && (
+        <div className="adm-bulk-bar">
+          <div className="text-[12.5px] font-semibold">
+            현재 <strong className="text-white">{selectedIds.length}개</strong>의 할인코드가 선택되었습니다.
+          </div>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={handleBatchResetAuth} className="adm-btn sage small">
+              <RefreshCw />
+              <span>선택 인증 리셋 ({selectedIds.length})</span>
+            </button>
+            <button type="button" onClick={handleBatchDelete} className="adm-btn danger small">
+              <Trash2 />
+              <span>선택 삭제 ({selectedIds.length})</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Panel */}
+      <div className="adm-panel">
+        <div className="adm-tabs">
           {[
-            { id: 'all', label: `전체 (${stats.total})` },
-            { id: 'active', label: `사용 가능 (${stats.active})` },
-            { id: 'expired', label: `만료됨 (${stats.expired})` },
-          ].map(tab => (
+            { id: 'all', label: '전체 코드', count: stats.total },
+            { id: 'active', label: '사용 가능 (활성)', count: stats.active },
+            { id: 'expired', label: '만료됨', count: stats.expired },
+          ].map((tab) => (
             <button
               key={tab.id}
+              type="button"
               onClick={() => setStatusFilter(tab.id as any)}
-              className={`px-3 py-1.5 rounded-lg text-[12.5px] font-bold transition-all cursor-pointer ${
-                statusFilter === tab.id
-                  ? 'bg-white text-[#191F28] shadow-2xs'
-                  : 'text-[#6B7684] hover:text-[#191F28]'
-              }`}
+              className={`adm-tab ${statusFilter === tab.id ? 'active' : ''}`}
             >
-              {tab.label}
+              <span>{tab.label}</span>
+              <span className="adm-tab-count">{tab.count}</span>
             </button>
           ))}
         </div>
 
-        {/* Search & Bulk Actions */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
-            <Search className="w-4 h-4 text-[#8B95A1] absolute left-3 top-1/2 -translate-y-1/2" />
+        <div className="adm-filter-bar">
+          <div className="adm-search-field">
+            <Search />
             <input
               type="text"
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              placeholder="코드, 고객명, 연락처, 메모 검색"
-              className="w-full pl-9 pr-3 py-2 bg-[#F9FAFB] border border-[#E5E8EB] rounded-xl text-[13px] focus:bg-white focus:border-[#3182F6] outline-none transition-colors"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="할인코드, 제공 고객명, 연락처, 메모 검색..."
             />
           </div>
-
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleBatchResetAuth}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-xl text-[12.5px] font-bold border border-amber-200 transition-colors whitespace-nowrap cursor-pointer"
-                title="선택한 코드의 사용자 인증을 일괄 리셋합니다."
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>{selectedIds.length}개 인증 리셋</span>
-              </button>
-              <button
-                onClick={handleBatchDelete}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-[12.5px] font-bold border border-rose-200 transition-colors whitespace-nowrap cursor-pointer"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>{selectedIds.length}개 일괄 삭제</span>
-              </button>
-            </div>
-          )}
+          <div className="adm-filter-end">
+            <span>조회 결과 <b className="text-[#263d36]">{filteredCodes.length}</b>개</span>
+          </div>
         </div>
-      </div>
 
-      {/* Code List Table */}
-      <div className="bg-white rounded-2xl border border-[#E5E8EB] shadow-2xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-[13px] border-collapse">
+        <div className="adm-table-scroll">
+          <table className="adm-table">
             <thead>
-              <tr className="bg-[#F8F9FA] border-b border-[#E5E8EB] text-[#6B7684] font-extrabold text-[12px]">
-                <th className="py-3.5 px-4 w-12 text-center">
+              <tr>
+                <th className="w-12 text-center">
                   <input
                     type="checkbox"
                     checked={filteredCodes.length > 0 && selectedIds.length === filteredCodes.length}
                     onChange={handleSelectAll}
-                    className="rounded border-[#D1D6DB] text-[#EA1D2C] focus:ring-[#EA1D2C] cursor-pointer"
+                    className="w-4 h-4 rounded cursor-pointer"
                   />
                 </th>
-                <th className="py-3.5 px-4">할인코드 (클릭 복사)</th>
-                <th className="py-3.5 px-4">제공 고객 정보</th>
-                <th className="py-3.5 px-4">발급 사유 / 메모</th>
-                <th className="py-3.5 px-4">발급 일시</th>
-                <th className="py-3.5 px-4">유효기간</th>
-                <th className="py-3.5 px-4 text-center">인증 횟수</th>
-                <th className="py-3.5 px-4 text-center">상태</th>
-                <th className="py-3.5 px-4 text-center w-28">관리</th>
+                <th>할인코드 (클릭 복사)</th>
+                <th>제공 대상 고객</th>
+                <th>발급 사유 · 메모</th>
+                <th>발급 일시</th>
+                <th>유효기간</th>
+                <th className="text-center">인증 횟수</th>
+                <th className="text-center">활성 토글</th>
+                <th className="text-center">관리</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F2F4F6]">
+            <tbody>
               {filteredCodes.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-[#8B95A1]">
-                    <KeyRound className="w-8 h-8 mx-auto text-[#D1D6DB] mb-2" />
-                    <p className="font-bold">발급된 할인코드가 없습니다.</p>
-                    <p className="text-[12px] text-[#A6ADB8] mt-0.5">상단의 &apos;신규 할인코드 발급&apos; 버튼으로 코드를 만들어보세요.</p>
+                  <td colSpan={9} className="text-center !py-16 text-[#86918a]">
+                    발급된 할인코드가 없거나 검색 결과가 없습니다.
                   </td>
                 </tr>
               ) : (
-                filteredCodes.map(code => (
-                  <tr key={code._id} className="hover:bg-[#F9FAFB] transition-colors">
-                    <td className="py-3.5 px-4 text-center">
+                filteredCodes.map((code) => (
+                  <tr key={code._id}>
+                    <td className="text-center">
                       <input
                         type="checkbox"
                         checked={selectedIds.includes(code._id)}
                         onChange={() => handleToggleSelect(code._id)}
-                        className="rounded border-[#D1D6DB] text-[#EA1D2C] focus:ring-[#EA1D2C] cursor-pointer"
+                        className="w-4 h-4 rounded cursor-pointer"
                       />
                     </td>
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-black text-[#191F28] text-[14px] bg-[#F2F4F6] px-2.5 py-1 rounded-lg border border-[#E5E8EB] tracking-wider">
+                    <td>
+                      <div className="inline-flex items-center gap-2">
+                        <span className="font-mono font-bold text-[#263d36] text-[13px] bg-[#f4f7f0] px-2.5 py-1 rounded-[6px] border border-[#dfe5d9] tracking-wider">
                           {code.code}
                         </span>
                         <button
+                          type="button"
                           onClick={() => handleCopyCode(code.code)}
-                          className="p-1 text-[#8B95A1] hover:text-[#191F28] hover:bg-[#E5E8EB] rounded-md transition-colors cursor-pointer"
+                          className="adm-icon-btn !p-1.5"
                           title="코드 복사"
                         >
                           {copiedCode === code.code ? (
-                            <Check className="w-4 h-4 text-[#00B074]" />
+                            <Check className="w-3.5 h-3.5 text-[#295e52]" />
                           ) : (
-                            <Copy className="w-4 h-4" />
+                            <Copy className="w-3.5 h-3.5" />
                           )}
                         </button>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4">
+                    <td>
                       {code.customerName || code.customerPhone ? (
-                        <div className="space-y-0.5">
-                          {code.customerName && (
-                            <div className="flex items-center gap-1 font-bold text-[#191F28]">
-                              <User className="w-3.5 h-3.5 text-[#8B95A1]" />
-                              <span>{code.customerName}</span>
-                            </div>
-                          )}
-                          {code.customerPhone && (
-                            <div className="flex items-center gap-1 text-[11.5px] font-mono text-[#6B7684]">
-                              <Phone className="w-3.5 h-3.5 text-[#8B95A1]" />
-                              <span>{code.customerPhone}</span>
-                            </div>
-                          )}
+                        <div className="adm-person">
+                          <div className="adm-person-circle">
+                            {(code.customerName || 'C').slice(0, 1)}
+                          </div>
+                          <div>
+                            <strong>{code.customerName || '대상 미지정'}</strong>
+                            {code.customerPhone && <small className="font-mono">{code.customerPhone}</small>}
+                          </div>
                         </div>
                       ) : (
-                        <span className="text-[#8B95A1] text-[12px]">-</span>
+                        <span className="text-[#9ba594]">-</span>
                       )}
                     </td>
-                    <td className="py-3.5 px-4 max-w-[200px]">
-                      <p className="text-[12.5px] text-[#4E5968] truncate" title={code.memo}>
-                        {code.memo || '-'}
-                      </p>
+                    <td className="max-w-[220px] truncate" title={code.memo}>
+                      {code.memo || '-'}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-[12px] text-[#6B7684]">
+                    <td className="font-mono text-[11.5px] text-[#6d786c]">
                       {formatDateTime(code.createdAt)}
                     </td>
-                    <td className="py-3.5 px-4">
-                      {renderExpireBadge(code.expiresAt)}
+                    <td>{renderExpireBadge(code.expiresAt)}</td>
+                    <td className="text-center">
+                      <span className="adm-pill teal">{code.useCount || 0}회</span>
                     </td>
-                    <td className="py-3.5 px-4 text-center font-bold text-[#3182F6]">
-                      {code.useCount || 0}회
-                    </td>
-                    <td className="py-3.5 px-4 text-center">
+                    <td className="text-center">
                       <button
+                        type="button"
                         onClick={() => toggleActive({ id: code._id, isActive: !code.isActive })}
-                        className={`text-[11px] font-bold px-2.5 py-1 rounded-full cursor-pointer transition-colors ${
-                          code.isActive
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
-                            : 'bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200'
-                        }`}
+                        className={`adm-switch mx-auto ${code.isActive ? 'checked' : ''}`}
+                        title={code.isActive ? '활성 상태 (클릭 시 비활성)' : '비활성 상태 (클릭 시 활성)'}
                       >
-                        {code.isActive ? '활성' : '비활성'}
+                        <span />
                       </button>
                     </td>
-                    <td className="py-3.5 px-4 text-center">
-                      <div className="flex items-center justify-center gap-1">
+                    <td className="text-center">
+                      <div className="inline-flex items-center gap-1">
                         <button
                           type="button"
                           onClick={() => handleResetAuth(code._id, code.code)}
-                          className="p-1.5 text-[#8B95A1] hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
-                          title={code.lastResetAt ? `인증 리셋 (최근 리셋: ${formatDateTime(code.lastResetAt)})` : '인증 리셋 (접속자 특가 다시 잠금)'}
+                          className="adm-btn small"
+                          title={
+                            code.lastResetAt
+                              ? `인증 리셋 (최근: ${formatDateTime(code.lastResetAt)})`
+                              : '인증 리셋 (접속자 특가 다시 잠금)'
+                          }
                         >
-                          <RefreshCw className="w-4 h-4" />
+                          <RefreshCw />
+                          <span>리셋</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(code._id, code.code)}
-                          className="p-1.5 text-[#8B95A1] hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          className="adm-btn danger small"
                           title="삭제"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 />
                         </button>
                       </div>
                     </td>
@@ -542,124 +553,124 @@ export default function DiscountCodeManagement() {
             </tbody>
           </table>
         </div>
+
+        <div className="adm-table-foot">
+          <span>전체 {stats.total}개 중 {filteredCodes.length}개 표시</span>
+          <span>인증 리셋 실행 시 해당 코드로 접속 중인 고객의 특가 화면이 즉시 잠금 상태로 전환됩니다.</span>
+        </div>
       </div>
 
       {/* Creation Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl border border-[#E5E8EB] shadow-2xl max-w-lg w-full overflow-hidden">
-            <div className="p-5 border-b border-[#E5E8EB] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-[#EA1D2C]/10 text-[#EA1D2C] rounded-xl">
-                  <KeyRound className="w-5 h-5" />
-                </div>
-                <h2 className="text-lg font-black text-[#191F28]">
-                  할인코드 신규 발급
-                </h2>
+        <div className="adm-modal-overlay">
+          <form onSubmit={handleSubmit} className="adm-modal max-w-[520px]">
+            <div className="adm-drawer-head">
+              <div>
+                <h2>할인코드 신규 발급</h2>
+                <p>단건 지정 코드 또는 접두사 기반 대량 난수 코드를 생성합니다.</p>
               </div>
-              <div className="flex items-center gap-1 bg-[#F2F4F6] p-1 rounded-xl text-[12px] font-bold">
+              <button type="button" onClick={() => setIsModalOpen(false)} className="adm-icon-btn">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="adm-drawer-scroll space-y-4">
+              <div className="adm-segmented w-full">
                 <button
                   type="button"
                   onClick={() => setCreateMode('single')}
-                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                    createMode === 'single'
-                      ? 'bg-white text-[#191F28] shadow-2xs'
-                      : 'text-[#6B7684]'
-                  }`}
+                  className={`flex-1 justify-center ${createMode === 'single' ? 'active' : ''}`}
                 >
-                  단건 등록
+                  단건 지정 발급
                 </button>
                 <button
                   type="button"
                   onClick={() => setCreateMode('batch')}
-                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                    createMode === 'batch'
-                      ? 'bg-white text-[#191F28] shadow-2xs'
-                      : 'text-[#6B7684]'
-                  }`}
+                  className={`flex-1 justify-center ${createMode === 'batch' ? 'active' : ''}`}
                 >
-                  대량 자동생성
+                  대량 자동 생성 (최대 100개)
                 </button>
               </div>
-            </div>
 
-            <form onSubmit={handleSubmit} className="p-5 space-y-4">
               {createMode === 'single' ? (
                 <>
-                  <div className="space-y-1.5">
+                  <div className="adm-field">
                     <div className="flex items-center justify-between">
-                      <label className="text-[12.5px] font-bold text-[#191F28]">
-                        할인코드 <span className="text-rose-500">*</span>
-                      </label>
+                      <label>할인코드 문자열 *</label>
                       <button
                         type="button"
                         onClick={handleGenerateRandomCode}
-                        className="text-[11.5px] text-[#3182F6] hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                        className="text-[11px] font-bold text-[#295e52] hover:underline inline-flex items-center gap-1 cursor-pointer"
                       >
-                        <RefreshCw className="w-3 h-3" />
-                        난수 자동생성
+                        <RefreshCw className="w-3 h-3" /> 난수 자동생성
                       </button>
                     </div>
                     <input
                       type="text"
                       required
                       value={singleForm.code}
-                      onChange={e => setSingleForm(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+                      onChange={(e) =>
+                        setSingleForm((prev) => ({ ...prev, code: e.target.value.toUpperCase() }))
+                      }
                       placeholder="예: VIP-SPECIAL, LGCARE2026"
-                      className="w-full px-3.5 py-2.5 bg-[#F9FAFB] border border-[#E5E8EB] rounded-xl text-[14px] font-mono font-bold uppercase focus:bg-white focus:border-[#EA1D2C] outline-none"
+                      className="adm-input font-mono font-bold uppercase"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-[12px] font-bold text-[#4E5968]">제공 고객명</label>
+
+                  <div className="adm-field-grid">
+                    <div className="adm-field">
+                      <label>제공 고객명 (선택)</label>
                       <input
                         type="text"
                         value={singleForm.customerName}
-                        onChange={e => setSingleForm(prev => ({ ...prev, customerName: e.target.value }))}
+                        onChange={(e) => setSingleForm((prev) => ({ ...prev, customerName: e.target.value }))}
                         placeholder="홍길동"
-                        className="w-full px-3.5 py-2 bg-[#F9FAFB] border border-[#E5E8EB] rounded-xl text-[13px] focus:bg-white focus:border-[#3182F6] outline-none"
+                        className="adm-input"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[12px] font-bold text-[#4E5968]">연락처</label>
+                    <div className="adm-field">
+                      <label>연락처 (선택)</label>
                       <input
                         type="tel"
                         maxLength={13}
                         value={singleForm.customerPhone}
-                        onChange={e => setSingleForm(prev => ({ ...prev, customerPhone: formatPhoneNumber(e.target.value) }))}
+                        onChange={(e) =>
+                          setSingleForm((prev) => ({
+                            ...prev,
+                            customerPhone: formatPhoneNumber(e.target.value),
+                          }))
+                        }
                         placeholder="010-1234-5678"
-                        className="w-full px-3.5 py-2 bg-[#F9FAFB] border border-[#E5E8EB] rounded-xl text-[13px] focus:bg-white focus:border-[#3182F6] outline-none"
+                        className="adm-input font-mono"
                       />
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[12px] font-bold text-[#4E5968]">발급 사유 / 메모</label>
+
+                  <div className="adm-field">
+                    <label>발급 사유 · 메모</label>
                     <input
                       type="text"
                       value={singleForm.memo}
-                      onChange={e => setSingleForm(prev => ({ ...prev, memo: e.target.value }))}
+                      onChange={(e) => setSingleForm((prev) => ({ ...prev, memo: e.target.value }))}
                       placeholder="예: VIP 상담 고객 프로모션 전달용"
-                      className="w-full px-3.5 py-2 bg-[#F9FAFB] border border-[#E5E8EB] rounded-xl text-[13px] focus:bg-white focus:border-[#3182F6] outline-none"
+                      className="adm-input"
                     />
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[12px] font-bold text-[#191F28]">유효기간 설정</label>
-                    <div className="grid grid-cols-4 gap-2">
+
+                  <div className="adm-field">
+                    <label>유효기간 설정</label>
+                    <div className="adm-segmented w-full">
                       {[
                         { id: '7', label: '7일' },
                         { id: '30', label: '30일 (기본)' },
                         { id: '90', label: '90일' },
                         { id: 'unlimited', label: '무제한' },
-                      ].map(preset => (
+                      ].map((preset) => (
                         <button
                           key={preset.id}
                           type="button"
-                          onClick={() => setSingleForm(prev => ({ ...prev, expiryPreset: preset.id }))}
-                          className={`py-2 rounded-xl text-[12px] font-bold border transition-all cursor-pointer ${
-                            singleForm.expiryPreset === preset.id
-                              ? 'bg-[#EA1D2C]/10 border-[#EA1D2C] text-[#EA1D2C]'
-                              : 'bg-white border-[#E5E8EB] text-[#6B7684] hover:border-[#B0B8C1]'
-                          }`}
+                          onClick={() => setSingleForm((prev) => ({ ...prev, expiryPreset: preset.id }))}
+                          className={`flex-1 justify-center ${singleForm.expiryPreset === preset.id ? 'active' : ''}`}
                         >
                           {preset.label}
                         </button>
@@ -669,72 +680,74 @@ export default function DiscountCodeManagement() {
                 </>
               ) : (
                 <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="text-[12.5px] font-bold text-[#191F28]">
-                        생성 수량 (개) <span className="text-rose-500">*</span>
-                      </label>
+                  <div className="adm-field-grid">
+                    <div className="adm-field">
+                      <label>생성 수량 (1~100개) *</label>
                       <input
                         type="number"
                         min={1}
                         max={100}
                         required
                         value={batchForm.count}
-                        onChange={e => setBatchForm(prev => ({ ...prev, count: parseInt(e.target.value, 10) || 1 }))}
-                        className="w-full px-3.5 py-2.5 bg-[#F9FAFB] border border-[#E5E8EB] rounded-xl text-[14px] font-bold focus:bg-white focus:border-[#EA1D2C] outline-none"
+                        onChange={(e) =>
+                          setBatchForm((prev) => ({
+                            ...prev,
+                            count: parseInt(e.target.value, 10) || 1,
+                          }))
+                        }
+                        className="adm-input font-bold"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[12.5px] font-bold text-[#191F28]">
-                        접두사 (Prefix)
-                      </label>
+                    <div className="adm-field">
+                      <label>접두사 (Prefix)</label>
                       <input
                         type="text"
                         value={batchForm.prefix}
-                        onChange={e => setBatchForm(prev => ({ ...prev, prefix: e.target.value.toUpperCase() }))}
-                        placeholder="예: LG, VIP, EVENT"
-                        className="w-full px-3.5 py-2.5 bg-[#F9FAFB] border border-[#E5E8EB] rounded-xl text-[14px] font-mono font-bold uppercase focus:bg-white focus:border-[#EA1D2C] outline-none"
+                        onChange={(e) =>
+                          setBatchForm((prev) => ({ ...prev, prefix: e.target.value.toUpperCase() }))
+                        }
+                        placeholder="예: LG, VIP"
+                        className="adm-input font-mono font-bold uppercase"
                       />
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[12px] font-bold text-[#4E5968]">제공 대상 / 채널명 (선택)</label>
+
+                  <div className="adm-field">
+                    <label>제공 대상 · 파트너 채널명 (선택)</label>
                     <input
                       type="text"
                       value={batchForm.customerName}
-                      onChange={e => setBatchForm(prev => ({ ...prev, customerName: e.target.value }))}
-                      placeholder="예: 신세계 제휴채널 배포용, 8월 이벤트"
-                      className="w-full px-3.5 py-2 bg-[#F9FAFB] border border-[#E5E8EB] rounded-xl text-[13px] focus:bg-white focus:border-[#3182F6] outline-none"
+                      onChange={(e) => setBatchForm((prev) => ({ ...prev, customerName: e.target.value }))}
+                      placeholder="예: 제휴 파트너 배포용"
+                      className="adm-input"
                     />
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[12px] font-bold text-[#4E5968]">발급 사유 / 메모</label>
+
+                  <div className="adm-field">
+                    <label>발급 사유 · 메모</label>
                     <input
                       type="text"
                       value={batchForm.memo}
-                      onChange={e => setBatchForm(prev => ({ ...prev, memo: e.target.value }))}
+                      onChange={(e) => setBatchForm((prev) => ({ ...prev, memo: e.target.value }))}
                       placeholder="예: 채널 프로모션 대량 쿠폰"
-                      className="w-full px-3.5 py-2 bg-[#F9FAFB] border border-[#E5E8EB] rounded-xl text-[13px] focus:bg-white focus:border-[#3182F6] outline-none"
+                      className="adm-input"
                     />
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[12px] font-bold text-[#191F28]">유효기간 설정</label>
-                    <div className="grid grid-cols-4 gap-2">
+
+                  <div className="adm-field">
+                    <label>유효기간 설정</label>
+                    <div className="adm-segmented w-full">
                       {[
                         { id: '7', label: '7일' },
                         { id: '30', label: '30일 (기본)' },
                         { id: '90', label: '90일' },
                         { id: 'unlimited', label: '무제한' },
-                      ].map(preset => (
+                      ].map((preset) => (
                         <button
                           key={preset.id}
                           type="button"
-                          onClick={() => setBatchForm(prev => ({ ...prev, expiryPreset: preset.id }))}
-                          className={`py-2 rounded-xl text-[12px] font-bold border transition-all cursor-pointer ${
-                            batchForm.expiryPreset === preset.id
-                              ? 'bg-[#EA1D2C]/10 border-[#EA1D2C] text-[#EA1D2C]'
-                              : 'bg-white border-[#E5E8EB] text-[#6B7684] hover:border-[#B0B8C1]'
-                          }`}
+                          onClick={() => setBatchForm((prev) => ({ ...prev, expiryPreset: preset.id }))}
+                          className={`flex-1 justify-center ${batchForm.expiryPreset === preset.id ? 'active' : ''}`}
                         >
                           {preset.label}
                         </button>
@@ -743,24 +756,21 @@ export default function DiscountCodeManagement() {
                   </div>
                 </>
               )}
-              <div className="pt-3 flex gap-2 justify-end border-t border-[#E5E8EB]">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2.5 bg-[#F2F4F6] hover:bg-[#E5E8EB] text-[#4E5968] text-[13px] font-bold rounded-xl cursor-pointer"
-                >
-                  취소
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2.5 bg-[#EA1D2C] hover:bg-[#D41423] disabled:opacity-50 text-white text-[13px] font-extrabold rounded-xl shadow-sm transition-all cursor-pointer"
-                >
-                  {isSubmitting ? '발급 중...' : (createMode === 'single' ? '할인코드 발급하기' : `${batchForm.count}개 대량 생성하기`)}
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+
+            <div className="adm-drawer-foot">
+              <button type="button" onClick={() => setIsModalOpen(false)} className="adm-btn">
+                취소
+              </button>
+              <button type="submit" disabled={isSubmitting} className="adm-btn primary">
+                {isSubmitting
+                  ? '발급 중...'
+                  : createMode === 'single'
+                    ? '할인코드 발급하기'
+                    : `${batchForm.count}개 대량 생성하기`}
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

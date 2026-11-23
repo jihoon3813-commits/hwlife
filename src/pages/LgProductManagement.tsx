@@ -192,7 +192,11 @@ function formatSubscriptionRefUrl(url?: string, modelCode?: string, categoryKey?
   return buildLgOfficialPdpUrl(url, modelCode, categoryKey, modelIdHint);
 }
 
-export default function LgProductManagement() {
+export default function LgProductManagement({
+  onOpenLandingSetting,
+}: {
+  onOpenLandingSetting?: () => void;
+} = {}) {
   // Convex queries & mutations
   const products = useQuery(api.lgProducts.getAll) || [];
   const dbCategories = useQuery(api.lgCategories.getOrdered);
@@ -1336,8 +1340,10 @@ export default function LgProductManagement() {
     }
   };
 
+  const visibleCount = products.filter((p) => p.isVisible).length;
+
   return (
-    <div className="flex h-screen bg-[#F8F9FA] text-[#191F28] overflow-hidden font-sans">
+    <div className="space-y-6">
       {/* Hidden File Input for Excel */}
       <input
         type="file"
@@ -1347,440 +1353,436 @@ export default function LgProductManagement() {
         className="hidden"
       />
 
-      {/* LEFT: Vertical Category Navigation Sidebar (Collapsible for wider content space) */}
-      <aside className={`bg-white border-r border-[#E5E8EB] flex flex-col shrink-0 h-full overflow-hidden transition-all duration-200 ${
-        isSidebarCollapsed ? 'w-[68px]' : 'w-[260px]'
-      }`}>
-        {/* Category Header with Collapse Toggle */}
-        <div className="p-3 border-b border-[#E5E8EB] flex items-center justify-between bg-[#F8F9FA]/50">
-          {!isSidebarCollapsed ? (
-            <div className="flex items-center gap-2 min-w-0">
-              <Layers className="w-5 h-5 text-[#EA1D2C] shrink-0" />
-              <h2 className="text-[14px] font-black text-[#191F28] tracking-tight truncate">
-                LG 제품 카테고리
-              </h2>
-            </div>
-          ) : (
-            <div className="mx-auto">
-              <Layers className="w-5 h-5 text-[#EA1D2C]" />
-            </div>
+      {/* Page Heading */}
+      <div className="adm-page-heading">
+        <div>
+          <span className="adm-eyebrow">LG CARE SOLUTIONS · CATALOG</span>
+          <h1 className="adm-page-title">LG구독 제품관리</h1>
+          <p className="adm-page-desc">
+            LG 가전구독 카테고리별 노출 순서, 공홈 인증 상태, 5년/6년 약정 결합 할인가를 통합 관리합니다.
+          </p>
+        </div>
+        <div className="adm-page-actions">
+          {onOpenLandingSetting && (
+            <button type="button" onClick={onOpenLandingSetting} className="adm-btn">
+              <Layers className="w-3.5 h-3.5" />
+              랜딩 설정 이동
+            </button>
           )}
           <button
             type="button"
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="p-1.5 rounded-lg hover:bg-[#E5E8EB] text-[#4E5968] hover:text-[#191F28] transition-colors cursor-pointer shrink-0"
-            title={isSidebarCollapsed ? "카테고리 사이드바 펼치기" : "카테고리 사이드바 접기 (화면 넓게 보기)"}
+            onClick={handleRunBatchVerification}
+            disabled={isBatchVerifying}
+            className="adm-btn"
+            title="등록된 모든 제품이 LG 공홈에 존재하는지 일괄 확인합니다."
           >
-            {isSidebarCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+            <RefreshCw className={`w-3.5 h-3.5 ${isBatchVerifying ? 'animate-spin' : ''}`} />
+            공홈 실존 재검증
+          </button>
+          <button
+            type="button"
+            onClick={handleHideUnverified}
+            className="adm-btn"
+            title="공홈에서 상세 페이지를 찾을 수 없는 모델들을 일괄 비노출 처리합니다."
+          >
+            <EyeOff className="w-3.5 h-3.5" />
+            미확인 일괄 숨김
+          </button>
+          <button type="button" onClick={handleDownloadTemplate} className="adm-btn">
+            <Download className="w-3.5 h-3.5" />
+            양식 다운로드
+          </button>
+          <button type="button" onClick={() => handleTriggerUpload('all')} className="adm-btn sage">
+            <Upload className="w-3.5 h-3.5" />
+            전체 엑셀 등록
+          </button>
+          <button type="button" onClick={handleOpenCreateModal} className="adm-btn primary">
+            <Plus className="w-3.5 h-3.5" />
+            개별 제품 등록
           </button>
         </div>
+      </div>
 
-        {/* Default Landing Category Selector Widget (Expanded mode only) */}
-        {!isSidebarCollapsed && (
-          <div className="p-3 border-b border-[#E5E8EB] bg-[#FFF5F6]/80">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] font-black text-[#EA1D2C] flex items-center gap-1">
-                <span>⭐ 랜딩 첫 화면 기본 카테고리</span>
-              </span>
-            </div>
-            <select
-              value={defaultLandingCategoryKey}
-              onChange={(e) => handleSetDefaultLandingCategory(e.target.value)}
-              className="w-full bg-white border border-[#EA1D2C]/40 focus:border-[#EA1D2C] rounded-lg px-2.5 py-1.5 text-[12px] font-bold text-[#191F28] outline-none shadow-2xs cursor-pointer"
-            >
-              <option value="all">✨ 전체 카테고리 (기본값)</option>
-              {categoriesList.filter(c => c.key !== 'all').map(c => (
-                <option key={c.key} value={c.key}>
-                  {c.name} ({categoryCounts[c.key] || 0}개)
-                </option>
-              ))}
-            </select>
-            <p className="text-[10px] text-[#8B95A1] mt-1">
-              * 고객이 랜딩 접속 시 처음에 열릴 카테고리입니다.
-            </p>
+      {/* Summary Metrics */}
+      <div className="adm-metrics-grid">
+        <div className="adm-metric-card">
+          <div className="adm-metric-top">
+            <span className="adm-metric-label">전체 구독 모델</span>
+            <span className="adm-metric-chip">TOTAL</span>
           </div>
-        )}
+          <div className="adm-metric-val">{products.length.toLocaleString()}</div>
+          <div className="adm-metric-sub">등록 카테고리 {Math.max(0, categoriesList.length - 1)}개</div>
+        </div>
+        <div className="adm-metric-card">
+          <div className="adm-metric-top">
+            <span className="adm-metric-label">랜딩 노출중</span>
+            <span className="adm-metric-chip sage">ACTIVE</span>
+          </div>
+          <div className="adm-metric-val accent">{visibleCount.toLocaleString()}</div>
+          <div className="adm-metric-sub">비노출 {Math.max(0, products.length - visibleCount)}개</div>
+        </div>
+        <div className="adm-metric-card">
+          <div className="adm-metric-top">
+            <span className="adm-metric-label">LG 공홈 인증</span>
+            <span className="adm-metric-chip sage">VERIFIED</span>
+          </div>
+          <div className="adm-metric-val">{verificationCounts.verified.toLocaleString()}</div>
+          <div className="adm-metric-sub">선택 카테고리 기준 실존 모델</div>
+        </div>
+        <div className="adm-metric-card">
+          <div className="adm-metric-top">
+            <span className="adm-metric-label">공홈 미확인</span>
+            <span className="adm-metric-chip gold">CHECK</span>
+          </div>
+          <div className="adm-metric-val">{verificationCounts.unverified.toLocaleString()}</div>
+          <div className="adm-metric-sub">링크 수정 또는 비노출 권장</div>
+        </div>
+      </div>
 
-        {/* Category Item List (Draggable Ordering) */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
-          {categoriesList.map((cat, idx) => {
-            const isActive = selectedCategoryKey === cat.key;
-            const count = categoryCounts[cat.key] || 0;
-            const isDraggable = cat.key !== 'all';
-            const isDragging = draggedCategoryIndex === idx;
-            const isLandingDefault = (cat as any).isDefault || (cat.key === 'all' && defaultLandingCategoryKey === 'all');
+      {/* Main 2-Column Layout */}
+      <div
+        className={`grid grid-cols-1 gap-5 items-start ${
+          isSidebarCollapsed ? 'xl:grid-cols-[84px_1fr]' : 'xl:grid-cols-[270px_1fr]'
+        }`}
+      >
+        {/* LEFT: Collapsible Category Panel */}
+        <aside className="adm-panel overflow-hidden">
+          <div className="adm-panel-top" style={{ padding: '14px 16px' }}>
+            {!isSidebarCollapsed ? (
+              <div className="min-w-0">
+                <h2 className="adm-panel-title" style={{ fontSize: 14 }}>LG 제품 카테고리</h2>
+                <p className="adm-panel-sub" style={{ fontSize: 11 }}>드래그하여 랜딩 순서 변경</p>
+              </div>
+            ) : (
+              <div className="mx-auto text-[#295e52]">
+                <Layers className="w-4 h-4" />
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="adm-btn icon-only sm"
+              title={isSidebarCollapsed ? '카테고리 사이드바 펼치기' : '카테고리 사이드바 접기'}
+            >
+              {isSidebarCollapsed ? <PanelLeftOpen className="w-3.5 h-3.5" /> : <PanelLeftClose className="w-3.5 h-3.5" />}
+            </button>
+          </div>
 
-            if (isSidebarCollapsed) {
-              return (
-                <button
-                  key={cat.key}
-                  type="button"
-                  onClick={() => {
-                    setSelectedCategoryKey(cat.key);
-                    setSelectedIds([]);
-                  }}
-                  className={`w-full flex flex-col items-center justify-center p-2 rounded-xl text-center transition-all cursor-pointer relative group/collapsed ${
-                    isActive
-                      ? 'bg-[#EA1D2C] text-white shadow-sm shadow-[#EA1D2C]/30'
-                      : 'text-[#4E5968] hover:bg-[#F2F4F6] hover:text-[#191F28]'
-                  }`}
-                  title={`${cat.name} (${count}개)`}
-                >
-                  <span className="flex items-center justify-center w-5 h-5">
-                    {renderCategoryIcon(cat.icon, cat.name, "w-5 h-5 object-contain rounded")}
-                  </span>
-                  <span className="text-[9px] font-bold mt-0.5 max-w-[50px] truncate">
-                    {cat.name.slice(0, 4)}
-                  </span>
-                  <span className={`text-[8px] font-extrabold px-1 py-0.2 rounded-full absolute -top-1 -right-1 ${
-                    isActive ? 'bg-white text-[#EA1D2C]' : 'bg-[#E5E8EB] text-[#4E5968]'
-                  }`}>
-                    {count}
-                  </span>
-                </button>
-              );
-            }
-
-            return (
-              <div
-                key={cat.key}
-                draggable={isDraggable}
-                onDragStart={(e) => handleCategoryDragStart(e, idx)}
-                onDragOver={handleCategoryDragOver}
-                onDrop={(e) => handleCategoryDrop(e, idx)}
-                className={`flex items-center rounded-xl transition-all group/cat ${
-                  isDragging ? 'opacity-30 bg-gray-200 border-2 border-dashed border-[#EA1D2C]' : ''
-                }`}
+          {!isSidebarCollapsed && (
+            <div className="p-3 border-b border-[#eef1ec] bg-[#fafbf9]">
+              <div className="text-[11px] font-bold text-[#295e52] mb-1.5">
+                랜딩 첫 화면 기본 카테고리
+              </div>
+              <select
+                value={defaultLandingCategoryKey}
+                onChange={(e) => handleSetDefaultLandingCategory(e.target.value)}
+                className="adm-select w-full"
+                style={{ height: 34, fontSize: 12 }}
               >
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedCategoryKey(cat.key);
-                    setSelectedIds([]);
-                  }}
-                  className={`flex-1 flex items-center justify-between px-2.5 py-2 rounded-xl text-[12.5px] font-bold transition-all text-left cursor-pointer ${
-                    isActive
-                      ? 'bg-[#EA1D2C] text-white shadow-sm shadow-[#EA1D2C]/30'
-                      : 'text-[#4E5968] hover:bg-[#F2F4F6] hover:text-[#191F28]'
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5 truncate min-w-0 flex-1">
-                    {isDraggable && (
-                      <span className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 opacity-60 hover:opacity-100 shrink-0">
-                        <GripVertical className="w-3 h-3" />
-                      </span>
-                    )}
-                    <span className="shrink-0 flex items-center justify-center w-4 h-4">
-                      {renderCategoryIcon(cat.icon, cat.name, "w-4 h-4 object-contain rounded")}
+                <option value="all">전체 카테고리 (기본값)</option>
+                {categoriesList.filter((c) => c.key !== 'all').map((c) => (
+                  <option key={c.key} value={c.key}>
+                    {c.name} ({categoryCounts[c.key] || 0}개)
+                  </option>
+                ))}
+              </select>
+              <p className="text-[10.5px] text-[#86918a] mt-1">
+                고객이 랜딩 접속 시 기본으로 열리는 탭입니다.
+              </p>
+            </div>
+          )}
+
+          <div className="p-2 space-y-1 max-h-[620px] overflow-y-auto">
+            {categoriesList.map((cat, idx) => {
+              const isActive = selectedCategoryKey === cat.key;
+              const count = categoryCounts[cat.key] || 0;
+              const isDraggable = cat.key !== 'all';
+              const isDragging = draggedCategoryIndex === idx;
+              const isLandingDefault = (cat as any).isDefault || (cat.key === 'all' && defaultLandingCategoryKey === 'all');
+
+              if (isSidebarCollapsed) {
+                return (
+                  <button
+                    key={cat.key}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategoryKey(cat.key);
+                      setSelectedIds([]);
+                    }}
+                    className={`w-full flex flex-col items-center justify-center p-2 rounded-[10px] text-center transition-all cursor-pointer relative ${
+                      isActive
+                        ? 'bg-[#eaf1e4] text-[#295e52] font-bold'
+                        : 'text-[#526058] hover:bg-[#f6f8f4] hover:text-[#263d36]'
+                    }`}
+                    title={`${cat.name} (${count}개)`}
+                  >
+                    <span className="flex items-center justify-center w-5 h-5">
+                      {renderCategoryIcon(cat.icon, cat.name, 'w-5 h-5 object-contain rounded')}
                     </span>
-                    <span className="truncate">{cat.name}</span>
-                    {isLandingDefault && (
-                      <span className={`text-[8px] px-1 py-0.2 rounded font-black shrink-0 ${
-                        isActive ? 'bg-white text-[#EA1D2C]' : 'bg-amber-100 text-amber-800 border border-amber-300'
-                      }`}>
-                        ⭐ 기본
-                      </span>
-                    )}
-                    {(cat as any).badge && (
-                      <span className={`text-[8.5px] px-1 py-0.2 rounded font-black shrink-0 ${
-                        isActive ? 'bg-white text-[#EA1D2C]' : 'bg-[#FEECEF] text-[#EA1D2C]'
-                      }`}>
-                        {(cat as any).badge}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0 ml-1">
-                    {isDraggable && (
-                      <div className="flex items-center gap-0.5 opacity-0 group-hover/cat:opacity-100 transition-opacity">
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          onClick={(e) => handleOpenCategoryEdit(cat, e)}
-                          className={`p-1 rounded hover:bg-black/10 transition-colors cursor-pointer ${
-                            isActive ? 'text-white' : 'text-[#8B95A1] hover:text-[#191F28]'
-                          }`}
-                          title="카테고리 정보 수정"
-                        >
-                          <Edit className="w-3 h-3" />
-                        </span>
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteCategory(cat);
-                          }}
-                          className={`p-1 rounded hover:bg-red-500/20 transition-colors cursor-pointer ${
-                            isActive ? 'text-white hover:text-red-200' : 'text-[#8B95A1] hover:text-red-600'
-                          }`}
-                          title="카테고리 삭제"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </span>
-                      </div>
-                    )}
+                    <span className="text-[9.5px] font-semibold mt-0.5 max-w-[54px] truncate">
+                      {cat.name.slice(0, 4)}
+                    </span>
                     <span
-                      className={`text-[10.5px] px-1.5 py-0.2 rounded-full font-extrabold ${
-                        isActive ? 'bg-white/25 text-white' : 'bg-[#E5E8EB] text-[#4E5968]'
+                      className={`text-[9px] font-bold px-1.5 rounded-full mt-0.5 ${
+                        isActive ? 'bg-[#295e52] text-white' : 'bg-[#eef1ec] text-[#6b7870]'
                       }`}
                     >
                       {count}
                     </span>
-                  </div>
-                </button>
-              </div>
-            );
-          })}
-        </div>
+                  </button>
+                );
+              }
 
-        {/* Quick Excel Action inside Sidebar */}
-        <div className="p-2.5 border-t border-[#E5E8EB] bg-[#F8F9FA]/80">
-          <button
-            type="button"
-            onClick={() => handleTriggerUpload(selectedCategoryKey)}
-            className="w-full flex items-center justify-center gap-1.5 bg-white hover:bg-gray-50 text-[#191F28] border border-[#D1D6DB] py-2 rounded-xl text-[11.5px] font-bold shadow-2xs transition-colors cursor-pointer"
-            title="엑셀 등록"
-          >
-            <Upload className="w-3.5 h-3.5 text-[#EA1D2C] shrink-0" />
-            {!isSidebarCollapsed && (
-              <span className="truncate">
-                {selectedCategoryKey === 'all'
-                  ? '전체 엑셀 등록'
-                  : `[${categoriesList.find((c) => c.key === selectedCategoryKey)?.name}] 엑셀`}
-              </span>
-            )}
-          </button>
-        </div>
-      </aside>
+              return (
+                <div
+                  key={cat.key}
+                  draggable={isDraggable}
+                  onDragStart={(e) => handleCategoryDragStart(e, idx)}
+                  onDragOver={handleCategoryDragOver}
+                  onDrop={(e) => handleCategoryDrop(e, idx)}
+                  className={`flex items-center rounded-[10px] transition-all group/cat ${
+                    isDragging ? 'opacity-30 bg-[#eef1ec] border border-dashed border-[#295e52]' : ''
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategoryKey(cat.key);
+                      setSelectedIds([]);
+                    }}
+                    className={`flex-1 flex items-center justify-between px-2.5 py-2 rounded-[10px] text-[12.5px] transition-all text-left cursor-pointer ${
+                      isActive
+                        ? 'bg-[#eaf1e4] text-[#295e52] font-bold'
+                        : 'text-[#526058] font-medium hover:bg-[#f6f8f4] hover:text-[#263d36]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 truncate min-w-0 flex-1">
+                      {isDraggable && (
+                        <span className="cursor-grab active:cursor-grabbing text-[#9aa89f] hover:text-[#263d36] shrink-0">
+                          <GripVertical className="w-3 h-3" />
+                        </span>
+                      )}
+                      <span className="shrink-0 flex items-center justify-center w-4 h-4">
+                        {renderCategoryIcon(cat.icon, cat.name, 'w-4 h-4 object-contain rounded')}
+                      </span>
+                      <span className="truncate">{cat.name}</span>
+                      {isLandingDefault && (
+                        <span className="text-[9px] px-1.5 py-0.2 rounded-full font-bold shrink-0 bg-[#faf5ea] text-[#8f6d2c] border border-[#eadbc0]">
+                          기본
+                        </span>
+                      )}
+                      {(cat as any).badge && (
+                        <span className="text-[9px] px-1.5 py-0.2 rounded-full font-bold shrink-0 bg-[#eaf1e4] text-[#295e52]">
+                          {(cat as any).badge}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0 ml-1">
+                      {isDraggable && (
+                        <div className="flex items-center gap-0.5 opacity-0 group-hover/cat:opacity-100 transition-opacity">
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => handleOpenCategoryEdit(cat, e)}
+                            className="p-1 rounded hover:bg-black/5 text-[#86918a] hover:text-[#263d36]"
+                            title="카테고리 정보 수정"
+                          >
+                            <Edit className="w-3 h-3" />
+                          </span>
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteCategory(cat);
+                            }}
+                            className="p-1 rounded hover:bg-[#faecea] text-[#86918a] hover:text-[#b8473a]"
+                            title="카테고리 삭제"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </span>
+                        </div>
+                      )}
+                      <span
+                        className={`text-[10.5px] px-1.5 py-0.2 rounded-full font-bold ${
+                          isActive ? 'bg-[#295e52] text-white' : 'bg-[#eef1ec] text-[#6b7870]'
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
 
-      {/* RIGHT: Main Content & Product List */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden bg-[#F2F4F6]">
-        {/* Top Sticky Action Bar */}
-        <header className="bg-white border-b border-[#E5E8EB] p-4 sm:px-6 shrink-0 space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            {/* Title & Active Category Breadcrumb */}
-            <div>
-              <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#EA1D2C]" />
-                <h1 className="text-[20px] font-black text-[#191F28] tracking-tight">
-                  LG구독제품관리
-                </h1>
-                <span className="text-[13px] font-bold text-[#EA1D2C] bg-[#FEECEF] px-2.5 py-0.5 rounded-md">
-                  {categoriesList.find((c) => c.key === selectedCategoryKey)?.name} ({filteredProducts.length}개)
+          <div className="p-2.5 border-t border-[#eef1ec] bg-[#fafbf9]">
+            <button
+              type="button"
+              onClick={() => handleTriggerUpload(selectedCategoryKey)}
+              className="adm-btn sm w-full justify-center"
+              title="엑셀 등록"
+            >
+              <Upload className="w-3.5 h-3.5 text-[#295e52] shrink-0" />
+              {!isSidebarCollapsed && (
+                <span className="truncate">
+                  {selectedCategoryKey === 'all'
+                    ? '전체 엑셀 등록'
+                    : `[${categoriesList.find((c) => c.key === selectedCategoryKey)?.name}] 엑셀`}
                 </span>
+              )}
+            </button>
+          </div>
+        </aside>
+
+        {/* RIGHT: Product List Panel */}
+        <section className="adm-panel overflow-hidden min-w-0">
+          <div className="adm-panel-top">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="adm-panel-title">
+                  {categoriesList.find((c) => c.key === selectedCategoryKey)?.name || '전체'} 라인업
+                </h2>
+                <span className="adm-pill active">{filteredProducts.length}개</span>
               </div>
-              <p className="text-[12px] text-[#6B7684] mt-0.5">
-                카테고리 좌측 ⠿ 아이콘을 드래그하여 순서 변경 가능 • 변경된 순서는 랜딩 페이지에 실시간 연동됩니다.
+              <p className="adm-panel-sub">
+                좌측 ⠿ 핸들을 드래그하여 노출 순서를 변경하면 고객 랜딩페이지에 즉시 반영됩니다.
               </p>
             </div>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
+          {/* Verification Tabs */}
+          <div className="adm-tabs">
+            <button
+              type="button"
+              onClick={() => setVerificationFilter('all')}
+              className={`adm-tab ${verificationFilter === 'all' ? 'active' : ''}`}
+            >
+              전체 <span className="adm-tab-count">{verificationCounts.total}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setVerificationFilter('verified')}
+              className={`adm-tab ${verificationFilter === 'verified' ? 'active' : ''}`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#295e52]" />
+              공홈 인증 모델 <span className="adm-tab-count">{verificationCounts.verified}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setVerificationFilter('unverified')}
+              className={`adm-tab ${verificationFilter === 'unverified' ? 'active' : ''}`}
+            >
+              <AlertTriangle className="w-3.5 h-3.5 text-[#b99a61]" />
+              공홈 미확인 모델 <span className="adm-tab-count">{verificationCounts.unverified}</span>
+            </button>
+          </div>
+
+          {/* Filter Bar */}
+          <div className="adm-filter-bar">
+            <div className="adm-search-wrap" style={{ flex: 1, maxWidth: 420 }}>
+              <Search className="w-4 h-4" />
+              <input
+                type="text"
+                placeholder="제품명, 모델명(예: WU923, AS356) 검색..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="adm-input w-full"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#86918a] hover:text-[#263d36]"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="adm-segmented ml-auto">
               <button
                 type="button"
-                onClick={handleRunBatchVerification}
-                disabled={isBatchVerifying}
-                className="inline-flex items-center gap-1.5 bg-white hover:bg-[#F2F4F6] text-[#191F28] border border-[#D1D6DB] px-3 py-2 rounded-xl text-[13px] font-bold transition-colors cursor-pointer disabled:opacity-50"
-                title="등록된 모든 제품이 LG 공홈에 여전히 존재하는지 일괄 확인하고 미등록 모델을 자동 숨김 처리합니다."
+                onClick={() => setViewMode('table')}
+                className={viewMode === 'table' ? 'active' : ''}
               >
-                <RefreshCw className={`w-3.5 h-3.5 text-[#3182F6] ${isBatchVerifying ? 'animate-spin' : ''}`} />
-                <span>공홈 실존 일괄 재검증</span>
+                <List className="w-3.5 h-3.5 inline mr-1" />
+                표 보기
               </button>
-
               <button
                 type="button"
-                onClick={handleHideUnverified}
-                className="inline-flex items-center gap-1.5 bg-white hover:bg-amber-50 text-amber-800 border border-amber-200 px-3 py-2 rounded-xl text-[13px] font-bold transition-colors cursor-pointer"
-                title="공홈에서 상세 페이지를 찾을 수 없는 모델들을 한 번에 랜딩에서 숨김(비노출) 처리합니다."
+                onClick={() => setViewMode('card')}
+                className={viewMode === 'card' ? 'active' : ''}
               >
-                <EyeOff className="w-3.5 h-3.5 text-amber-600" />
-                <span>공홈 미확인 일괄 숨김</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleDownloadTemplate}
-                className="inline-flex items-center gap-1.5 bg-white hover:bg-[#F2F4F6] text-[#4E5968] border border-[#D1D6DB] px-3 py-2 rounded-xl text-[13px] font-bold transition-colors cursor-pointer"
-                title="엑셀 업로드용 양식 다운로드"
-              >
-                <Download className="w-3.5 h-3.5 text-[#6B7684]" />
-                <span>양식 다운로드</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleTriggerUpload('all')}
-                className="inline-flex items-center gap-1.5 bg-[#3182F6] hover:bg-[#2272EB] text-white px-3.5 py-2 rounded-xl text-[13px] font-bold shadow-xs transition-colors cursor-pointer"
-              >
-                <Upload className="w-4 h-4" />
-                <span>전체 엑셀 일괄 등록</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleOpenCreateModal}
-                className="inline-flex items-center gap-1.5 bg-[#EA1D2C] hover:bg-[#C81020] text-white px-3.5 py-2 rounded-xl text-[13px] font-bold shadow-xs transition-colors cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>개별 제품 등록</span>
+                <LayoutGrid className="w-3.5 h-3.5 inline mr-1" />
+                카드 보기
               </button>
             </div>
           </div>
 
-          {/* Verification Status Filter Tabs & Search Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-1 bg-[#F2F4F6] p-1 rounded-xl">
-              <button
-                type="button"
-                onClick={() => setVerificationFilter('all')}
-                className={`px-3 py-1 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
-                  verificationFilter === 'all'
-                    ? 'bg-white text-[#191F28] shadow-2xs'
-                    : 'text-[#6B7684] hover:text-[#191F28]'
-                }`}
-              >
-                전체 ({verificationCounts.total})
-              </button>
-              <button
-                type="button"
-                onClick={() => setVerificationFilter('verified')}
-                className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
-                  verificationFilter === 'verified'
-                    ? 'bg-white text-emerald-700 shadow-2xs'
-                    : 'text-[#6B7684] hover:text-emerald-700'
-                }`}
-              >
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>공홈 인증 모델 ({verificationCounts.verified})</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setVerificationFilter('unverified')}
-                className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
-                  verificationFilter === 'unverified'
-                    ? 'bg-white text-amber-700 shadow-2xs'
-                    : 'text-[#6B7684] hover:text-amber-700'
-                }`}
-              >
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-                <span>공홈 미확인 모델 ({verificationCounts.unverified})</span>
-              </button>
-            </div>
-
-            {/* Search Input & Multi-Select Controls */}
-            <div className="flex items-center gap-2 flex-1 max-w-md justify-end">
-              <div className="relative flex-1">
-                <Search className="w-4 h-4 text-[#8B95A1] absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="제품명, 모델명(예: WU923, AS356) 검색..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-[#F8F9FA] border border-[#E5E8EB] rounded-xl pl-9 pr-8 py-1.5 text-[13px] font-medium text-[#191F28] focus:outline-none focus:border-[#EA1D2C] focus:bg-white transition-all"
-                />
-                {searchTerm && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchTerm('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8B95A1] hover:text-[#191F28]"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-
-              {/* View Mode Toggle (Table / Card) */}
-              <div className="flex items-center bg-[#F2F4F6] p-1 rounded-xl shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('table')}
-                  className={`px-2.5 py-1 rounded-lg text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                    viewMode === 'table' ? 'bg-white text-[#191F28] shadow-2xs' : 'text-[#6B7684] hover:text-[#191F28]'
-                  }`}
-                  title="테이블 표 형태로 보기"
-                >
-                  <List className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">표 보기</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('card')}
-                  className={`px-2.5 py-1 rounded-lg text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                    viewMode === 'card' ? 'bg-white text-[#191F28] shadow-2xs' : 'text-[#6B7684] hover:text-[#191F28]'
-                  }`}
-                  title="카드 그리드 형태로 보기 (가로가 좁아도 보기 편함)"
-                >
-                  <LayoutGrid className="w-3.5 h-3.5 text-[#EA1D2C]" />
-                  <span className="hidden sm:inline">카드 보기</span>
-                </button>
-              </div>
-
-              {/* Batch Action Toolbar */}
-              {selectedIds.length > 0 && (
-                <div className="flex items-center gap-2 bg-[#FEECEF] border border-[#FFD2D9] px-3 py-1.5 rounded-xl text-[12px] font-bold text-[#EA1D2C] animate-fade-in shrink-0">
-                  <span>{selectedIds.length}개 선택</span>
-                  <div className="h-3 w-[1px] bg-[#FFB8C2]" />
+          {/* Bulk Action Bar */}
+          {selectedIds.length > 0 && (
+            <div className="px-5 pt-3">
+              <div className="adm-bulk-bar">
+                <span className="text-[13px] font-semibold">
+                  선택됨 <span className="adm-bulk-count">{selectedIds.length}개</span>
+                </span>
+                <div className="ml-auto flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => handleBatchToggleVisibility(true)}
-                    className="hover:underline flex items-center gap-1 cursor-pointer"
+                    className="adm-btn sm"
+                    style={{ background: 'rgba(255,255,255,0.12)', borderColor: 'rgba(255,255,255,0.2)', color: '#fff' }}
                   >
-                    <Eye className="w-3.5 h-3.5" /> 노출
+                    <Eye className="w-3.5 h-3.5" /> 일괄 노출
                   </button>
                   <button
                     type="button"
                     onClick={() => handleBatchToggleVisibility(false)}
-                    className="hover:underline flex items-center gap-1 cursor-pointer"
+                    className="adm-btn sm"
+                    style={{ background: 'rgba(255,255,255,0.12)', borderColor: 'rgba(255,255,255,0.2)', color: '#fff' }}
                   >
-                    <EyeOff className="w-3.5 h-3.5" /> 숨김
+                    <EyeOff className="w-3.5 h-3.5" /> 일괄 숨김
                   </button>
                   <button
                     type="button"
                     onClick={handleBatchDelete}
-                    className="hover:underline flex items-center gap-1 text-red-700 cursor-pointer"
+                    className="adm-btn sm danger"
                   >
-                    <Trash2 className="w-3.5 h-3.5" /> 삭제
+                    <Trash2 className="w-3.5 h-3.5" /> 선택 삭제
                   </button>
                 </div>
-              )}
+              </div>
             </div>
-          </div>
-        </header>
+          )}
 
-        {/* Product Table List Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          {/* Product List Body */}
           {filteredProducts.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-[#E5E8EB] p-12 text-center space-y-4">
-              <div className="w-14 h-14 bg-[#F2F4F6] text-[#8B95A1] rounded-full flex items-center justify-center mx-auto text-2xl">
-                📦
+            <div className="adm-empty py-16">
+              <div className="adm-empty-icon">
+                <Layers className="w-5 h-5" />
               </div>
-              <div>
-                <h3 className="text-[16px] font-bold text-[#191F28]">등록된 LG 구독 제품이 없습니다.</h3>
-                <p className="text-[13px] text-[#8B95A1] mt-1">
-                  우측 상단의 [전체 엑셀 일괄 등록] 버튼을 눌러 엑셀 파일을 업로드하거나 개별 등록해 주세요.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleTriggerUpload('all')}
-                className="inline-flex items-center gap-2 bg-[#EA1D2C] hover:bg-[#C81020] text-white px-4 py-2 rounded-xl text-[13px] font-bold transition-all cursor-pointer"
-              >
+              <p className="font-bold text-[#263d36] text-[15px]">등록된 LG 구독 제품이 없습니다.</p>
+              <p className="text-[12.5px] text-[#86918a] mt-1 mb-4">
+                상단의 [전체 엑셀 등록] 버튼을 눌러 엑셀 파일을 업로드하거나 개별 등록해 주세요.
+              </p>
+              <button type="button" onClick={() => handleTriggerUpload('all')} className="adm-btn primary">
                 <Upload className="w-4 h-4" />
-                <span>엑셀 파일 업로드하기</span>
+                엑셀 파일 업로드하기
               </button>
             </div>
           ) : viewMode === 'card' ? (
-            /* CARD GRID VIEW (Optimized for narrow/laptop screens) */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5">
+            <div className="p-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {paginatedProducts.map((p, idx) => {
                 const globalIdx = (currentPage - 1) * (pageSize >= 9999 ? 0 : pageSize) + idx;
                 const isChecked = selectedIds.includes(p._id);
                 const isDragging = draggedIndex === globalIdx;
                 const capInfo = getProductCapacityInfo(p.model, p.name, p.categoryKey, p.category, p.specifications);
-                const isVer = p.isOfficialVerified !== undefined 
-                  ? p.isOfficialVerified 
-                  : (Boolean(p.image) && Boolean(p.refUrl) && p.refUrl.includes('lge.co.kr') && !p.refUrl.includes('/search/'));
+                const isVer =
+                  p.isOfficialVerified !== undefined
+                    ? p.isOfficialVerified
+                    : Boolean(p.image) && Boolean(p.refUrl) && p.refUrl.includes('lge.co.kr') && !p.refUrl.includes('/search/');
 
                 return (
                   <div
@@ -1789,55 +1791,49 @@ export default function LgProductManagement() {
                     onDragStart={() => handleDragStart(globalIdx)}
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop(globalIdx)}
-                    className={`bg-white rounded-2xl border transition-all p-3.5 flex flex-col justify-between space-y-3 group hover:shadow-md ${
-                      isDragging ? 'opacity-30 bg-gray-100 border-dashed border-[#EA1D2C]' : 'border-[#E5E8EB]'
-                    } ${isChecked ? 'ring-2 ring-[#EA1D2C] bg-[#FFF5F6]/40' : ''}`}
+                    className={`bg-white rounded-[14px] border transition-all p-4 flex flex-col justify-between space-y-3 group hover:border-[#b9c8b4] ${
+                      isDragging ? 'opacity-30 bg-[#f6f8f4] border-dashed border-[#295e52]' : 'border-[#e6eae3]'
+                    } ${isChecked ? 'ring-2 ring-[#295e52] bg-[#f7faf5]' : ''}`}
                   >
-                    {/* Card Header: Drag / Order / Checkbox / Category / Status / Actions */}
-                    <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-[#F2F4F6]">
+                    <div className="flex items-center justify-between gap-1.5 pb-2.5 border-b border-[#eef1ec]">
                       <div className="flex items-center gap-1.5">
-                        <span className="cursor-grab active:cursor-grabbing text-[#B0B8C1] hover:text-[#191F28]">
+                        <span className="cursor-grab active:cursor-grabbing text-[#9aa89f] hover:text-[#263d36]">
                           <MoveVertical className="w-3.5 h-3.5" />
                         </span>
                         <button
                           type="button"
                           onClick={() => toggleSelectOne(p._id)}
-                          className="text-[#8B95A1] hover:text-[#191F28] cursor-pointer"
+                          className="text-[#86918a] hover:text-[#263d36] cursor-pointer"
                         >
                           {isChecked ? (
-                            <CheckSquare className="w-4 h-4 text-[#EA1D2C]" />
+                            <CheckSquare className="w-4 h-4 text-[#295e52]" />
                           ) : (
                             <Square className="w-4 h-4" />
                           )}
                         </button>
-                        <span className="text-[11px] font-mono font-bold text-[#8B95A1] bg-[#F2F4F6] px-1.5 py-0.2 rounded">
+                        <span className="text-[11px] font-mono font-bold text-[#86918a] bg-[#f4f6f2] px-1.5 py-0.2 rounded">
                           #{globalIdx + 1}
                         </span>
-                        <span className="text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-1.5 py-0.2 rounded">
+                        <span className="adm-pill neutral" style={{ fontSize: 10.5, padding: '2px 7px' }}>
                           {p.category}
                         </span>
                       </div>
 
-                      {/* Header Actions */}
                       <div className="flex items-center gap-1">
-                        {/* Visibility Toggle */}
                         <button
                           type="button"
                           onClick={() => updateProduct({ id: p._id, isVisible: !p.isVisible })}
-                          className={`p-1 rounded-lg transition-colors cursor-pointer ${
-                            p.isVisible
-                              ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                              : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                          className={`p-1.5 rounded-[8px] transition-colors cursor-pointer ${
+                            p.isVisible ? 'bg-[#eaf1e4] text-[#295e52]' : 'bg-[#f4f6f2] text-[#9aa89f]'
                           }`}
-                          title={p.isVisible ? '현재 노출 중 (클릭 시 숨김)' : '현재 숨김 (클릭 시 노출)'}
+                          title={p.isVisible ? '노출 중 (클릭 시 숨김)' : '숨김 (클릭 시 노출)'}
                         >
                           {p.isVisible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                         </button>
-
                         <button
                           type="button"
                           onClick={() => handleOpenEditModal(p)}
-                          className="p-1 hover:bg-[#F2F4F6] text-[#4E5968] rounded-lg transition-colors cursor-pointer"
+                          className="adm-btn icon-only sm"
                           title="수정"
                         >
                           <Edit className="w-3.5 h-3.5" />
@@ -1845,7 +1841,7 @@ export default function LgProductManagement() {
                         <button
                           type="button"
                           onClick={() => handleCopyProduct(p)}
-                          className="p-1 hover:bg-[#F2F4F6] text-[#4E5968] rounded-lg transition-colors cursor-pointer"
+                          className="adm-btn icon-only sm"
                           title="복사"
                         >
                           <Copy className="w-3.5 h-3.5" />
@@ -1853,7 +1849,7 @@ export default function LgProductManagement() {
                         <button
                           type="button"
                           onClick={() => handleDeleteProduct(p._id, p.name)}
-                          className="p-1 hover:bg-red-50 text-red-500 rounded-lg transition-colors cursor-pointer"
+                          className="adm-btn icon-only sm danger"
                           title="삭제"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1861,9 +1857,8 @@ export default function LgProductManagement() {
                       </div>
                     </div>
 
-                    {/* Card Body: Image + Title + Model + Capacity */}
                     <div className="flex gap-3 items-start">
-                      <div className="w-16 h-16 rounded-xl bg-[#F8F9FA] border border-[#E5E8EB] overflow-hidden flex items-center justify-center shrink-0 p-1">
+                      <div className="w-16 h-16 rounded-[10px] bg-[#f9faf7] border border-[#e6eae3] overflow-hidden flex items-center justify-center shrink-0 p-1">
                         {p.image ? (
                           <img
                             src={getOptimizedImageUrl(p.image)}
@@ -1877,36 +1872,34 @@ export default function LgProductManagement() {
                             }}
                           />
                         ) : (
-                          <span className="text-[10px] text-[#8B95A1]">No Img</span>
+                          <span className="text-[10px] text-[#86918a]">No Img</span>
                         )}
                       </div>
 
                       <div className="flex-1 min-w-0 space-y-1">
-                        <p className="text-[13px] font-black text-[#191F28] line-clamp-2 leading-snug">
+                        <p className="text-[13px] font-bold text-[#263d36] line-clamp-2 leading-snug">
                           {p.name}
                         </p>
-                        
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="bg-[#E5E8EB] text-[#333D4B] px-1.5 py-0.2 rounded font-mono text-[11px] font-bold">
+                          <span className="bg-[#f4f6f2] text-[#263d36] px-1.5 py-0.2 rounded font-mono text-[11px] font-semibold">
                             {p.model}
                           </span>
                           {capInfo && (
-                            <span className="inline-flex items-center bg-[#E8F3FF] border border-[#BBDDFF] text-[#1B64DA] text-[10px] font-black px-1.5 py-0.2 rounded shrink-0">
+                            <span className="adm-pill info" style={{ fontSize: 10, padding: '1px 6px' }}>
                               {capInfo.label}
                             </span>
                           )}
                           {isVer ? (
-                            <span className="inline-flex items-center gap-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-extrabold px-1 py-0.2 rounded">
-                              <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" /> 공홈인증
+                            <span className="adm-pill active" style={{ fontSize: 10, padding: '1px 6px' }}>
+                              공홈인증
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-0.5 bg-amber-50 text-amber-700 text-[10px] font-extrabold px-1 py-0.2 rounded">
-                              <AlertTriangle className="w-2.5 h-2.5 text-amber-500" /> 미확인
+                            <span className="adm-pill warn" style={{ fontSize: 10, padding: '1px 6px' }}>
+                              미확인
                             </span>
                           )}
                         </div>
 
-                        {/* Official Link & Edit */}
                         <div className="flex items-center gap-2 pt-0.5 text-[11px]">
                           {(() => {
                             const rels = p.relatedUrls || [];
@@ -1920,12 +1913,9 @@ export default function LgProductManagement() {
                                 <button
                                   type="button"
                                   onClick={() => setChoiceModalProduct(p)}
-                                  className="inline-flex items-center gap-0.5 text-[#3182F6] hover:text-[#1B64DA] font-bold hover:underline cursor-pointer"
+                                  className="inline-flex items-center gap-0.5 text-[#295e52] font-bold hover:underline cursor-pointer"
                                 >
-                                  <span>공홈보기</span>
-                                  <span className="bg-[#E8F3FF] text-[#1B64DA] text-[9.5px] px-1 py-0.2 rounded font-black">
-                                    {rels.length}개
-                                  </span>
+                                  <span>공홈보기 ({rels.length})</span>
                                   <ArrowUpRight className="w-3 h-3" />
                                 </button>
                               );
@@ -1936,8 +1926,7 @@ export default function LgProductManagement() {
                                 href={targetUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-0.5 text-[#3182F6] hover:text-[#1B64DA] font-bold hover:underline cursor-pointer"
-                                title="LG 공홈에서 구독 제품 및 요금 확인"
+                                className="inline-flex items-center gap-0.5 text-[#295e52] font-bold hover:underline cursor-pointer"
                               >
                                 <span>공홈보기</span>
                                 <ArrowUpRight className="w-3 h-3" />
@@ -1956,7 +1945,7 @@ export default function LgProductManagement() {
                               });
                               setCustomUrlInput(p.refUrl || '');
                             }}
-                            className="text-[#6B7684] hover:text-[#3182F6] underline cursor-pointer"
+                            className="text-[#6b7870] hover:text-[#295e52] underline cursor-pointer"
                           >
                             링크수정
                           </button>
@@ -1964,43 +1953,39 @@ export default function LgProductManagement() {
                       </div>
                     </div>
 
-                    {/* Color & Care Options Meta */}
-                    <div className="flex items-center justify-between gap-2 text-[11px] bg-[#F8F9FA] p-2 rounded-xl border border-[#E5E8EB]">
+                    <div className="flex items-center justify-between gap-2 text-[11px] bg-[#f9faf7] p-2 rounded-[8px] border border-[#eef1ec]">
                       <div className="flex items-center gap-1.5 truncate">
                         <span
                           className="w-2.5 h-2.5 rounded-full border border-black/20 shrink-0"
                           style={{ backgroundColor: getLgColorHex(p.color || '') }}
                         />
-                        <span className="font-bold text-[#191F28] truncate">{p.color || '기본'}</span>
+                        <span className="font-semibold text-[#263d36] truncate">{p.color || '기본'}</span>
                       </div>
-                      <div className="text-[#6B7684] font-medium truncate">
-                        {p.careOptions?.[0]?.cycle || '12개월'} • {p.careOptions?.[0]?.type || '방문케어'}
+                      <div className="text-[#6b7870] truncate">
+                        {p.careOptions?.[0]?.cycle || '12개월'} · {p.careOptions?.[0]?.type || '방문케어'}
                       </div>
                     </div>
 
-                    {/* Card Footer: 5 Year / 6 Year Pricing Matrix */}
-                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[#F2F4F6]">
-                      {/* 5 Year */}
-                      <div className="bg-red-50/40 p-2 rounded-xl border border-red-100">
-                        <div className="flex items-center justify-between text-[10px] text-[#8B95A1] mb-0.5">
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <div className="bg-[#f9faf7] p-2.5 rounded-[10px] border border-[#e6eae3]">
+                        <div className="flex items-center justify-between text-[10px] text-[#86918a] mb-0.5">
                           <span>5년 약정</span>
-                          <span className="text-[#EA1D2C] font-black">{p.careOptions?.[0]?.p5DiscountRate || p.discountRate5Year || 10}%↓</span>
+                          <span className="text-[#295e52] font-bold">{p.careOptions?.[0]?.p5DiscountRate || p.discountRate5Year || 10}%↓</span>
                         </div>
-                        <div className="text-[13px] font-black text-[#191F28]">
+                        <div className="text-[13px] font-extrabold text-[#263d36]">
                           {(p.careOptions?.[0]?.p5Discount || p.discountPrice5Year || 0).toLocaleString()}
-                          <span className="text-[10px] font-normal text-[#6B7684]">원/월</span>
+                          <span className="text-[10px] font-normal text-[#6b7870]">원/월</span>
                         </div>
                       </div>
 
-                      {/* 6 Year */}
-                      <div className="bg-red-50/70 p-2 rounded-xl border border-red-200">
-                        <div className="flex items-center justify-between text-[10px] text-[#8B95A1] mb-0.5">
+                      <div className="bg-[#eaf1e4]/60 p-2.5 rounded-[10px] border border-[#d4e2cb]">
+                        <div className="flex items-center justify-between text-[10px] text-[#526058] mb-0.5">
                           <span>6년 약정</span>
-                          <span className="text-[#EA1D2C] font-black">{p.careOptions?.[0]?.p6DiscountRate || p.discountRate6Year || 10}%↓</span>
+                          <span className="text-[#295e52] font-bold">{p.careOptions?.[0]?.p6DiscountRate || p.discountRate6Year || 10}%↓</span>
                         </div>
-                        <div className="text-[13px] font-black text-[#EA1D2C]">
+                        <div className="text-[13px] font-extrabold text-[#295e52]">
                           {(p.careOptions?.[0]?.p6Discount || p.discountPrice6Year || 0).toLocaleString()}
-                          <span className="text-[10px] font-normal text-[#6B7684]">원/월</span>
+                          <span className="text-[10px] font-normal text-[#526058]">원/월</span>
                         </div>
                       </div>
                     </div>
@@ -2009,487 +1994,434 @@ export default function LgProductManagement() {
               })}
             </div>
           ) : (
-            /* TABLE VIEW (Full details with horizontal scroll) */
-            <div className="bg-white rounded-2xl border border-[#E5E8EB] shadow-xs overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-[13px] min-w-[1000px]">
-                  <thead>
-                    <tr className="bg-[#F8F9FA] border-b border-[#E5E8EB] text-[#4E5968] font-bold whitespace-nowrap">
-                      <th className="py-2.5 px-2.5 w-10 text-center">
-                        <span className="text-[11px] text-[#8B95A1]">순서</span>
-                      </th>
-                      <th className="py-2.5 px-2.5 w-10 text-center">
-                        <button
-                          type="button"
-                          onClick={toggleSelectAll}
-                          className="text-[#8B95A1] hover:text-[#191F28] cursor-pointer"
-                        >
-                          {selectedIds.length === filteredProducts.length && filteredProducts.length > 0 ? (
-                            <CheckSquare className="w-4 h-4 text-[#EA1D2C]" />
-                          ) : (
-                            <Square className="w-4 h-4" />
-                          )}
-                        </button>
-                      </th>
-                      <th className="py-2.5 px-2.5 w-14 text-center">이미지</th>
-                      <th className="py-2.5 px-2.5 w-20">카테고리</th>
-                      <th className="py-2.5 px-2.5 min-w-[200px]">제품명 / 모델명 / 공홈 링크</th>
-                      <th className="py-2.5 px-2.5 min-w-[120px]">색상</th>
-                      <th className="py-2.5 px-2.5 w-28">케어서비스</th>
-                      <th className="py-2.5 px-2.5 min-w-[120px] bg-red-50/40">5년 구독료 (할인율)</th>
-                      <th className="py-2.5 px-2.5 min-w-[120px] bg-red-50/60">6년 구독료 (할인율)</th>
-                      <th className="py-2.5 px-2.5 w-14 text-center">노출</th>
-                      <th className="py-2.5 px-2.5 w-24 text-center">관리</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E5E8EB]">
-                    {paginatedProducts.map((p, idx) => {
-                      const globalIdx = (currentPage - 1) * (pageSize >= 9999 ? 0 : pageSize) + idx;
-                      const isChecked = selectedIds.includes(p._id);
-                      const isDragging = draggedIndex === globalIdx;
+            <div className="adm-table-wrap">
+              <table className="adm-table min-w-[1020px]">
+                <thead>
+                  <tr>
+                    <th className="w-12 text-center">순서</th>
+                    <th className="w-10 text-center">
+                      <button
+                        type="button"
+                        onClick={toggleSelectAll}
+                        className="text-[#86918a] hover:text-[#263d36] cursor-pointer"
+                      >
+                        {selectedIds.length === filteredProducts.length && filteredProducts.length > 0 ? (
+                          <CheckSquare className="w-4 h-4 text-[#295e52]" />
+                        ) : (
+                          <Square className="w-4 h-4" />
+                        )}
+                      </button>
+                    </th>
+                    <th className="w-14 text-center">이미지</th>
+                    <th className="w-24">카테고리</th>
+                    <th className="min-w-[230px]">제품명 / 모델명 / 공홈 링크</th>
+                    <th className="min-w-[120px]">색상</th>
+                    <th className="w-32">케어서비스</th>
+                    <th className="min-w-[130px]">5년 구독료</th>
+                    <th className="min-w-[130px]">6년 구독료</th>
+                    <th className="w-16 text-center">노출</th>
+                    <th className="w-24 text-center">관리</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedProducts.map((p, idx) => {
+                    const globalIdx = (currentPage - 1) * (pageSize >= 9999 ? 0 : pageSize) + idx;
+                    const isChecked = selectedIds.includes(p._id);
+                    const isDragging = draggedIndex === globalIdx;
 
-                      return (
-                        <tr
-                          key={p._id}
-                          draggable
-                          onDragStart={() => handleDragStart(globalIdx)}
-                          onDragOver={handleDragOver}
-                          onDrop={() => handleDrop(globalIdx)}
-                          className={`hover:bg-[#F8F9FA] transition-colors group ${
-                            isDragging ? 'opacity-30 bg-gray-100' : ''
-                          } ${isChecked ? 'bg-[#FEECEF]/30' : ''}`}
-                        >
-                          {/* Drag Handle */}
-                          <td className="py-2.5 px-2 text-center text-[#8B95A1] cursor-grab active:cursor-grabbing">
-                            <div className="flex items-center justify-center gap-1">
-                              <MoveVertical className="w-3.5 h-3.5 text-[#B0B8C1] group-hover:text-[#191F28]" />
-                              <span className="text-[11px] font-mono">{globalIdx + 1}</span>
+                    return (
+                      <tr
+                        key={p._id}
+                        draggable
+                        onDragStart={() => handleDragStart(globalIdx)}
+                        onDragOver={handleDragOver}
+                        onDrop={() => handleDrop(globalIdx)}
+                        className={`${isDragging ? 'opacity-30 bg-[#f6f8f4]' : ''} ${isChecked ? 'selected' : ''}`}
+                      >
+                        <td className="text-center text-[#86918a] cursor-grab active:cursor-grabbing">
+                          <div className="flex items-center justify-center gap-1">
+                            <MoveVertical className="w-3.5 h-3.5 text-[#9aa89f]" />
+                            <span className="text-[11px] font-mono">{globalIdx + 1}</span>
+                          </div>
+                        </td>
+
+                        <td className="text-center">
+                          <button
+                            type="button"
+                            onClick={() => toggleSelectOne(p._id)}
+                            className="text-[#86918a] hover:text-[#263d36] cursor-pointer"
+                          >
+                            {isChecked ? (
+                              <CheckSquare className="w-4 h-4 text-[#295e52]" />
+                            ) : (
+                              <Square className="w-4 h-4" />
+                            )}
+                          </button>
+                        </td>
+
+                        <td className="text-center">
+                          <div className="w-11 h-11 rounded-[8px] bg-[#f9faf7] border border-[#e6eae3] overflow-hidden flex items-center justify-center mx-auto">
+                            {p.image ? (
+                              <img
+                                src={getOptimizedImageUrl(p.image)}
+                                alt={p.name}
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                className="w-full h-full object-contain p-0.5"
+                                onError={(e) => {
+                                  const target = e.target as HTMLElement;
+                                  target.style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <span className="text-[10px] text-[#86918a]">No Img</span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="whitespace-nowrap">
+                          <span className="adm-pill neutral">{p.category}</span>
+                        </td>
+
+                        <td>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <p className="font-bold text-[#263d36] line-clamp-1 leading-snug">{p.name}</p>
+                              {(() => {
+                                const capInfo = getProductCapacityInfo(p.model, p.name, p.categoryKey, p.category, p.specifications);
+                                return capInfo ? (
+                                  <span className="adm-pill info" style={{ fontSize: 10, padding: '1px 6px' }}>
+                                    {capInfo.label}
+                                  </span>
+                                ) : null;
+                              })()}
+                              {(() => {
+                                const isVer =
+                                  p.isOfficialVerified !== undefined
+                                    ? p.isOfficialVerified
+                                    : Boolean(p.image) && Boolean(p.refUrl) && p.refUrl.includes('lge.co.kr') && !p.refUrl.includes('/search/');
+                                return isVer ? (
+                                  <span className="adm-pill active" style={{ fontSize: 10, padding: '1px 7px' }}>
+                                    공홈 인증
+                                  </span>
+                                ) : (
+                                  <span className="adm-pill warn" style={{ fontSize: 10, padding: '1px 7px' }} title="LG 공홈에서 제품 페이지를 찾을 수 없음">
+                                    공홈 미확인
+                                  </span>
+                                );
+                              })()}
                             </div>
-                          </td>
+                            <div className="flex items-center gap-2 text-[11.5px] font-mono text-[#6b7870] flex-wrap">
+                              <span className="bg-[#f4f6f2] text-[#263d36] px-1.5 py-0.2 rounded font-semibold">
+                                {p.model}
+                              </span>
+                              {(() => {
+                                const rels = p.relatedUrls || [];
+                                const initialUrl = rels.length === 1 && rels[0].url ? rels[0].url : p.refUrl;
+                                const imgMatch = (p.image || '').match(/md(\d{6,10})/i);
+                                const modelIdHint = imgMatch ? `MD${imgMatch[1]}` : (p as any)?.modelId;
+                                const targetUrl = formatSubscriptionRefUrl(initialUrl, p.model, p.categoryKey || p.category, modelIdHint);
 
-                          {/* Checkbox */}
-                          <td className="py-2.5 px-2 text-center">
-                            <button
-                              type="button"
-                              onClick={() => toggleSelectOne(p._id)}
-                              className="text-[#8B95A1] hover:text-[#191F28] cursor-pointer"
-                            >
-                              {isChecked ? (
-                                <CheckSquare className="w-4 h-4 text-[#EA1D2C]" />
-                              ) : (
-                                <Square className="w-4 h-4" />
-                              )}
-                            </button>
-                          </td>
-
-                          {/* Thumbnail */}
-                          <td className="py-2 px-2.5 text-center">
-                            <div className="w-11 h-11 rounded-lg bg-[#F2F4F6] border border-[#E5E8EB] overflow-hidden flex items-center justify-center mx-auto">
-                              {p.image ? (
-                                <img
-                                  src={getOptimizedImageUrl(p.image)}
-                                  alt={p.name}
-                                  referrerPolicy="no-referrer"
-                                  loading="lazy"
-                                  className="w-full h-full object-contain p-0.5"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLElement;
-                                    target.style.display = 'none';
-                                  }}
-                                />
-                              ) : (
-                                <span className="text-[10px] text-[#8B95A1]">No Img</span>
-                              )}
-                            </div>
-                          </td>
-
-                          {/* Category */}
-                          <td className="py-2.5 px-2.5 font-bold text-[#4E5968] whitespace-nowrap">
-                            <span className="inline-block bg-[#F2F4F6] text-[#4E5968] px-2 py-0.5 rounded text-[11.5px]">
-                              {p.category}
-                            </span>
-                          </td>
-
-                          {/* Product Name / Model / LG Official Link */}
-                          <td className="py-2.5 px-2.5">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <p className="font-extrabold text-[#191F28] line-clamp-1 leading-snug">
-                                  {p.name}
-                                </p>
-                                {(() => {
-                                  const capInfo = getProductCapacityInfo(p.model, p.name, p.categoryKey, p.category, p.specifications);
-                                  return capInfo ? (
-                                    <span className="inline-flex items-center bg-[#E8F3FF] border border-[#BBDDFF] text-[#1B64DA] text-[10.5px] font-black px-1.5 py-0.2 rounded shrink-0">
-                                      {capInfo.label}
-                                    </span>
-                                  ) : null;
-                                })()}
-                                {(() => {
-                                  const isVer = p.isOfficialVerified !== undefined 
-                                    ? p.isOfficialVerified 
-                                    : (Boolean(p.image) && Boolean(p.refUrl) && p.refUrl.includes('lge.co.kr') && !p.refUrl.includes('/search/'));
-                                  return isVer ? (
-                                    <span className="inline-flex items-center gap-0.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-extrabold px-1.5 py-0.2 rounded shrink-0">
-                                      <CheckCircle2 className="w-3 h-3 text-emerald-600" /> 공홈 인증
-                                    </span>
-                                  ) : (
-                                    <span className="inline-flex items-center gap-0.5 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-extrabold px-1.5 py-0.2 rounded shrink-0" title="LG 공홈에서 제품 페이지를 찾을 수 없음 (단종 또는 미등록)">
-                                      <AlertTriangle className="w-3 h-3 text-amber-500" /> 공홈 미확인
-                                    </span>
-                                  );
-                                })()}
-                              </div>
-                              <div className="flex items-center gap-2 text-[11.5px] font-mono text-[#6B7684] flex-wrap">
-                                <span className="bg-[#E5E8EB] text-[#333D4B] px-1.5 py-0.2 rounded font-bold">
-                                  {p.model}
-                                </span>
-                                {(() => {
-                                  const rels = p.relatedUrls || [];
-                                  const initialUrl = rels.length === 1 && rels[0].url ? rels[0].url : p.refUrl;
-                                  const imgMatch = (p.image || '').match(/md(\d{6,10})/i);
-                                  const modelIdHint = imgMatch ? `MD${imgMatch[1]}` : (p as any)?.modelId;
-                                  const targetUrl = formatSubscriptionRefUrl(initialUrl, p.model, p.categoryKey || p.category, modelIdHint);
-
-                                  if (rels.length > 1) {
-                                    return (
-                                      <button
-                                        type="button"
-                                        onClick={() => setChoiceModalProduct(p)}
-                                        className="inline-flex items-center gap-0.5 text-[#3182F6] hover:text-[#1B64DA] font-bold hover:underline cursor-pointer"
-                                      >
-                                        <span>공홈 바로가기</span>
-                                        <span className="bg-[#E8F3FF] text-[#1B64DA] text-[9.5px] px-1 py-0.2 rounded font-black">
-                                          {rels.length}개 옵션
-                                        </span>
-                                        <ArrowUpRight className="w-3 h-3" />
-                                      </button>
-                                    );
-                                  }
-
+                                if (rels.length > 1) {
                                   return (
-                                    <a
-                                      href={targetUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-0.5 text-[#3182F6] hover:text-[#1B64DA] font-bold hover:underline cursor-pointer"
-                                      title="LG 공홈에서 구독 제품 및 요금 확인"
+                                    <button
+                                      type="button"
+                                      onClick={() => setChoiceModalProduct(p)}
+                                      className="inline-flex items-center gap-0.5 text-[#295e52] font-bold hover:underline cursor-pointer"
                                     >
-                                      <span>공홈 바로가기</span>
+                                      <span>공홈 바로가기 ({rels.length})</span>
                                       <ArrowUpRight className="w-3 h-3" />
-                                    </a>
+                                    </button>
                                   );
-                                })()}
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setLinkEditItem({
-                                      id: p._id,
-                                      model: p.model,
-                                      name: p.name,
-                                      refUrl: p.refUrl || '',
-                                    });
-                                    setCustomUrlInput(p.refUrl || '');
-                                  }}
-                                  className="inline-flex items-center gap-1 text-[10.5px] text-[#4E5968] hover:text-[#3182F6] bg-[#F2F4F6] hover:bg-[#E8F3FF] px-1.5 py-0.2 rounded font-bold cursor-pointer transition-colors border border-[#D1D6DB]"
-                                  title="공홈 링크 직접 수정하기 (원하는 URL로 변경)"
-                                >
-                                  <Edit className="w-2.5 h-2.5 text-[#6B7684]" />
-                                  <span>링크 수정</span>
-                                </button>
-                              </div>
-                            </div>
-                          </td>
+                                }
 
-                          {/* Colors */}
-                          <td className="py-2.5 px-2.5">
+                                return (
+                                  <a
+                                    href={targetUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-0.5 text-[#295e52] font-bold hover:underline cursor-pointer"
+                                  >
+                                    <span>공홈 바로가기</span>
+                                    <ArrowUpRight className="w-3 h-3" />
+                                  </a>
+                                );
+                              })()}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setLinkEditItem({
+                                    id: p._id,
+                                    model: p.model,
+                                    name: p.name,
+                                    refUrl: p.refUrl || '',
+                                  });
+                                  setCustomUrlInput(p.refUrl || '');
+                                }}
+                                className="adm-btn xs"
+                                style={{ height: 22, padding: '0 7px', fontSize: 10.5 }}
+                              >
+                                <Edit className="w-2.5 h-2.5" />
+                                링크 수정
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td>
+                          <div className="space-y-1">
+                            <div className="inline-flex items-center gap-1.5 bg-white border border-[#dce2d8] px-2 py-0.5 rounded-[6px]">
+                              <span
+                                className="w-2.5 h-2.5 rounded-full border border-black/20 shrink-0"
+                                style={{ backgroundColor: getLgColorHex(p.color || '') }}
+                              />
+                              <span className="text-[11.5px] font-semibold text-[#263d36]">
+                                {p.color || '기본'}
+                              </span>
+                            </div>
+
+                            {p.colors && p.colors.length > 1 && (
+                              <div className="flex flex-wrap gap-1 items-center max-w-[160px]">
+                                {p.colors.map((c, i) => (
+                                  <span
+                                    key={i}
+                                    className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9.5px] font-medium border ${
+                                      c.name === p.color
+                                        ? 'bg-[#eaf1e4] text-[#295e52] border-[#cfe0cb] font-bold'
+                                        : 'bg-[#f9faf7] text-[#6b7870] border-[#eef1ec]'
+                                    }`}
+                                  >
+                                    <span
+                                      className="w-2 h-2 rounded-full border border-black/10 shrink-0"
+                                      style={{ backgroundColor: c.code || getLgColorHex(c.name) }}
+                                    />
+                                    <span className="truncate max-w-[50px]">{c.name}</span>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="text-[11.5px]">
+                          {p.careOptions && p.careOptions.length > 0 ? (
                             <div className="space-y-1">
-                              {/* Exact Model Color Highlight */}
-                              <div className="inline-flex items-center gap-1.5 bg-white border-2 border-red-500 shadow-2xs px-2 py-0.5 rounded-md">
-                                <span
-                                  className="w-2.5 h-2.5 rounded-full border border-black/20 shrink-0 shadow-inner"
-                                  style={{ backgroundColor: getLgColorHex(p.color || '') }}
-                                />
-                                <span className="text-[11.5px] font-black text-[#191F28]">
-                                  {p.color || '기본'}
+                              {p.careOptions.map((opt, i) => (
+                                <div
+                                  key={i}
+                                  className="flex items-center justify-between gap-1 bg-[#f9faf7] border border-[#e6eae3] px-2 py-0.5 rounded text-[10.5px]"
+                                >
+                                  <span className="font-bold text-[#263d36]">{opt.cycle}</span>
+                                  <span className="text-[9.5px] text-[#6b7870]">{opt.type}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="space-y-0.5">
+                              <p className="font-semibold text-[#263d36]">
+                                {p.careCycles?.join(', ') || '12개월'}
+                              </p>
+                              <p className="text-[10.5px] text-[#6b7870] truncate max-w-[110px]">
+                                {p.careTypes?.join(', ') || '전문가 방문'}
+                              </p>
+                            </div>
+                          )}
+                        </td>
+
+                        <td>
+                          {p.careOptions && p.careOptions.length > 0 ? (
+                            <div className="space-y-1">
+                              {p.careOptions.map((opt, i) => (
+                                <div key={i} className="text-[11.5px] leading-tight">
+                                  <div className="flex items-center justify-between text-[9.5px] text-[#86918a]">
+                                    <span>{opt.cycle}</span>
+                                    <span className="line-through">{opt.p5Base?.toLocaleString()}원</span>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-bold text-[#263d36]">
+                                      {opt.p5Discount?.toLocaleString()}원
+                                    </span>
+                                    <span className="text-[9px] font-bold text-[#295e52] bg-[#eaf1e4] px-1 rounded">
+                                      {opt.p5DiscountRate}%↓
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10.5px] line-through text-[#86918a]">
+                                  {p.rentalPrice5Year?.toLocaleString()}원
+                                </span>
+                                <span className="text-[9.5px] font-bold text-[#295e52] bg-[#eaf1e4] px-1 rounded">
+                                  {p.discountRate5Year || 10}%
                                 </span>
                               </div>
-
-                              {/* Other Colors Lineup */}
-                              {p.colors && p.colors.length > 1 && (
-                                <div className="flex flex-wrap gap-1 items-center max-w-[160px]">
-                                  {p.colors.map((c, i) => (
-                                    <span
-                                      key={i}
-                                      className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9.5px] font-medium ${
-                                        c.name === p.color
-                                          ? 'bg-red-50 text-[#EA1D2C] border border-red-200 font-bold'
-                                          : 'bg-[#F2F4F6] text-[#6B7684] border border-[#E5E8EB]'
-                                      }`}
-                                    >
-                                      <span
-                                        className="w-2 h-2 rounded-full border border-black/10 shrink-0"
-                                        style={{ backgroundColor: c.code || getLgColorHex(c.name) }}
-                                      />
-                                      <span className="truncate max-w-[50px]">{c.name}</span>
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
+                              <p className="text-[13px] font-bold text-[#263d36]">
+                                {p.discountPrice5Year?.toLocaleString()}
+                                <span className="text-[10.5px] font-normal text-[#6b7870]">원/월</span>
+                              </p>
                             </div>
-                          </td>
+                          )}
+                        </td>
 
-                          {/* Care Service & Cycles */}
-                          <td className="py-2.5 px-2.5 text-[11.5px]">
-                            {p.careOptions && p.careOptions.length > 0 ? (
-                              <div className="space-y-1">
-                                {p.careOptions.map((opt, i) => (
-                                  <div
-                                    key={i}
-                                    className="flex items-center justify-between gap-1 bg-[#F8F9FA] border border-[#E5E8EB] px-1.5 py-0.5 rounded text-[10.5px]"
-                                  >
-                                    <span className="font-extrabold text-[#191F28]">{opt.cycle}</span>
-                                    <span className="text-[9.5px] text-[#6B7684]">{opt.type}</span>
+                        <td>
+                          {p.careOptions && p.careOptions.length > 0 ? (
+                            <div className="space-y-1">
+                              {p.careOptions.map((opt, i) => (
+                                <div key={i} className="text-[11.5px] leading-tight">
+                                  <div className="flex items-center justify-between text-[9.5px] text-[#86918a]">
+                                    <span>{opt.cycle}</span>
+                                    <span className="line-through">{opt.p6Base?.toLocaleString()}원</span>
                                   </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="space-y-0.5">
-                                <p className="font-bold text-[#191F28]">
-                                  {p.careCycles?.join(', ') || '12개월'}
-                                </p>
-                                <p className="text-[10.5px] text-[#6B7684] truncate max-w-[110px]">
-                                  {p.careTypes?.join(', ') || '전문가 방문'}
-                                </p>
-                              </div>
-                            )}
-                          </td>
-
-                          {/* 5 Year Price & Discount Rate */}
-                          <td className="py-2.5 px-2.5 bg-red-50/20">
-                            {p.careOptions && p.careOptions.length > 0 ? (
-                              <div className="space-y-1">
-                                {p.careOptions.map((opt, i) => (
-                                  <div key={i} className="text-[11.5px] leading-tight">
-                                    <div className="flex items-center justify-between text-[9.5px] text-[#8B95A1]">
-                                      <span>{opt.cycle}</span>
-                                      <span className="line-through">{opt.p5Base?.toLocaleString()}원</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                      <span className="font-black text-[#191F28]">
-                                        {opt.p5Discount?.toLocaleString()}원
-                                      </span>
-                                      <span className="text-[8.5px] font-black text-[#EA1D2C] bg-[#FEECEF] px-1 rounded">
-                                        {opt.p5DiscountRate}%↓
-                                      </span>
-                                    </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-extrabold text-[#295e52]">
+                                      {opt.p6Discount?.toLocaleString()}원
+                                    </span>
+                                    <span className="text-[9px] font-bold text-[#295e52] bg-[#eaf1e4] px-1 rounded">
+                                      {opt.p6DiscountRate}%↓
+                                    </span>
                                   </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="space-y-0.5">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-[10.5px] line-through text-[#8B95A1]">
-                                    {p.rentalPrice5Year?.toLocaleString()}원
-                                  </span>
-                                  <span className="text-[9.5px] font-black text-[#EA1D2C] bg-[#FEECEF] px-1 rounded">
-                                    {p.discountRate5Year || 10}%
-                                  </span>
                                 </div>
-                                <p className="text-[13px] font-black text-[#191F28]">
-                                  {p.discountPrice5Year?.toLocaleString()}
-                                  <span className="text-[10.5px] font-normal text-[#6B7684]">원/월</span>
-                                </p>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10.5px] line-through text-[#86918a]">
+                                  {p.rentalPrice6Year?.toLocaleString()}원
+                                </span>
+                                <span className="text-[9.5px] font-bold text-[#295e52] bg-[#eaf1e4] px-1 rounded">
+                                  {p.discountRate6Year || 10}%
+                                </span>
                               </div>
-                            )}
-                          </td>
+                              <p className="text-[13px] font-extrabold text-[#295e52]">
+                                {p.discountPrice6Year?.toLocaleString()}
+                                <span className="text-[10.5px] font-normal text-[#6b7870]">원/월</span>
+                              </p>
+                            </div>
+                          )}
+                        </td>
 
-                          {/* 6 Year Price & Discount Rate */}
-                          <td className="py-2.5 px-2.5 bg-red-50/40">
-                            {p.careOptions && p.careOptions.length > 0 ? (
-                              <div className="space-y-1">
-                                {p.careOptions.map((opt, i) => (
-                                  <div key={i} className="text-[11.5px] leading-tight">
-                                    <div className="flex items-center justify-between text-[9.5px] text-[#8B95A1]">
-                                      <span>{opt.cycle}</span>
-                                      <span className="line-through">{opt.p6Base?.toLocaleString()}원</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                      <span className="font-black text-[#EA1D2C]">
-                                        {opt.p6Discount?.toLocaleString()}원
-                                      </span>
-                                      <span className="text-[8.5px] font-black text-[#EA1D2C] bg-[#FEECEF] px-1 rounded">
-                                        {opt.p6DiscountRate}%↓
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="space-y-0.5">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-[10.5px] line-through text-[#8B95A1]">
-                                    {p.rentalPrice6Year?.toLocaleString()}원
-                                  </span>
-                                  <span className="text-[9.5px] font-black text-[#EA1D2C] bg-[#FEECEF] px-1 rounded">
-                                    {p.discountRate6Year || 10}%
-                                  </span>
-                                </div>
-                                <p className="text-[13px] font-black text-[#EA1D2C]">
-                                  {p.discountPrice6Year?.toLocaleString()}
-                                  <span className="text-[10.5px] font-normal text-[#6B7684]">원/월</span>
-                                </p>
-                              </div>
-                            )}
-                          </td>
+                        <td className="text-center">
+                          <button
+                            type="button"
+                            onClick={() => updateProduct({ id: p._id, isVisible: !p.isVisible })}
+                            className={`adm-switch ${p.isVisible ? 'on' : ''}`}
+                            title={p.isVisible ? '노출 중 (클릭 시 숨김)' : '숨김 (클릭 시 노출)'}
+                          />
+                        </td>
 
-                          {/* Visibility Toggle */}
-                          <td className="py-2.5 px-2.5 text-center">
+                        <td className="text-center">
+                          <div className="flex items-center justify-center gap-1">
                             <button
                               type="button"
-                              onClick={() => updateProduct({ id: p._id, isVisible: !p.isVisible })}
-                              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                                p.isVisible
-                                  ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                                  : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                              }`}
-                              title={p.isVisible ? '현재 노출 중 (클릭 시 숨김)' : '현재 숨김 (클릭 시 노출)'}
+                              onClick={() => handleOpenEditModal(p)}
+                              className="adm-btn icon-only sm"
+                              title="수정"
                             >
-                              {p.isVisible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                              <Edit className="w-3.5 h-3.5" />
                             </button>
-                          </td>
-
-                          {/* Actions */}
-                          <td className="py-2.5 px-2.5 text-center">
-                            <div className="flex items-center justify-center gap-0.5">
-                              <button
-                                type="button"
-                                onClick={() => handleOpenEditModal(p)}
-                                className="p-1 hover:bg-[#F2F4F6] text-[#4E5968] rounded-lg transition-colors cursor-pointer"
-                                title="수정"
-                              >
-                                <Edit className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleCopyProduct(p)}
-                                className="p-1 hover:bg-[#F2F4F6] text-[#4E5968] rounded-lg transition-colors cursor-pointer"
-                                title="복사"
-                              >
-                                <Copy className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteProduct(p._id, p.name)}
-                                className="p-1 hover:bg-red-50 text-red-500 rounded-lg transition-colors cursor-pointer"
-                                title="삭제"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyProduct(p)}
+                              className="adm-btn icon-only sm"
+                              title="복사"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteProduct(p._id, p.name)}
+                              className="adm-btn icon-only sm danger"
+                              title="삭제"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
 
-          {/* Pagination Controls Bar */}
+          {/* Pagination Footer */}
           {filteredProducts.length > 0 && (
-            <div className="mt-5 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-[#E5E8EB] shadow-2xs">
-              {/* Page info & Page size selector */}
-              <div className="flex items-center gap-3 text-[12.5px] text-[#4E5968]">
-                <span className="font-bold">
-                  총 <strong className="text-[#191F28]">{filteredProducts.length}</strong>개 제품 중{' '}
-                  <strong className="text-[#EA1D2C]">
-                    {Math.min((currentPage - 1) * (pageSize >= 9999 ? filteredProducts.length : pageSize) + 1, filteredProducts.length)}~{Math.min(currentPage * (pageSize >= 9999 ? filteredProducts.length : pageSize), filteredProducts.length)}
+            <div className="adm-table-foot">
+              <div className="flex items-center gap-3">
+                <span>
+                  총 <strong className="text-[#263d36]">{filteredProducts.length}</strong>개 제품 중{' '}
+                  <strong className="text-[#295e52]">
+                    {Math.min((currentPage - 1) * (pageSize >= 9999 ? filteredProducts.length : pageSize) + 1, filteredProducts.length)}~
+                    {Math.min(currentPage * (pageSize >= 9999 ? filteredProducts.length : pageSize), filteredProducts.length)}
                   </strong>
                   개 표시
                 </span>
-                <div className="flex items-center gap-1.5 border-l border-[#E5E8EB] pl-3">
-                  <span className="text-[12px] text-[#8B95A1]">페이지당:</span>
-                  <select
-                    value={pageSize}
-                    onChange={(e) => {
-                      setPageSize(Number(e.target.value));
-                      setCurrentPage(1);
-                    }}
-                    className="bg-[#F8F9FA] border border-[#D1D6DB] rounded-lg px-2 py-1 text-[12px] font-bold text-[#191F28] focus:outline-none focus:border-[#EA1D2C] cursor-pointer"
-                  >
-                    <option value={20}>20개씩</option>
-                    <option value={30}>30개씩 (추천)</option>
-                    <option value={50}>50개씩</option>
-                    <option value={100}>100개씩</option>
-                    <option value={9999}>전체 보기</option>
-                  </select>
-                </div>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="adm-select"
+                  style={{ height: 30, fontSize: 12, padding: '0 26px 0 10px' }}
+                >
+                  <option value={20}>20개씩</option>
+                  <option value={30}>30개씩</option>
+                  <option value={50}>50개씩</option>
+                  <option value={100}>100개씩</option>
+                  <option value={9999}>전체 보기</option>
+                </select>
               </div>
 
-              {/* Page Navigation Buttons */}
               {totalPages > 1 && pageSize < 9999 && (
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(1)}
-                    disabled={currentPage === 1}
-                    className="px-2.5 py-1.5 rounded-lg border border-[#E5E8EB] text-[12px] font-bold text-[#4E5968] hover:bg-[#F2F4F6] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                    title="첫 페이지"
-                  >
+                <div className="adm-pagination">
+                  <button type="button" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
                     «
                   </button>
                   <button
                     type="button"
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="px-3 py-1.5 rounded-lg border border-[#E5E8EB] text-[12px] font-bold text-[#4E5968] hover:bg-[#F2F4F6] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    style={{ width: 'auto', padding: '0 10px' }}
                   >
-                    ‹ 이전
+                    이전
                   </button>
-
-                  <div className="flex items-center gap-1 px-1">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                      .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
-                      .map((p, idx, arr) => {
-                        const prev = arr[idx - 1];
-                        const showEllipsis = prev && p - prev > 1;
-
-                        return (
-                          <React.Fragment key={p}>
-                            {showEllipsis && <span className="px-1 text-gray-400 text-[11px]">...</span>}
-                            <button
-                              type="button"
-                              onClick={() => setCurrentPage(p)}
-                              className={`w-8 h-8 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
-                                currentPage === p
-                                  ? 'bg-[#EA1D2C] text-white shadow-xs font-black'
-                                  : 'text-[#4E5968] hover:bg-[#F2F4F6] border border-transparent'
-                              }`}
-                            >
-                              {p}
-                            </button>
-                          </React.Fragment>
-                        );
-                      })}
-                  </div>
-
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+                    .map((p, idx, arr) => {
+                      const prev = arr[idx - 1];
+                      const showEllipsis = prev && p - prev > 1;
+                      return (
+                        <React.Fragment key={p}>
+                          {showEllipsis && <span className="px-1 text-[#86918a] text-[11px]">...</span>}
+                          <button
+                            type="button"
+                            onClick={() => setCurrentPage(p)}
+                            className={currentPage === p ? 'active' : ''}
+                          >
+                            {p}
+                          </button>
+                        </React.Fragment>
+                      );
+                    })}
                   <button
                     type="button"
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="px-3 py-1.5 rounded-lg border border-[#E5E8EB] text-[12px] font-bold text-[#4E5968] hover:bg-[#F2F4F6] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    style={{ width: 'auto', padding: '0 10px' }}
                   >
-                    다음 ›
+                    다음
                   </button>
                   <button
                     type="button"
                     onClick={() => setCurrentPage(totalPages)}
                     disabled={currentPage === totalPages}
-                    className="px-2.5 py-1.5 rounded-lg border border-[#E5E8EB] text-[12px] font-bold text-[#4E5968] hover:bg-[#F2F4F6] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                    title="마지막 페이지"
                   >
                     »
                   </button>
@@ -2497,85 +2429,78 @@ export default function LgProductManagement() {
               )}
             </div>
           )}
-        </div>
-      </main>
+        </section>
+      </div>
 
       {/* MODAL 1: Uploading & Crawling Progress Modal */}
       {uploadProgress && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-gray-100 text-center space-y-5 animate-scale-up">
-            <div className="w-16 h-16 bg-[#FEECEF] text-[#EA1D2C] rounded-full flex items-center justify-center mx-auto animate-spin">
-              <RefreshCw className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-1.5">
-              <h3 className="text-[18px] font-black text-[#191F28]">
-                LG 공홈 실시간 정보 수집 중
-              </h3>
-              <p className="text-[13px] text-[#6B7684]">
-                엑셀 모델명을 기준으로 LG 공홈에서 검증된 제품 정보(제품명, 이미지, 색상, 케어주기)를 실시간으로 가져오고 있습니다.
+        <div className="adm-modal-overlay">
+          <div className="adm-modal sm">
+            <div className="adm-modal-body text-center space-y-4 py-7">
+              <div className="w-14 h-14 bg-[#eaf1e4] text-[#295e52] rounded-full flex items-center justify-center mx-auto animate-spin">
+                <RefreshCw className="w-7 h-7" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-[16px] font-bold text-[#263d36]">LG 공홈 실시간 정보 수집 중</h3>
+                <p className="text-[12.5px] text-[#6b7870]">
+                  엑셀 모델명을 기준으로 LG 공홈에서 제품명, 이미지, 색상, 케어주기를 수집하고 있습니다.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <div className="w-full bg-[#eef1ec] h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-[#295e52] h-full transition-all duration-300 rounded-full"
+                    style={{
+                      width: `${Math.round((uploadProgress.current / uploadProgress.total) * 100)}%`,
+                    }}
+                  />
+                </div>
+                <div className="flex justify-between text-[12px] font-bold text-[#526058]">
+                  <span>{uploadProgress.currentModel}</span>
+                  <span>
+                    {uploadProgress.current} / {uploadProgress.total} (
+                    {Math.round((uploadProgress.current / uploadProgress.total) * 100)}%)
+                  </span>
+                </div>
+              </div>
+              <p className="text-[11px] text-[#86918a]">
+                ※ 공홈 미등록 모델은 자동 비노출 처리되며 완료 후 리포트가 제공됩니다.
               </p>
             </div>
-
-            {/* Progress Bar */}
-            <div className="space-y-2">
-              <div className="w-full bg-[#F2F4F6] h-3 rounded-full overflow-hidden">
-                <div
-                  className="bg-[#EA1D2C] h-full transition-all duration-300 rounded-full"
-                  style={{
-                    width: `${Math.round((uploadProgress.current / uploadProgress.total) * 100)}%`,
-                  }}
-                />
-              </div>
-              <div className="flex justify-between text-[12px] font-extrabold text-[#4E5968]">
-                <span>{uploadProgress.currentModel}</span>
-                <span>
-                  {uploadProgress.current} / {uploadProgress.total} (
-                  {Math.round((uploadProgress.current / uploadProgress.total) * 100)}%)
-                </span>
-              </div>
-            </div>
-
-            <p className="text-[11px] text-[#8B95A1]">
-              ※ 공홈에 등록되지 않은 모델은 자동으로 건너뛰며 완료 후 리포트가 제공됩니다.
-            </p>
           </div>
         </div>
       )}
 
       {/* MODAL 1-2: Batch Official Verification Progress Modal */}
       {isBatchVerifying && verifyProgress && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-gray-100 text-center space-y-5 animate-scale-up">
-            <div className="w-16 h-16 bg-[#E8F3FF] text-[#3182F6] rounded-full flex items-center justify-center mx-auto animate-spin">
-              <RefreshCw className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-1.5">
-              <h3 className="text-[18px] font-black text-[#191F28]">
-                LG 공홈 실존 여부 일괄 검증 중
-              </h3>
-              <p className="text-[13px] text-[#6B7684]">
-                등록된 모든 제품이 LG 공식 홈페이지에 정상 등록되어 있는지 확인하고 있습니다. (미등록/단종 모델은 자동 비노출 처리)
-              </p>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="space-y-2">
-              <div className="w-full bg-[#F2F4F6] h-3 rounded-full overflow-hidden">
-                <div
-                  className="bg-[#3182F6] h-full transition-all duration-300 rounded-full"
-                  style={{
-                    width: `${Math.round((verifyProgress.current / verifyProgress.total) * 100)}%`,
-                  }}
-                />
+        <div className="adm-modal-overlay">
+          <div className="adm-modal sm">
+            <div className="adm-modal-body text-center space-y-4 py-7">
+              <div className="w-14 h-14 bg-[#eaf1e4] text-[#295e52] rounded-full flex items-center justify-center mx-auto animate-spin">
+                <RefreshCw className="w-7 h-7" />
               </div>
-              <div className="flex justify-between text-[12px] font-extrabold text-[#4E5968]">
-                <span>실시간 검증 진행 중...</span>
-                <span>
-                  {verifyProgress.current} / {verifyProgress.total} (
-                  {Math.round((verifyProgress.current / verifyProgress.total) * 100)}%)
-                </span>
+              <div className="space-y-1">
+                <h3 className="text-[16px] font-bold text-[#263d36]">LG 공홈 실존 여부 일괄 검증 중</h3>
+                <p className="text-[12.5px] text-[#6b7870]">
+                  등록된 모든 제품이 LG 공식 홈페이지에 정상 등록되어 있는지 확인하고 있습니다.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <div className="w-full bg-[#eef1ec] h-2.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-[#295e52] h-full transition-all duration-300 rounded-full"
+                    style={{
+                      width: `${Math.round((verifyProgress.current / verifyProgress.total) * 100)}%`,
+                    }}
+                  />
+                </div>
+                <div className="flex justify-between text-[12px] font-bold text-[#526058]">
+                  <span>실시간 검증 진행 중...</span>
+                  <span>
+                    {verifyProgress.current} / {verifyProgress.total} (
+                    {Math.round((verifyProgress.current / verifyProgress.total) * 100)}%)
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -2584,82 +2509,63 @@ export default function LgProductManagement() {
 
       {/* MODAL 1-3: Quick Custom Link Edit Modal */}
       {linkEditItem && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl border border-gray-100 space-y-5 animate-scale-up">
-            <div className="flex items-center justify-between border-b border-[#E5E8EB] pb-3">
-              <div className="flex items-center gap-2">
-                <Edit className="w-5 h-5 text-[#3182F6]" />
-                <h3 className="text-[17px] font-black text-[#191F28]">
-                  공홈 바로가기 링크 직접 수정
-                </h3>
+        <div className="adm-modal-overlay">
+          <div className="adm-modal">
+            <div className="adm-modal-head">
+              <div>
+                <span className="adm-eyebrow">OFFICIAL PDP URL</span>
+                <h3 className="adm-modal-title">공홈 바로가기 링크 직접 수정</h3>
               </div>
-              <button
-                type="button"
-                onClick={() => setLinkEditItem(null)}
-                className="p-1 hover:bg-[#F2F4F6] rounded-full text-[#8B95A1]"
-              >
-                <X className="w-5 h-5" />
+              <button type="button" onClick={() => setLinkEditItem(null)} className="adm-btn icon-only sm">
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Target Product Info */}
-            <div className="bg-[#F8F9FA] p-3.5 rounded-2xl border border-[#E5E8EB] space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="bg-[#191F28] text-white text-[11px] font-mono font-bold px-2 py-0.5 rounded">
-                  {linkEditItem.model}
-                </span>
-                <span className="text-[13px] font-extrabold text-[#191F28] truncate">
-                  {linkEditItem.name}
-                </span>
+            <div className="adm-modal-body space-y-4">
+              <div className="adm-note-card space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="bg-[#193f39] text-white text-[11px] font-mono font-bold px-2 py-0.5 rounded">
+                    {linkEditItem.model}
+                  </span>
+                  <span className="text-[13px] font-bold text-[#263d36] truncate">{linkEditItem.name}</span>
+                </div>
+                <p className="text-[11.5px] text-[#6b7870]">
+                  연결하고 싶은 LG 공홈 URL(또는 상품 상세 페이지)을 직접 입력하세요.
+                </p>
               </div>
-              <p className="text-[11.5px] text-[#6B7684]">
-                연결되지 않는 공식 페이지 대신 연결하고 싶은 LG 공홈 URL(또는 검색/상품 페이지)을 직접 입력하세요.
-              </p>
-            </div>
 
-            {/* URL Input */}
-            <div className="space-y-1.5">
-              <label className="block text-[12px] font-bold text-[#4E5968]">
-                연결할 공홈 URL (바로가기 링크)
-              </label>
-              <input
-                type="text"
-                value={customUrlInput}
-                onChange={(e) => setCustomUrlInput(e.target.value)}
-                placeholder="예: https://www.lge.co.kr/care-solutions/tvs/65qned81bms"
-                className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-xl px-3.5 py-2.5 text-[13px] font-mono focus:outline-none focus:border-[#3182F6] focus:bg-white transition-colors"
-                autoFocus
-              />
-              <div className="flex justify-between items-center text-[11px] text-[#8B95A1] pt-1">
-                <span>※ 저장 시 자동으로 [공홈 인증] 및 [랜딩 노출 활성화]가 적용됩니다.</span>
-                {customUrlInput && (
-                  <a
-                    href={customUrlInput}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[#3182F6] hover:underline font-bold flex items-center gap-0.5 shrink-0"
-                  >
-                    <span>새창 테스트</span>
-                    <ArrowUpRight className="w-3 h-3" />
-                  </a>
-                )}
+              <div className="adm-field">
+                <label>연결할 공홈 URL (바로가기 링크)</label>
+                <input
+                  type="text"
+                  value={customUrlInput}
+                  onChange={(e) => setCustomUrlInput(e.target.value)}
+                  placeholder="예: https://www.lge.co.kr/care-solutions/tvs/65qned81bms"
+                  className="adm-input font-mono"
+                  autoFocus
+                />
+                <div className="flex justify-between items-center text-[11px] text-[#86918a] pt-1">
+                  <span>※ 저장 시 자동으로 [공홈 인증] 및 [랜딩 노출]이 적용됩니다.</span>
+                  {customUrlInput && (
+                    <a
+                      href={customUrlInput}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[#295e52] hover:underline font-bold flex items-center gap-0.5 shrink-0"
+                    >
+                      <span>새창 테스트</span>
+                      <ArrowUpRight className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => setLinkEditItem(null)}
-                className="flex-1 bg-[#F2F4F6] hover:bg-[#E5E8EB] text-[#4E5968] font-bold py-3 rounded-xl text-[13px] transition-colors cursor-pointer"
-              >
+            <div className="adm-modal-foot">
+              <button type="button" onClick={() => setLinkEditItem(null)} className="adm-btn">
                 취소
               </button>
-              <button
-                type="button"
-                onClick={handleSaveCustomLink}
-                className="flex-1 bg-[#3182F6] hover:bg-[#1B64DA] text-white font-bold py-3 rounded-xl text-[13px] shadow-sm transition-colors cursor-pointer"
-              >
+              <button type="button" onClick={handleSaveCustomLink} className="adm-btn primary">
                 링크 저장하기
               </button>
             </div>
@@ -2669,89 +2575,79 @@ export default function LgProductManagement() {
 
       {/* MODAL 2: Upload Result Summary Modal */}
       {uploadResultModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-2xl border border-gray-100 space-y-6 animate-scale-up max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-[#E5E8EB] pb-4">
-              <div className="flex items-center gap-2.5">
-                <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-                <h3 className="text-[18px] font-black text-[#191F28]">
-                  LG 구독 제품 엑셀 등록 완료
-                </h3>
+        <div className="adm-modal-overlay">
+          <div className="adm-modal lg">
+            <div className="adm-modal-head">
+              <div>
+                <span className="adm-eyebrow">EXCEL UPLOAD REPORT</span>
+                <h3 className="adm-modal-title">LG 구독 제품 엑셀 등록 완료</h3>
               </div>
-              <button
-                type="button"
-                onClick={() => setUploadResultModal(null)}
-                className="p-1 hover:bg-[#F2F4F6] rounded-full text-[#8B95A1]"
-              >
-                <X className="w-5 h-5" />
+              <button type="button" onClick={() => setUploadResultModal(null)} className="adm-btn icon-only sm">
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Counts Summary */}
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="bg-[#F8F9FA] p-3 rounded-2xl border border-[#E5E8EB]">
-                <p className="text-[11px] font-bold text-[#6B7684]">총 검사 모델</p>
-                <p className="text-[18px] font-black text-[#191F28]">{uploadResultModal.totalRows}건</p>
+            <div className="adm-modal-body space-y-4">
+              <div className="grid grid-cols-3 gap-3 text-center">
+                <div className="adm-note-card">
+                  <p className="text-[11px] font-semibold text-[#86918a]">총 검사 모델</p>
+                  <p className="text-[18px] font-extrabold text-[#263d36]">{uploadResultModal.totalRows}건</p>
+                </div>
+                <div className="adm-note-card" style={{ background: '#eaf1e4', borderColor: '#d4e2cb' }}>
+                  <p className="text-[11px] font-semibold text-[#295e52]">공홈 인증 (노출)</p>
+                  <p className="text-[18px] font-extrabold text-[#295e52]">{uploadResultModal.successCount}건</p>
+                </div>
+                <div className="adm-note-card" style={{ background: '#faf5ea', borderColor: '#eadbc0' }}>
+                  <p className="text-[11px] font-semibold text-[#8f6d2c]">공홈 미확인 (비노출)</p>
+                  <p className="text-[18px] font-extrabold text-[#8f6d2c]">{uploadResultModal.failCount}건</p>
+                </div>
               </div>
-              <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100">
-                <p className="text-[11px] font-bold text-emerald-600">공홈 인증 (랜딩 노출)</p>
-                <p className="text-[18px] font-black text-emerald-700">{uploadResultModal.successCount}건</p>
-              </div>
-              <div className="bg-amber-50 p-3 rounded-2xl border border-amber-100">
-                <p className="text-[11px] font-bold text-amber-700">공홈 미확인 (자동 비노출)</p>
-                <p className="text-[18px] font-black text-amber-800">{uploadResultModal.failCount}건</p>
-              </div>
+
+              {uploadResultModal.failedList.length > 0 ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5 text-[12px] font-bold text-[#8f6d2c]">
+                    <AlertTriangle className="w-4 h-4 text-[#b99a61]" />
+                    <span>공홈 미확인으로 비노출된 모델 목록 ({uploadResultModal.failedList.length}건)</span>
+                  </div>
+                  <div className="max-h-60 overflow-y-auto bg-[#f9faf7] rounded-[12px] p-3 border border-[#e6eae3] space-y-2 text-[12px]">
+                    {uploadResultModal.failedList.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-white p-2.5 rounded-[8px] border border-[#e6eae3] flex items-center justify-between"
+                      >
+                        <div>
+                          <span className="font-mono font-bold text-[#263d36]">{item.model}</span>
+                          {item.category && <span className="text-[11px] text-[#6b7870] ml-2">[{item.category}]</span>}
+                        </div>
+                        <span className="adm-pill warn">{item.reason}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="adm-section-note">
+                  엑셀의 모든 모델이 LG 공홈에서 정상 확인되어 랜딩에 노출됩니다.
+                </div>
+              )}
             </div>
 
-            {/* Skipped Models List (if any) */}
-            {uploadResultModal.failedList.length > 0 ? (
-              <div className="flex-1 overflow-hidden flex flex-col space-y-2">
-                <div className="flex items-center gap-1.5 text-[12px] font-bold text-[#4E5968]">
-                  <AlertTriangle className="w-4 h-4 text-amber-500" />
-                  <span>공홈 미확인으로 랜딩에 비노출된 모델 목록 ({uploadResultModal.failedList.length}건)</span>
-                </div>
-                <div className="flex-1 overflow-y-auto bg-[#F8F9FA] rounded-2xl p-3 border border-[#E5E8EB] space-y-2 text-[12px]">
-                  {uploadResultModal.failedList.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-white p-2.5 rounded-xl border border-[#E5E8EB] flex items-center justify-between"
-                    >
-                      <div className="space-y-0.5">
-                        <span className="font-mono font-bold text-[#191F28]">{item.model}</span>
-                        {item.category && (
-                          <span className="text-[11px] text-[#6B7684] ml-2">[{item.category}]</span>
-                        )}
-                      </div>
-                      <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-medium">{item.reason}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="bg-emerald-50 text-emerald-800 p-4 rounded-2xl text-[13px] font-bold text-center">
-                🎉 엑셀의 모든 모델이 LG 공홈에서 완벽하게 확인되어 랜딩에 정상 노출됩니다!
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setUploadResultModal(null)}
-              className="w-full bg-[#191F28] hover:bg-black text-white font-bold py-3 rounded-2xl text-[14px] transition-colors cursor-pointer"
-            >
-              확인
-            </button>
+            <div className="adm-modal-foot">
+              <button type="button" onClick={() => setUploadResultModal(null)} className="adm-btn primary">
+                확인
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* MODAL 3: Single Product Create / Edit Modal */}
       {isEditModalOpen && editingItem && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-gray-100 space-y-5 animate-scale-up max-h-[92vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-[#E5E8EB] pb-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#EA1D2C]" />
-                <h3 className="text-[18px] font-black text-[#191F28]">
+        <div className="adm-modal-overlay">
+          <div className="adm-modal lg">
+            <div className="adm-modal-head">
+              <div>
+                <span className="adm-eyebrow">LG SUBSCRIPTION ITEM</span>
+                <h3 className="adm-modal-title">
                   {editingItem._id ? 'LG 구독 제품 수정' : 'LG 구독 제품 개별 등록'}
                 </h3>
               </div>
@@ -2761,17 +2657,16 @@ export default function LgProductManagement() {
                   setIsEditModalOpen(false);
                   setEditingItem(null);
                 }}
-                className="p-1 hover:bg-[#F2F4F6] rounded-full text-[#8B95A1]"
+                className="adm-btn icon-only sm"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-              {/* Model Search & Live Fetch Area */}
-              <div className="bg-[#F8F9FA] p-3.5 rounded-2xl border border-[#E5E8EB] space-y-2">
-                <label className="block text-[12px] font-black text-[#191F28]">
-                  모델명 (LG 공홈 실시간 조회) <span className="text-[#EA1D2C]">*</span>
+            <div className="adm-modal-body space-y-4">
+              <div className="adm-note-card space-y-2">
+                <label className="block text-[12px] font-bold text-[#263d36]">
+                  모델명 (LG 공홈 실시간 조회) *
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -2779,41 +2674,37 @@ export default function LgProductManagement() {
                     placeholder="예: WU923ACB, AS356NSMAM, H876GBB111"
                     value={editingItem.model}
                     onChange={(e) => setEditingItem({ ...editingItem, model: e.target.value })}
-                    className="flex-1 bg-white border border-[#D1D6DB] rounded-xl px-3 py-2 text-[13px] font-mono font-bold focus:outline-none focus:border-[#EA1D2C]"
+                    className="adm-input flex-1 font-mono font-semibold"
                   />
                   <button
                     type="button"
                     onClick={handleSingleScrape}
                     disabled={isFetchingSingle}
-                    className="bg-[#EA1D2C] hover:bg-[#C81020] disabled:bg-gray-400 text-white px-4 py-2 rounded-xl text-[12px] font-bold shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    className="adm-btn primary shrink-0"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isFetchingSingle ? 'animate-spin' : ''}`} />
-                    <span>{isFetchingSingle ? '공홈 조회중...' : '공홈 정보 가져오기'}</span>
+                    <span>{isFetchingSingle ? '조회중...' : '공홈 정보 가져오기'}</span>
                   </button>
                 </div>
-                <p className="text-[11px] text-[#6B7684]">
+                <p className="text-[11px] text-[#6b7870]">
                   모델명을 입력하고 버튼을 누르면 제품명, 이미지, 색상 옵션, 스펙, 공홈 URL이 자동으로 채워집니다.
                 </p>
               </div>
 
-              {/* Product Name */}
-              <div>
-                <label className="block text-[12px] font-bold text-[#4E5968] mb-1">
-                  공식 제품명 <span className="text-[#EA1D2C]">*</span>
-                </label>
+              <div className="adm-field">
+                <label>공식 제품명 *</label>
                 <input
                   type="text"
                   placeholder="예: LG 디오스 AI 오브제컬렉션 냉장고 (매직스페이스)"
                   value={editingItem.name}
                   onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                  className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-xl px-3 py-2 text-[13px] font-medium focus:outline-none focus:border-[#EA1D2C] focus:bg-white"
+                  className="adm-input font-semibold"
                 />
               </div>
 
-              {/* Category & Brand */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[12px] font-bold text-[#4E5968] mb-1">카테고리</label>
+              <div className="adm-field-grid">
+                <div className="adm-field">
+                  <label>카테고리</label>
                   <select
                     value={editingItem.categoryKey}
                     onChange={(e) => {
@@ -2824,7 +2715,7 @@ export default function LgProductManagement() {
                         category: found?.name || '가전',
                       });
                     }}
-                    className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-xl px-3 py-2 text-[13px] font-medium focus:outline-none focus:border-[#EA1D2C]"
+                    className="adm-select"
                   >
                     {LG_CATEGORIES.filter((c) => c.key !== 'all').map((c) => (
                       <option key={c.key} value={c.key}>
@@ -2833,55 +2724,50 @@ export default function LgProductManagement() {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-[12px] font-bold text-[#4E5968] mb-1">브랜드</label>
+                <div className="adm-field">
+                  <label>브랜드</label>
                   <input
                     type="text"
                     value={editingItem.brand}
                     onChange={(e) => setEditingItem({ ...editingItem, brand: e.target.value })}
-                    className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-xl px-3 py-2 text-[13px] font-medium focus:outline-none focus:border-[#EA1D2C]"
+                    className="adm-input"
                   />
                 </div>
-              </div>
-
-              {/* Image URL & Official Page URL */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[12px] font-bold text-[#4E5968] mb-1">대표 이미지 URL</label>
+                <div className="adm-field">
+                  <label>대표 이미지 URL</label>
                   <input
                     type="text"
                     placeholder="https://..."
                     value={editingItem.image}
                     onChange={(e) => setEditingItem({ ...editingItem, image: e.target.value })}
-                    className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-xl px-3 py-2 text-[12px] font-mono focus:outline-none focus:border-[#EA1D2C]"
+                    className="adm-input font-mono text-[12px]"
                   />
                 </div>
-                <div>
-                  <label className="block text-[12px] font-bold text-[#4E5968] mb-1">LG 공홈 URL (바로가기)</label>
+                <div className="adm-field">
+                  <label>LG 공홈 URL (바로가기)</label>
                   <input
                     type="text"
                     placeholder="https://www.lge.co.kr/..."
                     value={editingItem.refUrl}
                     onChange={(e) => setEditingItem({ ...editingItem, refUrl: e.target.value })}
-                    className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-xl px-3 py-2 text-[12px] font-mono focus:outline-none focus:border-[#EA1D2C]"
+                    className="adm-input font-mono text-[12px]"
                   />
                 </div>
               </div>
 
-              {/* Pricing Section (5 Years & 6 Years) */}
-              <div className="bg-red-50/40 p-4 rounded-2xl border border-red-100 space-y-3">
-                <h4 className="text-[13px] font-black text-[#191F28] flex items-center gap-1.5">
-                  <Tag className="w-4 h-4 text-[#EA1D2C]" />
+              {/* Pricing Section */}
+              <div className="adm-note-card space-y-3" style={{ background: '#f7faf5', borderColor: '#d4e2cb' }}>
+                <h4 className="text-[13px] font-bold text-[#263d36] flex items-center gap-1.5">
+                  <Tag className="w-4 h-4 text-[#295e52]" />
                   <span>5년 / 6년 구독료 및 할인율 설정</span>
                 </h4>
 
-                <div className="grid grid-cols-2 gap-4">
-                  {/* 5-Year Pricing */}
-                  <div className="bg-white p-3 rounded-xl border border-[#E5E8EB] space-y-2">
-                    <p className="text-[12px] font-black text-[#191F28]">5년 약정 구독료</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="bg-white p-3.5 rounded-[10px] border border-[#e6eae3] space-y-2">
+                    <p className="text-[12px] font-bold text-[#263d36]">5년 약정 구독료</p>
                     <div className="space-y-1.5 text-[12px]">
                       <div>
-                        <span className="text-[#6B7684]">공홈 기본 월요금:</span>
+                        <span className="text-[#6b7870] text-[11px]">공홈 기본 월요금</span>
                         <input
                           type="number"
                           value={editingItem.rentalPrice5Year}
@@ -2896,11 +2782,11 @@ export default function LgProductManagement() {
                               discountRate5Year: rate,
                             });
                           }}
-                          className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-lg px-2 py-1 text-[13px] font-bold"
+                          className="adm-input font-semibold mt-0.5"
                         />
                       </div>
                       <div>
-                        <span className="text-[#6B7684]">효원 결합 할인가:</span>
+                        <span className="text-[#6b7870] text-[11px]">효원 결합 할인가</span>
                         <input
                           type="number"
                           value={editingItem.discountPrice5Year}
@@ -2914,21 +2800,20 @@ export default function LgProductManagement() {
                               discountRate5Year: rate,
                             });
                           }}
-                          className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-lg px-2 py-1 text-[13px] font-black text-[#EA1D2C]"
+                          className="adm-input font-bold text-[#295e52] mt-0.5"
                         />
                       </div>
-                      <div className="text-right text-[11px] font-bold text-[#EA1D2C]">
+                      <div className="text-right text-[11px] font-bold text-[#295e52]">
                         할인율: {editingItem.discountRate5Year || 0}% 할인
                       </div>
                     </div>
                   </div>
 
-                  {/* 6-Year Pricing */}
-                  <div className="bg-white p-3 rounded-xl border border-[#E5E8EB] space-y-2">
-                    <p className="text-[12px] font-black text-[#191F28]">6년 약정 구독료</p>
+                  <div className="bg-white p-3.5 rounded-[10px] border border-[#e6eae3] space-y-2">
+                    <p className="text-[12px] font-bold text-[#263d36]">6년 약정 구독료</p>
                     <div className="space-y-1.5 text-[12px]">
                       <div>
-                        <span className="text-[#6B7684]">공홈 기본 월요금:</span>
+                        <span className="text-[#6b7870] text-[11px]">공홈 기본 월요금</span>
                         <input
                           type="number"
                           value={editingItem.rentalPrice6Year}
@@ -2943,11 +2828,11 @@ export default function LgProductManagement() {
                               discountRate6Year: rate,
                             });
                           }}
-                          className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-lg px-2 py-1 text-[13px] font-bold"
+                          className="adm-input font-semibold mt-0.5"
                         />
                       </div>
                       <div>
-                        <span className="text-[#6B7684]">효원 결합 할인가:</span>
+                        <span className="text-[#6b7870] text-[11px]">효원 결합 할인가</span>
                         <input
                           type="number"
                           value={editingItem.discountPrice6Year}
@@ -2961,10 +2846,10 @@ export default function LgProductManagement() {
                               discountRate6Year: rate,
                             });
                           }}
-                          className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-lg px-2 py-1 text-[13px] font-black text-[#EA1D2C]"
+                          className="adm-input font-bold text-[#295e52] mt-0.5"
                         />
                       </div>
-                      <div className="text-right text-[11px] font-bold text-[#EA1D2C]">
+                      <div className="text-right text-[11px] font-bold text-[#295e52]">
                         할인율: {editingItem.discountRate6Year || 0}% 할인
                       </div>
                     </div>
@@ -2972,12 +2857,9 @@ export default function LgProductManagement() {
                 </div>
               </div>
 
-              {/* Care Cycle & Type */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[12px] font-bold text-[#4E5968] mb-1">
-                    케어서비스 주기 (쉼표 구분)
-                  </label>
+              <div className="adm-field-grid">
+                <div className="adm-field">
+                  <label>케어서비스 주기 (쉼표 구분)</label>
                   <input
                     type="text"
                     value={editingItem.careCycles?.join(', ')}
@@ -2987,13 +2869,11 @@ export default function LgProductManagement() {
                         careCycles: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
                       })
                     }
-                    className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-xl px-3 py-2 text-[13px]"
+                    className="adm-input"
                   />
                 </div>
-                <div>
-                  <label className="block text-[12px] font-bold text-[#4E5968] mb-1">
-                    케어서비스 유형 (쉼표 구분)
-                  </label>
+                <div className="adm-field">
+                  <label>케어서비스 유형 (쉼표 구분)</label>
                   <input
                     type="text"
                     value={editingItem.careTypes?.join(', ')}
@@ -3003,29 +2883,24 @@ export default function LgProductManagement() {
                         careTypes: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
                       })
                     }
-                    className="w-full bg-[#F8F9FA] border border-[#D1D6DB] rounded-xl px-3 py-2 text-[13px]"
+                    className="adm-input"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Bottom Actions */}
-            <div className="flex items-center justify-end gap-2 border-t border-[#E5E8EB] pt-3">
+            <div className="adm-modal-foot">
               <button
                 type="button"
                 onClick={() => {
                   setIsEditModalOpen(false);
                   setEditingItem(null);
                 }}
-                className="px-4 py-2 rounded-xl text-[13px] font-bold text-[#4E5968] hover:bg-[#F2F4F6] cursor-pointer"
+                className="adm-btn"
               >
                 취소
               </button>
-              <button
-                type="button"
-                onClick={handleSaveModal}
-                className="bg-[#EA1D2C] hover:bg-[#C81020] text-white px-5 py-2 rounded-xl text-[13px] font-bold shadow-xs cursor-pointer"
-              >
+              <button type="button" onClick={handleSaveModal} className="adm-btn primary">
                 저장하기
               </button>
             </div>
@@ -3035,40 +2910,33 @@ export default function LgProductManagement() {
 
       {/* Choice Modal for Multiple Matched/Fuzzy Models */}
       {choiceModalProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-[#E5E8EB] flex items-center justify-between">
+        <div className="adm-modal-overlay">
+          <div className="adm-modal">
+            <div className="adm-modal-head">
               <div>
-                <span className="text-[11px] font-bold text-[#EA1D2C] bg-red-50 px-2 py-0.5 rounded">
-                  공홈 공식 제품 선택
-                </span>
-                <h3 className="text-[16px] font-black text-[#191F28] mt-1">
-                  이동할 제품 페이지를 선택하세요
-                </h3>
+                <span className="adm-eyebrow">OFFICIAL PDP OPTIONS</span>
+                <h3 className="adm-modal-title">이동할 제품 페이지를 선택하세요</h3>
               </div>
-              <button
-                type="button"
-                onClick={() => setChoiceModalProduct(null)}
-                className="text-[#8B95A1] hover:text-[#191F28] p-1 rounded-lg hover:bg-[#F2F4F6] cursor-pointer"
-              >
-                <X className="w-5 h-5" />
+              <button type="button" onClick={() => setChoiceModalProduct(null)} className="adm-btn icon-only sm">
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-5 space-y-4">
-              <div className="bg-[#F8F9FA] p-3 rounded-xl border border-[#E5E8EB]">
-                <p className="text-[12px] font-bold text-[#6B7684]">요청 모델</p>
-                <p className="text-[14px] font-black text-[#191F28] font-mono">
+            <div className="adm-modal-body space-y-3.5">
+              <div className="adm-note-card">
+                <p className="text-[11px] font-semibold text-[#86918a]">요청 모델</p>
+                <p className="text-[13.5px] font-bold text-[#263d36] font-mono">
                   {choiceModalProduct.model} ({choiceModalProduct.name})
-                </p>
-                <p className="text-[11px] text-[#8B95A1] mt-1">
-                  공홈에서 일치/유사한 제품 옵션이 확인되었습니다. 아래에서 원하는 형태를 클릭하시면 해당 공홈 페이지로 바로 이동합니다:
                 </p>
               </div>
 
               <div className="space-y-2">
                 {choiceModalProduct.relatedUrls?.map((rel: any, i: number) => {
-                  const safeUrl = formatSubscriptionRefUrl(rel.url, rel.model, choiceModalProduct.categoryKey || choiceModalProduct.category);
+                  const safeUrl = formatSubscriptionRefUrl(
+                    rel.url,
+                    rel.model,
+                    choiceModalProduct.categoryKey || choiceModalProduct.category
+                  );
                   return (
                     <a
                       key={i}
@@ -3076,51 +2944,42 @@ export default function LgProductManagement() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setChoiceModalProduct(null)}
-                      className="flex items-center justify-between p-3.5 rounded-xl border border-[#E5E8EB] hover:border-[#3182F6] hover:bg-[#F8FAFF] transition-all group cursor-pointer"
+                      className="flex items-center justify-between p-3.5 rounded-[12px] border border-[#e6eae3] hover:border-[#295e52] hover:bg-[#f7faf5] transition-all group cursor-pointer"
                     >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#E8F3FF] text-[#1B64DA] flex items-center justify-center font-bold text-[12px] shrink-0">
-                        {i + 1}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[12px] font-extrabold bg-[#F2F4F6] group-hover:bg-[#E8F3FF] text-[#333D4B] group-hover:text-[#1B64DA] px-2 py-0.5 rounded">
-                            {rel.title}
-                          </span>
-                          <span className="text-[13px] font-black text-[#191F28] font-mono">
-                            {rel.model}
-                          </span>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-7 h-7 rounded-[8px] bg-[#eaf1e4] text-[#295e52] flex items-center justify-center font-bold text-[12px] shrink-0">
+                          {i + 1}
                         </div>
-                        <p className="text-[11px] text-[#8B95A1] mt-0.5 truncate max-w-[260px]">
-                          {rel.url}
-                        </p>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="adm-pill neutral" style={{ fontSize: 10.5 }}>
+                              {rel.title}
+                            </span>
+                            <span className="text-[13px] font-bold text-[#263d36] font-mono">{rel.model}</span>
+                          </div>
+                          <p className="text-[11px] text-[#86918a] mt-0.5 truncate max-w-[280px]">{rel.url}</p>
+                        </div>
                       </div>
-                    </div>
-                    <ArrowUpRight className="w-4 h-4 text-[#8B95A1] group-hover:text-[#3182F6] shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <ArrowUpRight className="w-4 h-4 text-[#86918a] group-hover:text-[#295e52] shrink-0" />
                     </a>
                   );
                 })}
 
-                {/* Direct Search Link Fallback */}
                 <a
                   href={`https://www.lge.co.kr/search/search-all?searchKey=${encodeURIComponent(choiceModalProduct.model)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setChoiceModalProduct(null)}
-                  className="flex items-center justify-between p-3 rounded-xl border border-dashed border-[#D1D6DB] hover:border-[#4E5968] hover:bg-gray-50 transition-all text-[#6B7684] hover:text-[#191F28] text-[12px] font-bold"
+                  className="flex items-center justify-between p-3 rounded-[10px] border border-dashed border-[#dce2d8] hover:border-[#295e52] hover:bg-[#f9faf7] transition-all text-[#526058] text-[12px] font-semibold"
                 >
-                  <span>🔍 LG 공홈에서 &apos;{choiceModalProduct.model}&apos; 전체 검색결과 보기</span>
+                  <span>LG 공홈에서 &apos;{choiceModalProduct.model}&apos; 전체 검색결과 보기</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
                 </a>
               </div>
             </div>
 
-            <div className="p-4 bg-[#F8F9FA] border-t border-[#E5E8EB] flex justify-end">
-              <button
-                type="button"
-                onClick={() => setChoiceModalProduct(null)}
-                className="px-4 py-2 bg-white border border-[#D1D6DB] hover:bg-[#F2F4F6] text-[#4E5968] text-[13px] font-bold rounded-xl cursor-pointer"
-              >
+            <div className="adm-modal-foot">
+              <button type="button" onClick={() => setChoiceModalProduct(null)} className="adm-btn">
                 닫기
               </button>
             </div>
@@ -3130,70 +2989,58 @@ export default function LgProductManagement() {
 
       {/* Category Edit Modal */}
       {isCategoryModalOpen && editingCategory && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-[#E5E8EB] animate-scale-up">
-            <div className="p-5 border-b border-[#E5E8EB] flex items-center justify-between bg-[#F8F9FA]">
-              <div className="flex items-center gap-2">
+        <div className="adm-modal-overlay">
+          <div className="adm-modal">
+            <div className="adm-modal-head">
+              <div className="flex items-center gap-2.5">
                 <span className="text-2xl">{editingCategory.icon || '📦'}</span>
                 <div>
-                  <h3 className="text-[16px] font-black text-[#191F28]">카테고리 정보 수정</h3>
-                  <p className="text-[12px] text-[#8B95A1]">이름, 아이콘 및 뱃지를 변경할 수 있습니다.</p>
+                  <span className="adm-eyebrow">CATEGORY SETTINGS</span>
+                  <h3 className="adm-modal-title">카테고리 정보 수정</h3>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsCategoryModalOpen(false)}
-                className="text-[#8B95A1] hover:text-[#191F28] p-1.5 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <X className="w-5 h-5" />
+              <button type="button" onClick={() => setIsCategoryModalOpen(false)} className="adm-btn icon-only sm">
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveCategoryEdit} className="p-5 space-y-4">
-              {/* Category Name */}
-              <div>
-                <label className="block text-[13px] font-bold text-[#333D4B] mb-1.5">
-                  카테고리명 <span className="text-[#EA1D2C]">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={editingCategory.name}
-                  onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
-                  placeholder="예: 정수기, 올레드 TV 등"
-                  className="w-full bg-[#F8F9FA] border border-[#E5E8EB] focus:border-[#EA1D2C] focus:bg-white rounded-xl px-3.5 py-2.5 text-[14px] font-medium transition-colors outline-none"
-                />
-              </div>
-
-              {/* Category Icon (Emoji / Image Upload / Image URL) */}
-              <div>
-                <label className="block text-[13px] font-bold text-[#333D4B] mb-1.5">
-                  카테고리 아이콘 <span className="text-[#EA1D2C]">*</span>
-                </label>
-
-                {/* Preview & Current Icon */}
-                <div className="flex items-center gap-3 p-3 bg-[#F8F9FA] border border-[#E5E8EB] rounded-xl mb-3">
-                  <div className="w-12 h-12 rounded-xl bg-white border border-gray-200 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
-                    {renderCategoryIcon(editingCategory.icon, editingCategory.name, "w-8 h-8 object-contain")}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-bold text-[#191F28] truncate">
-                      {editingCategory.icon?.startsWith('data:image') 
-                        ? '사용자 업로드 이미지' 
-                        : (editingCategory.icon?.startsWith('http') ? '외부 이미지 URL' : `이모지 아이콘 (${editingCategory.icon})`)}
-                    </p>
-                    <p className="text-[11px] text-[#8B95A1] truncate">
-                      사이드바 및 랜딩 상단 퀵 메뉴에 표시됩니다.
-                    </p>
-                  </div>
+            <form onSubmit={handleSaveCategoryEdit}>
+              <div className="adm-modal-body space-y-4">
+                <div className="adm-field">
+                  <label>카테고리명 *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingCategory.name}
+                    onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                    placeholder="예: 정수기, 올레드 TV 등"
+                    className="adm-input font-semibold"
+                  />
                 </div>
 
-                {/* Mode Selection & Inputs */}
-                <div className="space-y-3">
-                  {/* File Upload Option */}
-                  <div className="flex items-center gap-2">
-                    <label className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-gray-50 border border-dashed border-[#D1D6DB] hover:border-[#EA1D2C] text-[#333D4B] py-2 px-3 rounded-xl text-[12px] font-bold cursor-pointer transition-all">
-                      <Upload className="w-4 h-4 text-[#EA1D2C]" />
+                <div className="adm-field">
+                  <label>카테고리 아이콘 *</label>
+                  <div className="flex items-center gap-3 p-3 bg-[#f9faf7] border border-[#e6eae3] rounded-[10px] mb-2">
+                    <div className="w-11 h-11 rounded-[10px] bg-white border border-[#e6eae3] flex items-center justify-center overflow-hidden shrink-0">
+                      {renderCategoryIcon(editingCategory.icon, editingCategory.name, 'w-7 h-7 object-contain')}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] font-bold text-[#263d36] truncate">
+                        {editingCategory.icon?.startsWith('data:image')
+                          ? '사용자 업로드 이미지'
+                          : editingCategory.icon?.startsWith('http')
+                          ? '외부 이미지 URL'
+                          : `이모지 아이콘 (${editingCategory.icon})`}
+                      </p>
+                      <p className="text-[11px] text-[#86918a] truncate">
+                        사이드바 및 랜딩 상단 퀵 메뉴에 표시됩니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <label className="adm-btn w-full justify-center cursor-pointer">
+                      <Upload className="w-3.5 h-3.5 text-[#295e52]" />
                       <span>PC에서 이미지 파일 업로드</span>
                       <input
                         type="file"
@@ -3218,126 +3065,110 @@ export default function LgProductManagement() {
                         }}
                       />
                     </label>
-                  </div>
 
-                  {/* Image URL Direct Input */}
-                  <div>
-                    <span className="text-[11px] text-[#8B95A1] font-bold block mb-1">이미지 URL 직접 입력:</span>
-                    <input
-                      type="text"
-                      value={editingCategory.icon?.startsWith('http') ? editingCategory.icon : ''}
-                      onChange={(e) => setEditingCategory({ ...editingCategory, icon: e.target.value })}
-                      placeholder="https://... 이미지 웹 주소 입력"
-                      className="w-full bg-[#F8F9FA] border border-[#E5E8EB] focus:border-[#EA1D2C] focus:bg-white rounded-xl px-3 py-1.5 text-[12px] font-medium transition-colors outline-none"
-                    />
-                  </div>
+                    <div>
+                      <span className="text-[11px] text-[#86918a] font-semibold block mb-1">이미지 URL 직접 입력</span>
+                      <input
+                        type="text"
+                        value={editingCategory.icon?.startsWith('http') ? editingCategory.icon : ''}
+                        onChange={(e) => setEditingCategory({ ...editingCategory, icon: e.target.value })}
+                        placeholder="https://... 이미지 웹 주소 입력"
+                        className="adm-input text-[12px]"
+                      />
+                    </div>
 
-                  {/* Popular Emoji Presets */}
-                  <div className="space-y-1">
-                    <span className="text-[11px] text-[#8B95A1] font-bold block">또는 이모지 선택:</span>
-                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-gray-50 rounded-lg border border-gray-200">
-                      {['💧', '🧊', '🥬', '🍽️', '🔥', '🧺', '🏢', '🔄', '👕', '👔', '❄️', '🍃', '🌪️', '💨', '💦', '📺', '📱', '🧹', '💆', '👟', '☕', '✨', '⚡', '📦'].map((emoji) => (
-                        <button
-                          key={emoji}
-                          type="button"
-                          onClick={() => setEditingCategory({ ...editingCategory, icon: emoji })}
-                          className={`w-7 h-7 rounded flex items-center justify-center text-[15px] hover:bg-white hover:scale-110 transition-transform ${
-                            editingCategory.icon === emoji ? 'bg-white border-2 border-[#EA1D2C] shadow-xs' : ''
-                          }`}
-                        >
-                          {emoji}
-                        </button>
-                      ))}
+                    <div>
+                      <span className="text-[11px] text-[#86918a] font-semibold block mb-1">또는 이모지 선택</span>
+                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1.5 bg-[#f9faf7] rounded-[8px] border border-[#e6eae3]">
+                        {['💧', '🧊', '🥬', '🍽️', '🔥', '🧺', '🏢', '🔄', '👕', '👔', '❄️', '🍃', '🌪️', '💨', '💦', '📺', '📱', '🧹', '💆', '👟', '☕', '✨', '⚡', '📦'].map((emoji) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => setEditingCategory({ ...editingCategory, icon: emoji })}
+                            className={`w-7 h-7 rounded flex items-center justify-center text-[15px] hover:bg-white transition-transform ${
+                              editingCategory.icon === emoji ? 'bg-white border-2 border-[#295e52]' : ''
+                            }`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Category Badge */}
-              <div>
-                <label className="block text-[13px] font-bold text-[#333D4B] mb-1.5">
-                  뱃지 (선택 사항)
-                </label>
-                <div className="flex items-center gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={editingCategory.badge || ''}
-                    onChange={(e) => setEditingCategory({ ...editingCategory, badge: e.target.value })}
-                    placeholder="예: 인기, BEST, HOT, 추천 (비워두면 뱃지 없음)"
-                    className="flex-1 bg-[#F8F9FA] border border-[#E5E8EB] focus:border-[#EA1D2C] focus:bg-white rounded-xl px-3.5 py-2 text-[13px] font-medium transition-colors outline-none"
-                  />
-                  {editingCategory.badge && (
-                    <button
-                      type="button"
-                      onClick={() => setEditingCategory({ ...editingCategory, badge: '' })}
-                      className="text-[11px] text-[#8B95A1] hover:text-red-500 font-bold px-2 py-1 bg-gray-100 rounded-md"
-                    >
-                      삭제
-                    </button>
-                  )}
-                </div>
-
-                {/* Badge Presets */}
-                <div className="flex items-center gap-1.5">
-                  {['인기', 'BEST', 'HOT', '추천', '필수', '품절임박'].map((preset) => (
-                    <button
-                      key={preset}
-                      type="button"
-                      onClick={() => setEditingCategory({ ...editingCategory, badge: preset })}
-                      className={`text-[11px] font-extrabold px-2 py-0.5 rounded-full border transition-all ${
-                        editingCategory.badge === preset
-                          ? 'bg-[#EA1D2C] text-white border-[#EA1D2C]'
-                          : 'bg-white text-[#4E5968] border-gray-300 hover:border-gray-400'
-                      }`}
-                    >
-                      {preset}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Landing Default Category Toggle */}
-              <div className="p-3 bg-[#FFF5F6] border border-[#EA1D2C]/20 rounded-xl">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={editingCategory.isDefault || false}
-                    onChange={(e) => setEditingCategory({ ...editingCategory, isDefault: e.target.checked })}
-                    className="w-4 h-4 text-[#EA1D2C] rounded border-gray-300 focus:ring-[#EA1D2C]"
-                  />
-                  <div>
-                    <span className="text-[13px] font-black text-[#191F28]">
-                      ⭐ 랜딩 첫 화면 기본 카테고리로 지정
-                    </span>
-                    <p className="text-[11px] text-[#8B95A1] mt-0.5">
-                      고객이 랜딩 페이지에 처음 들어왔을 때 이 카테고리가 기본으로 선택되어 열립니다.
-                    </p>
+                <div className="adm-field">
+                  <label>뱃지 (선택 사항)</label>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <input
+                      type="text"
+                      value={editingCategory.badge || ''}
+                      onChange={(e) => setEditingCategory({ ...editingCategory, badge: e.target.value })}
+                      placeholder="예: 인기, BEST, HOT, 추천"
+                      className="adm-input flex-1"
+                    />
+                    {editingCategory.badge && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingCategory({ ...editingCategory, badge: '' })}
+                        className="adm-btn xs"
+                      >
+                        초기화
+                      </button>
+                    )}
                   </div>
-                </label>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {['인기', 'BEST', 'HOT', '추천', '필수', '품절임박'].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setEditingCategory({ ...editingCategory, badge: preset })}
+                        className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border transition-all cursor-pointer ${
+                          editingCategory.badge === preset
+                            ? 'bg-[#295e52] text-white border-[#295e52]'
+                            : 'bg-white text-[#526058] border-[#dce2d8] hover:border-[#295e52]'
+                        }`}
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="adm-note-card" style={{ background: '#faf5ea', borderColor: '#eadbc0' }}>
+                  <label className="flex items-center gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editingCategory.isDefault || false}
+                      onChange={(e) => setEditingCategory({ ...editingCategory, isDefault: e.target.checked })}
+                      className="w-4 h-4 accent-[#295e52] rounded"
+                    />
+                    <div>
+                      <span className="text-[12.5px] font-bold text-[#263d36]">
+                        랜딩 첫 화면 기본 카테고리로 지정
+                      </span>
+                      <p className="text-[11px] text-[#6b7870] mt-0.5">
+                        고객이 랜딩 페이지에 접속했을 때 이 카테고리가 기본 선택됩니다.
+                      </p>
+                    </div>
+                  </label>
+                </div>
               </div>
 
-              {/* Actions */}
-              <div className="pt-3 border-t border-[#E5E8EB] flex items-center justify-between gap-2">
+              <div className="adm-modal-foot" style={{ justifyContent: 'space-between' }}>
                 <button
                   type="button"
                   onClick={() => handleDeleteCategory(editingCategory)}
-                  className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-[#EA1D2C] border border-red-200 text-[12.5px] font-bold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="adm-btn danger"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span>카테고리 삭제</span>
+                  카테고리 삭제
                 </button>
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsCategoryModalOpen(false)}
-                    className="px-4 py-2 bg-white border border-[#D1D6DB] hover:bg-[#F2F4F6] text-[#4E5968] text-[13px] font-bold rounded-xl cursor-pointer"
-                  >
+                  <button type="button" onClick={() => setIsCategoryModalOpen(false)} className="adm-btn">
                     취소
                   </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 bg-[#EA1D2C] hover:bg-[#C81020] text-white text-[13px] font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
-                  >
+                  <button type="submit" className="adm-btn primary">
                     저장하기
                   </button>
                 </div>

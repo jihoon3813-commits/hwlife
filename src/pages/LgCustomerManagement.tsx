@@ -1,5 +1,22 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { X, Search, History, RefreshCw, Trash2, Save, Plus, Smartphone, Send, Loader2, RotateCcw, Sparkles, Copy, MessageCircle } from 'lucide-react';
+import {
+  X,
+  Search,
+  History,
+  RefreshCw,
+  Trash2,
+  Save,
+  Plus,
+  Smartphone,
+  Send,
+  Loader2,
+  RotateCcw,
+  Sparkles,
+  Copy,
+  MessageCircle,
+  Users,
+  Phone,
+} from 'lucide-react';
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
@@ -103,10 +120,10 @@ interface ResolvedLgOptions {
 const isOfficialLgApplianceText = (val: string, lgDbProducts?: any[]): boolean => {
   if (!val) return false;
   if (val === '상담 시 제품선택 (전문 상담원 맞춤 추천)') return true;
-  if (LG_OFFICIAL_PRODUCTS.some(p => `[${p.categoryName}] ${p.name} (${p.model})` === val || p.model === val)) {
+  if (LG_OFFICIAL_PRODUCTS.some((p) => `[${p.categoryName}] ${p.name} (${p.model})` === val || p.model === val)) {
     return true;
   }
-  if (lgDbProducts?.some(p => `[${p.category}] ${p.name} (${p.model})` === val || p.model === val)) {
+  if (lgDbProducts?.some((p) => `[${p.category}] ${p.name} (${p.model})` === val || p.model === val)) {
     return true;
   }
   return false;
@@ -116,10 +133,10 @@ const resolveLgProductOptions = (applianceVal: string, lgDbProducts?: any[]): Re
   if (!applianceVal || applianceVal === '상담 시 제품선택 (전문 상담원 맞춤 추천)') return null;
 
   const dbMatch = lgDbProducts?.find(
-    p => `[${p.category}] ${p.name} (${p.model})` === applianceVal || p.model === applianceVal
+    (p) => `[${p.category}] ${p.name} (${p.model})` === applianceVal || p.model === applianceVal
   );
   const officialMatch = LG_OFFICIAL_PRODUCTS.find(
-    p => `[${p.categoryName}] ${p.name} (${p.model})` === applianceVal || p.model === applianceVal
+    (p) => `[${p.categoryName}] ${p.name} (${p.model})` === applianceVal || p.model === applianceVal
   );
 
   const matched: any = dbMatch || officialMatch;
@@ -155,7 +172,7 @@ const resolveLgProductOptions = (applianceVal: string, lgDbProducts?: any[]): Re
   const types: string[] = [];
   if (subOpts?.careServiceTypes?.length) {
     subOpts.careServiceTypes.forEach((t: any) => {
-      const label = t.accentLabel ? `[${t.accentLabel}] ${t.label}` : (t.label || t.value);
+      const label = t.accentLabel ? `[${t.accentLabel}] ${t.label}` : t.label || t.value;
       if (label && !types.includes(label)) types.push(label);
     });
   } else if (matched.careTypes?.length) {
@@ -202,7 +219,6 @@ function LgApplianceOptionFields({
     () => Boolean(value.account) && !ACCOUNT_PRESETS.includes(value.account)
   );
 
-  // Sync direct mode when switching selectedCustomer
   useEffect(() => {
     const matched = isOfficialLgApplianceText(value.appliance, lgDbProducts);
     setForceDirectAppliance(Boolean(value.appliance) && !matched);
@@ -245,17 +261,20 @@ function LgApplianceOptionFields({
     }
   };
 
-  const selectValue = forceDirectAppliance ? '__DIRECT__' : (value.appliance || '');
+  const selectValue = forceDirectAppliance ? '__DIRECT__' : value.appliance || '';
   const accountSelectValue = forceDirectAccount
     ? '__DIRECT__'
-    : (ACCOUNT_PRESETS.includes(value.account) ? value.account : (value.account ? '__DIRECT__' : '1구좌'));
+    : ACCOUNT_PRESETS.includes(value.account)
+      ? value.account
+      : value.account
+        ? '__DIRECT__'
+        : '1구좌';
 
   return (
-    <div className="space-y-3">
-      {/* 결합 가전명 */}
-      <div>
-        <div className="flex items-center justify-between mb-1">
-          <label className="block text-[12px] font-medium text-[#8B95A1]">결합 가전명 (제품명, 모델명)</label>
+    <div className="space-y-3.5">
+      <div className="adm-field">
+        <div className="flex items-center justify-between">
+          <label>결합 가전명 (제품명 · 모델명)</label>
           {forceDirectAppliance && (
             <button
               type="button"
@@ -263,23 +282,23 @@ function LgApplianceOptionFields({
                 setForceDirectAppliance(false);
                 onChange({ appliance: '' });
               }}
-              className="text-[11px] font-bold text-[#3182F6] hover:underline"
+              className="text-[11px] font-bold text-[#295e52] hover:underline"
             >
-              목록에서 선택하기
+              카탈로그 목록에서 선택
             </button>
           )}
         </div>
         <select
           value={selectValue}
-          onChange={e => handleSelectApplianceChange(e.target.value)}
-          className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+          onChange={(e) => handleSelectApplianceChange(e.target.value)}
+          className="adm-select"
         >
           <option value="">가전 선택</option>
           <option value="__DIRECT__">✏️ 직접 입력</option>
           <option value="상담 시 제품선택 (전문 상담원 맞춤 추천)">상담 시 제품선택 (전문 상담원 맞춤 추천)</option>
           {Object.entries(lgProductsByCategory).map(([catName, prods]) => (
             <optgroup key={catName} label={`LG 가전구독 - ${catName} (${prods.length})`}>
-              {prods.map(p => {
+              {prods.map((p) => {
                 const itemText = `[${p.categoryName}] ${p.name} (${p.model})`;
                 return (
                   <option key={p.id} value={itemText}>
@@ -295,20 +314,19 @@ function LgApplianceOptionFields({
           <input
             type="text"
             value={value.appliance || ''}
-            onChange={e => onChange({ appliance: e.target.value })}
+            onChange={(e) => onChange({ appliance: e.target.value })}
             placeholder="예: LG 퓨리케어 오브제컬렉션 정수기 (WD507ACB)"
-            className="mt-2 w-full bg-white border border-[#3182F6]/40 px-3 py-2 rounded-[8px] text-[13px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20"
+            className="adm-input"
           />
         )}
       </div>
 
-      {/* 상조 구좌수 / 구독기간(5년/6년) / 공급사 */}
       <div className={`grid grid-cols-1 ${showSupplier ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-3`}>
-        <div>
-          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">상조 구좌수</label>
+        <div className="adm-field">
+          <label>상조 구좌수</label>
           <select
             value={accountSelectValue}
-            onChange={e => {
+            onChange={(e) => {
               const val = e.target.value;
               if (val === '__DIRECT__') {
                 setForceDirectAccount(true);
@@ -318,10 +336,12 @@ function LgApplianceOptionFields({
                 onChange({ account: val });
               }
             }}
-            className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+            className="adm-select font-bold"
           >
-            {ACCOUNT_PRESETS.map(acc => (
-              <option key={acc} value={acc}>{acc}</option>
+            {ACCOUNT_PRESETS.map((acc) => (
+              <option key={acc} value={acc}>
+                {acc}
+              </option>
             ))}
             <option value="__DIRECT__">직접 입력</option>
           </select>
@@ -329,24 +349,26 @@ function LgApplianceOptionFields({
             <input
               type="text"
               value={value.account || ''}
-              onChange={e => onChange({ account: e.target.value })}
+              onChange={(e) => onChange({ account: e.target.value })}
               placeholder="예: 2구좌"
-              className="mt-1.5 w-full bg-white border border-[#3182F6]/40 px-3 py-1.5 rounded-[8px] text-[13px]"
+              className="adm-input"
             />
           )}
         </div>
 
-        <div>
-          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">구독 기간 (5년/6년)</label>
+        <div className="adm-field">
+          <label>구독 기간 (5년/6년)</label>
           {resolvedOpts && resolvedOpts.periods.length > 0 ? (
             <select
               value={value.subscriptionPeriod || ''}
-              onChange={e => onChange({ subscriptionPeriod: e.target.value })}
-              className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+              onChange={(e) => onChange({ subscriptionPeriod: e.target.value })}
+              className="adm-select font-bold"
             >
               <option value="">기간 선택</option>
-              {resolvedOpts.periods.map(p => (
-                <option key={p} value={p}>{p}</option>
+              {resolvedOpts.periods.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
               ))}
               {value.subscriptionPeriod && !resolvedOpts.periods.includes(value.subscriptionPeriod) && (
                 <option value={value.subscriptionPeriod}>{value.subscriptionPeriod}</option>
@@ -354,17 +376,13 @@ function LgApplianceOptionFields({
             </select>
           ) : (
             <div className="space-y-1.5">
-              <div className="flex gap-1.5">
-                {PERIOD_PRESETS.map(p => (
+              <div className="adm-segmented w-full">
+                {PERIOD_PRESETS.map((p) => (
                   <button
                     key={p}
                     type="button"
                     onClick={() => onChange({ subscriptionPeriod: p })}
-                    className={`flex-1 py-1.5 rounded-[8px] text-[12px] font-bold border transition-colors ${
-                      value.subscriptionPeriod === p
-                        ? 'bg-[#191F28] text-white border-[#191F28]'
-                        : 'bg-[#F9FAFB] text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-                    }`}
+                    className={`flex-1 justify-center ${value.subscriptionPeriod === p ? 'active' : ''}`}
                   >
                     {p}
                   </button>
@@ -373,21 +391,21 @@ function LgApplianceOptionFields({
               <input
                 type="text"
                 value={value.subscriptionPeriod || ''}
-                onChange={e => onChange({ subscriptionPeriod: e.target.value })}
+                onChange={(e) => onChange({ subscriptionPeriod: e.target.value })}
                 placeholder="직접 입력 (예: 5년, 6년)"
-                className="w-full bg-white border border-[#E5E8EB] px-3 py-1.5 rounded-[8px] text-[12px]"
+                className="adm-input"
               />
             </div>
           )}
         </div>
 
         {showSupplier && (
-          <div>
-            <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">공급사</label>
+          <div className="adm-field">
+            <label>공급사</label>
             <select
               value={value.supplier || '라이프앤조이'}
-              onChange={e => onChange({ supplier: e.target.value })}
-              className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+              onChange={(e) => onChange({ supplier: e.target.value })}
+              className="adm-select font-bold"
             >
               <option value="TU">TU</option>
               <option value="BSON">BSON</option>
@@ -400,19 +418,20 @@ function LgApplianceOptionFields({
         )}
       </div>
 
-      {/* 케어서비스 주기 & 유형 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">케어서비스 주기</label>
+        <div className="adm-field">
+          <label>케어서비스 주기</label>
           {resolvedOpts && resolvedOpts.cycles.length > 0 ? (
             <select
               value={value.careCycle || ''}
-              onChange={e => onChange({ careCycle: e.target.value })}
-              className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+              onChange={(e) => onChange({ careCycle: e.target.value })}
+              className="adm-select"
             >
               <option value="">주기 선택</option>
-              {resolvedOpts.cycles.map(c => (
-                <option key={c} value={c}>{c}</option>
+              {resolvedOpts.cycles.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
               {value.careCycle && !resolvedOpts.cycles.includes(value.careCycle) && (
                 <option value={value.careCycle}>{value.careCycle}</option>
@@ -422,24 +441,26 @@ function LgApplianceOptionFields({
             <input
               type="text"
               value={value.careCycle || ''}
-              onChange={e => onChange({ careCycle: e.target.value })}
+              onChange={(e) => onChange({ careCycle: e.target.value })}
               placeholder="직접 입력 (예: 1회 / 12개월, 방문없음)"
-              className="w-full bg-white border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+              className="adm-input"
             />
           )}
         </div>
 
-        <div>
-          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">케어서비스 유형</label>
+        <div className="adm-field">
+          <label>케어서비스 유형</label>
           {resolvedOpts && resolvedOpts.types.length > 0 ? (
             <select
               value={value.careType || ''}
-              onChange={e => onChange({ careType: e.target.value })}
-              className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+              onChange={(e) => onChange({ careType: e.target.value })}
+              className="adm-select"
             >
               <option value="">유형 선택</option>
-              {resolvedOpts.types.map(t => (
-                <option key={t} value={t}>{t}</option>
+              {resolvedOpts.types.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
               ))}
               {value.careType && !resolvedOpts.types.includes(value.careType) && (
                 <option value={value.careType}>{value.careType}</option>
@@ -449,9 +470,9 @@ function LgApplianceOptionFields({
             <input
               type="text"
               value={value.careType || ''}
-              onChange={e => onChange({ careType: e.target.value })}
+              onChange={(e) => onChange({ careType: e.target.value })}
               placeholder="직접 입력 (예: 방문관리, 자가관리)"
-              className="w-full bg-white border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+              className="adm-input"
             />
           )}
         </div>
@@ -462,6 +483,7 @@ function LgApplianceOptionFields({
 
 export default function LgCustomerManagement({ channelId }: { channelId?: string }) {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [drawerTab, setDrawerTab] = useState<'sms' | 'info' | 'history'>('sms');
   const [memo, setMemo] = useState('');
   const [status, setStatus] = useState('대기');
   const [searchQuery, setSearchQuery] = useState('');
@@ -472,11 +494,9 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isSendingSms, setIsSendingSms] = useState(false);
 
-  // Local state for editing details
   const [editData, setEditData] = useState<any>({});
   const [selectedChannelId, setSelectedChannelId] = useState<string>('all');
 
-  // Date filter state
   const getKstTodayStr = () => {
     const d = new Date();
     const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
@@ -487,7 +507,6 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const [startDate, setStartDate] = useState<string>(getKstTodayStr());
   const [endDate, setEndDate] = useState<string>(getKstTodayStr());
 
-  // Direct Registration State
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [registerList, setRegisterList] = useState<any[]>([]);
   const [registerForm, setRegisterForm] = useState<any>({
@@ -504,7 +523,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     birth: '',
     gender: '',
     address: '',
-    detailAddress: ''
+    detailAddress: '',
   });
 
   const settings = useQuery(api.settings.get);
@@ -517,9 +536,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
 
   const inquiries = useQuery(
     api.inquiries.list,
-    channelId
-      ? (subChannelIds ? { channelIds: subChannelIds } : 'skip')
-      : {}
+    channelId ? (subChannelIds ? { channelIds: subChannelIds } : 'skip') : {}
   );
 
   const updateInquiry = useMutation(api.inquiries.update);
@@ -534,10 +551,9 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const landings = useQuery(api.landings.get);
   const allPlans = useQuery(api.plans.get);
 
-  const guideTemplates: GuideTemplate[] =
-    (settings as any)?.guideTemplates?.length
-      ? (settings as any).guideTemplates
-      : DEFAULT_GUIDE_TEMPLATES;
+  const guideTemplates: GuideTemplate[] = (settings as any)?.guideTemplates?.length
+    ? (settings as any).guideTemplates
+    : DEFAULT_GUIDE_TEMPLATES;
   const [selectedGuideIdx, setSelectedGuideIdx] = useState(0);
   const [guideDraft, setGuideDraft] = useState('');
   const [customSmsTitle, setCustomSmsTitle] = useState('[효원상조 × LG가전구독] 안내');
@@ -558,6 +574,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     setCustomSmsDraft('');
     setQuickReplyDraft('');
     setExpandedSmsLogId(null);
+    setDrawerTab('sms');
   }, [selectedCustomer?._id]);
 
   useEffect(() => {
@@ -576,7 +593,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
-  }, [smsLogs?.length, selectedCustomer?._id]);
+  }, [smsLogs?.length, selectedCustomer?._id, drawerTab]);
 
   useEffect(() => {
     if (!selectedCustomer || selectedGuideIdx < 0) return;
@@ -586,27 +603,28 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     }
   }, [selectedCustomer?._id, selectedGuideIdx, (settings as any)?.guideTemplates]);
 
-  // LG구독 고객만 필터링
   const lgInquiries = useMemo(() => {
     if (!inquiries) return undefined;
     return inquiries.filter(isLgCareCustomer);
   }, [inquiries]);
 
-  // Column Resizing Setup
-  const DEFAULT_COLUMNS = useMemo(() => [
-    { id: 'index', label: '순번', minWidth: 45, defaultWidth: 55, align: 'center' as const },
-    { id: 'checkbox', label: '', minWidth: 40, defaultWidth: 45, align: 'center' as const },
-    { id: 'source', label: '유입경로', minWidth: 65, defaultWidth: 85, align: 'center' as const },
-    { id: 'createdAt', label: '등록일시', minWidth: 100, defaultWidth: 125, align: 'left' as const },
-    { id: 'channel', label: '채널명', minWidth: 80, defaultWidth: 100, align: 'left' as const },
-    { id: 'name', label: '고객명', minWidth: 70, defaultWidth: 90, align: 'left' as const },
-    { id: 'phone', label: '연락처', minWidth: 110, defaultWidth: 125, align: 'left' as const },
-    { id: 'address', label: '주소', minWidth: 140, defaultWidth: 200, align: 'left' as const },
-    { id: 'productName', label: '신청상품', minWidth: 140, defaultWidth: 220, align: 'left' as const },
-    { id: 'appliance', label: '결합제품', minWidth: 160, defaultWidth: 260, align: 'left' as const },
-    { id: 'supplier', label: '공급사', minWidth: 70, defaultWidth: 90, align: 'center' as const },
-    { id: 'status', label: '진행상태', minWidth: 75, defaultWidth: 95, align: 'center' as const },
-  ], []);
+  const DEFAULT_COLUMNS = useMemo(
+    () => [
+      { id: 'index', label: '순번', minWidth: 45, defaultWidth: 55, align: 'center' as const },
+      { id: 'checkbox', label: '', minWidth: 40, defaultWidth: 45, align: 'center' as const },
+      { id: 'source', label: '유입 · 방식', minWidth: 75, defaultWidth: 95, align: 'center' as const },
+      { id: 'createdAt', label: '등록일시', minWidth: 100, defaultWidth: 125, align: 'left' as const },
+      { id: 'channel', label: '채널명', minWidth: 80, defaultWidth: 100, align: 'left' as const },
+      { id: 'name', label: '고객명', minWidth: 95, defaultWidth: 125, align: 'left' as const },
+      { id: 'phone', label: '연락처', minWidth: 110, defaultWidth: 125, align: 'left' as const },
+      { id: 'address', label: '주소', minWidth: 140, defaultWidth: 200, align: 'left' as const },
+      { id: 'productName', label: '신청상품', minWidth: 140, defaultWidth: 220, align: 'left' as const },
+      { id: 'appliance', label: '결합제품 · 조건', minWidth: 170, defaultWidth: 270, align: 'left' as const },
+      { id: 'supplier', label: '공급사', minWidth: 70, defaultWidth: 90, align: 'center' as const },
+      { id: 'status', label: '진행상태', minWidth: 75, defaultWidth: 95, align: 'center' as const },
+    ],
+    []
+  );
 
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>(() => {
     try {
@@ -617,17 +635,17 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
         [
           { id: 'index', defaultWidth: 55 },
           { id: 'checkbox', defaultWidth: 45 },
-          { id: 'source', defaultWidth: 60 },
+          { id: 'source', defaultWidth: 95 },
           { id: 'createdAt', defaultWidth: 125 },
           { id: 'channel', defaultWidth: 100 },
-          { id: 'name', defaultWidth: 90 },
+          { id: 'name', defaultWidth: 125 },
           { id: 'phone', defaultWidth: 125 },
           { id: 'address', defaultWidth: 200 },
           { id: 'productName', defaultWidth: 220 },
-          { id: 'appliance', defaultWidth: 260 },
+          { id: 'appliance', defaultWidth: 270 },
           { id: 'supplier', defaultWidth: 90 },
           { id: 'status', defaultWidth: 95 },
-        ].forEach(col => {
+        ].forEach((col) => {
           initial[col.id] = parsed[col.id] || col.defaultWidth;
         });
         return initial;
@@ -636,14 +654,14 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     return {
       index: 55,
       checkbox: 45,
-      source: 60,
+      source: 95,
       createdAt: 125,
       channel: 100,
-      name: 90,
+      name: 125,
       phone: 125,
       address: 200,
       productName: 220,
-      appliance: 260,
+      appliance: 270,
       supplier: 90,
       status: 95,
     };
@@ -663,12 +681,12 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       const { colId: currentColId, startX: cStartX, startWidth: cStartWidth, minWidth: cMinWidth } = resizingRef.current;
       const delta = moveEvent.clientX - cStartX;
       const newWidth = Math.max(cMinWidth, cStartWidth + delta);
-      setColumnWidths(prev => ({ ...prev, [currentColId]: newWidth }));
+      setColumnWidths((prev) => ({ ...prev, [currentColId]: newWidth }));
     };
 
     const handleMouseUp = () => {
       if (resizingRef.current) {
-        setColumnWidths(current => {
+        setColumnWidths((current) => {
           try {
             localStorage.setItem('lg_customer_table_column_widths', JSON.stringify(current));
           } catch (e) {}
@@ -692,14 +710,14 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     const defaults = {
       index: 55,
       checkbox: 45,
-      source: 60,
+      source: 95,
       createdAt: 125,
       channel: 100,
-      name: 90,
+      name: 125,
       phone: 125,
       address: 200,
       productName: 220,
-      appliance: 260,
+      appliance: 270,
       supplier: 90,
       status: 95,
     };
@@ -709,7 +727,6 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     } catch (e) {}
   };
 
-  // 공급사 계산 함수
   const getSupplier = (customer: any): string => {
     if (customer.supplier && String(customer.supplier).trim() !== '' && customer.supplier !== '-') {
       return String(customer.supplier).trim();
@@ -717,10 +734,9 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     return '라이프앤조이';
   };
 
-  // Group LG Official Products by categoryName
   const lgProductsByCategory = useMemo(() => {
     const groups: Record<string, typeof LG_OFFICIAL_PRODUCTS> = {};
-    LG_OFFICIAL_PRODUCTS?.forEach(p => {
+    LG_OFFICIAL_PRODUCTS?.forEach((p) => {
       const cat = p.categoryName || '기타';
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(p);
@@ -750,7 +766,9 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
 
       setEditData({
         ...selectedCustomer,
-        newRegDate: selectedCustomer.newRegDate || new Date(selectedCustomer.createdAt + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
+        newRegDate:
+          selectedCustomer.newRegDate ||
+          new Date(selectedCustomer.createdAt + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
         productName: resolvedCategoryName,
         account: resolvedAccount,
         appliance: initialAppliance,
@@ -759,7 +777,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
         careCycle: selectedCustomer.careCycle || '',
         careType: selectedCustomer.careType || '',
       });
-      setStatus(selectedCustomer.status);
+      setStatus(selectedCustomer.status || '대기');
       setMemo('');
     }
   }, [selectedCustomer]);
@@ -773,22 +791,15 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       oncomplete: function (data: any) {
         let fullAddr = data.roadAddress || data.jibunAddress;
         let extraAddr = '';
-
         if (data.addressType === 'R') {
-          if (data.bname !== '') {
-            extraAddr += data.bname;
-          }
+          if (data.bname !== '') extraAddr += data.bname;
           if (data.buildingName !== '') {
-            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+            extraAddr += extraAddr !== '' ? ', ' + data.buildingName : data.buildingName;
           }
-          fullAddr += (extraAddr !== '' ? ' (' + extraAddr + ')' : '');
+          fullAddr += extraAddr !== '' ? ' (' + extraAddr + ')' : '';
         }
-
-        setEditData((prev: any) => ({
-          ...prev,
-          address: fullAddr
-        }));
-      }
+        setEditData((prev: any) => ({ ...prev, address: fullAddr }));
+      },
     }).open();
   };
 
@@ -801,22 +812,15 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       oncomplete: function (data: any) {
         let fullAddr = data.roadAddress || data.jibunAddress;
         let extraAddr = '';
-
         if (data.addressType === 'R') {
-          if (data.bname !== '') {
-            extraAddr += data.bname;
-          }
+          if (data.bname !== '') extraAddr += data.bname;
           if (data.buildingName !== '') {
-            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+            extraAddr += extraAddr !== '' ? ', ' + data.buildingName : data.buildingName;
           }
-          fullAddr += (extraAddr !== '' ? ' (' + extraAddr + ')' : '');
+          fullAddr += extraAddr !== '' ? ' (' + extraAddr + ')' : '';
         }
-
-        setRegisterForm((prev: any) => ({
-          ...prev,
-          address: fullAddr
-        }));
-      }
+        setRegisterForm((prev: any) => ({ ...prev, address: fullAddr }));
+      },
     }).open();
   };
 
@@ -844,7 +848,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
         birth: '',
         gender: '',
         address: '',
-        detailAddress: ''
+        detailAddress: '',
       });
     } else {
       alert('고객명과 연락처는 필수 입력 사항입니다.');
@@ -852,7 +856,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   };
 
   const handleRemoveFromList = (id: number) => {
-    setRegisterList(registerList.filter(item => item.id !== id));
+    setRegisterList(registerList.filter((item) => item.id !== id));
   };
 
   const handleBulkRegister = async () => {
@@ -888,22 +892,19 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       birth: '',
       gender: '',
       address: '',
-      detailAddress: ''
+      detailAddress: '',
     });
     setIsRegisterModalOpen(true);
   };
 
   const handleSendConsent = async () => {
     if (!selectedCustomer) return;
-
     const smsConfig = (settings as any)?.sms;
     if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
       alert('SMS 설정이 완료되지 않았습니다.\n환경설정 > SMS 설정에서 알리고 API 정보를 먼저 입력해주세요.');
       return;
     }
-
     if (!window.confirm(`${selectedCustomer.name}님에게 동의서 문자를 발송하시겠습니까?`)) return;
-
     setIsSendingSms(true);
     try {
       const result = await sendConsentSms({
@@ -943,7 +944,6 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const handleUpdate = async () => {
     if (!selectedCustomer) return;
     try {
-      // Only include fields accepted by inquiries.update to avoid Convex validation errors on tracking/system fields
       const allowedFields = [
         'name', 'phone', 'gender', 'birth', 'address', 'detailAddress',
         'newRegDate', 'cardPaymentDate', 'purchaseConsentDate', 'sangjoContractDate',
@@ -961,12 +961,11 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
 
       if (memo.trim()) {
         const writerName = getCurrentWriterName();
-
         const newHistory = {
           date: new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
           status,
           memo: memo.trim(),
-          writer: writerName
+          writer: writerName,
         };
         updates.memoHistory = [...(selectedCustomer.memoHistory || []), newHistory];
       }
@@ -985,7 +984,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     if (confirm('정말로 이 고객 정보를 삭제하시겠습니까?')) {
       await removeInquiry({ id: selectedCustomer._id });
       setSelectedCustomer(null);
-      setSelectedIds(prev => prev.filter(id => id !== selectedCustomer._id));
+      setSelectedIds((prev) => prev.filter((id) => id !== selectedCustomer._id));
     }
   };
 
@@ -1004,9 +1003,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     const phoneNumber = value.replace(/[^\d]/g, '');
     const phoneNumberLength = phoneNumber.length;
     if (phoneNumberLength < 4) return phoneNumber;
-    if (phoneNumberLength < 7) {
-      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
-    }
+    if (phoneNumberLength < 7) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
     if (phoneNumberLength < 11) {
       return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6)}`;
     }
@@ -1017,97 +1014,105 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     const statusSetting = settings?.statuses?.find((s: any) => s.name === statusName);
     if (statusSetting && statusSetting.color) {
       const hex = statusSetting.color;
-      let textColor = '#4E5968';
+      let textColor = '#263d36';
       try {
         const color = hex.replace('#', '');
         const r = parseInt(color.substring(0, 2), 16);
         const g = parseInt(color.substring(2, 4), 16);
         const b = parseInt(color.substring(4, 6), 16);
         const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-        textColor = brightness > 155 ? '#4E5968' : '#FFFFFF';
+        textColor = brightness > 155 ? '#263d36' : '#FFFFFF';
       } catch (e) {
-        textColor = '#4E5968';
+        textColor = '#263d36';
       }
       return { bg: hex, text: textColor };
     }
-    return { bg: '#F2F4F6', text: '#4E5968' };
+    return { bg: '#f0f2ed', text: '#5c6b5b' };
   };
 
   const getChannelName = (id?: string) => {
     if (!id || id === '본사' || id === 'default') return '본사';
     if (!channels) return '...';
-    return channels?.find(c => c.subdomain === id)?.channelName || id;
+    return channels?.find((c) => c.subdomain === id)?.channelName || id;
   };
 
   const getInquiryCountsByChannel = () => {
     if (!lgInquiries || !channels || channelId) return [];
 
     const pathMap: { [key: string]: string } = {};
-    channels.forEach(c => {
+    channels.forEach((c) => {
       if (c.landingPage) {
         pathMap[c.landingPage.replace('/', '')] = c.subdomain;
       }
     });
 
     const counts: { [key: string]: number } = {};
-    lgInquiries.forEach(inq => {
-      let cid = (!inq.channelId || inq.channelId === '본사' || inq.channelId === 'default') ? 'default' : inq.channelId;
-      if (pathMap[cid]) {
-        cid = pathMap[cid];
-      }
+    lgInquiries.forEach((inq) => {
+      let cid = !inq.channelId || inq.channelId === '본사' || inq.channelId === 'default' ? 'default' : inq.channelId;
+      if (pathMap[cid]) cid = pathMap[cid];
       counts[cid] = (counts[cid] || 0) + 1;
     });
 
-    const result = channels.map(c => ({
+    const result = channels.map((c) => ({
       name: c.channelName,
       id: c.subdomain,
-      count: counts[c.subdomain] || 0
+      count: counts[c.subdomain] || 0,
     }));
 
     result.unshift({ name: '본사', id: 'default', count: counts['default'] || 0 });
     return result;
   };
 
+  const lgSummary = useMemo(() => {
+    const list = lgInquiries || [];
+    const kakaoCount = list.filter((i) => getLgConsultType(i) === 'kakao').length;
+    const phoneCount = list.filter((i) => getLgConsultType(i) === 'phone').length;
+    const totalUnread = (Object.entries(unreadSmsCounts) as [string, number][]).reduce((acc, [id, cnt]) => {
+      if (list.some((i) => String(i._id) === id)) return acc + (cnt || 0);
+      return acc;
+    }, 0);
+    return {
+      total: list.length,
+      kakaoCount,
+      phoneCount,
+      totalUnread,
+    };
+  }, [lgInquiries, unreadSmsCounts]);
+
   if (!lgInquiries) {
     return (
-      <div className="p-8 flex flex-col items-center justify-center h-full">
-        <RefreshCw className="w-8 h-8 text-[#3182F6] animate-spin mb-4" />
-        <p className="text-[14px] font-bold text-[#4E5968]">LG구독 고객 데이터를 불러오는 중...</p>
+      <div className="py-24 flex flex-col items-center justify-center">
+        <RefreshCw className="w-7 h-7 text-[#295e52] animate-spin mb-3" />
+        <p className="text-[13px] font-semibold text-[#45554e]">LG구독 고객 데이터를 불러오는 중입니다...</p>
       </div>
     );
   }
 
-  const filteredInquiries = lgInquiries.filter(inq => {
-    // 1. Channel Filter
+  const filteredInquiries = lgInquiries.filter((inq) => {
     if (selectedChannelId !== 'all') {
-      const targetCid = (selectedChannelId === 'default' || selectedChannelId === '본사') ? undefined : selectedChannelId;
-      const inquiryCid = (!inq.channelId || inq.channelId === '본사' || inq.channelId === 'default') ? undefined : inq.channelId;
+      const targetCid = selectedChannelId === 'default' || selectedChannelId === '본사' ? undefined : selectedChannelId;
+      const inquiryCid = !inq.channelId || inq.channelId === '본사' || inq.channelId === 'default' ? undefined : inq.channelId;
       if (inquiryCid !== targetCid) return false;
     }
 
-    // 2. Status Filter
-    if (statusFilter !== 'all' && inq.status !== statusFilter) {
+    if (statusFilter !== 'all' && (inq.status || '대기') !== statusFilter) {
       return false;
     }
 
-    // 2.5 Inflow Filter
     if (inflowFilter !== 'all' && getCustomerInflow(inq) !== inflowFilter) {
       return false;
     }
 
-    // 2.6 Consult Type Filter (카톡 안내 / 전화 상담)
     if (consultTypeFilter !== 'all' && getLgConsultType(inq) !== consultTypeFilter) {
       return false;
     }
 
-    // 3. Date Filter
     if (dateFilter !== 'all') {
       const range = getFilterDateRange(dateFilter, startDate, endDate);
       const time = inq.createdAt;
       if (time < range.start || time > range.end) return false;
     }
 
-    // 4. Search Query Filter
     const search = searchQuery.toLowerCase();
     if (!search) return true;
     const sup = getSupplier(inq).toLowerCase();
@@ -1127,15 +1132,13 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     if (selectedIds.length === filteredInquiries.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(filteredInquiries.map(inq => inq._id));
+      setSelectedIds(filteredInquiries.map((inq) => inq._id));
     }
   };
 
   const toggleSelect = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
   };
 
   const usedStatuses = settings?.statuses?.filter((s: any) => s.isUsed) || [
@@ -1145,1202 +1148,1444 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   ];
 
   return (
-    <div className="p-4 lg:p-8">
-      {!channelId && (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
-          <div
-            onClick={() => setSelectedChannelId('all')}
-            className={`p-4 rounded-[16px] border cursor-pointer transition-all ${selectedChannelId === 'all' ? 'bg-[#3182F6] border-[#3182F6] text-white shadow-lg shadow-blue-500/20' : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:border-[#3182F6]'}`}
+    <div>
+      {/* Page Heading */}
+      <div className="adm-page-heading">
+        <div>
+          <div className="adm-eyebrow">LG CARE SOLUTIONS · CUSTOMERS</div>
+          <h1>
+            고객 관리 (LG구독)
+            {!channelId && selectedChannelId !== 'all' && (
+              <span className="text-[#295e52] text-[17px] ml-2 font-bold">
+                · {getChannelName(selectedChannelId === 'default' ? undefined : selectedChannelId)}
+              </span>
+            )}
+          </h1>
+          <p>
+            LG가전 구독 결합 고객의 카톡 · 문자 안내 발송, 양방향 답장 내역 및 구독 조건을 관리합니다. (검색 결과{' '}
+            <strong className="text-[#263d36]">{filteredInquiries.length}</strong>명)
+          </p>
+        </div>
+
+        <div className="adm-heading-buttons">
+          <button
+            type="button"
+            onClick={() => setIsDaangnModalOpen(true)}
+            className="adm-btn sage"
           >
-            <p className="text-[12px] font-bold opacity-80 mb-1">전체 채널 (LG구독)</p>
-            <p className="text-[18px] font-black">{lgInquiries.length}건</p>
+            <span>당근 리드폼 연동</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenRegisterModal}
+            className="adm-btn primary"
+          >
+            <Plus />
+            <span>LG구독 고객 등록</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 4-Column Metric Cards */}
+      <div className="adm-metrics-grid">
+        <div className="adm-metric clickable" onClick={() => { setConsultTypeFilter('all'); setStatusFilter('all'); }}>
+          <div className="adm-metric-head">
+            <span>LG구독 누적 접수</span>
+            <div className="adm-metric-icon"><Users /></div>
           </div>
-          {getInquiryCountsByChannel().filter(c => c.count > 0 || c.id === 'default').map(c => (
-            <div
-              key={c.id}
-              onClick={() => setSelectedChannelId(c.id === 'default' ? 'default' : c.id)}
-              className={`p-4 rounded-[16px] border cursor-pointer transition-all ${((c.id === 'default' && selectedChannelId === 'default') || selectedChannelId === c.id) ? 'bg-[#191F28] border-[#191F28] text-white shadow-lg' : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:border-[#191F28]'}`}
+          <div className="adm-metric-value">
+            {lgSummary.total.toLocaleString()}<span>건</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">LG 케어솔루션</span>
+            <span>전용 결합 고객</span>
+          </div>
+        </div>
+
+        <div className="adm-metric clickable" onClick={() => setConsultTypeFilter('kakao')}>
+          <div className="adm-metric-head">
+            <span>카톡 안내 신청</span>
+            <div className="adm-metric-icon"><Sparkles /></div>
+          </div>
+          <div className="adm-metric-value">
+            {lgSummary.kakaoCount.toLocaleString()}<span>건</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">문구 발송 대상</span>
+            <span>비대면 견적 요청</span>
+          </div>
+        </div>
+
+        <div className="adm-metric clickable" onClick={() => setConsultTypeFilter('phone')}>
+          <div className="adm-metric-head">
+            <span>전문 전화 상담</span>
+            <div className="adm-metric-icon"><Phone /></div>
+          </div>
+          <div className="adm-metric-value">
+            {lgSummary.phoneCount.toLocaleString()}<span>건</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">유선 상담 희망</span>
+            <span>해피콜 진행 대상</span>
+          </div>
+        </div>
+
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>미확인 고객 답장</span>
+            <div className="adm-metric-icon"><MessageCircle /></div>
+          </div>
+          <div className="adm-metric-value">
+            {lgSummary.totalUnread.toLocaleString()}<span>건</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className={`adm-metric-trend ${lgSummary.totalUnread > 0 ? 'warning' : ''}`}>
+              {lgSummary.totalUnread > 0 ? '답장 확인 필요' : '전건 확인됨'}
+            </span>
+            <span>양방향 문자 수신</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Master Admin Quick Channel Strip */}
+      {!channelId && (
+        <div className="adm-panel p-3.5 mb-5">
+          <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar">
+            <span className="text-[11.5px] font-bold text-[#6d786c] shrink-0 px-2">채널별 현황</span>
+            <button
+              type="button"
+              onClick={() => setSelectedChannelId('all')}
+              className={`adm-btn small ${selectedChannelId === 'all' ? 'primary' : ''}`}
             >
-              <p className="text-[12px] font-bold opacity-80 mb-1">{c.name}</p>
-              <p className="text-[18px] font-black">{c.count}건</p>
-            </div>
-          ))}
+              전체 채널 ({lgInquiries.length})
+            </button>
+            {getInquiryCountsByChannel()
+              .filter((c) => c.count > 0 || c.id === 'default')
+              .map((c) => {
+                const targetVal = c.id === 'default' ? 'default' : c.id;
+                const isActive = selectedChannelId === targetVal;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setSelectedChannelId(targetVal)}
+                    className={`adm-btn small ${isActive ? 'primary' : ''}`}
+                  >
+                    <span>{c.name}</span>
+                    <span className="opacity-75 font-mono">({c.count})</span>
+                  </button>
+                );
+              })}
+          </div>
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <div className="flex items-center gap-3 flex-wrap">
-          <h2 className="text-[20px] lg:text-[24px] font-bold flex items-center gap-2">
-            고객관리(LG구독)
-            {!channelId && selectedChannelId !== 'all' && (
-              <span className="text-[#3182F6] text-[16px]">
-                ({getChannelName(selectedChannelId === 'default' ? undefined : selectedChannelId)})
-              </span>
-            )}
-          </h2>
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-bold bg-[#EA1D2C]/10 text-[#EA1D2C]">
-            <Sparkles className="w-3.5 h-3.5" />
-            총 {filteredInquiries.length}건
-          </span>
-        </div>
-
-        <div className="flex flex-col sm:flex-row w-full lg:w-auto gap-2">
-          <div className="flex gap-2">
-            {selectedIds.length > 0 && (
-              <button
-                onClick={handleBulkDelete}
-                className="flex-1 lg:flex-none bg-red-50 text-red-500 border border-red-100 hover:bg-red-100 px-4 py-2 rounded-[8px] flex items-center justify-center gap-2 text-[14px] font-bold transition-colors"
-              >
-                <Trash2 className="w-4 h-4" /> 삭제 ({selectedIds.length})
-              </button>
-            )}
-            <button
-              onClick={() => setIsDaangnModalOpen(true)}
-              className="flex-1 lg:flex-none bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100 px-3.5 py-2 rounded-[8px] flex items-center justify-center gap-1.5 text-[13px] font-bold transition-colors shrink-0"
-            >
-              당근 리드폼 연동
+      {/* Bulk Action Bar */}
+      {selectedIds.length > 0 && (
+        <div className="adm-bulk-bar">
+          <div className="text-[12.5px] font-semibold">
+            현재 <strong className="text-white">{selectedIds.length}명</strong>의 LG구독 고객이 선택되었습니다.
+          </div>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => setSelectedIds([])} className="adm-btn small">
+              선택 해제
             </button>
-            <button
-              onClick={handleOpenRegisterModal}
-              className="flex-1 lg:flex-none bg-[#191F28] text-white px-4 py-2 rounded-[8px] flex items-center justify-center gap-2 text-[14px] font-bold hover:bg-[#2D3644] transition-colors"
-            >
-              <Plus className="w-4 h-4" /> LG구독 고객 등록
+            <button type="button" onClick={handleBulkDelete} className="adm-btn danger small">
+              <Trash2 />
+              <span>선택 삭제 ({selectedIds.length})</span>
             </button>
           </div>
-          <div className="flex gap-2 w-full lg:w-auto">
-            {!channelId && (
-              <select
-                value={selectedChannelId}
-                onChange={(e) => setSelectedChannelId(e.target.value)}
-                className="bg-white border border-[#E5E8EB] px-4 py-2 rounded-[8px] text-[14px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
-              >
-                <option value="all">모든 채널</option>
-                <option value="default">본사</option>
-                {channels?.map(c => (
-                  <option key={c._id} value={c.subdomain}>{c.channelName}</option>
-                ))}
-              </select>
-            )}
-            {channelId && subChannelIds && subChannelIds.length > 1 && (
-              <select
-                value={selectedChannelId}
-                onChange={(e) => setSelectedChannelId(e.target.value)}
-                className="bg-white border border-[#E5E8EB] px-4 py-2 rounded-[8px] text-[14px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
-              >
-                <option value="all">내 하위 채널 전체</option>
-                {subChannelIds.map(sid => (
-                  <option key={sid} value={sid}>{getChannelName(sid)}</option>
-                ))}
-              </select>
-            )}
+        </div>
+      )}
 
-            <div className="flex-1 lg:w-[240px] bg-white border border-[#E5E8EB] rounded-[8px] flex items-center px-3 py-2 shadow-sm">
-              <Search className="w-4 h-4 text-[#8B95A1] mr-2" />
+      {/* Main Panel */}
+      <div className="adm-panel">
+        {/* Status Tabs */}
+        <div className="adm-tabs">
+          <button
+            type="button"
+            onClick={() => setStatusFilter('all')}
+            className={`adm-tab ${statusFilter === 'all' ? 'active' : ''}`}
+          >
+            <span>전체 상태</span>
+            <span className="adm-tab-count">{lgInquiries.length}</span>
+          </button>
+          {usedStatuses.map((s: any) => {
+            const count = lgInquiries.filter((i) => (i.status || '대기') === s.name).length;
+            return (
+              <button
+                key={s.name}
+                type="button"
+                onClick={() => setStatusFilter(s.name)}
+                className={`adm-tab ${statusFilter === s.name ? 'active' : ''}`}
+              >
+                <span>{s.name}</span>
+                <span className="adm-tab-count">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Filter Row 1 */}
+        <div className="adm-filter-bar">
+          <div className="adm-search-field">
+            <Search />
+            <input
+              type="text"
+              placeholder="고객명, 연락처, 가전 모델명 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {!channelId && (
+            <select
+              value={selectedChannelId}
+              onChange={(e) => setSelectedChannelId(e.target.value)}
+              className="adm-select"
+            >
+              <option value="all">모든 파트너 채널</option>
+              <option value="default">본사 직접유입</option>
+              {channels?.map((c) => (
+                <option key={c._id} value={c.subdomain}>
+                  {c.channelName}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {channelId && subChannelIds && subChannelIds.length > 1 && (
+            <select
+              value={selectedChannelId}
+              onChange={(e) => setSelectedChannelId(e.target.value)}
+              className="adm-select"
+            >
+              <option value="all">내 하위 채널 전체</option>
+              {subChannelIds.map((sid) => (
+                <option key={sid} value={sid}>
+                  {getChannelName(sid)}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {/* Consult Type Segmented */}
+          <div className="adm-segmented">
+            {(
+              [
+                { id: 'all', label: '방식 전체' },
+                { id: 'kakao', label: '카톡 안내' },
+                { id: 'phone', label: '전화 상담' },
+              ] as const
+            ).map((item) => {
+              const count =
+                item.id === 'all'
+                  ? lgInquiries.length
+                  : lgInquiries.filter((i) => getLgConsultType(i) === item.id).length;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setConsultTypeFilter(item.id)}
+                  className={consultTypeFilter === item.id ? 'active' : ''}
+                >
+                  {item.label} ({count})
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Inflow Segmented */}
+          <div className="adm-segmented">
+            {(['all', 'landing', 'direct', 'daangn'] as const).map((type) => {
+              const count =
+                type === 'all'
+                  ? lgInquiries.length
+                  : lgInquiries.filter((i) => getCustomerInflow(i) === type).length;
+              const label = type === 'all' ? '유입 전체' : INFLOW_META[type].label;
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setInflowFilter(type)}
+                  className={inflowFilter === type ? 'active' : ''}
+                >
+                  {label} ({count})
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Filter Row 2: Date Range */}
+        <div className="adm-filter-bar">
+          <span className="text-[11.5px] font-semibold text-[#6d786c]">접수 기간</span>
+          <div className="adm-segmented">
+            {[
+              { label: '전체', value: 'all' },
+              { label: '당일', value: 'today' },
+              { label: '전일', value: 'yesterday' },
+              { label: '1주일', value: '1week' },
+              { label: '당월', value: 'thisMonth' },
+              { label: '전월', value: 'lastMonth' },
+              { label: '3개월', value: '3months' },
+              { label: '6개월', value: '6months' },
+              { label: '기간선택', value: 'custom' },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setDateFilter(opt.value)}
+                className={dateFilter === opt.value ? 'active' : ''}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          {dateFilter === 'custom' && (
+            <div className="inline-flex items-center gap-1.5">
               <input
-                type="text"
-                placeholder="고객명, 연락처, 가전 검색"
-                className="text-[14px] focus:outline-none w-full"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="adm-input"
+              />
+              <span className="text-[#86918a] text-[12px]">~</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="adm-input"
               />
             </div>
+          )}
+
+          <div className="adm-filter-end">
+            <button
+              type="button"
+              onClick={handleResetColumnWidths}
+              className="adm-btn small"
+            >
+              <RotateCcw />
+              <span>열 간격 초기화</span>
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* 유입경로 필터 탭 */}
-      <div className="flex items-center gap-2 mb-3 overflow-x-auto no-scrollbar pb-1">
-        <span className="text-[12px] font-bold text-[#8B95A1] shrink-0 mr-1">유입경로</span>
-        {(['all', 'landing', 'direct', 'daangn'] as const).map((type) => {
-          const count = type === 'all'
-            ? lgInquiries.length
-            : lgInquiries.filter(i => getCustomerInflow(i) === type).length;
-          const label = type === 'all' ? '전체' : INFLOW_META[type].label;
-          const isActive = inflowFilter === type;
-          return (
-            <button
-              key={type}
-              onClick={() => setInflowFilter(type)}
-              className={`px-3 py-1 rounded-full text-[12px] font-bold transition-all shrink-0 border ${
-                isActive
-                  ? type === 'daangn'
-                    ? 'bg-orange-500 text-white border-orange-500 shadow-sm'
-                    : 'bg-[#191F28] text-white border-[#191F28]'
-                  : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-              }`}
-            >
-              {label} ({count})
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 상담방식 필터 탭 (카톡 안내 / 전화 상담) */}
-      <div className="flex items-center gap-2 mb-3 overflow-x-auto no-scrollbar pb-1">
-        <span className="text-[12px] font-bold text-[#8B95A1] shrink-0 mr-1">상담방식</span>
-        {([
-          { id: 'all', label: '전체' },
-          { id: 'kakao', label: '카톡 안내' },
-          { id: 'phone', label: '전화 상담' },
-        ] as const).map((item) => {
-          const count =
-            item.id === 'all'
-              ? lgInquiries.length
-              : lgInquiries.filter((i) => getLgConsultType(i) === item.id).length;
-          const isActive = consultTypeFilter === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setConsultTypeFilter(item.id)}
-              className={`px-3 py-1 rounded-full text-[12px] font-bold transition-all shrink-0 border ${
-                isActive
-                  ? item.id === 'kakao'
-                    ? 'bg-[#FEE500] text-[#191919] border-[#EAB308] shadow-sm'
-                    : item.id === 'phone'
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                      : 'bg-[#191F28] text-white border-[#191F28]'
-                  : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-              }`}
-            >
-              {item.label} ({count})
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 진행상태 필터 탭 */}
-      <div className="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar pb-1">
-        <button
-          onClick={() => setStatusFilter('all')}
-          className={`px-3.5 py-1.5 rounded-full text-[13px] font-bold transition-all shrink-0 border ${
-            statusFilter === 'all'
-              ? 'bg-[#191F28] text-white border-[#191F28]'
-              : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-          }`}
-        >
-          전체 ({lgInquiries.length})
-        </button>
-        {usedStatuses.map((s: any) => {
-          const count = lgInquiries.filter(i => i.status === s.name).length;
-          const isActive = statusFilter === s.name;
-          return (
-            <button
-              key={s.name}
-              onClick={() => setStatusFilter(s.name)}
-              className={`px-3.5 py-1.5 rounded-full text-[13px] font-bold transition-all shrink-0 border ${
-                isActive
-                  ? 'bg-[#3182F6] text-white border-[#3182F6] shadow-sm'
-                  : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-              }`}
-            >
-              {s.name} ({count})
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 기간 필터링 바 */}
-      <div className="bg-white p-4 rounded-[16px] border border-[#E5E8EB] mb-6 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
-        <div className="flex items-center gap-2 w-full overflow-x-auto no-scrollbar py-1">
-          <span className="text-[13px] font-bold text-[#4E5968] shrink-0 mr-2">등록기간</span>
-          {[
-            { label: '전체', value: 'all' },
-            { label: '당일', value: 'today' },
-            { label: '전일', value: 'yesterday' },
-            { label: '1주일', value: '1week' },
-            { label: '당월', value: 'thisMonth' },
-            { label: '전월', value: 'lastMonth' },
-            { label: '3개월', value: '3months' },
-            { label: '6개월', value: '6months' },
-            { label: '기간선택', value: 'custom' },
-          ].map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setDateFilter(opt.value)}
-              className={`px-3 py-1.5 rounded-[8px] text-[13px] font-bold transition-all shrink-0 ${
-                dateFilter === opt.value
-                  ? 'bg-[#3182F6] text-white shadow-sm'
-                  : 'bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        {dateFilter === 'custom' && (
-          <div className="flex items-center gap-2 w-full md:w-auto shrink-0 justify-end">
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="bg-white border border-[#E5E8EB] px-3 py-1.5 rounded-[8px] text-[13px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
-            />
-            <span className="text-[#8B95A1] text-[13px]">~</span>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="bg-white border border-[#E5E8EB] px-3 py-1.5 rounded-[8px] text-[13px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
-            />
-          </div>
-        )}
-
-        <button
-          onClick={handleResetColumnWidths}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-[12px] font-bold text-[#8B95A1] hover:text-[#191F28] hover:bg-[#F2F4F6] transition-colors shrink-0"
-          title="테이블 열 너비를 기본값으로 초기화합니다"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          열 너비 초기화
-        </button>
-      </div>
-
-      {/* 테이블 */}
-      <div className="bg-white rounded-[16px] border border-[#E5E8EB] overflow-x-auto shadow-sm">
-        <table className="w-full text-left border-collapse table-fixed" style={{ minWidth: Object.values(columnWidths).reduce((a: number, b) => a + Number(b), 0) }}>
-          <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
-            <tr>
-              {DEFAULT_COLUMNS.map((col) => (
-                <th
-                  key={col.id}
-                  style={{ width: `${columnWidths[col.id]}px` }}
-                  className={`relative px-3 py-3.5 text-[12px] font-bold text-[#4E5968] select-none ${
-                    col.align === 'center' ? 'text-center' : 'text-left'
-                  }`}
-                >
-                  {col.id === 'checkbox' ? (
-                    <input
-                      type="checkbox"
-                      checked={filteredInquiries.length > 0 && selectedIds.length === filteredInquiries.length}
-                      onChange={toggleSelectAll}
-                      className="w-4 h-4 rounded border-[#E5E8EB] text-[#3182F6] focus:ring-[#3182F6] cursor-pointer"
-                    />
-                  ) : (
-                    <span className="truncate block">{col.label}</span>
-                  )}
-                  <div
-                    onMouseDown={(e) => handleResizeStart(col.id, col.minWidth, e)}
-                    className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-[#3182F6]/40 transition-colors"
-                  />
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#E5E8EB]">
-            {filteredInquiries.length === 0 ? (
+        {/* Resizable Table */}
+        <div className="adm-table-scroll custom-scrollbar">
+          <table
+            className="adm-table table-fixed"
+            style={{ minWidth: Object.values(columnWidths).reduce((a: number, b) => a + Number(b), 0) }}
+          >
+            <thead className="select-none">
               <tr>
-                <td colSpan={12} className="px-6 py-20 text-center text-[#8B95A1] text-[14px]">
-                  등록된 LG구독 고객이 없습니다.
-                </td>
-              </tr>
-            ) : (
-              filteredInquiries.map((customer, index) => {
-                let displayPlan = customer.productName;
-                let displayAppliance = customer.appliance || '-';
-
-                if (displayAppliance !== '-') {
-                  displayAppliance = displayAppliance.replace(/\s*\[효원상조\s*\d+구좌\s*결합[^\]]*\]/g, '').trim();
-                }
-
-                if (displayAppliance !== '-' && allProducts) {
-                  const matchedProduct = allProducts.find(p => p.model === displayAppliance);
-                  if (matchedProduct) {
-                    displayAppliance = `${matchedProduct.name} (${matchedProduct.model})`;
-                  }
-                }
-
-                const lgLanding = landings?.find(l => l.path === '/care_new' || l.path === '/care');
-                const baseLandingTitle = lgLanding?.name || 'LG가전 구독 할인 전용 (new)';
-                if (!customer.productName || customer.productName.startsWith('[')) {
-                  displayPlan = baseLandingTitle;
-                } else {
-                  displayPlan = customer.productName;
-                }
-
-                const isMainSubmission = displayPlan?.endsWith('_메인') || customer.productName?.endsWith('_메인');
-                let finalOutput = displayPlan;
-                if (!isMainSubmission && customer.account) {
-                  const accountStr = `(${customer.account})`;
-                  if (!displayPlan.includes(accountStr)) {
-                    finalOutput = `${displayPlan}${accountStr}`;
-                  }
-                }
-
-                const supplierName = getSupplier(customer);
-                const unreadSmsCount = unreadSmsCounts[String(customer._id)] || 0;
-
-                return (
-                  <tr
-                    key={customer._id}
-                    className={`hover:bg-[#F9FAFB] cursor-pointer transition-colors ${
-                      selectedIds.includes(customer._id)
-                        ? 'bg-[#F2F8FF]'
-                        : unreadSmsCount > 0
-                          ? 'bg-red-50/40'
-                          : ''
-                    }`}
-                    onClick={() => setSelectedCustomer(customer)}
+                {DEFAULT_COLUMNS.map((col) => (
+                  <th
+                    key={col.id}
+                    style={{ width: `${columnWidths[col.id]}px` }}
+                    className={`relative ${col.align === 'center' ? 'text-center' : 'text-left'}`}
                   >
-                    {/* 1. 순번 */}
-                    <td style={{ width: `${columnWidths.index}px` }} className="px-3 py-3 text-[13px] text-[#4E5968] font-medium text-center truncate">
-                      {filteredInquiries.length - index}
-                    </td>
-
-                    {/* 2. 체크박스 */}
-                    <td style={{ width: `${columnWidths.checkbox}px` }} className="px-3 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                    {col.id === 'checkbox' ? (
                       <input
                         type="checkbox"
-                        checked={selectedIds.includes(customer._id)}
-                        onChange={(e) => { e.stopPropagation(); toggleSelect(customer._id, e as any); }}
-                        className="w-4 h-4 rounded border-[#E5E8EB] text-[#3182F6] focus:ring-[#3182F6] cursor-pointer"
+                        checked={filteredInquiries.length > 0 && selectedIds.length === filteredInquiries.length}
+                        onChange={toggleSelectAll}
+                        className="w-4 h-4 rounded cursor-pointer"
                       />
-                    </td>
+                    ) : (
+                      <span className="truncate block">{col.label}</span>
+                    )}
+                    <div
+                      onMouseDown={(e) => handleResizeStart(col.id, col.minWidth, e)}
+                      className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-[#295e52]/15 transition-colors"
+                    />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredInquiries.length === 0 ? (
+                <tr>
+                  <td colSpan={12} className="text-center !py-20 text-[#86918a]">
+                    조건에 일치하는 LG구독 고객이 없습니다.
+                  </td>
+                </tr>
+              ) : (
+                filteredInquiries.map((customer, index) => {
+                  let displayPlan = customer.productName;
+                  let displayAppliance = customer.appliance || '-';
 
-                    {/* 3. 유입경로 */}
-                    <td style={{ width: `${Math.max(columnWidths.source, 70)}px` }} className="px-2 py-3 text-center truncate">
-                      {(() => {
-                        const inflow = getCustomerInflow(customer);
-                        const meta = INFLOW_META[inflow];
-                        const detail = getCustomerTrafficDetail(customer);
-                        const consultType = getLgConsultType(customer);
-                        return (
-                          <div className="flex flex-col items-center gap-0.5">
-                            <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${meta.badgeClass}`}>
-                              {meta.label}
-                            </span>
-                            <span
-                              className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold border ${
-                                consultType === 'kakao'
-                                  ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
-                                  : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              }`}
-                            >
-                              {consultType === 'kakao' ? '카톡 안내' : '전화 상담'}
-                            </span>
-                            {detail && !detail.label?.includes('카톡') && !detail.label?.includes('전화') && (
+                  if (displayAppliance !== '-') {
+                    displayAppliance = displayAppliance.replace(/\s*\[효원상조\s*\d+구좌\s*결합[^\]]*\]/g, '').trim();
+                  }
+
+                  if (displayAppliance !== '-' && allProducts) {
+                    const matchedProduct = allProducts.find((p) => p.model === displayAppliance);
+                    if (matchedProduct) {
+                      displayAppliance = `${matchedProduct.name} (${matchedProduct.model})`;
+                    }
+                  }
+
+                  const lgLanding = landings?.find((l) => l.path === '/care_new' || l.path === '/care');
+                  const baseLandingTitle = lgLanding?.name || 'LG가전 구독 할인 전용 (new)';
+                  if (!customer.productName || customer.productName.startsWith('[')) {
+                    displayPlan = baseLandingTitle;
+                  } else {
+                    displayPlan = customer.productName;
+                  }
+
+                  const isMainSubmission =
+                    displayPlan?.endsWith('_메인') || customer.productName?.endsWith('_메인');
+                  let finalOutput = displayPlan;
+                  if (!isMainSubmission && customer.account) {
+                    const accountStr = `(${customer.account})`;
+                    if (!displayPlan.includes(accountStr)) {
+                      finalOutput = `${displayPlan}${accountStr}`;
+                    }
+                  }
+
+                  const supplierName = getSupplier(customer);
+                  const unreadSmsCount = unreadSmsCounts[String(customer._id)] || 0;
+                  const isRowSelected = selectedIds.includes(customer._id);
+
+                  return (
+                    <tr
+                      key={customer._id}
+                      className={`adm-clickable-row ${
+                        isRowSelected ? '!bg-[#f2f6ef]' : unreadSmsCount > 0 ? '!bg-[#fdf5f3]' : ''
+                      }`}
+                      onClick={() => setSelectedCustomer(customer)}
+                    >
+                      <td style={{ width: `${columnWidths.index}px` }} className="text-center font-mono text-[11.5px] text-[#7d8879] truncate">
+                        {filteredInquiries.length - index}
+                      </td>
+
+                      <td style={{ width: `${columnWidths.checkbox}px` }} className="text-center" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={isRowSelected}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            toggleSelect(customer._id, e as any);
+                          }}
+                          className="w-4 h-4 rounded cursor-pointer"
+                        />
+                      </td>
+
+                      <td style={{ width: `${Math.max(columnWidths.source, 85)}px` }} className="text-center truncate">
+                        {(() => {
+                          const inflow = getCustomerInflow(customer);
+                          const meta = INFLOW_META[inflow];
+                          const detail = getCustomerTrafficDetail(customer);
+                          const consultType = getLgConsultType(customer);
+                          return (
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span className={`adm-pill ${consultType === 'kakao' ? 'orange' : 'green'}`}>
+                                {consultType === 'kakao' ? '카톡 안내' : '전화 상담'}
+                              </span>
+                              <span className="text-[10px] font-medium text-[#7d8879]">
+                                {meta.label}
+                                {detail && !detail.label?.includes('카톡') && !detail.label?.includes('전화') ? ` · ${detail.label}` : ''}
+                              </span>
+                            </div>
+                          );
+                        })()}
+                      </td>
+
+                      <td style={{ width: `${columnWidths.createdAt}px` }} className="truncate">
+                        <div className="text-[12px] text-[#263d36] font-semibold font-mono leading-tight">
+                          {new Date(customer.createdAt)
+                            .toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
+                            .replace(/\. /g, '.')
+                            .replace(/\.$/, '')}
+                        </div>
+                        <div className="text-[10.5px] text-[#86918a] font-mono leading-tight mt-0.5">
+                          {new Date(customer.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </td>
+
+                      <td style={{ width: `${columnWidths.channel}px` }} className="truncate">
+                        <span
+                          className={`adm-pill ${!customer.channelId || customer.channelId === '본사' ? 'gray' : 'teal'} max-w-full truncate`}
+                          title={getChannelName(customer.channelId)}
+                        >
+                          {getChannelName(customer.channelId)}
+                        </span>
+                      </td>
+
+                      <td style={{ width: `${columnWidths.name}px` }} className="truncate" title={customer.name}>
+                        <div className="adm-person">
+                          <div className="adm-person-circle alt">{(customer.name || '고').slice(0, 1)}</div>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <strong className="truncate">{customer.name}</strong>
+                            {unreadSmsCount > 0 && (
                               <span
-                                title={detail.tooltip}
-                                className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold max-w-full truncate ${detail.badgeClass}`}
+                                title={`읽지 않은 고객 답장 ${unreadSmsCount}건`}
+                                className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-[#c96453] text-white text-[10px] font-bold leading-none shrink-0"
                               >
-                                {detail.label}
+                                {unreadSmsCount > 99 ? '99+' : unreadSmsCount}
                               </span>
                             )}
                           </div>
-                        );
-                      })()}
-                    </td>
+                        </div>
+                      </td>
 
-                    {/* 4. 등록일시 */}
-                    <td style={{ width: `${columnWidths.createdAt}px` }} className="px-3 py-3 truncate">
-                      <div className="text-[12px] text-[#191F28] font-medium leading-tight">
-                        {new Date(customer.createdAt).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '')}
-                      </div>
-                      <div className="text-[11px] text-[#8B95A1] leading-tight mt-1">
-                        {new Date(customer.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    </td>
+                      <td style={{ width: `${columnWidths.phone}px` }} className="font-mono text-[12px] text-[#45554e] truncate" title={customer.phone}>
+                        {customer.phone}
+                      </td>
 
-                    {/* 5. 채널명 */}
-                    <td style={{ width: `${columnWidths.channel}px` }} className="px-3 py-3 truncate">
-                      <span className={`inline-block max-w-full truncate text-[12px] font-bold px-2 py-0.5 rounded-md ${(!customer.channelId || customer.channelId === '본사') ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-[#3182F6]'}`} title={getChannelName(customer.channelId)}>
-                        {getChannelName(customer.channelId)}
-                      </span>
-                    </td>
-
-                    {/* 6. 고객명 */}
-                    <td style={{ width: `${columnWidths.name}px` }} className="px-3 py-3 text-[13px] font-bold text-[#191F28] truncate" title={customer.name}>
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="truncate">{customer.name}</span>
-                        {unreadSmsCount > 0 && (
-                          <span
-                            title={`읽지 않은 고객 답장 ${unreadSmsCount}건`}
-                            className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-[#F04452] text-white text-[10px] font-bold leading-none shrink-0"
-                          >
-                            {unreadSmsCount > 99 ? '99+' : unreadSmsCount}
-                          </span>
+                      <td style={{ width: `${columnWidths.address}px` }}>
+                        {customer.address ? (
+                          <div className="text-[12px] leading-tight">
+                            <div className="truncate text-[#263d36] font-medium" title={customer.address}>
+                              {customer.address}
+                            </div>
+                            <div className="truncate text-[10.5px] text-[#86918a] mt-0.5" title={customer.detailAddress || ''}>
+                              {customer.detailAddress || '-'}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-[#9ba594] text-[12px]">-</span>
                         )}
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* 7. 연락처 */}
-                    <td style={{ width: `${columnWidths.phone}px` }} className="px-3 py-3 text-[13px] text-[#4E5968] truncate" title={customer.phone}>
-                      {customer.phone}
-                    </td>
+                      <td style={{ width: `${columnWidths.productName}px` }} className="font-semibold text-[#263d36] truncate" title={finalOutput}>
+                        {finalOutput}
+                      </td>
 
-                    {/* 8. 주소 */}
-                    <td style={{ width: `${columnWidths.address}px` }} className="px-3 py-3">
-                      {customer.address ? (
-                        <div className="text-[12px] leading-tight">
-                          <div className="truncate text-[#191F28] font-medium" title={customer.address}>
-                            {customer.address}
-                          </div>
-                          <div className="truncate text-[11px] text-[#8B95A1] mt-0.5" title={customer.detailAddress || ''}>
-                            {customer.detailAddress || '-'}
-                          </div>
+                      <td style={{ width: `${columnWidths.appliance}px` }} className="whitespace-normal">
+                        <div className="line-clamp-2 text-[12px] text-[#45554e] leading-snug break-keep" title={displayAppliance}>
+                          {displayAppliance}
                         </div>
-                      ) : (
-                        <span className="text-[#8B95A1] text-[12px]">-</span>
-                      )}
-                    </td>
+                        {(customer.subscriptionPeriod || customer.careCycle || customer.careType) && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {customer.subscriptionPeriod && (
+                              <span className="adm-pill gray">{customer.subscriptionPeriod}</span>
+                            )}
+                            {customer.careCycle && <span className="adm-pill blue">{customer.careCycle}</span>}
+                            {customer.careType && (
+                              <span className="adm-pill teal truncate max-w-[130px]" title={customer.careType}>
+                                {customer.careType}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </td>
 
-                    {/* 9. 신청상품 */}
-                    <td style={{ width: `${columnWidths.productName}px` }} className="px-3 py-3 text-[13px] text-[#4E5968] font-medium truncate" title={finalOutput}>
-                      {finalOutput}
-                    </td>
+                      <td style={{ width: `${columnWidths.supplier}px` }} className="text-center truncate">
+                        <span className={`adm-pill ${supplierName === 'TU' ? 'orange' : 'blue'}`}>
+                          {supplierName}
+                        </span>
+                      </td>
 
-                    {/* 10. 결합제품 */}
-                    <td style={{ width: `${columnWidths.appliance}px` }} className="px-3 py-3 text-[13px] text-[#4E5968]">
-                      <div
-                        className="line-clamp-2 leading-snug break-keep"
-                        title={displayAppliance}
-                        style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          wordBreak: 'break-all'
-                        }}
-                      >
-                        {displayAppliance}
-                      </div>
-                      {(customer.subscriptionPeriod || customer.careCycle || customer.careType) && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {customer.subscriptionPeriod && (
-                            <span className="text-[10px] font-bold bg-[#F2F4F6] text-[#4E5968] px-1.5 py-0.5 rounded">
-                              {customer.subscriptionPeriod}
-                            </span>
-                          )}
-                          {customer.careCycle && (
-                            <span className="text-[10px] font-medium bg-blue-50 text-[#3182F6] px-1.5 py-0.5 rounded">
-                              {customer.careCycle}
-                            </span>
-                          )}
-                          {customer.careType && (
-                            <span className="text-[10px] font-medium bg-emerald-50 text-[#059669] px-1.5 py-0.5 rounded truncate max-w-[140px]" title={customer.careType}>
-                              {customer.careType}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </td>
+                      <td style={{ width: `${columnWidths.status}px` }} className="text-center truncate">
+                        <span
+                          className="inline-block text-[11px] font-bold px-2.5 py-1 rounded-[5px]"
+                          style={{
+                            backgroundColor: getStatusStyle(customer.status).bg,
+                            color: getStatusStyle(customer.status).text,
+                          }}
+                        >
+                          {customer.status || '대기'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
 
-                    {/* 11. 공급사 */}
-                    <td style={{ width: `${columnWidths.supplier}px` }} className="px-3 py-3 text-center truncate">
-                      <span className={`inline-block text-[11px] font-bold px-2 py-0.5 rounded ${
-                        supplierName === 'TU'
-                          ? 'bg-red-50 text-red-600 border border-red-200'
-                          : supplierName !== '-'
-                            ? 'bg-blue-50 text-[#3182F6] border border-blue-200'
-                            : 'text-[#8B95A1]'
-                      }`} title={supplierName}>
-                        {supplierName}
-                      </span>
-                    </td>
-
-                    {/* 12. 진행상태 */}
-                    <td style={{ width: `${columnWidths.status}px` }} className="px-3 py-3 text-center truncate">
-                      <span
-                        className="inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full"
-                        style={{
-                          backgroundColor: getStatusStyle(customer.status).bg,
-                          color: getStatusStyle(customer.status).text
-                        }}
-                      >
-                        {customer.status}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+        <div className="adm-table-foot">
+          <span>
+            전체 {lgInquiries.length}건 중 검색 결과 <strong className="text-[#263d36]">{filteredInquiries.length}</strong>건
+          </span>
+          <span>행을 클릭하면 우측 드로어에서 카톡 · 문자 안내 및 구독 조건을 관리할 수 있습니다.</span>
+        </div>
       </div>
 
-      {/* 상세 정보 모달 */}
+      {/* Slide-over LG Customer Detail Drawer */}
       {selectedCustomer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 lg:p-4">
-          <div className="bg-white lg:rounded-[24px] w-full max-w-[800px] h-full lg:h-auto lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
-            <div className="px-6 py-5 border-b border-[#E5E8EB] flex justify-between items-center bg-white z-10 shrink-0">
-              <div className="flex items-center gap-3">
-                <h3 className="text-[20px] font-bold">LG구독 고객 상세정보</h3>
-                <span
-                  className="inline-block text-[12px] font-bold px-2.5 py-1 rounded-full"
-                  style={{
-                    backgroundColor: getStatusStyle(status).bg,
-                    color: getStatusStyle(status).text
-                  }}
-                >
-                  {status}
-                </span>
+        <div className="adm-drawer-overlay" onClick={() => setSelectedCustomer(null)}>
+          <div className="adm-drawer !max-w-[820px]" onClick={(e) => e.stopPropagation()}>
+            <div className="adm-drawer-head">
+              <div>
+                <div className="flex items-center gap-2.5">
+                  <h2>LG구독 고객 상세 관리</h2>
+                  <span
+                    className="inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-[5px]"
+                    style={{
+                      backgroundColor: getStatusStyle(status).bg,
+                      color: getStatusStyle(status).text,
+                    }}
+                  >
+                    {status}
+                  </span>
+                </div>
+                <p>
+                  {getChannelName(selectedCustomer.channelId)} · 접수일시{' '}
+                  {new Date(selectedCustomer.createdAt).toLocaleString('ko-KR')}
+                </p>
               </div>
-              <div className="flex gap-2">
-                <button onClick={handleDelete} className="p-2 hover:bg-red-50 text-red-500 rounded-full transition-colors" title="삭제">
-                  <Trash2 className="w-5 h-5" />
-                </button>
-                {(selectedCustomer.productName?.toLowerCase().includes('living') || selectedCustomer.productName?.includes('리빙') || editData.productName?.includes('리빙')) && (
+
+              <div className="flex items-center gap-2">
+                {(selectedCustomer.productName?.toLowerCase().includes('living') ||
+                  selectedCustomer.productName?.includes('리빙') ||
+                  editData.productName?.includes('리빙')) && (
                   <button
+                    type="button"
                     onClick={handleSendConsent}
                     disabled={isSendingSms}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-[13px] font-bold transition-all ${isSendingSms ? 'bg-gray-100 text-gray-400' : 'bg-[#3182F6] text-white hover:bg-[#1B64DA] shadow-sm'}`}
-                    title="구매동의 문자 발송"
+                    className="adm-btn sage small"
                   >
-                    {isSendingSms ? <Loader2 className="w-4 h-4 animate-spin" /> : <Smartphone className="w-4 h-4" />}
-                    구매동의 문자발송
+                    {isSendingSms ? <Loader2 className="animate-spin" /> : <Smartphone />}
+                    <span>구매동의 발송</span>
                   </button>
                 )}
-                <button onClick={() => setSelectedCustomer(null)} className="p-2 hover:bg-[#F2F4F6] rounded-full transition-colors">
-                  <X className="w-6 h-6 text-[#4E5968]" />
+                <button type="button" onClick={handleDelete} className="adm-btn danger small">
+                  <Trash2 />
+                  <span>삭제</span>
+                </button>
+                <button type="button" onClick={() => setSelectedCustomer(null)} className="adm-icon-btn">
+                  <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-6 bg-[#F9FAFB] hide-scrollbar">
-              {/* 카톡 · 문자 상품 안내 및 자유문자 발송 */}
-              <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                  <h4 className="text-[15px] font-bold flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#EAB308]"></span>
-                    카톡 · 문자 발송
-                    <span className="text-[12px] font-normal text-[#8B95A1]">(안내 문구 및 자유문자)</span>
-                  </h4>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        const textToCopy = selectedGuideIdx === -1 ? customSmsDraft : guideDraft;
-                        if (!textToCopy.trim()) {
-                          alert('복사할 내용이 없습니다.');
-                          return;
-                        }
-                        try {
-                          await navigator.clipboard.writeText(textToCopy);
-                          setGuideCopied(true);
-                          setTimeout(() => setGuideCopied(false), 2000);
-                        } catch {
-                          alert('복사에 실패했습니다. 직접 드래그해 복사해 주세요.');
-                        }
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#FEE500] hover:bg-[#f5dc00] text-[#191919] text-[12px] font-bold transition-colors"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      {guideCopied ? '복사됨!' : '문구 복사 (카톡용)'}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={isSendingGuideSms}
-                      onClick={async () => {
-                        const targetPhone = editData.phone || selectedCustomer.phone;
-                        if (!targetPhone) {
-                          alert('고객 연락처가 없습니다.');
-                          return;
-                        }
-                        const isCustomMode = selectedGuideIdx === -1;
-                        const activeMessage = isCustomMode ? customSmsDraft : guideDraft;
-                        if (!activeMessage.trim()) {
-                          alert('발송할 문자 내용을 입력해주세요.');
-                          return;
-                        }
-                        if (!confirm(`${selectedCustomer.name}님(${targetPhone})에게 ${isCustomMode ? '자유문자' : '안내 문자'}를 발송하시겠습니까?`)) return;
-                        setIsSendingGuideSms(true);
-                        try {
-                          const res = await sendCustomGuideSms({
-                            inquiryId: selectedCustomer._id,
-                            customerName: selectedCustomer.name,
-                            customerPhone: targetPhone,
-                            smsType: isCustomMode ? '자유문자' : '상품안내',
-                            senderName: getCurrentWriterName(),
-                            title: isCustomMode
-                              ? (customSmsTitle.trim() || '[효원상조 × LG가전구독] 안내')
-                              : '[효원상조 × LG가전구독] 상품 안내',
-                            message: activeMessage,
-                          });
-                          if (isCustomMode) {
-                            setCustomSmsDraft('');
-                          }
-                          alert(res?.message || '문자 발송이 완료되었습니다.');
-                        } catch (err: any) {
-                          alert(err?.message || '문자 발송에 실패했습니다.');
-                        } finally {
-                          setIsSendingGuideSms(false);
-                        }
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[12px] font-bold transition-colors disabled:opacity-50"
-                    >
-                      {isSendingGuideSms ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MessageCircle className="w-3.5 h-3.5" />}
-                      문자 발송
-                    </button>
-                  </div>
+            {/* Drawer Tabs */}
+            <div className="adm-drawer-tabs">
+              <button
+                type="button"
+                onClick={() => setDrawerTab('sms')}
+                className={`adm-drawer-tab ${drawerTab === 'sms' ? 'active' : ''}`}
+              >
+                카톡 · 문자 안내 &amp; 대화창
+                <span className="adm-tab-count">{smsLogs?.length || 0}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDrawerTab('info')}
+                className={`adm-drawer-tab ${drawerTab === 'info' ? 'active' : ''}`}
+              >
+                고객 · LG구독 상품 정보
+              </button>
+              <button
+                type="button"
+                onClick={() => setDrawerTab('history')}
+                className={`adm-drawer-tab ${drawerTab === 'history' ? 'active' : ''}`}
+              >
+                상태 변경 이력
+                <span className="adm-tab-count">{selectedCustomer.memoHistory?.length || 0}</span>
+              </button>
+            </div>
+
+            <div className="adm-drawer-scroll space-y-5">
+              {/* Customer Header Card */}
+              <div className="flex items-center gap-3.5 p-4 rounded-[12px] bg-white border border-[#e6eae3]">
+                <div className="w-11 h-11 rounded-full bg-[#f2ede3] text-[#8a7957] font-bold text-[15px] grid place-items-center shrink-0">
+                  {(editData.name || selectedCustomer.name || '고').slice(0, 1)}
                 </div>
-
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {guideTemplates.map((tpl, idx) => (
-                    <button
-                      key={tpl.id || idx}
-                      type="button"
-                      onClick={() => setSelectedGuideIdx(idx)}
-                      className={`px-3 py-1.5 rounded-[8px] text-[12px] font-bold border transition-colors ${
-                        selectedGuideIdx === idx
-                          ? 'bg-[#191F28] text-white border-[#191F28]'
-                          : 'bg-[#F9FAFB] text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-                      }`}
-                    >
-                      {tpl.title}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedGuideIdx(-1)}
-                    className={`px-3 py-1.5 rounded-[8px] text-[12px] font-bold border transition-colors ${
-                      selectedGuideIdx === -1
-                        ? 'bg-[#3182F6] text-white border-[#3182F6]'
-                        : 'bg-[#EFF6FF] text-[#3182F6] border-[#BFDBFE] hover:bg-[#DBEAFE]'
-                    }`}
-                  >
-                    ✏️ 자유문자 (직접 입력)
-                  </button>
-                </div>
-
-                {selectedGuideIdx === -1 ? (
-                  <div className="space-y-2.5">
-                    <div>
-                      <label className="block text-[11px] font-semibold text-[#8B95A1] mb-1">문자 제목 (LMS)</label>
-                      <input
-                        type="text"
-                        value={customSmsTitle}
-                        onChange={(e) => setCustomSmsTitle(e.target.value)}
-                        placeholder="[효원상조 × LG가전구독] 안내"
-                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[8px] px-3 py-2 text-[13px] outline-none focus:border-[#3182F6]"
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-[11px] font-semibold text-[#8B95A1]">자유문자 내용</label>
-                        <span className="text-[11px] text-[#8B95A1]">{customSmsDraft.length}자 (LMS)</span>
-                      </div>
-                      <textarea
-                        rows={5}
-                        value={customSmsDraft}
-                        onChange={(e) => setCustomSmsDraft(e.target.value)}
-                        placeholder="고객님께 발송할 자유 문자 내용을 직접 입력하세요..."
-                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[10px] p-3.5 text-[13px] leading-relaxed outline-none focus:border-[#3182F6]"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="flex justify-end mb-1">
-                      <span className="text-[11px] text-[#8B95A1]">{guideDraft.length}자 (LMS)</span>
-                    </div>
-                    <textarea
-                      rows={6}
-                      value={guideDraft}
-                      onChange={(e) => setGuideDraft(e.target.value)}
-                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[10px] p-3.5 text-[13px] leading-relaxed outline-none focus:border-[#3182F6]"
-                    />
-                  </div>
-                )}
-
-                {/* 문자 대화 내역 (양방향 채팅) */}
-                <div className="mt-4 pt-4 border-t border-[#E5E8EB]">
-                  <div className="flex items-center justify-between mb-2.5">
-                    <h5 className="text-[13px] font-bold text-[#4E5968] flex items-center gap-1.5">
-                      <MessageCircle className="w-4 h-4 text-[#3182F6]" />
-                      문자 대화 내역
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#F2F4F6] text-[#4E5968]">
-                        {smsLogs ? `${smsLogs.length}건` : '조회중...'}
-                      </span>
-                    </h5>
-                    <span className="text-[11px] text-[#8B95A1]">
-                      왼쪽: 고객 답장 · 오른쪽: 발신 문자
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[15px] font-bold text-[#263d36]">
+                      {editData.name || selectedCustomer.name}
+                    </span>
+                    <span className="text-[12.5px] font-mono font-medium text-[#6d786c]">
+                      {editData.phone || selectedCustomer.phone}
+                    </span>
+                    <span className={`adm-pill ${getLgConsultType(selectedCustomer) === 'kakao' ? 'orange' : 'green'}`}>
+                      {getLgConsultType(selectedCustomer) === 'kakao' ? '카톡 안내 희망' : '전화 상담 희망'}
                     </span>
                   </div>
-                  {smsLogs && smsLogs.length > 0 ? (
-                    <div
-                      ref={chatScrollRef}
-                      className="space-y-2.5 max-h-[280px] overflow-y-auto p-3 rounded-[12px] bg-[#F2F4F6]/70 border border-[#E5E8EB]"
-                    >
-                      {[...smsLogs].reverse().map((log: any) => {
-                        const isInbound = log.direction === 'inbound';
-                        const isExpanded = expandedSmsLogId === log._id;
-                        const isLongMessage =
-                          (log.message?.length || 0) > 160 ||
-                          (log.message?.split('\n').length || 0) > 4;
-                        const kst = new Date(log.createdAt + 9 * 60 * 60 * 1000);
-                        const formattedDate = `${String(kst.getUTCMonth() + 1).padStart(2, '0')}.${String(kst.getUTCDate()).padStart(2, '0')} ${String(kst.getUTCHours()).padStart(2, '0')}:${String(kst.getUTCMinutes()).padStart(2, '0')}`;
-                        return (
-                          <div
-                            key={log._id}
-                            className={`flex flex-col ${isInbound ? 'items-start' : 'items-end'}`}
-                          >
-                            <div
-                              className={`max-w-[85%] rounded-[12px] px-3.5 py-2.5 text-[12px] shadow-xs border ${
-                                isInbound
-                                  ? 'bg-white border-[#E5E8EB] text-[#191F28] rounded-tl-[4px]'
-                                  : log.status === '실패'
-                                    ? 'bg-red-50 border-red-200 text-[#191F28] rounded-tr-[4px]'
-                                    : 'bg-[#EFF6FF] border-[#BFDBFE] text-[#191F28] rounded-tr-[4px]'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between gap-2 mb-1">
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span
-                                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                                      isInbound
-                                        ? 'bg-emerald-50 text-emerald-700'
-                                        : log.status === '성공'
-                                          ? 'bg-[#3182F6] text-white'
-                                          : 'bg-red-500 text-white'
-                                    }`}
-                                  >
-                                    {isInbound ? '고객 답장' : log.smsType || '발신'}
-                                  </span>
-                                  {!isInbound && log.senderName && (
-                                    <span className="text-[10px] text-[#6B7684] font-medium">
-                                      {log.senderName}
-                                    </span>
-                                  )}
-                                  {!isInbound && log.status === '실패' && (
-                                    <span className="text-[10px] text-red-600 font-bold">실패</span>
-                                  )}
-                                </div>
-                                <span className="text-[10px] text-[#8B95A1] shrink-0">
-                                  {formattedDate}
-                                </span>
-                              </div>
-                              {log.title && !isInbound && (
-                                <div className="text-[11px] font-semibold text-[#333D4B] mb-1 truncate">
-                                  {log.title}
-                                </div>
-                              )}
-                              <p
-                                className={`text-[#333D4B] whitespace-pre-wrap break-words leading-relaxed ${
-                                  isLongMessage && !isExpanded ? 'line-clamp-4' : ''
-                                }`}
-                              >
-                                {log.message}
-                              </p>
-                              {isLongMessage && (
-                                <button
-                                  type="button"
-                                  onClick={() => setExpandedSmsLogId(isExpanded ? null : log._id)}
-                                  className="mt-1 text-[11px] font-semibold text-[#3182F6] hover:underline"
-                                >
-                                  {isExpanded ? '접기' : '전체보기'}
-                                </button>
-                              )}
-                              {log.status === '실패' && log.errorMessage && (
-                                <div className="mt-1.5 text-[11px] text-red-600 bg-red-100/60 px-2 py-1 rounded">
-                                  실패 사유: {log.errorMessage}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="bg-[#F9FAFB] border border-dashed border-[#E5E8EB] rounded-[10px] py-4 text-center text-[12px] text-[#8B95A1]">
-                      {smsLogs ? '아직 주고받은 문자 내역이 없습니다.' : '문자 대화 내역을 불러오는 중입니다...'}
-                    </div>
-                  )}
-
-                  {/* 빠른 문자 답장 입력바 */}
-                  <div className="mt-2.5 flex items-end gap-2">
-                    <textarea
-                      rows={2}
-                      value={quickReplyDraft}
-                      onChange={(e) => setQuickReplyDraft(e.target.value)}
-                      placeholder="고객에게 바로 보낼 답장 내용을 입력하세요..."
-                      className="flex-1 bg-[#F9FAFB] border border-[#E5E8EB] rounded-[10px] px-3 py-2 text-[12.5px] leading-relaxed outline-none focus:border-[#3182F6] resize-none"
-                    />
-                    <button
-                      type="button"
-                      disabled={isSendingQuickReply || !quickReplyDraft.trim()}
-                      onClick={async () => {
-                        const targetPhone = editData.phone || selectedCustomer.phone;
-                        if (!targetPhone) {
-                          alert('고객 연락처가 없습니다.');
-                          return;
-                        }
-                        if (!quickReplyDraft.trim()) return;
-                        if (!confirm(`${selectedCustomer.name}님(${targetPhone})에게 문자를 발송하시겠습니까?`)) return;
-                        setIsSendingQuickReply(true);
-                        try {
-                          await sendCustomGuideSms({
-                            inquiryId: selectedCustomer._id,
-                            customerName: selectedCustomer.name,
-                            customerPhone: targetPhone,
-                            smsType: '자유문자',
-                            senderName: getCurrentWriterName(),
-                            title: '[효원상조 × LG가전구독] 안내',
-                            message: quickReplyDraft.trim(),
-                          });
-                          setQuickReplyDraft('');
-                        } catch (err: any) {
-                          alert(err?.message || '문자 발송에 실패했습니다.');
-                        } finally {
-                          setIsSendingQuickReply(false);
-                        }
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3.5 h-[54px] rounded-[10px] bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[12px] font-bold transition-colors disabled:opacity-50 shrink-0"
-                    >
-                      {isSendingQuickReply ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Send className="w-4 h-4" />
-                      )}
-                      답장
-                    </button>
+                  <div className="text-[12px] text-[#7d877f] truncate mt-0.5">
+                    {editData.appliance || '결합가전 미지정'} · {editData.account || '1구좌'}
                   </div>
                 </div>
-              </section>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* 1. 기본 고객 정보 */}
-                <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                  <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#3182F6]"></span>기본 고객 정보
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">고객명</label>
-                      <input type="text" value={editData.name || ''} onChange={e => setEditData({ ...editData, name: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">연락처</label>
-                      <input type="text" value={editData.phone || ''} onChange={e => setEditData({ ...editData, phone: formatPhoneNumber(e.target.value) })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">성별</label>
-                      <select value={editData.gender || ''} onChange={e => setEditData({ ...editData, gender: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]">
-                        <option value="">선택</option>
-                        <option>남성</option>
-                        <option>여성</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">생년월일 (6자리)</label>
-                      <input type="text" value={editData.birth || ''} onChange={e => setEditData({ ...editData, birth: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="YYMMDD" />
-                    </div>
-                    <div className="col-span-2">
-                      <div className="flex justify-between items-end mb-1">
-                        <label className="block text-[12px] font-medium text-[#8B95A1]">주소</label>
-                        <button onClick={openPostcode} className="text-[11px] bg-[#3182F6] text-white px-2.5 py-1 rounded-[4px] font-bold hover:bg-[#1B64DA] transition-colors">주소 검색</button>
-                      </div>
-                      <input type="text" value={editData.address || ''} readOnly onClick={openPostcode} className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] mb-2 cursor-pointer text-[#4E5968]" placeholder="기본 주소 (검색 버튼을 눌러주세요)" />
-                      <input type="text" value={editData.detailAddress || ''} onChange={e => setEditData({ ...editData, detailAddress: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="상세 주소 입력" />
-                    </div>
-                  </div>
-                </section>
-
-                {/* 2. 상담/계약 일정 정보 */}
-                <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                  <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#BE123C]"></span>상담/계약 일정 정보
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">신규 접수일</label>
-                      <input type="date" value={editData.newRegDate || ''} onChange={e => setEditData({ ...editData, newRegDate: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">상조 계약일</label>
-                      <input type="date" value={editData.sangjoContractDate || ''} onChange={e => setEditData({ ...editData, sangjoContractDate: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">구독(렌탈) 계약일</label>
-                      <input type="date" value={editData.rentalContractDate || ''} onChange={e => setEditData({ ...editData, rentalContractDate: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">청약 철회일</label>
-                      <input type="date" value={editData.cancelDate || ''} onChange={e => setEditData({ ...editData, cancelDate: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">계약 해지일</label>
-                      <input type="date" value={editData.terminationDate || ''} onChange={e => setEditData({ ...editData, terminationDate: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">가전 설치/배송일</label>
-                      <input type="date" value={editData.deliveryDate || ''} onChange={e => setEditData({ ...editData, deliveryDate: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div className="col-span-2">
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">특이사항</label>
-                      <input type="text" value={editData.note || ''} onChange={e => setEditData({ ...editData, note: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                  </div>
-                </section>
               </div>
 
-              {/* 3. 신청 상품 정보 */}
-              <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#059669]"></span>신청 상품 정보
-                </h4>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="bg-[#F2F4F6] p-4 rounded-[12px] space-y-3">
-                    <div>
-                      <label className="block text-[12px] font-bold text-[#8B95A1] mb-1">신청상품 (카테고리)</label>
-                      <select
-                        value={editData.productName || ''}
-                        onChange={e => {
-                          const val = e.target.value;
-                          const plan = allPlans?.find(p => p.name === val);
-                          let resolvedAcc = plan ? plan.accountCount : '1구좌';
-                          if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독')) {
-                            resolvedAcc = '1구좌';
-                          }
-                          setEditData({
-                            ...editData,
-                            productName: val,
-                            account: resolvedAcc,
-                          });
-                        }}
-                        className="w-full bg-white border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold"
-                      >
-                        <option value="LG구독할인(new)">LG구독할인(new)</option>
-                        <option value="LG가전구독(new) (1구좌)">LG가전구독(new) (1구좌)</option>
-                        {allPlans?.map(plan => (
-                          <option key={plan._id} value={plan.name}>{plan.name}</option>
-                        ))}
-                        {editData.productName &&
-                          editData.productName !== 'LG구독할인(new)' &&
-                          editData.productName !== 'LG가전구독(new) (1구좌)' &&
-                          !allPlans?.some(p => p.name === editData.productName) && (
-                            <option value={editData.productName}>{editData.productName}</option>
-                          )}
-                      </select>
-                    </div>
-                    {selectedCustomer.message && (
-                      <div className="mt-2 text-[13px] text-[#4E5968] bg-white/70 p-3 rounded border border-[#E5E8EB]">
-                        <span className="text-[11px] font-bold text-[#8B95A1] block mb-1">고객 문의 메시지 / 견적 조건</span>
-                        <p className="whitespace-pre-wrap leading-relaxed">{selectedCustomer.message}</p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-3">
-                    <LgApplianceOptionFields
-                      value={{
-                        appliance: editData.appliance || '',
-                        account: editData.account || '1구좌',
-                        subscriptionPeriod: editData.subscriptionPeriod || '',
-                        careCycle: editData.careCycle || '',
-                        careType: editData.careType || '',
-                        supplier: editData.supplier || '라이프앤조이',
-                      }}
-                      onChange={(patch) => setEditData((prev: any) => ({ ...prev, ...patch }))}
-                      lgProductsByCategory={lgProductsByCategory}
-                      lgDbProducts={lgDbProducts}
-                      showSupplier={true}
-                    />
-                  </div>
-                </div>
-              </section>
-
-              {/* 4. 상태 변경 및 메모 */}
-              <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#191F28]"></span>상태 변경 및 메모
-                </h4>
-                <div className="flex flex-col lg:flex-row gap-3">
+              {/* Quick Status & Memo Update */}
+              <div className="adm-note-card space-y-3">
+                <div className="text-[12px] font-bold text-[#263d36]">진행상태 변경 및 상담 메모</div>
+                <div className="flex flex-col sm:flex-row gap-2.5">
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-[140px] bg-white border border-[#D1D6DB] px-3 py-2 rounded-[8px] text-[13px] font-bold focus:outline-none"
-                    style={{
-                      backgroundColor: getStatusStyle(status).bg,
-                      color: getStatusStyle(status).text
-                    }}
+                    className="adm-select sm:w-[160px] font-bold"
                   >
                     {usedStatuses.map((s: any) => (
-                      <option key={s.name} value={s.name} style={{ backgroundColor: '#ffffff', color: '#191F28' }}>{s.name}</option>
+                      <option key={s.name} value={s.name}>
+                        {s.name}
+                      </option>
                     ))}
                   </select>
                   <input
                     type="text"
                     value={memo}
                     onChange={(e) => setMemo(e.target.value)}
-                    placeholder="변경 사유 또는 메모를 입력하세요 (선택)"
-                    className="flex-1 bg-[#F9FAFB] border border-[#E5E8EB] px-4 py-2 rounded-[8px] text-[13px] focus:outline-none"
+                    placeholder="변경 사유 또는 메모 입력 (우측 하단 저장 시 반영)"
+                    className="adm-input flex-1"
                   />
-                  <button onClick={handleUpdate} className="w-full lg:w-auto bg-[#3182F6] text-white px-6 py-3 lg:py-2 rounded-[8px] font-bold text-[14px] lg:text-[13px] flex items-center justify-center gap-2 hover:bg-[#1B64DA] transition-colors shadow-sm">
-                    <Save className="w-4 h-4" /> 저장
-                  </button>
                 </div>
+              </div>
 
-                {selectedCustomer.memoHistory && selectedCustomer.memoHistory.length > 0 && (
-                  <div className="mt-5 border-t border-[#E5E8EB] pt-5">
-                    <h5 className="text-[13px] font-bold text-[#8B95A1] mb-3 flex items-center gap-1">
-                      <History className="w-4 h-4" /> 상태 변경 이력
-                    </h5>
-                    <div className="space-y-3 bg-[#F9FAFB] p-4 rounded-[12px] max-h-[150px] overflow-y-auto">
-                      {selectedCustomer.memoHistory.map((history: any, idx: number) => (
-                        <div key={idx} className="flex gap-3 text-[13px] items-start justify-between">
-                          <div className="flex gap-3 flex-1 min-w-0 items-start">
-                            <span className="text-[#8B95A1] shrink-0 font-medium">{history.date}</span>
-                            <span className="font-bold text-[#3182F6] shrink-0 w-[60px]">{history.status}</span>
-                            <span className="text-[#4E5968] break-all">{history.memo}</span>
+              {drawerTab === 'sms' && (
+                <div className="space-y-5">
+                  {/* Template & Free SMS Sender */}
+                  <div className="adm-panel p-5 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#edf0e7]">
+                      <div>
+                        <h3 className="text-[14px] font-bold text-[#263d36]">카톡 · 문자 안내 발송</h3>
+                        <p className="text-[11.5px] text-[#86918a]">
+                          템플릿 문구를 카카오톡용으로 복사하거나 LMS 문자로 즉시 발송합니다.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const textToCopy = selectedGuideIdx === -1 ? customSmsDraft : guideDraft;
+                            if (!textToCopy.trim()) {
+                              alert('복사할 내용이 없습니다.');
+                              return;
+                            }
+                            try {
+                              await navigator.clipboard.writeText(textToCopy);
+                              setGuideCopied(true);
+                              setTimeout(() => setGuideCopied(false), 2000);
+                            } catch {
+                              alert('복사에 실패했습니다. 직접 드래그해 복사해 주세요.');
+                            }
+                          }}
+                          className="adm-btn sage small"
+                        >
+                          <Copy />
+                          <span>{guideCopied ? '복사됨!' : '문구 복사 (카톡용)'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isSendingGuideSms}
+                          onClick={async () => {
+                            const targetPhone = editData.phone || selectedCustomer.phone;
+                            if (!targetPhone) {
+                              alert('고객 연락처가 없습니다.');
+                              return;
+                            }
+                            const isCustomMode = selectedGuideIdx === -1;
+                            const activeMessage = isCustomMode ? customSmsDraft : guideDraft;
+                            if (!activeMessage.trim()) {
+                              alert('발송할 문자 내용을 입력해주세요.');
+                              return;
+                            }
+                            if (
+                              !confirm(
+                                `${selectedCustomer.name}님(${targetPhone})에게 ${
+                                  isCustomMode ? '자유문자' : '안내 문자'
+                                }를 발송하시겠습니까?`
+                              )
+                            )
+                              return;
+                            setIsSendingGuideSms(true);
+                            try {
+                              const res = await sendCustomGuideSms({
+                                inquiryId: selectedCustomer._id,
+                                customerName: selectedCustomer.name,
+                                customerPhone: targetPhone,
+                                smsType: isCustomMode ? '자유문자' : '상품안내',
+                                senderName: getCurrentWriterName(),
+                                title: isCustomMode
+                                  ? customSmsTitle.trim() || '[효원상조 × LG가전구독] 안내'
+                                  : '[효원상조 × LG가전구독] 상품 안내',
+                                message: activeMessage,
+                              });
+                              if (isCustomMode) setCustomSmsDraft('');
+                              alert(res?.message || '문자 발송이 완료되었습니다.');
+                            } catch (err: any) {
+                              alert(err?.message || '문자 발송에 실패했습니다.');
+                            } finally {
+                              setIsSendingGuideSms(false);
+                            }
+                          }}
+                          className="adm-btn primary small"
+                        >
+                          {isSendingGuideSms ? <Loader2 className="animate-spin" /> : <MessageCircle />}
+                          <span>LMS 문자 발송</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="adm-segmented">
+                      {guideTemplates.map((tpl, idx) => (
+                        <button
+                          key={tpl.id || idx}
+                          type="button"
+                          onClick={() => setSelectedGuideIdx(idx)}
+                          className={selectedGuideIdx === idx ? 'active' : ''}
+                        >
+                          {tpl.title}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedGuideIdx(-1)}
+                        className={selectedGuideIdx === -1 ? 'active' : ''}
+                      >
+                        ✏️ 자유문자 직접 작성
+                      </button>
+                    </div>
+
+                    {selectedGuideIdx === -1 ? (
+                      <div className="space-y-3">
+                        <div className="adm-field">
+                          <label>문자 제목 (LMS)</label>
+                          <input
+                            type="text"
+                            value={customSmsTitle}
+                            onChange={(e) => setCustomSmsTitle(e.target.value)}
+                            placeholder="[효원상조 × LG가전구독] 안내"
+                            className="adm-input"
+                          />
+                        </div>
+                        <div className="adm-field">
+                          <div className="flex items-center justify-between">
+                            <label>자유문자 본문</label>
+                            <span className="text-[11px] text-[#86918a]">{customSmsDraft.length}자 (LMS)</span>
                           </div>
-                          {history.writer && (
-                            <span className="text-[#8B95A1] shrink-0 text-[11px] bg-[#E5E8EB]/50 px-1.5 py-0.5 rounded font-medium">
-                              {history.writer}
-                            </span>
-                          )}
+                          <textarea
+                            rows={5}
+                            value={customSmsDraft}
+                            onChange={(e) => setCustomSmsDraft(e.target.value)}
+                            placeholder="고객님께 발송할 자유 문자 내용을 입력하세요..."
+                            className="adm-textarea"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="adm-field">
+                        <div className="flex justify-end">
+                          <span className="text-[11px] text-[#86918a]">{guideDraft.length}자 (LMS)</span>
+                        </div>
+                        <textarea
+                          rows={6}
+                          value={guideDraft}
+                          onChange={(e) => setGuideDraft(e.target.value)}
+                          className="adm-textarea"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Two-way SMS Chat History */}
+                  <div className="adm-panel p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <MessageCircle className="w-4 h-4 text-[#295e52]" />
+                        <strong className="text-[13.5px] font-bold text-[#263d36]">양방향 문자 대화 내역</strong>
+                        <span className="adm-pill green">{smsLogs ? `${smsLogs.length}건` : '조회중...'}</span>
+                      </div>
+                      <span className="text-[11px] text-[#86918a]">좌측: 고객 답장 · 우측: 발신 문자</span>
+                    </div>
+
+                    {smsLogs && smsLogs.length > 0 ? (
+                      <div
+                        ref={chatScrollRef}
+                        className="space-y-2.5 max-h-[280px] overflow-y-auto p-3.5 rounded-[10px] bg-[#f5f6f3] border border-[#e6eae3]"
+                      >
+                        {[...smsLogs].reverse().map((log: any) => {
+                          const isInbound = log.direction === 'inbound';
+                          const isExpanded = expandedSmsLogId === log._id;
+                          const isLongMessage =
+                            (log.message?.length || 0) > 160 || (log.message?.split('\n').length || 0) > 4;
+                          const kst = new Date(log.createdAt + 9 * 60 * 60 * 1000);
+                          const formattedDate = `${String(kst.getUTCMonth() + 1).padStart(2, '0')}.${String(
+                            kst.getUTCDate()
+                          ).padStart(2, '0')} ${String(kst.getUTCHours()).padStart(2, '0')}:${String(
+                            kst.getUTCMinutes()
+                          ).padStart(2, '0')}`;
+
+                          return (
+                            <div
+                              key={log._id}
+                              className={`flex flex-col ${isInbound ? 'items-start' : 'items-end'}`}
+                            >
+                              <div
+                                className={`max-w-[85%] rounded-[11px] px-3.5 py-2.5 text-[12px] border ${
+                                  isInbound
+                                    ? 'bg-white border-[#e6eae3] text-[#263d36] rounded-tl-[3px]'
+                                    : log.status === '실패'
+                                      ? 'bg-[#faeae5] border-[#ead5cf] text-[#263d36] rounded-tr-[3px]'
+                                      : 'bg-[#edf3e8] border-[#cfe0c7] text-[#263d36] rounded-tr-[3px]'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between gap-2 mb-1">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span
+                                      className={`adm-pill ${
+                                        isInbound ? 'teal' : log.status === '성공' ? 'green' : 'red'
+                                      }`}
+                                    >
+                                      {isInbound ? '고객 답장' : log.smsType || '발신'}
+                                    </span>
+                                    {!isInbound && log.senderName && (
+                                      <span className="text-[10.5px] text-[#5c6b5b] font-semibold">
+                                        {log.senderName}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-[10px] font-mono text-[#86918a] shrink-0">
+                                    {formattedDate}
+                                  </span>
+                                </div>
+                                {log.title && !isInbound && (
+                                  <div className="text-[11px] font-bold text-[#263d36] mb-1 truncate">
+                                    {log.title}
+                                  </div>
+                                )}
+                                <p
+                                  className={`text-[#45554e] whitespace-pre-wrap break-words leading-relaxed ${
+                                    isLongMessage && !isExpanded ? 'line-clamp-4' : ''
+                                  }`}
+                                >
+                                  {log.message}
+                                </p>
+                                {isLongMessage && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setExpandedSmsLogId(isExpanded ? null : log._id)}
+                                    className="mt-1 text-[11px] font-bold text-[#295e52] hover:underline"
+                                  >
+                                    {isExpanded ? '접기' : '전체보기'}
+                                  </button>
+                                )}
+                                {log.status === '실패' && log.errorMessage && (
+                                  <div className="mt-1.5 text-[11px] text-[#a85042] bg-white/70 px-2 py-1 rounded">
+                                    실패 사유: {log.errorMessage}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="adm-note-card text-center py-8 text-[#86918a]">
+                        {smsLogs ? '아직 주고받은 문자 내역이 없습니다.' : '문자 내역을 불러오는 중입니다...'}
+                      </div>
+                    )}
+
+                    {/* Quick Reply Input */}
+                    <div className="flex items-end gap-2 pt-1">
+                      <textarea
+                        rows={2}
+                        value={quickReplyDraft}
+                        onChange={(e) => setQuickReplyDraft(e.target.value)}
+                        placeholder="고객에게 바로 보낼 빠른 답장 내용을 입력하세요..."
+                        className="adm-textarea !min-h-[54px] flex-1"
+                      />
+                      <button
+                        type="button"
+                        disabled={isSendingQuickReply || !quickReplyDraft.trim()}
+                        onClick={async () => {
+                          const targetPhone = editData.phone || selectedCustomer.phone;
+                          if (!targetPhone) {
+                            alert('고객 연락처가 없습니다.');
+                            return;
+                          }
+                          if (!quickReplyDraft.trim()) return;
+                          if (!confirm(`${selectedCustomer.name}님(${targetPhone})에게 문자를 발송하시겠습니까?`)) return;
+                          setIsSendingQuickReply(true);
+                          try {
+                            await sendCustomGuideSms({
+                              inquiryId: selectedCustomer._id,
+                              customerName: selectedCustomer.name,
+                              customerPhone: targetPhone,
+                              smsType: '자유문자',
+                              senderName: getCurrentWriterName(),
+                              title: '[효원상조 × LG가전구독] 안내',
+                              message: quickReplyDraft.trim(),
+                            });
+                            setQuickReplyDraft('');
+                          } catch (err: any) {
+                            alert(err?.message || '문자 발송에 실패했습니다.');
+                          } finally {
+                            setIsSendingQuickReply(false);
+                          }
+                        }}
+                        className="adm-btn primary !h-[54px] shrink-0"
+                      >
+                        {isSendingQuickReply ? <Loader2 className="animate-spin" /> : <Send />}
+                        <span>답장 전송</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {drawerTab === 'info' && (
+                <div className="space-y-5">
+                  <div>
+                    <div className="adm-section-label !mt-0">
+                      <span>기본 고객 정보</span>
+                    </div>
+                    <div className="adm-field-grid">
+                      <div className="adm-field">
+                        <label>고객명</label>
+                        <input
+                          type="text"
+                          value={editData.name || ''}
+                          onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                          className="adm-input"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>연락처</label>
+                        <input
+                          type="text"
+                          value={editData.phone || ''}
+                          onChange={(e) => setEditData({ ...editData, phone: formatPhoneNumber(e.target.value) })}
+                          className="adm-input font-mono"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>성별</label>
+                        <select
+                          value={editData.gender || ''}
+                          onChange={(e) => setEditData({ ...editData, gender: e.target.value })}
+                          className="adm-select"
+                        >
+                          <option value="">선택</option>
+                          <option>남성</option>
+                          <option>여성</option>
+                        </select>
+                      </div>
+                      <div className="adm-field">
+                        <label>생년월일 (6자리)</label>
+                        <input
+                          type="text"
+                          value={editData.birth || ''}
+                          onChange={(e) => setEditData({ ...editData, birth: e.target.value })}
+                          className="adm-input font-mono"
+                          placeholder="YYMMDD"
+                        />
+                      </div>
+                      <div className="adm-field full">
+                        <div className="flex items-center justify-between">
+                          <label>설치 주소</label>
+                          <button type="button" onClick={openPostcode} className="adm-btn sage small">
+                            우편번호 검색
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={editData.address || ''}
+                          readOnly
+                          onClick={openPostcode}
+                          className="adm-input cursor-pointer !bg-[#f8f9f5]"
+                          placeholder="기본 주소 (우편번호 검색)"
+                        />
+                        <input
+                          type="text"
+                          value={editData.detailAddress || ''}
+                          onChange={(e) => setEditData({ ...editData, detailAddress: e.target.value })}
+                          className="adm-input"
+                          placeholder="상세 주소 입력"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="adm-section-label">
+                      <span>상담 · 구독 계약 일정</span>
+                    </div>
+                    <div className="adm-field-grid">
+                      <div className="adm-field">
+                        <label>신규 접수일</label>
+                        <input
+                          type="date"
+                          value={editData.newRegDate || ''}
+                          onChange={(e) => setEditData({ ...editData, newRegDate: e.target.value })}
+                          className="adm-input"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>상조 계약일</label>
+                        <input
+                          type="date"
+                          value={editData.sangjoContractDate || ''}
+                          onChange={(e) => setEditData({ ...editData, sangjoContractDate: e.target.value })}
+                          className="adm-input"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>구독(렌탈) 계약일</label>
+                        <input
+                          type="date"
+                          value={editData.rentalContractDate || ''}
+                          onChange={(e) => setEditData({ ...editData, rentalContractDate: e.target.value })}
+                          className="adm-input"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>가전 설치/배송일</label>
+                        <input
+                          type="date"
+                          value={editData.deliveryDate || ''}
+                          onChange={(e) => setEditData({ ...editData, deliveryDate: e.target.value })}
+                          className="adm-input"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>청약 철회일</label>
+                        <input
+                          type="date"
+                          value={editData.cancelDate || ''}
+                          onChange={(e) => setEditData({ ...editData, cancelDate: e.target.value })}
+                          className="adm-input"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>계약 해지일</label>
+                        <input
+                          type="date"
+                          value={editData.terminationDate || ''}
+                          onChange={(e) => setEditData({ ...editData, terminationDate: e.target.value })}
+                          className="adm-input"
+                        />
+                      </div>
+                      <div className="adm-field full">
+                        <label>특이사항</label>
+                        <input
+                          type="text"
+                          value={editData.note || ''}
+                          onChange={(e) => setEditData({ ...editData, note: e.target.value })}
+                          className="adm-input"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="adm-section-label">
+                      <span>LG구독 상품 및 케어서비스 설정</span>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="adm-field">
+                        <label>신청상품 (카테고리)</label>
+                        <select
+                          value={editData.productName || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const plan = allPlans?.find((p) => p.name === val);
+                            let resolvedAcc = plan ? plan.accountCount : '1구좌';
+                            if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독')) {
+                              resolvedAcc = '1구좌';
+                            }
+                            setEditData({
+                              ...editData,
+                              productName: val,
+                              account: resolvedAcc,
+                            });
+                          }}
+                          className="adm-select font-bold"
+                        >
+                          <option value="LG구독할인(new)">LG구독할인(new)</option>
+                          <option value="LG가전구독(new) (1구좌)">LG가전구독(new) (1구좌)</option>
+                          {allPlans?.map((plan) => (
+                            <option key={plan._id} value={plan.name}>
+                              {plan.name}
+                            </option>
+                          ))}
+                          {editData.productName &&
+                            editData.productName !== 'LG구독할인(new)' &&
+                            editData.productName !== 'LG가전구독(new) (1구좌)' &&
+                            !allPlans?.some((p) => p.name === editData.productName) && (
+                              <option value={editData.productName}>{editData.productName}</option>
+                            )}
+                        </select>
+                      </div>
+
+                      <LgApplianceOptionFields
+                        value={{
+                          appliance: editData.appliance || '',
+                          account: editData.account || '1구좌',
+                          subscriptionPeriod: editData.subscriptionPeriod || '',
+                          careCycle: editData.careCycle || '',
+                          careType: editData.careType || '',
+                          supplier: editData.supplier || '라이프앤조이',
+                        }}
+                        onChange={(patch) => setEditData((prev: any) => ({ ...prev, ...patch }))}
+                        lgProductsByCategory={lgProductsByCategory}
+                        lgDbProducts={lgDbProducts}
+                        showSupplier={true}
+                      />
+
+                      {selectedCustomer.message && (
+                        <div className="adm-field">
+                          <label>고객 문의 메시지 · 견적 조건</label>
+                          <div className="adm-note-card whitespace-pre-wrap">{selectedCustomer.message}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {drawerTab === 'history' && (
+                <div>
+                  <div className="adm-section-label !mt-0">
+                    <span>상태 변경 및 상담 이력</span>
+                  </div>
+                  {selectedCustomer.memoHistory && selectedCustomer.memoHistory.length > 0 ? (
+                    <div className="space-y-2.5">
+                      {selectedCustomer.memoHistory.map((history: any, idx: number) => (
+                        <div key={idx} className="adm-note-card !bg-white flex items-start justify-between gap-3">
+                          <div className="space-y-1 min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="adm-pill green">{history.status}</span>
+                              <span className="font-mono text-[11px] text-[#86918a]">{history.date}</span>
+                            </div>
+                            <p className="text-[12.5px] text-[#263d36] break-all">{history.memo}</p>
+                          </div>
+                          {history.writer && <span className="adm-pill gray shrink-0">{history.writer}</span>}
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
-              </section>
+                  ) : (
+                    <div className="adm-note-card text-center py-12 text-[#86918a]">
+                      <History className="w-6 h-6 mx-auto mb-2 opacity-50" />
+                      기록된 상담/상태 변경 이력이 없습니다.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="adm-drawer-foot">
+              <span className="adm-caption">고객 정보 및 진행상태 변경 후 저장하기를 눌러주세요.</span>
+              <button type="button" onClick={() => setSelectedCustomer(null)} className="adm-btn">
+                닫기
+              </button>
+              <button type="button" onClick={handleUpdate} className="adm-btn primary">
+                <Save />
+                <span>수정사항 저장하기</span>
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 직접 등록 모달 */}
+      {/* Direct Registration Modal */}
       {isRegisterModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 lg:p-4">
-          <div className="bg-white lg:rounded-[24px] w-full max-w-[900px] h-full lg:h-auto lg:max-h-[95vh] flex flex-col overflow-hidden shadow-2xl">
-            <div className="px-6 py-5 border-b border-[#E5E8EB] flex justify-between items-center bg-white z-10 shrink-0">
-              <h3 className="text-[20px] font-bold">LG구독 고객 직접 등록</h3>
-              <button onClick={() => setIsRegisterModalOpen(false)} className="p-2 hover:bg-[#F2F4F6] rounded-full transition-colors">
-                <X className="w-6 h-6 text-[#4E5968]" />
+        <div className="adm-modal-overlay">
+          <div className="adm-modal max-w-[920px]">
+            <div className="adm-drawer-head">
+              <div>
+                <h2>LG구독 고객 직접 등록</h2>
+                <p>수기 상담 고객을 대기 목록에 담아 일괄 등록합니다.</p>
+              </div>
+              <button type="button" onClick={() => setIsRegisterModalOpen(false)} className="adm-icon-btn">
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col lg:flex-row gap-6 bg-[#F9FAFB] hide-scrollbar">
-              {/* Left: Input Form */}
-              <div className="flex-1 space-y-6">
-                <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                  <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#3182F6]"></span>고객 정보 입력
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">파트너사</label>
-                      <select value={registerForm.channelId} onChange={e => setRegisterForm({ ...registerForm, channelId: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]">
+            <div className="adm-drawer-scroll flex flex-col lg:flex-row gap-6">
+              <div className="flex-1 space-y-5">
+                <div className="adm-panel p-5">
+                  <div className="adm-section-label !mt-0">
+                    <span>고객 기본 정보</span>
+                  </div>
+                  <div className="adm-field-grid">
+                    <div className="adm-field">
+                      <label>파트너 채널</label>
+                      <select
+                        value={registerForm.channelId}
+                        onChange={(e) => setRegisterForm({ ...registerForm, channelId: e.target.value })}
+                        className="adm-select"
+                      >
                         {!channelId ? (
                           <>
                             <option value="본사">본사</option>
-                            {channels?.map(c => (
-                              <option key={c._id} value={c.subdomain}>{c.channelName}</option>
+                            {channels?.map((c) => (
+                              <option key={c._id} value={c.subdomain}>
+                                {c.channelName}
+                              </option>
                             ))}
                           </>
                         ) : (
-                          channels?.filter(c => subChannelIds?.includes(c.subdomain)).map(c => (
-                            <option key={c._id} value={c.subdomain}>{c.channelName}</option>
-                          ))
+                          channels
+                            ?.filter((c) => subChannelIds?.includes(c.subdomain))
+                            .map((c) => (
+                              <option key={c._id} value={c.subdomain}>
+                                {c.channelName}
+                              </option>
+                            ))
                         )}
                       </select>
                     </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">고객명 <span className="text-red-500">*</span></label>
-                      <input type="text" value={registerForm.name} onChange={e => setRegisterForm({ ...registerForm, name: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="성함 입력" />
+
+                    <div className="adm-field">
+                      <label>고객명 *</label>
+                      <input
+                        type="text"
+                        value={registerForm.name}
+                        onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
+                        className="adm-input"
+                        placeholder="성함 입력"
+                      />
                     </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">연락처 <span className="text-red-500">*</span></label>
-                      <input type="tel" inputMode="numeric" value={registerForm.phone} onChange={e => setRegisterForm({ ...registerForm, phone: formatPhoneNumber(e.target.value) })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="010-0000-0000" />
+
+                    <div className="adm-field">
+                      <label>연락처 *</label>
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        value={registerForm.phone}
+                        onChange={(e) => setRegisterForm({ ...registerForm, phone: formatPhoneNumber(e.target.value) })}
+                        className="adm-input font-mono"
+                        placeholder="010-0000-0000"
+                      />
                     </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">생년월일 (6자리)</label>
-                      <input type="text" inputMode="numeric" value={registerForm.birth} onChange={e => setRegisterForm({ ...registerForm, birth: formatBirthDate(e.target.value) })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="YY-MM-DD" maxLength={8} />
+
+                    <div className="adm-field">
+                      <label>생년월일 (6자리)</label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={registerForm.birth}
+                        onChange={(e) => setRegisterForm({ ...registerForm, birth: formatBirthDate(e.target.value) })}
+                        className="adm-input font-mono"
+                        placeholder="YY-MM-DD"
+                        maxLength={8}
+                      />
                     </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">성별</label>
-                      <div className="flex gap-2">
-                        {['남성', '여성'].map(g => (
-                          <button key={g} onClick={() => setRegisterForm({ ...registerForm, gender: g })} className={`flex-1 py-2 rounded-[8px] text-[13px] font-bold border transition-all ${registerForm.gender === g ? 'bg-[#191F28] border-[#191F28] text-white' : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:bg-[#F9FAFB]'}`}>{g}</button>
+
+                    <div className="adm-field full">
+                      <label>성별</label>
+                      <div className="adm-segmented w-fit">
+                        {['남성', '여성'].map((g) => (
+                          <button
+                            key={g}
+                            type="button"
+                            onClick={() => setRegisterForm({ ...registerForm, gender: g })}
+                            className={registerForm.gender === g ? 'active' : ''}
+                          >
+                            {g}
+                          </button>
                         ))}
                       </div>
                     </div>
-                    <div className="col-span-2">
-                      <div className="flex justify-between items-end mb-1">
-                        <label className="block text-[12px] font-medium text-[#8B95A1]">주소</label>
-                        <button onClick={openRegisterPostcode} className="text-[11px] bg-[#3182F6] text-white px-2.5 py-1 rounded-[4px] font-bold hover:bg-[#1B64DA]">주소 검색</button>
-                      </div>
-                      <input type="text" value={registerForm.address} readOnly onClick={openRegisterPostcode} className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] mb-2 cursor-pointer" placeholder="주소 검색을 클릭해주세요" />
-                      <input type="text" value={registerForm.detailAddress} onChange={e => setRegisterForm({ ...registerForm, detailAddress: e.target.value })} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="상세 주소 입력" />
-                    </div>
-                  </div>
-                </section>
 
-                <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                  <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#059669]"></span>LG구독 상품 정보 입력
-                  </h4>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">신청상품 (카테고리)</label>
-                      <select
-                        value={registerForm.productName}
-                        onChange={e => {
-                          const val = e.target.value;
-                          setRegisterForm({
-                            ...registerForm,
-                            productName: val,
-                            account: '1구좌',
-                            supplier: '라이프앤조이',
-                          });
-                        }}
-                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold"
-                      >
-                        <option value="LG구독할인(new)">LG구독할인(new)</option>
-                        <option value="LG가전구독(new) (1구좌)">LG가전구독(new) (1구좌)</option>
-                        <option value="LG전자 가전구독 X 효원라이프 144 (1구좌)">LG전자 가전구독 X 효원라이프 144 (1구좌)</option>
-                      </select>
+                    <div className="adm-field full">
+                      <div className="flex items-center justify-between">
+                        <label>설치 주소</label>
+                        <button type="button" onClick={openRegisterPostcode} className="adm-btn sage small">
+                          주소 검색
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={registerForm.address}
+                        readOnly
+                        onClick={openRegisterPostcode}
+                        className="adm-input cursor-pointer !bg-[#f8f9f5]"
+                        placeholder="주소 검색을 클릭해주세요"
+                      />
+                      <input
+                        type="text"
+                        value={registerForm.detailAddress}
+                        onChange={(e) => setRegisterForm({ ...registerForm, detailAddress: e.target.value })}
+                        className="adm-input"
+                        placeholder="상세 주소 입력"
+                      />
                     </div>
-                    <LgApplianceOptionFields
-                      value={{
-                        appliance: registerForm.appliance || '',
-                        account: registerForm.account || '1구좌',
-                        subscriptionPeriod: registerForm.subscriptionPeriod || '',
-                        careCycle: registerForm.careCycle || '',
-                        careType: registerForm.careType || '',
-                        supplier: registerForm.supplier || '라이프앤조이',
-                      }}
-                      onChange={(patch) => setRegisterForm((prev: any) => ({ ...prev, ...patch }))}
-                      lgProductsByCategory={lgProductsByCategory}
-                      lgDbProducts={lgDbProducts}
-                      showSupplier={true}
-                    />
-                    <button onClick={handleAddToList} className="w-full bg-[#3182F6] text-white py-3 rounded-[12px] font-bold text-[14px] hover:bg-[#1B64DA] mt-2 shadow-sm transition-all active:scale-[0.98]">등록대기 목록에 추가</button>
                   </div>
-                </section>
+                </div>
+
+                <div className="adm-panel p-5 space-y-4">
+                  <div className="adm-section-label !mt-0">
+                    <span>LG구독 상품 옵션</span>
+                  </div>
+                  <div className="adm-field">
+                    <label>신청상품 (카테고리)</label>
+                    <select
+                      value={registerForm.productName}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setRegisterForm({
+                          ...registerForm,
+                          productName: val,
+                          account: '1구좌',
+                          supplier: '라이프앤조이',
+                        });
+                      }}
+                      className="adm-select font-bold"
+                    >
+                      <option value="LG구독할인(new)">LG구독할인(new)</option>
+                      <option value="LG가전구독(new) (1구좌)">LG가전구독(new) (1구좌)</option>
+                      <option value="LG전자 가전구독 X 효원라이프 144 (1구좌)">
+                        LG전자 가전구독 X 효원라이프 144 (1구좌)
+                      </option>
+                    </select>
+                  </div>
+
+                  <LgApplianceOptionFields
+                    value={{
+                      appliance: registerForm.appliance || '',
+                      account: registerForm.account || '1구좌',
+                      subscriptionPeriod: registerForm.subscriptionPeriod || '',
+                      careCycle: registerForm.careCycle || '',
+                      careType: registerForm.careType || '',
+                      supplier: registerForm.supplier || '라이프앤조이',
+                    }}
+                    onChange={(patch) => setRegisterForm((prev: any) => ({ ...prev, ...patch }))}
+                    lgProductsByCategory={lgProductsByCategory}
+                    lgDbProducts={lgDbProducts}
+                    showSupplier={true}
+                  />
+
+                  <button type="button" onClick={handleAddToList} className="adm-btn sage w-full">
+                    <Plus />
+                    <span>등록대기 목록에 추가</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Right: Wait List */}
-              <div className="w-full lg:w-[320px] flex flex-col gap-4">
-                <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB] flex-1 flex flex-col overflow-hidden">
-                  <h4 className="text-[15px] font-bold mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#191F28]"></span>등록대기 목록
-                    </div>
-                    <span className="text-[12px] bg-[#F2F4F6] text-[#4E5968] px-2 py-0.5 rounded-full font-bold">{registerList.length}건</span>
-                  </h4>
+              <div className="w-full lg:w-[300px] flex flex-col">
+                <div className="adm-panel p-5 flex-1 flex flex-col">
+                  <div className="adm-section-label !mt-0">
+                    <span>등록대기 목록</span>
+                    <span className="adm-pill green">{registerList.length}건</span>
+                  </div>
 
-                  <div className="flex-1 overflow-y-auto space-y-3 pr-1 hide-scrollbar">
+                  <div className="flex-1 overflow-y-auto space-y-2.5 max-h-[420px]">
                     {registerList.length === 0 ? (
-                      <div className="h-full flex flex-col items-center justify-center text-center py-10">
-                        <Plus className="w-8 h-8 text-[#E5E8EB] mb-2" />
-                        <p className="text-[13px] text-[#8B95A1]">목록이 비어있습니다.<br />좌측 폼을 입력해 추가해주세요.</p>
+                      <div className="py-16 text-center text-[#86918a] text-[12px]">
+                        대기 목록이 비어있습니다.<br />좌측 폼을 입력해 추가해 주세요.
                       </div>
                     ) : (
                       registerList.map((item) => (
-                        <div key={item.id} className="p-3 bg-[#F9FAFB] rounded-[12px] border border-[#E5E8EB] relative group">
-                          <button onClick={() => handleRemoveFromList(item.id)} className="absolute top-2 right-2 p-1 text-[#8B95A1] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div key={item.id} className="adm-note-card relative">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFromList(item.id)}
+                            className="absolute top-2.5 right-2.5 text-[#86918a] hover:text-[#a85042]"
+                          >
                             <X className="w-4 h-4" />
                           </button>
-                          <div className="text-[14px] font-bold text-[#191F28] mb-1">{item.name}</div>
-                          <div className="text-[12px] text-[#4E5968] mb-2">{item.phone}</div>
+                          <div className="font-bold text-[#263d36]">{item.name}</div>
+                          <div className="font-mono text-[11.5px] text-[#6d786c] mb-2">{item.phone}</div>
                           <div className="flex flex-wrap gap-1">
-                            <span className="text-[10px] bg-white border border-[#E5E8EB] text-[#8B95A1] px-1.5 py-0.5 rounded">{getChannelName(item.channelId)}</span>
-                            {item.productName && <span className="text-[10px] bg-blue-50 text-[#3182F6] px-1.5 py-0.5 rounded">{item.productName}</span>}
-                            {item.account && <span className="text-[10px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded">{item.account}</span>}
-                            {item.subscriptionPeriod && <span className="text-[10px] bg-gray-100 text-[#4E5968] px-1.5 py-0.5 rounded">{item.subscriptionPeriod}</span>}
-                            {item.careCycle && <span className="text-[10px] bg-blue-50 text-[#3182F6] px-1.5 py-0.5 rounded">{item.careCycle}</span>}
-                            {item.careType && <span className="text-[10px] bg-emerald-50 text-[#059669] px-1.5 py-0.5 rounded truncate max-w-[180px]">{item.careType}</span>}
-                            {item.appliance && <span className="text-[10px] bg-emerald-50 text-[#059669] px-1.5 py-0.5 rounded truncate max-w-[180px]">{item.appliance}</span>}
+                            <span className="adm-pill gray">{getChannelName(item.channelId)}</span>
+                            {item.account && <span className="adm-pill green">{item.account}</span>}
+                            {item.subscriptionPeriod && (
+                              <span className="adm-pill blue">{item.subscriptionPeriod}</span>
+                            )}
+                            {item.appliance && (
+                              <span className="adm-pill teal truncate max-w-[180px]">{item.appliance}</span>
+                            )}
                           </div>
                         </div>
                       ))
@@ -2348,18 +2593,20 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                   </div>
 
                   <button
+                    type="button"
                     onClick={handleBulkRegister}
                     disabled={registerList.length === 0}
-                    className={`w-full py-4 rounded-[16px] font-bold text-[15px] mt-6 shadow-lg transition-all active:scale-[0.98] ${registerList.length > 0 ? 'bg-[#191F28] text-white hover:bg-[#2D3644] shadow-black/10' : 'bg-[#E5E8EB] text-[#8B95A1] cursor-not-allowed shadow-none'}`}
+                    className="adm-btn primary w-full mt-5"
                   >
-                    총 {registerList.length}명 등록하기
+                    총 {registerList.length}명 최종 등록하기
                   </button>
-                </section>
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
+
       <DaangnLeadModal
         isOpen={isDaangnModalOpen}
         onClose={() => setIsDaangnModalOpen(false)}

@@ -3,20 +3,18 @@ import {
   BarChart3,
   Users,
   MousePointerClick,
-  TrendingUp,
+  CheckCircle2,
   RefreshCw,
   Globe,
   Compass,
-  Smartphone,
   Link2,
   Copy,
   Check,
-  Tag,
   ShieldAlert,
+  Calendar,
 } from 'lucide-react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { getTrafficBadgeClass } from '../utils/inflow';
 
 const UTM_CHANNEL_PRESETS = [
   { id: 'kakao', label: '카카오톡 링크', source: 'kakao', medium: 'chat' },
@@ -41,9 +39,10 @@ const DEFAULT_LANDING_PATHS = [
 ];
 
 export default function Statistics({ channelId }: { channelId?: string }) {
-  const [period, setPeriod] = useState('today');
+  const [period, setPeriod] = useState('week');
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [showLinkBuilder, setShowLinkBuilder] = useState(false);
+  const [detailTab, setDetailTab] = useState<'channels' | 'landings' | 'utm' | 'env'>('channels');
 
   // Link Builder state
   const [builderPath, setBuilderPath] = useState('/');
@@ -66,7 +65,7 @@ export default function Statistics({ channelId }: { channelId?: string }) {
   );
 
   const generatedUtmUrl = useMemo(() => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://hyowon.co.kr';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://hyowon-life.com';
     const preset = UTM_CHANNEL_PRESETS.find((p) => p.id === builderPreset) || UTM_CHANNEL_PRESETS[0];
     const cleanPath = builderPath.startsWith('/') ? builderPath : `/${builderPath}`;
     const params = new URLSearchParams();
@@ -80,41 +79,12 @@ export default function Statistics({ channelId }: { channelId?: string }) {
 
   if (!stats) {
     return (
-      <div className="p-8 flex flex-col items-center justify-center h-full">
-        <RefreshCw className="w-8 h-8 text-[#3182F6] animate-spin mb-4" />
-        <p className="text-[14px] font-bold text-[#4E5968]">통계 데이터를 불러오는 중...</p>
+      <div className="py-24 flex flex-col items-center justify-center">
+        <RefreshCw className="w-7 h-7 text-[#295e52] animate-spin mb-3" />
+        <p className="text-[13px] font-semibold text-[#45554e]">통계 데이터를 집계하는 중입니다...</p>
       </div>
     );
   }
-
-  const periodLabel = period === 'today' ? '오늘' : period === 'week' ? '최근 1주일' : '최근 1개월';
-
-  const statCards = [
-    {
-      label: `${periodLabel} 유입 인원 (UV)`,
-      value: stats.summary.uv.toLocaleString(),
-      change: stats.summary.uvChange,
-      icon: Users,
-      color: 'text-blue-500',
-      bg: 'bg-blue-50',
-    },
-    {
-      label: `${periodLabel} 페이지 뷰 (PV)`,
-      value: stats.summary.pv.toLocaleString(),
-      change: stats.summary.pvChange,
-      icon: MousePointerClick,
-      color: 'text-purple-500',
-      bg: 'bg-purple-50',
-    },
-    {
-      label: `${periodLabel} 상담 신청`,
-      value: stats.summary.inquiries.toLocaleString(),
-      change: stats.summary.inquiryChange,
-      icon: TrendingUp,
-      color: 'text-green-500',
-      bg: 'bg-green-50',
-    },
-  ];
 
   const trafficChannels = (stats as any).trafficChannels || [];
   const categorySummary = (stats as any).categorySummary || [];
@@ -145,68 +115,94 @@ export default function Statistics({ channelId }: { channelId?: string }) {
       setCopiedUrl(true);
       setTimeout(() => setCopiedUrl(false), 2000);
     } catch {
-      // Fallback
+      // ignore
     }
   };
 
+  const convRate =
+    stats.summary.uv > 0
+      ? ((stats.summary.inquiries / stats.summary.uv) * 100).toFixed(1)
+      : '0.0';
+
+  const dailyList = stats.dailyStats || [];
+  const maxDailyPv = Math.max(10, ...dailyList.map((d: any) => Math.max(d.pv || 0, d.uv || 0, d.applies || 0)));
+
   return (
-    <div className="p-4 lg:p-8 space-y-6 overflow-y-auto no-scrollbar pb-20">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+    <div>
+      {/* Page Heading */}
+      <div className="adm-page-heading">
         <div>
-          <h2 className="text-[20px] lg:text-[24px] font-bold text-[#191F28]">통계분석</h2>
-          <p className="text-[12px] lg:text-[13px] text-[#8B95A1] mt-1 break-keep">
-            실시간 방문자, 상세 유입경로(카톡·문자·당근·인스타·네이버 등) 및 전환 현황을 확인합니다.
+          <div className="adm-eyebrow">HYOWON SANGJO · STATISTICS</div>
+          <h1>통계</h1>
+          <p>
+            페이지 뷰(PV), 순 방문자(UV), 파트너별 유입 채널(카톡·문자·당근·인스타·네이버) 및 일자별 전환 현황을 분석합니다.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+        <div className="adm-heading-buttons">
+          <span className="adm-pill green">● LIVE 실시간 집계</span>
           <button
+            type="button"
             onClick={() => setShowLinkBuilder((prev) => !prev)}
-            className={`px-4 py-2.5 rounded-[12px] text-[12px] lg:text-[13px] font-bold flex items-center gap-1.5 border transition-all ${
-              showLinkBuilder
-                ? 'bg-[#3182F6] text-white border-[#3182F6] shadow-sm'
-                : 'bg-white text-[#191F28] border-[#E5E8EB] hover:bg-[#F9FAFB]'
-            }`}
+            className={`adm-btn ${showLinkBuilder ? 'primary' : 'sage'}`}
           >
-            <Link2 className="w-4 h-4" />
-            추적 링크 생성기
+            <Link2 />
+            <span>추적 링크(UTM) 생성기</span>
           </button>
-          <div className="flex flex-1 lg:flex-none bg-white rounded-[12px] border border-[#E5E8EB] overflow-hidden p-1 shadow-sm overflow-x-auto">
-            {['today', 'week', 'month'].map((p) => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                className={`flex-1 lg:flex-none px-4 lg:px-5 py-2 text-[12px] lg:text-[13px] font-bold rounded-[8px] transition-all whitespace-nowrap ${
-                  period === p ? 'bg-[#F2F4F6] text-[#191F28]' : 'text-[#4E5968] hover:bg-[#F9FAFB]'
-                }`}
-              >
-                {p === 'today' ? '오늘' : p === 'week' ? '1주일' : '1개월'}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
-      {/* 추적 링크(UTM) 생성기 */}
-      {showLinkBuilder && (
-        <div className="bg-white p-5 lg:p-7 rounded-[20px] lg:rounded-[24px] border border-[#3182F6]/30 shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h3 className="text-[16px] lg:text-[18px] font-bold flex items-center gap-2 text-[#191F28]">
-                <Link2 className="w-5 h-5 text-[#3182F6]" /> 채널별 추적 링크 생성기 (UTM)
-              </h3>
-              <p className="text-[12px] text-[#8B95A1] mt-1">
-                문자(SMS)·카톡·당근·인스타·네이버 등에 아래 생성된 링크를 사용하면 리퍼러가 누락되는 환경에서도 100% 정확히 집계됩니다.
-              </p>
-            </div>
+      {/* Period Filter Bar Panel */}
+      <div className="adm-panel mb-5">
+        <div className="adm-filter-bar !border-b-0">
+          <div className="inline-flex items-center gap-2 text-[12.5px] font-semibold text-[#45554e] mr-1">
+            <Calendar className="w-4 h-4 text-[#295e52]" />
+            <span>조회 기간 (KST)</span>
+          </div>
+          <div className="adm-segmented">
+            {[
+              { id: 'today', label: '당일 (오늘)' },
+              { id: 'week', label: '최근 7일' },
+              { id: 'month', label: '최근 1개월' },
+            ].map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                className={period === p.id ? 'active' : ''}
+                onClick={() => setPeriod(p.id)}
+              >
+                {p.label}
+              </button>
+            ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-[12px] font-bold text-[#4E5968] mb-1.5">랜딩 페이지</label>
+          {botVisitsCount > 0 && (
+            <div className="adm-filter-end">
+              <span className="adm-pill gray">
+                <ShieldAlert className="w-3.5 h-3.5" />
+                검색봇 · 미리보기 {botVisitsCount.toLocaleString()}건 자동 제외됨
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Collapsible UTM Link Builder */}
+      {showLinkBuilder && (
+        <div className="adm-panel mb-5 p-6">
+          <div className="adm-section-label !mt-0">
+            <span>채널별 추적 링크 생성기 (UTM)</span>
+            <span className="text-[11px] font-normal text-[#86918a]">
+              리퍼러가 누락되는 문자 · 카톡 · 인앱 환경에서도 유입처를 100% 정확히 판별합니다.
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="adm-field">
+              <label>랜딩 페이지</label>
               <select
                 value={builderPath}
                 onChange={(e) => setBuilderPath(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-[12px] border border-[#E5E8EB] text-[13px] font-medium text-[#191F28] bg-[#F9FAFB] focus:outline-none focus:border-[#3182F6]"
+                className="adm-select"
               >
                 {landingOptions.map((opt) => (
                   <option key={opt.path} value={opt.path}>
@@ -216,12 +212,12 @@ export default function Statistics({ channelId }: { channelId?: string }) {
               </select>
             </div>
 
-            <div>
-              <label className="block text-[12px] font-bold text-[#4E5968] mb-1.5">유입 채널</label>
+            <div className="adm-field">
+              <label>유입 매체 프리셋</label>
               <select
                 value={builderPreset}
                 onChange={(e) => setBuilderPreset(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-[12px] border border-[#E5E8EB] text-[13px] font-medium text-[#191F28] bg-[#F9FAFB] focus:outline-none focus:border-[#3182F6]"
+                className="adm-select"
               >
                 {UTM_CHANNEL_PRESETS.map((preset) => (
                   <option key={preset.id} value={preset.id}>
@@ -231,426 +227,500 @@ export default function Statistics({ channelId }: { channelId?: string }) {
               </select>
             </div>
 
-            <div>
-              <label className="block text-[12px] font-bold text-[#4E5968] mb-1.5">캠페인 / 메모 (선택)</label>
+            <div className="adm-field">
+              <label>캠페인 식별 메모 (선택)</label>
               <input
                 type="text"
                 value={builderCampaign}
                 onChange={(e) => setBuilderCampaign(e.target.value)}
-                placeholder="예: 11월_공동구매, 당근_동네홍보"
-                className="w-full px-3.5 py-2.5 rounded-[12px] border border-[#E5E8EB] text-[13px] font-medium text-[#191F28] bg-[#F9FAFB] focus:outline-none focus:border-[#3182F6]"
+                placeholder="예: 11월_프로모션, 당근_지역광고"
+                className="adm-input"
               />
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-[#F2F4F6] p-3 rounded-[14px] border border-[#E5E8EB]">
-            <code className="flex-1 text-[12px] text-[#191F28] font-mono break-all px-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 p-3 rounded-[10px] bg-[#f8f9f5] border border-[#e6eae3]">
+            <code className="flex-1 text-[12px] text-[#263d36] font-mono break-all px-1.5">
               {generatedUtmUrl}
             </code>
             <button
+              type="button"
               onClick={handleCopyUtmUrl}
-              className="shrink-0 px-4 py-2 rounded-[10px] bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[12px] font-bold flex items-center justify-center gap-1.5 transition-colors"
+              className="adm-btn primary shrink-0"
             >
-              {copiedUrl ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              {copiedUrl ? '복사됨' : '링크 복사'}
+              {copiedUrl ? <Check /> : <Copy />}
+              <span>{copiedUrl ? '복사됨' : '추적 링크 복사'}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* 요약 카드 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        {statCards.map((card, idx) => {
-          const Icon = card.icon;
-          const isPositive = card.change.startsWith('+');
-          const isNeutral = card.change === '0%';
-          return (
-            <div
-              key={idx}
-              className="bg-white p-5 lg:p-7 rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="flex justify-between items-start mb-4 lg:mb-5">
-                <div className={`p-3 lg:p-3.5 rounded-[12px] lg:rounded-[16px] ${card.bg}`}>
-                  <Icon className={`w-5 h-5 lg:w-6 lg:h-6 ${card.color}`} />
-                </div>
-                <div
-                  className={`flex items-center gap-1 text-[12px] lg:text-[13px] font-bold px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-full ${
-                    isNeutral
-                      ? 'bg-gray-50 text-gray-400'
-                      : isPositive
-                      ? 'bg-green-50 text-green-500'
-                      : 'bg-red-50 text-red-500'
-                  }`}
-                >
-                  {isNeutral ? '' : isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingUp className="w-3 h-3 rotate-180" />}
-                  {card.change}
-                </div>
-              </div>
-              <p className="text-[13px] lg:text-[14px] font-bold text-[#4E5968] mb-1">{card.label}</p>
-              <h3 className="text-[24px] lg:text-[32px] font-black text-[#191F28]">{card.value}</h3>
+      {/* 4-Column Metric Cards (Sono Statistics Layout) */}
+      <div className="adm-metrics-grid">
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>전체 페이지 뷰 (PV)</span>
+            <div className="adm-metric-icon">
+              <MousePointerClick />
             </div>
-          );
-        })}
+          </div>
+          <div className="adm-metric-value">
+            {stats.summary.pv.toLocaleString()}
+            <span>건</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">{stats.summary.pvChange}</span>
+            <span>조회 기간 누적 조회수</span>
+          </div>
+        </div>
+
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>순 방문자 수 (UV)</span>
+            <div className="adm-metric-icon">
+              <Users />
+            </div>
+          </div>
+          <div className="adm-metric-value">
+            {stats.summary.uv.toLocaleString()}
+            <span>명</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">{stats.summary.uvChange}</span>
+            <span>고유 방문자 집계</span>
+          </div>
+        </div>
+
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>유입 채널 종류</span>
+            <div className="adm-metric-icon">
+              <Compass />
+            </div>
+          </div>
+          <div className="adm-metric-value">
+            {trafficChannels.length.toLocaleString()}
+            <span>개</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">유입 다변화</span>
+            <span>감지된 유입 경로 수</span>
+          </div>
+        </div>
+
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>상담 신청 건수 (APPLY)</span>
+            <div className="adm-metric-icon">
+              <CheckCircle2 />
+            </div>
+          </div>
+          <div className="adm-metric-value">
+            {stats.summary.inquiries.toLocaleString()}
+            <span>건</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend warning">UV 대비 {convRate}%</span>
+            <span>상담 접수 전환 성과</span>
+          </div>
+        </div>
       </div>
 
-      {/* 상세 유입 경로 분석 (카톡/문자/당근/인스타/네이버 등) */}
-      <div className="bg-white p-5 lg:p-8 rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] shadow-sm">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 mb-5">
+      {/* Daily Performance Bar Chart Panel (Modeled after Sono Statistics) */}
+      <div className="adm-panel mb-5">
+        <div className="adm-panel-top">
           <div>
-            <h3 className="text-[16px] lg:text-[18px] font-bold flex items-center gap-2 text-[#191F28]">
-              <Compass className="w-5 h-5 text-[#3182F6]" /> 유입 채널별 상세 분석
-            </h3>
-            <p className="text-[12px] text-[#8B95A1] mt-1">
-              인앱 브라우저(UA), 광고 클릭ID(fbclid·n_media·gclid), UTM 파라미터, 리퍼러 도메인을 종합 판별합니다.
-            </p>
+            <div className="flex items-center gap-2">
+              <h2>일별 성과 추이</h2>
+              <span className="adm-pill green">최근 7일 집계</span>
+            </div>
+            <div className="adm-panel-subtitle">
+              일자별 페이지뷰(PV), 순방문자(UV), 상담신청(APPLY) 추이를 비교합니다.
+            </div>
           </div>
-          {botVisitsCount > 0 && (
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#4E5968] bg-[#F2F4F6] px-3 py-1.5 rounded-full">
-              <ShieldAlert className="w-3.5 h-3.5 text-[#8B95A1]" />
-              검색봇·미리보기 {botVisitsCount.toLocaleString()}건 분리됨
-            </span>
-          )}
+          <span className="text-[11px] text-[#8f9a8b] font-medium">단위: 건 / 명</span>
         </div>
 
-        {/* 카테고리 요약 필터 */}
-        <div className="flex flex-wrap gap-2 mb-5">
-          <button
-            onClick={() => setSelectedCategory('전체')}
-            className={`px-3.5 py-1.5 rounded-full text-[12px] font-bold border transition-all ${
-              selectedCategory === '전체'
-                ? 'bg-[#191F28] text-white border-[#191F28]'
-                : 'bg-[#F9FAFB] text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-            }`}
-          >
-            전체 ({trafficChannels.length})
-          </button>
-          {categorySummary.map((cat: any) => (
-            <button
-              key={cat.category}
-              onClick={() => setSelectedCategory(cat.category)}
-              className={`px-3.5 py-1.5 rounded-full text-[12px] font-bold border transition-all ${
-                selectedCategory === cat.category
-                  ? 'bg-[#3182F6] text-white border-[#3182F6]'
-                  : 'bg-[#F9FAFB] text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-              }`}
-            >
-              {cat.category} · {cat.pv.toLocaleString()}회 ({cat.share}%)
-            </button>
-          ))}
+        <div className="adm-chart-summary">
+          <span className="adm-legend-item">
+            <i className="adm-legend-dot" />
+            PV (페이지뷰)
+          </span>
+          <span className="adm-legend-item">
+            <i className="adm-legend-dot sage" />
+            UV (순방문자)
+          </span>
+          <span className="adm-legend-item">
+            <i className="adm-legend-dot gold" />
+            APPLY (상담신청)
+          </span>
         </div>
 
-        <div className="overflow-x-auto rounded-[16px] border border-[#F2F4F6] hide-scrollbar">
-          <table className="w-full text-left border-collapse min-w-[680px]">
-            <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
-              <tr>
-                <th className="px-5 py-3.5 text-[13px] font-bold text-[#4E5968]">유입 채널</th>
-                <th className="px-4 py-3.5 text-[13px] font-bold text-[#4E5968]">카테고리</th>
-                <th className="px-4 py-3.5 text-[13px] font-bold text-[#4E5968]">비중</th>
-                <th className="px-4 py-3.5 text-[13px] font-bold text-[#4E5968] text-right">유입 (UV)</th>
-                <th className="px-4 py-3.5 text-[13px] font-bold text-[#4E5968] text-right">조회 (PV)</th>
-                <th className="px-4 py-3.5 text-[13px] font-bold text-[#4E5968] text-right">상담 신청</th>
-                <th className="px-5 py-3.5 text-[13px] font-bold text-[#4E5968] text-right">전환율</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F2F4F6]">
-              {filteredChannels.length > 0 ? (
-                filteredChannels.map((ch: any) => (
-                  <tr key={ch.channel} className="hover:bg-[#F9FAFB] transition-colors">
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`inline-block px-2.5 py-1 rounded-[8px] text-[12px] font-bold ${getTrafficBadgeClass(ch.channel)}`}>
-                          {ch.label}
-                        </span>
-                        {ch.isPaidAd && (
-                          <span className="px-1.5 py-0.5 rounded bg-rose-50 text-rose-600 border border-rose-200 text-[10px] font-bold">
-                            광고
-                          </span>
+        <div className="p-5 overflow-x-auto">
+          <div className="min-w-[560px] bg-[#fcfdfb] border border-[#edf0e7] rounded-[12px] p-5">
+            <div className="grid grid-cols-7 gap-4 items-end h-[180px] pt-6 border-b border-[#e6eae3]">
+              {dailyList.map((d: any, idx: number) => {
+                const pvH = Math.max(4, Math.round(((d.pv || 0) / maxDailyPv) * 130));
+                const uvH = Math.max(4, Math.round(((d.uv || 0) / maxDailyPv) * 130));
+                const appH = Math.max(d.applies > 0 ? 6 : 2, Math.round(((d.applies || 0) / maxDailyPv) * 130));
+                return (
+                  <div key={idx} className="flex flex-col items-center justify-end h-full">
+                    <div className="flex items-end gap-1.5 h-full">
+                      <div className="flex flex-col items-center justify-end">
+                        <span className="text-[10px] font-bold text-[#263d36] mb-1 tabular-nums">{d.pv}</span>
+                        <div
+                          className="w-3 rounded-t-[3px] bg-[#295e52] transition-all"
+                          style={{ height: `${pvH}px` }}
+                          title={`PV: ${d.pv}`}
+                        />
+                      </div>
+                      <div className="flex flex-col items-center justify-end">
+                        <span className="text-[10px] font-semibold text-[#6d786c] mb-1 tabular-nums">{d.uv}</span>
+                        <div
+                          className="w-3 rounded-t-[3px] bg-[#a6b6a1] transition-all"
+                          style={{ height: `${uvH}px` }}
+                          title={`UV: ${d.uv}`}
+                        />
+                      </div>
+                      <div className="flex flex-col items-center justify-end">
+                        {d.applies > 0 && (
+                          <span className="text-[10px] font-bold text-[#a97f3f] mb-1 tabular-nums">{d.applies}</span>
                         )}
+                        <div
+                          className="w-3 rounded-t-[3px] bg-[#b99a61] transition-all"
+                          style={{ height: `${appH}px` }}
+                          title={`상담신청: ${d.applies}`}
+                        />
                       </div>
-                      {ch.matchReasons && ch.matchReasons.length > 0 && (
-                        <div className="text-[11px] text-[#8B95A1] mt-1">
-                          판별: {ch.matchReasons.join(', ')}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3.5 text-[13px] font-medium text-[#4E5968]">{ch.category}</td>
-                    <td className="px-4 py-3.5 w-[150px]">
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-2 bg-[#F2F4F6] rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-[#3182F6] rounded-full"
-                            style={{ width: `${Math.min(100, ch.share)}%` }}
-                          />
-                        </div>
-                        <span className="text-[12px] font-bold text-[#191F28] w-11 text-right">{ch.share}%</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3.5 text-[14px] text-[#4E5968] text-right font-medium">
-                      {ch.uv.toLocaleString()}명
-                    </td>
-                    <td className="px-4 py-3.5 text-[14px] text-[#191F28] text-right font-bold">
-                      {ch.pv.toLocaleString()}회
-                    </td>
-                    <td className="px-4 py-3.5 text-[14px] text-[#3182F6] text-right font-black">
-                      {ch.inquiries.toLocaleString()}건
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <span className="text-[13px] font-bold text-[#191F28] bg-[#F2F4F6] px-2.5 py-1 rounded-full">
-                        {ch.conversionRate.toFixed(1)}%
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="text-center py-10 text-[#8B95A1] text-[13px]">
-                    해당 기간의 유입 데이터가 없습니다.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* UTM 캠페인별 상세 (데이터가 있을 때 표시) */}
-      {utmCampaigns.length > 0 && (
-        <div className="bg-white p-5 lg:p-8 rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] shadow-sm">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-            <h3 className="text-[16px] lg:text-[18px] font-bold flex items-center gap-2 text-[#191F28]">
-              <Tag className="w-5 h-5 text-[#3182F6]" /> 캠페인(UTM)별 유입 및 전환
-            </h3>
-            <span className="text-[11px] lg:text-[12px] text-[#8B95A1] font-medium">
-              추적 링크(UTM)가 포함된 유입 성과입니다.
-            </span>
-          </div>
-          <div className="overflow-x-auto rounded-[16px] border border-[#F2F4F6] hide-scrollbar">
-            <table className="w-full text-left border-collapse min-w-[600px]">
-              <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
-                <tr>
-                  <th className="px-5 py-3.5 text-[13px] font-bold text-[#4E5968]">소스 (utm_source)</th>
-                  <th className="px-4 py-3.5 text-[13px] font-bold text-[#4E5968]">매체 (utm_medium)</th>
-                  <th className="px-4 py-3.5 text-[13px] font-bold text-[#4E5968]">캠페인 (utm_campaign)</th>
-                  <th className="px-4 py-3.5 text-[13px] font-bold text-[#4E5968] text-right">유입 (UV)</th>
-                  <th className="px-4 py-3.5 text-[13px] font-bold text-[#4E5968] text-right">조회 (PV)</th>
-                  <th className="px-5 py-3.5 text-[13px] font-bold text-[#4E5968] text-right">상담 신청</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#F2F4F6]">
-                {utmCampaigns.map((u: any, idx: number) => (
-                  <tr key={idx} className="hover:bg-[#F9FAFB] transition-colors">
-                    <td className="px-5 py-3.5 text-[13px] font-bold text-[#191F28]">{u.utmSource}</td>
-                    <td className="px-4 py-3.5 text-[13px] text-[#4E5968]">{u.utmMedium}</td>
-                    <td className="px-4 py-3.5 text-[13px] text-[#4E5968]">
-                      {u.utmCampaign}
-                      {u.utmContent !== '-' && <span className="text-[11px] text-[#8B95A1] ml-1.5">({u.utmContent})</span>}
-                    </td>
-                    <td className="px-4 py-3.5 text-[14px] text-[#4E5968] text-right font-medium">{u.uv.toLocaleString()}명</td>
-                    <td className="px-4 py-3.5 text-[14px] text-[#191F28] text-right font-bold">{u.pv.toLocaleString()}회</td>
-                    <td className="px-5 py-3.5 text-[14px] text-[#3182F6] text-right font-black">{u.inquiries.toLocaleString()}건</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* 접속 기기 & 브라우저(인앱) 환경 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-5 lg:p-8 rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] shadow-sm">
-          <h3 className="text-[16px] lg:text-[17px] font-bold mb-5 text-[#191F28] flex items-center gap-2">
-            <Smartphone className="w-5 h-5 text-[#3182F6]" /> 접속 기기 분포
-          </h3>
-          <div className="space-y-3">
-            {deviceBreakdown.length > 0 ? (
-              deviceBreakdown.map((d: any) => (
-                <div key={d.deviceType} className="bg-[#F9FAFB] p-4 rounded-[14px] border border-[#F2F4F6]">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-[13px] font-bold text-[#191F28]">{d.deviceType}</span>
-                    <span className="text-[13px] font-bold text-[#3182F6]">
-                      {d.count.toLocaleString()}회 ({d.share}%)
-                    </span>
-                  </div>
-                  <div className="h-2 bg-[#E5E8EB] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#3182F6] rounded-full" style={{ width: `${Math.min(100, d.share)}%` }} />
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-[#8B95A1] text-[13px]">데이터가 없습니다.</div>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white p-5 lg:p-8 rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] shadow-sm">
-          <h3 className="text-[16px] lg:text-[17px] font-bold mb-5 text-[#191F28] flex items-center gap-2">
-            <Globe className="w-5 h-5 text-[#3182F6]" /> 브라우저 / 인앱 환경
-          </h3>
-          <div className="space-y-2.5 max-h-[260px] overflow-y-auto pr-1">
-            {browserBreakdown.length > 0 ? (
-              browserBreakdown.map((b: any) => (
-                <div
-                  key={b.browser}
-                  className="flex justify-between items-center bg-[#F9FAFB] px-4 py-3 rounded-[12px] border border-[#F2F4F6]"
-                >
-                  <span className="text-[13px] font-bold text-[#191F28]">{b.browser}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[12px] text-[#8B95A1] font-medium">{b.share}%</span>
-                    <span className="text-[13px] font-black text-[#191F28] bg-white px-2.5 py-0.5 rounded-[8px] border border-[#E5E8EB]">
-                      {b.count.toLocaleString()}회
-                    </span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-[#8B95A1] text-[13px]">데이터가 없습니다.</div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* 최근 7일 통계 */}
-      <div className="bg-white p-5 lg:p-8 rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] shadow-sm">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-          <h3 className="text-[16px] lg:text-[18px] font-bold flex items-center gap-2 text-[#191F28]">
-            <BarChart3 className="w-5 h-5 text-[#3182F6]" /> 최근 7일 통계
-          </h3>
-          <span className="text-[11px] lg:text-[12px] text-[#8B95A1] font-medium">최근 일주일간의 데이터입니다.</span>
-        </div>
-        <div className="overflow-x-auto rounded-[16px] border border-[#F2F4F6] hide-scrollbar">
-          <table className="w-full text-left border-collapse min-w-[600px]">
-            <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
-              <tr>
-                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">일자</th>
-                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968] text-right">유입 인원 (UV)</th>
-                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968] text-right">페이지 뷰 (PV)</th>
-                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968] text-right">상담 신청</th>
-                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968] text-right">전환율</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F2F4F6]">
-              {stats.dailyStats.map((stat, idx) => (
-                <tr key={idx} className="hover:bg-[#F9FAFB] transition-colors">
-                  <td className="px-6 py-4 text-[14px] font-bold text-[#191F28]">{stat.date}</td>
-                  <td className="px-6 py-4 text-[14px] text-[#4E5968] text-right font-medium">{stat.uv.toLocaleString()}명</td>
-                  <td className="px-6 py-4 text-[14px] text-[#4E5968] text-right font-medium">{stat.pv.toLocaleString()}회</td>
-                  <td className="px-6 py-4 text-[14px] font-black text-[#3182F6] text-right">{stat.applies.toLocaleString()}건</td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="text-[14px] font-bold text-[#191F28] bg-[#F2F4F6] px-3 py-1 rounded-full">
-                      {stat.uv > 0 ? ((stat.applies / stat.uv) * 100).toFixed(1) : '0.0'}%
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* 랜딩페이지별 유입 현황 */}
-      <div className="bg-white p-5 lg:p-8 rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] shadow-sm">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-          <h3 className="text-[16px] lg:text-[18px] font-bold flex items-center gap-2 text-[#191F28]">
-            <Globe className="w-5 h-5 text-[#3182F6]" /> 랜딩페이지별 유입 현황
-          </h3>
-          <span className="text-[11px] lg:text-[12px] text-[#8B95A1] font-medium">접속 경로별 실시간 유입 분석입니다.</span>
-        </div>
-        <div className="overflow-x-auto rounded-[16px] border border-[#F2F4F6] hide-scrollbar">
-          <table className="w-full text-left border-collapse min-w-[500px]">
-            <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
-              <tr>
-                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">랜딩페이지명</th>
-                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968]">접속 경로 (Path)</th>
-                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968] text-right">유입 인원 (UV)</th>
-                <th className="px-6 py-4 text-[13px] font-bold text-[#4E5968] text-right">페이지 뷰 (PV)</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F2F4F6]">
-              {stats.landingStats && stats.landingStats.length > 0 ? (
-                stats.landingStats.map((lStat: any, idx: number) => (
-                  <tr key={idx} className="hover:bg-[#F9FAFB] transition-colors">
-                    <td className="px-6 py-4 text-[14px] font-bold text-[#191F28]">{lStat.name}</td>
-                    <td className="px-6 py-4 text-[13px] text-[#4E5968] font-mono">{lStat.path}</td>
-                    <td className="px-6 py-4 text-[14px] text-[#4E5968] text-right font-medium">{lStat.uv.toLocaleString()}명</td>
-                    <td className="px-6 py-4 text-[14px] text-[#3182F6] text-right font-black">{lStat.pv.toLocaleString()}회</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="text-center py-10 text-[#8B95A1] text-[13px]">데이터가 없습니다.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* 유입 경로 (Top 10 Referrer) & 최근 접속 IP 현황 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-5 lg:p-8 rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] shadow-sm">
-          <h3 className="text-[16px] lg:text-[17px] font-bold mb-6 text-[#191F28]">유입 경로 (Top 10 Referrer)</h3>
-          <div className="space-y-3">
-            {stats.referrers.length > 0 ? (
-              stats.referrers.map((ref: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="flex justify-between items-center gap-3 bg-[#F9FAFB] p-4 rounded-[16px] border border-[#F2F4F6] hover:border-[#3182F6]/30 transition-all"
-                >
-                  <div className="min-w-0 flex-1">
-                    {ref.label && (
-                      <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold mb-1 ${getTrafficBadgeClass(ref.channel)}`}>
-                        {ref.label}
-                      </span>
-                    )}
-                    <div className="text-[13px] font-bold text-[#4E5968] truncate" title={ref.url}>
-                      {ref.url}
                     </div>
                   </div>
-                  <div className="shrink-0 text-[14px] font-black text-[#191F28] bg-white px-3 py-1 rounded-[8px] shadow-sm border border-[#E5E8EB]">
-                    {ref.count.toLocaleString()}건
-                  </div>
+                );
+              })}
+            </div>
+            <div className="grid grid-cols-7 gap-4 pt-2.5 text-center">
+              {dailyList.map((d: any, idx: number) => (
+                <div key={idx} className="text-[11.5px] font-semibold text-[#5c6b5b] tabular-nums">
+                  {d.date?.slice(5)?.replace('-', '.') || d.date}
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-10 text-[#8B95A1] text-[13px]">데이터가 없습니다.</div>
-            )}
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabbed Detailed Analytics Panel */}
+      <div className="adm-panel">
+        <div className="adm-panel-top !pb-3">
+          <div>
+            <h2>상세 유입 채널 &amp; 로그 분석</h2>
+            <div className="adm-panel-subtitle">
+              인앱 브라우저(UA), 광고 클릭ID, UTM 파라미터 및 리퍼러 도메인 기반 상세 성과표입니다.
+            </div>
           </div>
         </div>
 
-        <div className="bg-white p-5 lg:p-8 rounded-[20px] lg:rounded-[24px] border border-[#E5E8EB] shadow-sm">
-          <h3 className="text-[16px] lg:text-[17px] font-bold mb-6 text-[#191F28]">최근 접속 IP 현황</h3>
-          <div className="overflow-x-auto rounded-[16px] border border-[#F2F4F6] hide-scrollbar">
-            <table className="w-full text-left min-w-[300px]">
-              <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
+        <div className="adm-tabs">
+          <button
+            type="button"
+            className={`adm-tab ${detailTab === 'channels' ? 'active' : ''}`}
+            onClick={() => setDetailTab('channels')}
+          >
+            유입 채널 분석
+            <span className="adm-tab-count">{trafficChannels.length}</span>
+          </button>
+          <button
+            type="button"
+            className={`adm-tab ${detailTab === 'landings' ? 'active' : ''}`}
+            onClick={() => setDetailTab('landings')}
+          >
+            랜딩페이지별 현황
+            <span className="adm-tab-count">{stats.landingStats?.length || 0}</span>
+          </button>
+          <button
+            type="button"
+            className={`adm-tab ${detailTab === 'utm' ? 'active' : ''}`}
+            onClick={() => setDetailTab('utm')}
+          >
+            UTM 캠페인 성과
+            <span className="adm-tab-count">{utmCampaigns.length}</span>
+          </button>
+          <button
+            type="button"
+            className={`adm-tab ${detailTab === 'env' ? 'active' : ''}`}
+            onClick={() => setDetailTab('env')}
+          >
+            기기 · 리퍼러 · IP 현황
+            <span className="adm-tab-count">{stats.ipLogs?.length || 0}</span>
+          </button>
+        </div>
+
+        {/* TAB 1: Traffic Channels */}
+        {detailTab === 'channels' && (
+          <>
+            <div className="adm-filter-bar">
+              <div className="adm-segmented">
+                <button
+                  type="button"
+                  className={selectedCategory === '전체' ? 'active' : ''}
+                  onClick={() => setSelectedCategory('전체')}
+                >
+                  전체 ({trafficChannels.length})
+                </button>
+                {categorySummary.map((cat: any) => (
+                  <button
+                    key={cat.category}
+                    type="button"
+                    className={selectedCategory === cat.category ? 'active' : ''}
+                    onClick={() => setSelectedCategory(cat.category)}
+                  >
+                    {cat.category} · {cat.pv.toLocaleString()}회 ({cat.share}%)
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="adm-table-scroll">
+              <table className="adm-table">
+                <thead>
+                  <tr>
+                    <th>유입 채널</th>
+                    <th>분류</th>
+                    <th>점유 비중</th>
+                    <th className="text-right">순방문자 (UV)</th>
+                    <th className="text-right">페이지뷰 (PV)</th>
+                    <th className="text-right">상담 신청</th>
+                    <th className="text-right">전환율</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredChannels.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="text-center !py-14 text-[#86918a]">
+                        해당 기간에 집계된 유입 채널 데이터가 없습니다.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredChannels.map((ch: any) => (
+                      <tr key={ch.channel}>
+                        <td>
+                          <div className="flex items-center gap-2">
+                            <span className="adm-pill green">{ch.label}</span>
+                            {ch.isPaidAd && <span className="adm-pill orange">광고</span>}
+                          </div>
+                          {ch.matchReasons && ch.matchReasons.length > 0 && (
+                            <div className="text-[10.5px] text-[#8e9988] mt-1">
+                              판별: {ch.matchReasons.join(', ')}
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          <span className="adm-pill gray">{ch.category}</span>
+                        </td>
+                        <td className="w-[180px]">
+                          <div className="flex items-center gap-2.5">
+                            <div className="adm-bar-track flex-1">
+                              <span style={{ width: `${Math.min(100, ch.share)}%` }} />
+                            </div>
+                            <span className="text-[11.5px] font-bold text-[#263d36] w-10 text-right tabular-nums">
+                              {ch.share}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="text-right tabular-nums">{ch.uv.toLocaleString()}명</td>
+                        <td className="text-right font-bold text-[#263d36] tabular-nums">{ch.pv.toLocaleString()}회</td>
+                        <td className="text-right font-bold text-[#295e52] tabular-nums">{ch.inquiries.toLocaleString()}건</td>
+                        <td className="text-right">
+                          <span className="adm-pill teal">{ch.conversionRate.toFixed(1)}%</span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {/* TAB 2: Landings */}
+        {detailTab === 'landings' && (
+          <div className="adm-table-scroll">
+            <table className="adm-table">
+              <thead>
                 <tr>
-                  <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968]">IP 주소</th>
-                  <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968] text-center">건수</th>
-                  <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968] text-right">최근 접속</th>
+                  <th>랜딩페이지명</th>
+                  <th>접속 경로 (Path)</th>
+                  <th className="text-right">순 방문자 (UV)</th>
+                  <th className="text-right">페이지 뷰 (PV)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F2F4F6]">
-                {stats.ipLogs.length > 0 ? (
-                  stats.ipLogs.map((log, idx) => (
-                    <tr key={idx} className="hover:bg-[#F9FAFB]">
-                      <td className="px-4 py-3 text-[13px] text-[#191F28] font-bold">{log.ip}</td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="text-[12px] font-bold text-[#3182F6] bg-[#E8F3FF] px-2 py-0.5 rounded-md">
-                          {log.count}회
-                        </span>
+              <tbody>
+                {stats.landingStats && stats.landingStats.length > 0 ? (
+                  stats.landingStats.map((lStat: any, idx: number) => (
+                    <tr key={idx}>
+                      <td className="font-bold text-[#263d36]">{lStat.name}</td>
+                      <td>
+                        <span className="adm-pill gray font-mono">{lStat.path}</span>
                       </td>
-                      <td className="px-4 py-3 text-[12px] text-[#8B95A1] text-right font-medium">{log.lastVisit}</td>
+                      <td className="text-right tabular-nums">{lStat.uv.toLocaleString()}명</td>
+                      <td className="text-right font-bold text-[#295e52] tabular-nums">{lStat.pv.toLocaleString()}회</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={3} className="text-center py-10 text-[#8B95A1] text-[13px]">데이터가 없습니다.</td>
+                    <td colSpan={4} className="text-center !py-14 text-[#86918a]">
+                      집계된 랜딩페이지 유입 데이터가 없습니다.
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
-        </div>
+        )}
+
+        {/* TAB 3: UTM Campaigns */}
+        {detailTab === 'utm' && (
+          <div className="adm-table-scroll">
+            <table className="adm-table">
+              <thead>
+                <tr>
+                  <th>소스 (utm_source)</th>
+                  <th>매체 (utm_medium)</th>
+                  <th>캠페인 (utm_campaign)</th>
+                  <th className="text-right">순 방문자 (UV)</th>
+                  <th className="text-right">페이지 뷰 (PV)</th>
+                  <th className="text-right">상담 신청</th>
+                </tr>
+              </thead>
+              <tbody>
+                {utmCampaigns.length > 0 ? (
+                  utmCampaigns.map((u: any, idx: number) => (
+                    <tr key={idx}>
+                      <td className="font-bold text-[#263d36]">{u.utmSource}</td>
+                      <td>{u.utmMedium}</td>
+                      <td>
+                        {u.utmCampaign}
+                        {u.utmContent !== '-' && (
+                          <span className="text-[11px] text-[#86918a] ml-1.5">({u.utmContent})</span>
+                        )}
+                      </td>
+                      <td className="text-right tabular-nums">{u.uv.toLocaleString()}명</td>
+                      <td className="text-right font-bold text-[#263d36] tabular-nums">{u.pv.toLocaleString()}회</td>
+                      <td className="text-right font-bold text-[#295e52] tabular-nums">{u.inquiries.toLocaleString()}건</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="text-center !py-14 text-[#86918a]">
+                      추적 링크(UTM)로 집계된 캠페인 데이터가 없습니다. 우측 상단의 [추적 링크 생성기]를 활용해보세요.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* TAB 4: Environment, Referrers & IP Logs */}
+        {detailTab === 'env' && (
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Device & Browser */}
+              <div className="adm-note-card !bg-white space-y-4">
+                <div className="adm-section-label !mt-0">
+                  <span>접속 기기 및 인앱 브라우저 분포</span>
+                </div>
+                <div className="space-y-3">
+                  {deviceBreakdown.map((d: any) => (
+                    <div key={d.deviceType}>
+                      <div className="flex justify-between text-[12px] mb-1">
+                        <span className="font-semibold text-[#263d36]">{d.deviceType}</span>
+                        <span className="font-bold text-[#295e52] tabular-nums">
+                          {d.count.toLocaleString()}회 ({d.share}%)
+                        </span>
+                      </div>
+                      <div className="adm-bar-track">
+                        <span style={{ width: `${Math.min(100, d.share)}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {browserBreakdown.length > 0 && (
+                  <div className="pt-3 border-t border-[#edf0e7] flex flex-wrap gap-2">
+                    {browserBreakdown.map((b: any) => (
+                      <span key={b.browser} className="adm-pill gray">
+                        {b.browser}: <b className="text-[#263d36]">{b.count}회</b> ({b.share}%)
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Top Referrers */}
+              <div className="adm-note-card !bg-white">
+                <div className="adm-section-label !mt-0">
+                  <span>상위 리퍼러 출처 (Top 10)</span>
+                </div>
+                <div className="space-y-2 max-h-[240px] overflow-y-auto">
+                  {stats.referrers.length > 0 ? (
+                    stats.referrers.map((ref: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between gap-3 p-2.5 rounded-[8px] bg-[#f8f9f5] border border-[#edf0e7]"
+                      >
+                        <div className="min-w-0 flex-1">
+                          {ref.label && <span className="adm-pill green mr-2">{ref.label}</span>}
+                          <span className="text-[12px] font-medium text-[#45554e] truncate inline-block max-w-full align-middle" title={ref.url}>
+                            {ref.url}
+                          </span>
+                        </div>
+                        <span className="adm-pill teal shrink-0">{ref.count.toLocaleString()}건</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center py-8 text-[#86918a] text-[12px]">리퍼러 데이터가 없습니다.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* IP Logs Table */}
+            <div>
+              <div className="adm-section-label !mt-0">
+                <span>최근 접속 IP 현황</span>
+              </div>
+              <div className="adm-table-scroll border border-[#e6eae3] rounded-[10px]">
+                <table className="adm-table">
+                  <thead>
+                    <tr>
+                      <th>접속 IP 주소</th>
+                      <th className="text-center">누적 접속 건수</th>
+                      <th className="text-right">최근 접속 일시</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stats.ipLogs.length > 0 ? (
+                      stats.ipLogs.map((log: any, idx: number) => (
+                        <tr key={idx}>
+                          <td className="font-mono font-semibold text-[#263d36]">{log.ip}</td>
+                          <td className="text-center">
+                            <span className="adm-pill green">{log.count}회</span>
+                          </td>
+                          <td className="text-right text-[#86918a] font-mono text-[11.5px]">{log.lastVisit}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={3} className="text-center !py-10 text-[#86918a]">
+                          최근 접속 IP 기록이 없습니다.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

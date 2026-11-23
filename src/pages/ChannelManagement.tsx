@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Plus, Search, Edit2, Trash2, Eye, EyeOff, X, ExternalLink } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import {
+  Plus,
+  Search,
+  Trash2,
+  Eye,
+  EyeOff,
+  X,
+  ExternalLink,
+  LayoutGrid,
+  CheckCircle2,
+  Clock,
+  Ban,
+  Save,
+} from 'lucide-react';
 
-export default function ChannelManagement({ 
+export default function ChannelManagement({
   currentChannelId,
-  onLoginAsChannel 
-}: { 
+  onLoginAsChannel,
+}: {
   currentChannelId?: string;
-  onLoginAsChannel?: (channel: any) => void 
+  onLoginAsChannel?: (channel: any) => void;
 }) {
   const channels = useQuery(api.channels.get) || [];
   const createChannel = useMutation(api.channels.create);
@@ -17,17 +30,16 @@ export default function ChannelManagement({
   const landings = useQuery(api.landings.get) || [];
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | '정상' | '승인대기' | '정지'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
 
   const initialFormState = {
     _id: '',
     accountId: '',
     password: '',
     subdomain: '',
-
     status: '승인대기',
     channelName: '',
     managerName: '',
@@ -37,17 +49,13 @@ export default function ChannelManagement({
     parentChannelId: '',
   };
 
-
-
   const [formData, setFormData] = useState(initialFormState);
 
   const formatPhoneNumber = (value: string) => {
     const phoneNumber = value.replace(/[^\d]/g, '');
     const phoneNumberLength = phoneNumber.length;
     if (phoneNumberLength < 4) return phoneNumber;
-    if (phoneNumberLength < 7) {
-      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
-    }
+    if (phoneNumberLength < 7) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
     if (phoneNumberLength < 11) {
       return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6)}`;
     }
@@ -63,7 +71,6 @@ export default function ChannelManagement({
     setFormData(initialFormState);
     setShowPassword(false);
     setIsModalOpen(true);
-
   };
 
   const openEditModal = (channel: any) => {
@@ -71,20 +78,15 @@ export default function ChannelManagement({
     setFormData({
       ...channel,
       password: '',
-
       landingPages: channel.landingPages || (channel.landingPage ? [channel.landingPage] : []),
     });
-
     setShowPassword(false);
     setIsModalOpen(true);
-
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     try {
-
       if (isEditing) {
         const updates: any = {
           id: formData._id as any,
@@ -97,8 +99,6 @@ export default function ChannelManagement({
           landingPages: formData.landingPages,
           parentChannelId: formData.parentChannelId || undefined,
         };
-
-
         if (formData.password) {
           updates.password = formData.password;
         }
@@ -116,8 +116,6 @@ export default function ChannelManagement({
           landingPages: formData.landingPages,
           parentChannelId: formData.parentChannelId || undefined,
         });
-
-
       }
       setIsModalOpen(false);
     } catch (error: any) {
@@ -132,347 +130,494 @@ export default function ChannelManagement({
     }
   };
 
-  const filteredChannels = channels.filter(channel => {
-    // 1. Basic search filter
-    const matchesSearch = channel.channelName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         channel.managerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         channel.accountId.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    if (!matchesSearch) return false;
+  // Scope channels by permission first
+  const scopedChannels = useMemo(() => {
+    if (!currentChannelId) return channels;
+    return channels.filter(
+      (c) => c.subdomain === currentChannelId || c.parentChannelId === currentChannelId
+    );
+  }, [channels, currentChannelId]);
 
-    // 2. Hierarchical permission filter
-    if (!currentChannelId) return true; // Master admin sees everything
+  const counts = useMemo(() => {
+    const active = scopedChannels.filter((c) => c.status === '정상').length;
+    const pending = scopedChannels.filter((c) => c.status === '승인대기').length;
+    const stopped = scopedChannels.filter((c) => c.status === '정지').length;
+    return {
+      total: scopedChannels.length,
+      active,
+      pending,
+      stopped,
+    };
+  }, [scopedChannels]);
 
-    // Channel admin sees themselves and their direct sub-channels
-    const isSelf = channel.subdomain === currentChannelId;
-    const isSub = channel.parentChannelId === currentChannelId;
-    
-    return isSelf || isSub;
-  });
+  const filteredChannels = useMemo(() => {
+    return scopedChannels.filter((channel) => {
+      if (statusFilter !== 'all' && channel.status !== statusFilter) return false;
+      if (searchTerm.trim()) {
+        const q = searchTerm.toLowerCase();
+        const matches =
+          channel.channelName.toLowerCase().includes(q) ||
+          channel.managerName.toLowerCase().includes(q) ||
+          channel.accountId.toLowerCase().includes(q) ||
+          channel.subdomain.toLowerCase().includes(q);
+        if (!matches) return false;
+      }
+      return true;
+    });
+  }, [scopedChannels, statusFilter, searchTerm]);
 
   return (
-    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div>
+      {/* Page Heading */}
+      <div className="adm-page-heading">
         <div>
-          <h1 className="text-[24px] font-bold text-[#191F28] mb-1">채널 관리</h1>
-          <p className="text-[14px] text-[#8B95A1]">파트너 채널을 등록하고 관리할 수 있습니다.</p>
+          <div className="adm-eyebrow">HYOWON SANGJO · PARTNERS</div>
+          <h1>파트너 관리</h1>
+          <p>
+            제휴 파트너 채널 계정, 전용 서브도메인 경로 및 상위·하위 파트너 계층을 운영합니다.
+          </p>
         </div>
-        <button 
-          onClick={openCreateModal}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#3182F6] text-white px-5 py-2.5 rounded-[12px] font-medium hover:bg-[#1B64DA] transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          신규 채널 등록
-        </button>
-      </div>
-
-      <div className="bg-white rounded-[20px] p-4 sm:p-6 shadow-[0_2px_10px_rgba(0,0,0,0.04)] mb-6">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8B95A1]" />
-          <input 
-            type="text" 
-            placeholder="채널명, 담당자명 또는 아이디로 검색" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#F2F4F6] pl-11 pr-5 py-3.5 rounded-[14px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 transition-all"
-          />
+        <div className="adm-heading-buttons">
+          <button type="button" onClick={openCreateModal} className="adm-btn primary">
+            <Plus />
+            <span>파트너 신규 등록</span>
+          </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.04)] overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[800px]">
+      {/* 4-Column Metric Cards */}
+      <div className="adm-metrics-grid">
+        <div className="adm-metric clickable" onClick={() => setStatusFilter('all')}>
+          <div className="adm-metric-head">
+            <span>전체 파트너 채널</span>
+            <div className="adm-metric-icon"><LayoutGrid /></div>
+          </div>
+          <div className="adm-metric-value">
+            {counts.total.toLocaleString()}<span>곳</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">등록 파트너</span>
+            <span>통합 관리 대상</span>
+          </div>
+        </div>
+
+        <div className="adm-metric clickable" onClick={() => setStatusFilter('정상')}>
+          <div className="adm-metric-head">
+            <span>정상 운영 파트너</span>
+            <div className="adm-metric-icon"><CheckCircle2 /></div>
+          </div>
+          <div className="adm-metric-value">
+            {counts.active.toLocaleString()}<span>곳</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">정상 영업중</span>
+            <span>전용 랜딩 활성화</span>
+          </div>
+        </div>
+
+        <div className="adm-metric clickable" onClick={() => setStatusFilter('승인대기')}>
+          <div className="adm-metric-head">
+            <span>승인대기 파트너</span>
+            <div className="adm-metric-icon"><Clock /></div>
+          </div>
+          <div className="adm-metric-value">
+            {counts.pending.toLocaleString()}<span>곳</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className={`adm-metric-trend ${counts.pending > 0 ? 'warning' : ''}`}>
+              {counts.pending > 0 ? '승인 검토 필요' : '대기 없음'}
+            </span>
+            <span>신규 신청 건</span>
+          </div>
+        </div>
+
+        <div className="adm-metric clickable" onClick={() => setStatusFilter('정지')}>
+          <div className="adm-metric-head">
+            <span>정지 · 휴면 파트너</span>
+            <div className="adm-metric-icon"><Ban /></div>
+          </div>
+          <div className="adm-metric-value">
+            {counts.stopped.toLocaleString()}<span>곳</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">이용 제한</span>
+            <span>접속 비활성화</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Panel */}
+      <div className="adm-panel">
+        <div className="adm-tabs">
+          {[
+            { id: 'all', label: '전체 파트너', count: counts.total },
+            { id: '정상', label: '정상 운영', count: counts.active },
+            { id: '승인대기', label: '승인대기', count: counts.pending },
+            { id: '정지', label: '정지', count: counts.stopped },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setStatusFilter(tab.id as any)}
+              className={`adm-tab ${statusFilter === tab.id ? 'active' : ''}`}
+            >
+              <span>{tab.label}</span>
+              <span className="adm-tab-count">{tab.count}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="adm-filter-bar">
+          <div className="adm-search-field">
+            <Search />
+            <input
+              type="text"
+              placeholder="채널명, 담당자명, 아이디, 경로 검색..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="adm-filter-end">
+            <span>조회 결과 <b className="text-[#263d36]">{filteredChannels.length}</b>곳</span>
+          </div>
+        </div>
+
+        <div className="adm-table-scroll">
+          <table className="adm-table">
             <thead>
-              <tr className="bg-[#F9FAFB] border-b border-[#E5E8EB]">
-                <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">아이디</th>
-                <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">채널명</th>
-                <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">담당자</th>
-                <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">연락처</th>
-                <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">상위 채널</th>
-                <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1]">상태</th>
-
-                <th className="py-4 px-6 text-[13px] font-semibold text-[#8B95A1] text-center">관리</th>
+              <tr>
+                <th>파트너 채널명 · 아이디</th>
+                <th>전용 경로 (Subdomain)</th>
+                <th>담당자명</th>
+                <th>담당자 연락처</th>
+                <th>상위 채널</th>
+                <th>상태</th>
+                <th className="text-center">대리 접속</th>
               </tr>
             </thead>
             <tbody>
-              {filteredChannels.length > 0 ? (
+              {filteredChannels.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="text-center !py-16 text-[#86918a]">
+                    조건에 일치하는 파트너 채널이 없습니다.
+                  </td>
+                </tr>
+              ) : (
                 filteredChannels.map((channel) => (
-                  <tr 
-                    key={channel._id} 
+                  <tr
+                    key={channel._id}
                     onClick={() => openEditModal(channel)}
-                    className="border-b border-[#E5E8EB] last:border-0 hover:bg-[#F9FAFB] cursor-pointer transition-colors"
+                    className="adm-clickable-row"
                   >
-                    <td className="py-4 px-6 text-[14px] font-medium text-[#191F28]">{channel.accountId}</td>
-                    <td className="py-4 px-6 text-[14px] font-bold text-[#191F28]">{channel.channelName}</td>
-                    <td className="py-4 px-6 text-[14px] font-medium text-[#191F28]">{channel.managerName}</td>
-                    <td className="py-4 px-6 text-[14px] text-[#4E5968]">{channel.managerContact}</td>
-                    <td className="py-4 px-6 text-[13px] text-[#8B95A1]">
-                      {channel.parentChannelId ? (
-                        <span className="font-medium text-[#191F28]">{channels.find(c => c.subdomain === channel.parentChannelId)?.channelName || channel.parentChannelId}</span>
-                      ) : '-'}
+                    <td>
+                      <div className="adm-person">
+                        <div className="adm-person-circle">
+                          {(channel.channelName || 'P').slice(0, 1)}
+                        </div>
+                        <div>
+                          <strong>{channel.channelName}</strong>
+                          <small className="font-mono">ID: {channel.accountId}</small>
+                        </div>
+                      </div>
                     </td>
-                    <td className="py-4 px-6">
-
-                      <span className={`inline-flex px-2.5 py-1 rounded-full text-[12px] font-bold ${
-                        channel.status === '정상' ? 'bg-[#E8F3FF] text-[#1B64DA]' :
-                        channel.status === '승인대기' ? 'bg-[#FFF3E1] text-[#F9A825]' :
-                        'bg-[#FEECEF] text-[#F04452]'
-                      }`}>
+                    <td>
+                      <span className="adm-pill gray font-mono">/{channel.subdomain}</span>
+                    </td>
+                    <td className="font-semibold text-[#263d36]">{channel.managerName}</td>
+                    <td className="font-mono text-[12px] text-[#45554e]">{channel.managerContact}</td>
+                    <td>
+                      {channel.parentChannelId ? (
+                        <span className="adm-pill teal">
+                          {channels.find((c) => c.subdomain === channel.parentChannelId)?.channelName ||
+                            channel.parentChannelId}
+                        </span>
+                      ) : (
+                        <span className="text-[#9ba594] text-[12px]">최상위 채널</span>
+                      )}
+                    </td>
+                    <td>
+                      <span
+                        className={`adm-pill ${
+                          channel.status === '정상'
+                            ? 'green'
+                            : channel.status === '승인대기'
+                              ? 'orange'
+                              : 'red'
+                        }`}
+                      >
                         {channel.status}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-center" onClick={(e) => e.stopPropagation()}>
-                      <button 
+                    <td className="text-center" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
                         onClick={() => onLoginAsChannel?.(channel)}
-                        className="p-2 text-[#3182F6] hover:bg-[#E8F3FF] rounded-lg transition-colors group"
-                        title="채널 어드민 바로가기"
+                        className="adm-btn sage small"
+                        title="채널 어드민 워크스페이스 새창 열기"
                       >
-                        <ExternalLink className="w-4 h-4" />
+                        <span>어드민 접속</span>
+                        <ExternalLink />
                       </button>
                     </td>
                   </tr>
                 ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center text-[#8B95A1] text-[14px]">
-                    등록된 채널이 없습니다.
-                  </td>
-                </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        <div className="adm-table-foot">
+          <span>전체 {counts.total}곳 중 {filteredChannels.length}곳 표시</span>
+          <span>행을 클릭하면 파트너 정보 및 할당 랜딩페이지를 수정할 수 있습니다.</span>
+        </div>
       </div>
 
-      {/* Create/Edit Modal */}
+      {/* Slide-over Drawer for Create / Edit Channel */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-[24px] w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-            <div className="px-6 py-4 border-b border-[#E5E8EB] flex justify-between items-center shrink-0">
-              <h2 className="text-[18px] font-bold text-[#191F28]">
-                {isEditing ? '채널 수정' : '신규 채널 등록'}
-              </h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-1 text-[#8B95A1] hover:bg-[#F2F4F6] rounded-full">
-                <X className="w-6 h-6" />
+        <div className="adm-drawer-overlay" onClick={() => setIsModalOpen(false)}>
+          <form
+            onSubmit={handleSubmit}
+            className="adm-drawer !max-w-[560px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="adm-drawer-head">
+              <div>
+                <h2>{isEditing ? '파트너 채널 정보 수정' : '파트너 신규 등록'}</h2>
+                <p>파트너 계정 로그인 정보, 서브도메인 및 할당 랜딩페이지를 설정합니다.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="adm-icon-btn"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
-            
-            <form onSubmit={handleSubmit} className="p-6 overflow-y-auto">
-              <div className="space-y-5">
-                {/* ID */}
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">아이디 <span className="text-[#F04452]">*</span></label>
-                  <input 
-                    type="text" 
-                    required
-                    disabled={isEditing}
-                    value={formData.accountId}
-                    onChange={(e) => setFormData({...formData, accountId: e.target.value})}
-                    autoComplete="off"
-                    className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 disabled:opacity-60 disabled:cursor-not-allowed" 
-                    placeholder="채널 아이디 입력" 
-                  />
+
+            <div className="adm-drawer-scroll space-y-5">
+              <div>
+                <div className="adm-section-label !mt-0">
+                  <span>접속 계정 및 경로 설정</span>
                 </div>
-
-                {/* Password */}
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">
-                    비밀번호 {isEditing ? '(변경시에만 입력)' : <span className="text-[#F04452]">*</span>}
-                  </label>
-                  <div className="relative">
-                    <input 
-                      type={showPassword ? "text" : "password"}
-                      required={!isEditing}
-                      value={formData.password}
-                      onChange={(e) => setFormData({...formData, password: e.target.value})}
-                      autoComplete="new-password"
-                      className="w-full bg-[#F2F4F6] pl-5 pr-12 py-3.5 rounded-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20" 
-                      placeholder="비밀번호 입력" 
-                    />
-
-                    <button 
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8B95A1] hover:text-[#4E5968]"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </div>
-
-
-
-                {/* Subdomain */}
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">접속 경로 <span className="text-[#F04452]">*</span></label>
-                  <div className="flex items-center">
-                    <span className="bg-[#E5E8EB] text-[#4E5968] px-4 py-3.5 rounded-l-[16px] text-[15px] font-medium border-r border-[#D1D6DB]">
-                      hyowon-life.com/living/?
-                    </span>
-                    <input 
-                      type="text" 
+                <div className="adm-field-grid">
+                  <div className="adm-field">
+                    <label>접속 아이디 *</label>
+                    <input
+                      type="text"
                       required
-                      value={formData.subdomain}
-                      onChange={(e) => setFormData({...formData, subdomain: e.target.value})}
-                      className="flex-1 bg-[#F2F4F6] px-5 py-3.5 rounded-r-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20" 
-                      placeholder="예: partner" 
+                      disabled={isEditing}
+                      value={formData.accountId}
+                      onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
+                      autoComplete="off"
+                      className="adm-input font-mono"
+                      placeholder="채널 아이디 입력"
                     />
                   </div>
-                </div>
 
-                {/* Channel Name */}
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">채널명 (파트너사명) <span className="text-[#F04452]">*</span></label>
-                  <input 
-                    type="text" 
-                    required
-                    value={formData.channelName}
-                    onChange={(e) => setFormData({...formData, channelName: e.target.value})}
-                    className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20" 
-                    placeholder="채널명 입력" 
-                  />
-                </div>
+                  <div className="adm-field">
+                    <label>비밀번호 {isEditing ? '(변경 시 입력)' : '*'}</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required={!isEditing}
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        autoComplete="new-password"
+                        className="adm-input w-full pr-9"
+                        placeholder="비밀번호 입력"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#86918a] hover:text-[#263d36]"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Manager Name */}
-                  <div>
-                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">담당자명 <span className="text-[#F04452]">*</span></label>
-                    <input 
-                      type="text" 
+                  <div className="adm-field full">
+                    <label>전용 접속 경로 (Subdomain) *</label>
+                    <div className="flex items-center">
+                      <span className="px-3 py-2 bg-[#f3f5ef] border border-r-0 border-[#dfe5d9] rounded-l-[7px] text-[12px] font-mono text-[#6d786c] min-h-[36px] flex items-center">
+                        hyowon-life.com/living/?
+                      </span>
+                      <input
+                        type="text"
+                        required
+                        value={formData.subdomain}
+                        onChange={(e) => setFormData({ ...formData, subdomain: e.target.value })}
+                        className="adm-input !rounded-l-none flex-1 font-mono"
+                        placeholder="예: partner01"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="adm-section-label">
+                  <span>파트너사 및 담당자 정보</span>
+                </div>
+                <div className="adm-field-grid">
+                  <div className="adm-field full">
+                    <label>채널명 (파트너사명) *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.channelName}
+                      onChange={(e) => setFormData({ ...formData, channelName: e.target.value })}
+                      className="adm-input font-bold"
+                      placeholder="파트너사명 입력"
+                    />
+                  </div>
+
+                  <div className="adm-field">
+                    <label>담당자명 *</label>
+                    <input
+                      type="text"
                       required
                       value={formData.managerName}
-                      onChange={(e) => setFormData({...formData, managerName: e.target.value})}
-                      className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20" 
-                      placeholder="이름 입력" 
+                      onChange={(e) => setFormData({ ...formData, managerName: e.target.value })}
+                      className="adm-input"
+                      placeholder="이름 입력"
                     />
                   </div>
-                  {/* Manager Contact */}
-                  <div>
-                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">담당자 연락처 <span className="text-[#F04452]">*</span></label>
-                    <input 
-                      type="text" 
+
+                  <div className="adm-field">
+                    <label>담당자 연락처 *</label>
+                    <input
+                      type="text"
                       required
                       value={formData.managerContact}
                       onChange={handleContactChange}
-                      className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20" 
-                      placeholder="010-0000-0000" 
+                      className="adm-input font-mono"
+                      placeholder="010-0000-0000"
                       maxLength={13}
                     />
                   </div>
-                </div>
 
-                {/* Landing Page Selection (Multiple) */}
-                {!currentChannelId && (
-                  <div>
-                    <label className="block text-[13px] font-bold text-[#4E5968] mb-3 px-1">적용 랜딩페이지 (복수 선택)</label>
-                    <div className="space-y-2 max-h-[200px] overflow-y-auto p-4 bg-[#F2F4F6] rounded-[16px]">
-                      <label className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors group">
-                        <input 
-                          type="checkbox"
-                          checked={formData.landingPages.includes('/') || formData.landingPage === '/'}
-                          onChange={(e) => {
-                            const val = '/';
-                            const current = formData.landingPages;
-                            setFormData({
-                              ...formData,
-                              landingPages: e.target.checked ? [...current, val] : current.filter(v => v !== val)
-                            });
-                          }}
-                          className="w-5 h-5 rounded border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6]"
-                        />
-                        <span className="text-[14px] font-medium text-[#191F28]">메인 페이지 (/)</span>
-                      </label>
-                      {landings.filter(l => l.isActive && l.path !== '/').map(landing => (
-                        <label key={landing._id} className="flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors group">
-                          <input 
-                            type="checkbox"
-                            checked={formData.landingPages.includes(landing.path) || formData.landingPage === landing.path}
-                            onChange={(e) => {
-                              const val = landing.path;
-                              const current = formData.landingPages;
-                              setFormData({
-                                ...formData,
-                                landingPages: e.target.checked ? [...current, val] : current.filter(v => v !== val)
-                              });
-                            }}
-                            className="w-5 h-5 rounded border-[#D1D6DB] text-[#3182F6] focus:ring-[#3182F6]"
-                          />
-                          <div className="flex flex-col">
-                            <span className="text-[14px] font-medium text-[#191F28]">{landing.name}</span>
-                            <span className="text-[11px] text-[#8B95A1]">{landing.path}</span>
-                          </div>
-                        </label>
+                  <div className="adm-field full">
+                    <label>상위 채널 (계층 설정 · 선택)</label>
+                    <select
+                      value={formData.parentChannelId}
+                      onChange={(e) => setFormData({ ...formData, parentChannelId: e.target.value })}
+                      className="adm-select"
+                    >
+                      <option value="">없음 (최상위 파트너 채널)</option>
+                      {channels
+                        .filter((c) => c.status === '정상' && c._id !== formData._id)
+                        .map((channel) => (
+                          <option key={channel._id} value={channel.subdomain}>
+                            {channel.channelName} ({channel.subdomain})
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  <div className="adm-field full">
+                    <label>파트너 운영 상태 *</label>
+                    <div className="adm-segmented w-full">
+                      {['승인대기', '정상', '정지'].map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          disabled={!!currentChannelId}
+                          onClick={() => setFormData({ ...formData, status: s })}
+                          className={`flex-1 justify-center ${formData.status === s ? 'active' : ''}`}
+                        >
+                          {s}
+                        </button>
                       ))}
                     </div>
                   </div>
-                )}
-
-
-                {/* Parent Channel Selection */}
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">상위 채널 (선택 사항)</label>
-                  <select 
-                    value={formData.parentChannelId}
-                    onChange={(e) => setFormData({...formData, parentChannelId: e.target.value})}
-                    className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 appearance-none cursor-pointer"
-                  >
-                    <option value="">없음 (최상위 채널)</option>
-                    {channels
-                      .filter(c => c.status === '정상' && c._id !== formData._id)
-                      .map(channel => (
-                        <option key={channel._id} value={channel.subdomain}>
-                          {channel.channelName} ({channel.subdomain})
-                        </option>
-                      ))}
-                  </select>
                 </div>
+              </div>
 
-                {/* Status */}
+              {!currentChannelId && (
                 <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">파트너 상태 <span className="text-[#F04452]">*</span></label>
-                  <div className="flex gap-2">
-                    {['승인대기', '정상', '정지'].map(status => (
-                      <label key={status} className={`flex-1 flex items-center justify-center py-3 rounded-[12px] font-medium text-[14px] transition-colors border ${
-                        formData.status === status 
-                          ? 'border-[#3182F6] bg-[#E8F3FF] text-[#3182F6]' 
-                          : 'border-[#E5E8EB] bg-white text-[#4E5968]'
-                      } ${!!currentChannelId ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-[#F9FAFB]'}`}>
-                        <input 
-                          type="radio" 
-                          name="status"
-                          value={status}
-                          disabled={!!currentChannelId}
-                          checked={formData.status === status}
-                          onChange={(e) => setFormData({...formData, status: e.target.value})}
-                          className="hidden" 
-                        />
-                        {status}
-                      </label>
-                    ))}
+                  <div className="adm-section-label">
+                    <span>할당 랜딩페이지 (복수 선택 가능)</span>
+                  </div>
+                  <div className="adm-note-card !bg-white space-y-2 max-h-[220px] overflow-y-auto">
+                    <label className="flex items-center gap-2.5 p-2 rounded-[7px] hover:bg-[#f6f8f3] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.landingPages.includes('/') || formData.landingPage === '/'}
+                        onChange={(e) => {
+                          const val = '/';
+                          const current = formData.landingPages;
+                          setFormData({
+                            ...formData,
+                            landingPages: e.target.checked
+                              ? [...current, val]
+                              : current.filter((v) => v !== val),
+                          });
+                        }}
+                        className="w-4 h-4 rounded"
+                      />
+                      <span className="text-[12.5px] font-semibold text-[#263d36]">메인 페이지 (/)</span>
+                    </label>
+                    {landings
+                      .filter((l) => l.isActive && l.path !== '/')
+                      .map((landing) => (
+                        <label
+                          key={landing._id}
+                          className="flex items-center justify-between gap-2.5 p-2 rounded-[7px] hover:bg-[#f6f8f3] cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={
+                                formData.landingPages.includes(landing.path) ||
+                                formData.landingPage === landing.path
+                              }
+                              onChange={(e) => {
+                                const val = landing.path;
+                                const current = formData.landingPages;
+                                setFormData({
+                                  ...formData,
+                                  landingPages: e.target.checked
+                                    ? [...current, val]
+                                    : current.filter((v) => v !== val),
+                                });
+                              }}
+                              className="w-4 h-4 rounded"
+                            />
+                            <span className="text-[12.5px] font-semibold text-[#263d36] truncate">
+                              {landing.name}
+                            </span>
+                          </div>
+                          <span className="adm-pill gray font-mono">{landing.path}</span>
+                        </label>
+                      ))}
                   </div>
                 </div>
+              )}
+            </div>
 
-              </div>
-
-              <div className="mt-8 flex gap-3">
-                {isEditing && (
-                  <button 
-                    type="button"
-                    onClick={() => handleDelete(formData._id as string)}
-                    className="flex-1 bg-white border border-[#E5E8EB] text-[#F04452] py-4 rounded-[16px] font-bold text-[16px] hover:bg-[#FEECEF] hover:border-[#F04452] transition-colors"
-                  >
-                    삭제
-                  </button>
-                )}
-                <button 
-                  type="submit"
-                  className={`${isEditing ? 'flex-[2]' : 'w-full'} bg-[#3182F6] text-white py-4 rounded-[16px] font-bold text-[16px] hover:bg-[#1B64DA] transition-colors`}
+            <div className="adm-drawer-foot">
+              {isEditing ? (
+                <button
+                  type="button"
+                  onClick={() => handleDelete(formData._id as string)}
+                  className="adm-btn danger mr-auto"
                 >
-                  {isEditing ? '수정 완료' : '등록 완료'}
+                  <Trash2 />
+                  <span>채널 삭제</span>
                 </button>
-              </div>
-            </form>
-          </div>
+              ) : (
+                <span className="adm-caption">등록 즉시 파트너 계정 로그인이 가능합니다.</span>
+              )}
+              <button type="button" onClick={() => setIsModalOpen(false)} className="adm-btn">
+                취소
+              </button>
+              <button type="submit" className="adm-btn primary">
+                <Save />
+                <span>{isEditing ? '수정 완료' : '파트너 등록'}</span>
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

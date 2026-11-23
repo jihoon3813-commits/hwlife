@@ -1,12 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Plus, Edit2, Trash2, Globe, ExternalLink, ShieldCheck, Check, Sparkles, Copy } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Globe,
+  ExternalLink,
+  ShieldCheck,
+  Copy,
+  CheckCircle2,
+  Ban,
+  X,
+  Save,
+} from 'lucide-react';
 
-export default function LandingManagement({ userType = 'admin', subdomain }: { userType?: string, subdomain?: string }) {
+export default function LandingManagement({
+  userType = 'admin',
+  subdomain,
+}: {
+  userType?: string;
+  subdomain?: string;
+}) {
   const landings = useQuery(api.landings.get) || [];
-  const currentChannel = useQuery(api.channels.getBySubdomain, userType === 'channel' && subdomain ? { subdomain } : 'skip');
-  
+  const currentChannel = useQuery(
+    api.channels.getBySubdomain,
+    userType === 'channel' && subdomain ? { subdomain } : 'skip'
+  );
+
   const createLanding = useMutation(api.landings.create);
   const updateLanding = useMutation(api.landings.update);
   const removeLanding = useMutation(api.landings.remove);
@@ -24,30 +45,32 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
     path: '',
     description: '',
     thumbnail: '',
-    isActive: true
+    isActive: true,
   });
 
-  // Assigned landing paths for channel admin
-  const assignedPaths = currentChannel?.landingPages || (currentChannel?.landingPage ? [currentChannel?.landingPage] : []);
-  
-  const rawLandings = userType === 'admin' 
-    ? landings 
-    : landings.filter(l => assignedPaths.includes(l.path) && l.isActive);
+  const assignedPaths =
+    currentChannel?.landingPages || (currentChannel?.landingPage ? [currentChannel?.landingPage] : []);
 
-  const displayLandings = [...rawLandings].sort((a, b) => {
-    if (sortOrder === 'latest') {
-      return (b._creationTime || 0) - (a._creationTime || 0);
-    }
-    if (sortOrder === 'oldest') {
-      return (a._creationTime || 0) - (b._creationTime || 0);
-    }
-    if (sortOrder === 'name') {
-      return (a.name || '').localeCompare(b.name || '');
-    }
-    return 0;
-  });
+  const rawLandings =
+    userType === 'admin'
+      ? landings
+      : landings.filter((l) => assignedPaths.includes(l.path) && l.isActive);
 
-  // Seed and Update thumbnails if needed
+  const displayLandings = useMemo(() => {
+    return [...rawLandings].sort((a, b) => {
+      if (sortOrder === 'latest') return (b._creationTime || 0) - (a._creationTime || 0);
+      if (sortOrder === 'oldest') return (a._creationTime || 0) - (b._creationTime || 0);
+      if (sortOrder === 'name') return (a.name || '').localeCompare(b.name || '');
+      return 0;
+    });
+  }, [rawLandings, sortOrder]);
+
+  const counts = useMemo(() => {
+    const active = displayLandings.filter((l) => l.isActive).length;
+    const inactive = displayLandings.length - active;
+    return { total: displayLandings.length, active, inactive };
+  }, [displayLandings]);
+
   useEffect(() => {
     if (userType === 'admin') {
       if (landings.length === 0) {
@@ -76,12 +99,11 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
   const openDuplicateModal = (landing: any) => {
     if (userType !== 'admin') return;
     setModalMode('duplicate');
-    
-    // Auto-generate suggested path
+
     const baseClean = landing.path === '/' ? '/copy' : `${landing.path}_copy`;
     let suggestedPath = baseClean;
     let counter = 1;
-    while (landings.some(l => l.path === suggestedPath)) {
+    while (landings.some((l) => l.path === suggestedPath)) {
       counter++;
       suggestedPath = `${baseClean}${counter}`;
     }
@@ -92,23 +114,9 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
       path: suggestedPath,
       description: landing.description || '',
       thumbnail: landing.thumbnail || '',
-      isActive: landing.isActive
+      isActive: landing.isActive,
     });
     setIsModalOpen(true);
-  };
-
-  const handleQuickDuplicate = async (landing: any) => {
-    if (userType !== 'admin') return;
-    if (!window.confirm(`'${landing.name}' 랜딩페이지를 복제하시겠습니까?`)) {
-      return;
-    }
-    try {
-      await duplicateLanding({ id: landing._id as any });
-      alert(`'${landing.name}' 복제가 완료되었습니다.`);
-    } catch (err) {
-      console.error(err);
-      alert('복제 중 오류가 발생했습니다.');
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,7 +130,7 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
           path: formData.path,
           description: formData.description,
           thumbnail: formData.thumbnail,
-          isActive: formData.isActive
+          isActive: formData.isActive,
         });
       } else if (modalMode === 'duplicate') {
         await duplicateLanding({
@@ -131,7 +139,7 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
           path: formData.path,
           description: formData.description,
           thumbnail: formData.thumbnail,
-          isActive: formData.isActive
+          isActive: formData.isActive,
         });
       } else {
         await createLanding({
@@ -139,10 +147,9 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
           path: formData.path,
           description: formData.description,
           thumbnail: formData.thumbnail,
-          isActive: formData.isActive
+          isActive: formData.isActive,
         });
       }
-
       setIsModalOpen(false);
     } catch (err) {
       alert('저장 중 오류가 발생했습니다.');
@@ -157,209 +164,241 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
   };
 
   const getCustomUrl = (path: string) => {
-    // If no subdomain is provided, return the base path
     if (!subdomain) return path;
-    
-    // For root path, use /subdomain
     if (path === '/') return `/${subdomain}`;
-    
-    // For subpaths like /living or /special, always use /?subdomain for SNS compatibility
     const cleanPath = path.endsWith('/') ? path : `${path}/`;
     return `${cleanPath}?${subdomain}`;
   };
 
   return (
-    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div>
+      {/* Page Heading */}
+      <div className="adm-page-heading">
         <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-[24px] font-bold text-[#191F28]">
-              {userType === 'admin' ? '랜딩페이지 관리' : '내 랜딩페이지 내역'}
-            </h1>
-            <span className="text-[12px] font-extrabold bg-[#E8F3FF] text-[#3182F6] px-2.5 py-0.5 rounded-full border border-[#3182F6]/20">
-              총 {displayLandings.length}개
-            </span>
-          </div>
-          <p className="text-[14px] text-[#8B95A1]">
-            {userType === 'admin' 
-              ? '채널에 적용할 수 있는 랜딩페이지 리스트입니다.' 
-              : '귀하의 채널에 할당된 랜딩페이지 리스트와 전용 주소입니다.'}
+          <div className="adm-eyebrow">OPERATIONS · LANDING PAGES</div>
+          <h1>{userType === 'admin' ? '랜딩페이지 관리' : '내 랜딩페이지 내역'}</h1>
+          <p>
+            {userType === 'admin'
+              ? '파트너 채널에 할당 가능한 공식 결합상품 랜딩페이지 템플릿과 접속 주소를 관리합니다.'
+              : '귀하의 파트너 채널에 할당된 전용 랜딩페이지 주소 목록입니다.'}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-          {/* Sort Selection Buttons */}
-          <div className="flex items-center bg-white p-1 rounded-[12px] border border-[#E5E8EB] shadow-xs">
+        <div className="adm-heading-buttons">
+          <div className="adm-segmented">
             <button
+              type="button"
               onClick={() => setSortOrder('latest')}
-              className={`px-3.5 py-2 rounded-[8px] text-[13px] font-bold transition-all ${
-                sortOrder === 'latest'
-                  ? 'bg-[#3182F6] text-white shadow-xs'
-                  : 'text-[#4E5968] hover:text-[#191F28] hover:bg-[#F2F4F6]'
-              }`}
+              className={sortOrder === 'latest' ? 'active' : ''}
             >
               최신순
             </button>
             <button
+              type="button"
               onClick={() => setSortOrder('oldest')}
-              className={`px-3.5 py-2 rounded-[8px] text-[13px] font-bold transition-all ${
-                sortOrder === 'oldest'
-                  ? 'bg-[#3182F6] text-white shadow-xs'
-                  : 'text-[#4E5968] hover:text-[#191F28] hover:bg-[#F2F4F6]'
-              }`}
+              className={sortOrder === 'oldest' ? 'active' : ''}
             >
               등록일순
             </button>
             <button
+              type="button"
               onClick={() => setSortOrder('name')}
-              className={`px-3.5 py-2 rounded-[8px] text-[13px] font-bold transition-all ${
-                sortOrder === 'name'
-                  ? 'bg-[#3182F6] text-white shadow-xs'
-                  : 'text-[#4E5968] hover:text-[#191F28] hover:bg-[#F2F4F6]'
-              }`}
+              className={sortOrder === 'name' ? 'active' : ''}
             >
               이름순
             </button>
           </div>
 
           {userType === 'admin' && (
-            <button 
-              onClick={openCreateModal}
-              className="flex items-center justify-center gap-2 bg-[#3182F6] text-white px-5 py-2.5 rounded-[12px] font-medium hover:bg-[#1B64DA] transition-colors shadow-sm"
-            >
-              <Plus className="w-5 h-5" />
-              신규 랜딩 등록
+            <button type="button" onClick={openCreateModal} className="adm-btn primary">
+              <Plus />
+              <span>신규 랜딩 등록</span>
             </button>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Summary Metrics */}
+      <div className="adm-metrics-grid">
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>전체 랜딩페이지</span>
+            <div className="adm-metric-icon"><Globe /></div>
+          </div>
+          <div className="adm-metric-value">
+            {counts.total}<span>개</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">등록 템플릿</span>
+            <span>통합 라우팅 연동</span>
+          </div>
+        </div>
+
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>활성 랜딩페이지</span>
+            <div className="adm-metric-icon"><CheckCircle2 /></div>
+          </div>
+          <div className="adm-metric-value">
+            {counts.active}<span>개</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">정상 접속</span>
+            <span>채널 배정 가능</span>
+          </div>
+        </div>
+
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>비활성 보관</span>
+            <div className="adm-metric-icon"><Ban /></div>
+          </div>
+          <div className="adm-metric-value">
+            {counts.inactive}<span>개</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">비노출</span>
+            <span>보관 상태</span>
+          </div>
+        </div>
+
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>접속 도메인 모드</span>
+            <div className="adm-metric-icon"><ShieldCheck /></div>
+          </div>
+          <div className="adm-metric-value !text-[21px]">
+            {subdomain ? `/${subdomain}` : '본사 기본'}
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">자동 트래킹</span>
+            <span>유입 채널 자동 귀속</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {displayLandings.map((landing) => (
-          <div 
-            key={landing._id} 
-            className="bg-white rounded-[24px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-[#E5E8EB] flex flex-col hover:shadow-lg transition-shadow"
+          <div
+            key={landing._id}
+            className="adm-panel flex flex-col transition-shadow hover:shadow-[0_10px_28px_rgba(25,63,57,0.06)]"
           >
-            <div className="w-full aspect-[4/3] bg-[#F2F4F6] flex items-center justify-center relative group overflow-hidden">
+            <div className="w-full aspect-[16/10] bg-[#f3f5ef] border-b border-[#edf0e7] flex items-center justify-center relative group overflow-hidden">
               {landing.thumbnail ? (
-                <img 
-                  src={landing.thumbnail} 
-                  alt={landing.name} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                <img
+                  src={landing.thumbnail}
+                  alt={landing.name}
+                  className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                 />
-
-
               ) : (
-                <Globe className="w-12 h-12 text-[#D1D6DB]" />
+                <Globe className="w-10 h-10 text-[#b7c2b0]" />
               )}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                <a 
-                  href={getCustomUrl(landing.path)} 
-                  target="_blank" 
+
+              <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                {landing.isActive ? (
+                  <span className="adm-pill green shadow-xs">활성 운영중</span>
+                ) : (
+                  <span className="adm-pill red shadow-xs">사용 안 함</span>
+                )}
+              </div>
+
+              <div className="absolute inset-0 bg-[#193f39]/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2.5">
+                <a
+                  href={getCustomUrl(landing.path)}
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white p-3 rounded-full hover:scale-110 transition-transform shadow-lg"
-                  title="랜딩페이지 바로가기"
+                  className="adm-btn small"
+                  title="새창에서 랜딩페이지 열기"
                 >
-                  <ExternalLink className="w-5 h-5 text-[#191F28]" />
+                  <ExternalLink />
+                  <span>열기</span>
                 </a>
                 {userType === 'admin' && (
                   <>
-                    <button 
+                    <button
+                      type="button"
                       onClick={() => openEditModal(landing)}
-                      className="bg-[#3182F6] p-3 rounded-full hover:scale-110 transition-transform shadow-lg text-white"
-                      title="랜딩페이지 수정"
+                      className="adm-btn primary small"
                     >
-                      <Edit2 className="w-5 h-5" />
+                      <Edit2 />
+                      <span>수정</span>
                     </button>
-                    <button 
+                    <button
+                      type="button"
                       onClick={() => openDuplicateModal(landing)}
-                      className="bg-emerald-500 hover:bg-emerald-600 p-3 rounded-full hover:scale-110 transition-transform shadow-lg text-white"
-                      title="랜딩페이지 복제"
+                      className="adm-btn sage small"
                     >
-                      <Copy className="w-5 h-5" />
+                      <Copy />
+                      <span>복제</span>
                     </button>
                   </>
                 )}
               </div>
-              {!landing.isActive && (
-                <div className="absolute top-4 left-4 bg-[#FEECEF] text-[#F04452] text-[11px] font-bold px-2.5 py-1 rounded-full border border-[#F04452]/20">
-                  사용 안 함
-                </div>
-              )}
             </div>
 
-            
-            <div className="p-6 flex-1 flex flex-col">
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="text-[17px] font-black text-[#191F28]">{landing.name}</h3>
-                <span className="text-[12px] font-bold text-[#3182F6] bg-[#E8F3FF] px-2 py-0.5 rounded-md">
-                  {getCustomUrl(landing.path)}
-                </span>
+            <div className="p-5 flex-1 flex flex-col">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <h3 className="text-[15.5px] font-bold text-[#263d36] leading-snug">{landing.name}</h3>
+                <span className="adm-pill teal font-mono shrink-0">{getCustomUrl(landing.path)}</span>
               </div>
-              <p className="text-[14px] text-[#4E5968] leading-relaxed mb-6 flex-1 break-keep">
-                {landing.description || '설명이 없습니다.'}
+
+              <p className="text-[12.5px] text-[#6d786c] leading-relaxed mb-5 flex-1 break-keep">
+                {landing.description || '등록된 상세 설명이 없습니다.'}
               </p>
-              
-              <div className="mt-auto flex flex-col gap-3">
+
+              <div className="mt-auto space-y-3">
                 <div className="grid grid-cols-2 gap-2">
-                  <a 
+                  <a
                     href={getCustomUrl(landing.path)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 bg-[#3182F6] text-white py-2.5 rounded-[12px] font-bold text-[13px] hover:bg-[#1B64DA] transition-colors"
+                    className="adm-btn primary justify-center"
                   >
-                    <ExternalLink className="w-4 h-4" />
-                    바로가기
+                    <ExternalLink />
+                    <span>바로가기</span>
                   </a>
                   {userType === 'admin' ? (
-                    <button 
+                    <button
+                      type="button"
                       onClick={() => openDuplicateModal(landing)}
-                      className="flex items-center justify-center gap-1.5 bg-[#F2F4F6] text-[#333D4B] hover:bg-[#E5E8EB] py-2.5 rounded-[12px] font-bold text-[13px] transition-colors cursor-pointer"
+                      className="adm-btn sage justify-center"
                     >
-                      <Copy className="w-4 h-4 text-[#4E5968]" />
-                      복제하기
+                      <Copy />
+                      <span>복제하기</span>
                     </button>
                   ) : (
-                    <div className="flex items-center justify-center gap-1.5 bg-[#F2F4F6] text-[#6B7684] py-2.5 rounded-[12px] font-medium text-[13px]">
-                      공식 랜딩
-                    </div>
+                    <span className="adm-btn justify-center cursor-default">공식 할당 랜딩</span>
                   )}
                 </div>
-                
-                <div className="flex items-center justify-between pt-4 border-t border-[#F2F4F6]">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4 text-[#3182F6]" />
-                      <span className="text-[12px] font-bold text-[#8B95A1]">효원 공식 랜딩</span>
-                    </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-[#edf0e7] text-[11.5px] text-[#86918a]">
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#295e52]" />
+                    <span>효원 공식 랜딩</span>
                     {landing._creationTime && (
-                      <span className="text-[11px] font-medium text-[#8B95A1] bg-[#F2F4F6] px-2 py-0.5 rounded-full">
-                        {new Date(landing._creationTime).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' })} 등록
+                      <span className="font-mono">
+                        · {new Date(landing._creationTime).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' })}
                       </span>
                     )}
                   </div>
                   {userType === 'admin' && (
                     <div className="flex items-center gap-1">
-                      <button 
+                      <button
+                        type="button"
                         onClick={() => openEditModal(landing)}
-                        className="p-2 text-[#8B95A1] hover:text-[#3182F6] hover:bg-[#F2F4F6] rounded-lg transition-colors cursor-pointer"
+                        className="adm-icon-btn !p-1.5"
                         title="수정"
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      <button 
-                        onClick={() => openDuplicateModal(landing)}
-                        className="p-2 text-[#8B95A1] hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
-                        title="복제"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                      <button 
+                      <button
+                        type="button"
                         onClick={() => handleDelete(landing._id)}
-                        className="p-2 text-[#8B95A1] hover:text-[#F04452] hover:bg-[#FEECEF] rounded-lg transition-colors cursor-pointer"
+                        className="adm-icon-btn !p-1.5 hover:!text-[#a85042]"
                         title="삭제"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   )}
@@ -369,111 +408,113 @@ export default function LandingManagement({ userType = 'admin', subdomain }: { u
           </div>
         ))}
 
-
-
-        {landings.length === 0 && (
-          <div className="col-span-full py-20 text-center bg-white rounded-[24px] border border-dashed border-[#D1D6DB]">
-             <p className="text-[#8B95A1] font-medium">등록된 랜딩페이지가 없습니다.</p>
+        {displayLandings.length === 0 && (
+          <div className="col-span-full adm-panel py-20 text-center text-[#86918a]">
+            등록된 랜딩페이지가 없습니다.
           </div>
         )}
       </div>
 
-      {/* Modal */}
+      {/* Create / Edit / Duplicate Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-6">
-          <div className="bg-white rounded-[32px] w-full max-w-[480px] shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
-            <div className="p-6 border-b border-[#F2F4F6] flex justify-between items-center">
-              <h2 className="text-[18px] font-black text-[#191F28] flex items-center gap-2">
-                {modalMode === 'duplicate' && <Copy className="w-5 h-5 text-emerald-600" />}
-                {modalMode === 'duplicate' ? '랜딩페이지 복제' : modalMode === 'edit' ? '랜딩페이지 수정' : '신규 랜딩 등록'}
-              </h2>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="w-10 h-10 flex items-center justify-center bg-[#F9FAFB] rounded-full hover:bg-[#F2F4F6] transition-colors cursor-pointer"
-              >
-                <Plus className="w-6 h-6 text-[#8B95A1] rotate-45" />
+        <div className="adm-modal-overlay">
+          <form onSubmit={handleSubmit} className="adm-modal max-w-[500px]">
+            <div className="adm-drawer-head">
+              <div>
+                <h2>
+                  {modalMode === 'duplicate'
+                    ? '랜딩페이지 복제 생성'
+                    : modalMode === 'edit'
+                      ? '랜딩페이지 정보 수정'
+                      : '신규 랜딩페이지 등록'}
+                </h2>
+                <p>랜딩명, 접속 경로(Path), 설명 및 대표 썸네일을 설정합니다.</p>
+              </div>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="adm-icon-btn">
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-8">
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">랜딩명</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    placeholder="예: 리빙/생활가전 전용 랜딩"
-                    className="w-full bg-[#F2F4F6] px-5 py-4 rounded-[16px] text-[15px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 transition-all"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">접속 경로 (Path)</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={formData.path}
-                    onChange={(e) => setFormData({...formData, path: e.target.value})}
-                    placeholder="예: /living_copy"
-                    className="w-full bg-[#F2F4F6] px-5 py-4 rounded-[16px] text-[15px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 transition-all"
-                  />
-                  {modalMode === 'duplicate' && (
-                    <p className="text-[11px] text-[#8B95A1] mt-1.5 px-1">
-                      ※ 기존 랜딩과 중복되지 않도록 고유한 접속 경로(Path)를 지정해주세요.
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">상세 설명</label>
-                  <textarea 
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="랜딩페이지에 대한 간단한 설명을 입력해주세요."
-                    className="w-full bg-[#F2F4F6] px-5 py-4 rounded-[16px] text-[15px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 transition-all min-h-[80px] resize-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">썸네일 이미지 URL</label>
-                  <input 
-                    type="text" 
-                    value={formData.thumbnail}
-                    onChange={(e) => setFormData({...formData, thumbnail: e.target.value})}
-                    placeholder="이미지 주소를 입력하세요 (상단 히어로 이미지 권장)"
-                    className="w-full bg-[#F2F4F6] px-5 py-4 rounded-[16px] text-[15px] font-medium focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 transition-all"
-                  />
-                </div>
-
-
-                <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-[20px] border border-[#F2F4F6]">
-                  <span className="text-[14px] font-bold text-[#191F28]">활성화 상태</span>
-                  <button 
-                    type="button"
-                    onClick={() => setFormData({...formData, isActive: !formData.isActive})}
-                    className={`w-12 h-6 rounded-full relative transition-colors cursor-pointer ${formData.isActive ? 'bg-[#3182F6]' : 'bg-[#D1D6DB]'}`}
-                  >
-                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isActive ? 'left-7' : 'left-1'}`} />
-                  </button>
-                </div>
+            <div className="adm-drawer-scroll space-y-4">
+              <div className="adm-field">
+                <label>랜딩페이지 명칭 *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="예: 리빙144 신한카드 전용 랜딩"
+                  className="adm-input font-bold"
+                />
               </div>
 
-              <div className="mt-10">
-                <button 
-                  type="submit"
-                  className={`w-full py-5 text-white font-black rounded-[20px] transition-all shadow-lg active:scale-[0.98] cursor-pointer ${
-                    modalMode === 'duplicate' 
-                      ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20' 
-                      : 'bg-[#3182F6] hover:bg-[#1B64DA] shadow-[#3182F6]/20'
-                  }`}
+              <div className="adm-field">
+                <label>접속 경로 (Path) *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.path}
+                  onChange={(e) => setFormData({ ...formData, path: e.target.value })}
+                  placeholder="예: /living_new"
+                  className="adm-input font-mono"
+                />
+                {modalMode === 'duplicate' && (
+                  <small>※ 기존 랜딩과 중복되지 않는 고유 접속 경로(Path)를 지정해주세요.</small>
+                )}
+              </div>
+
+              <div className="adm-field">
+                <label>상세 설명</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="랜딩페이지의 주요 구성과 타겟 상품을 설명해주세요."
+                  className="adm-textarea"
+                />
+              </div>
+
+              <div className="adm-field">
+                <label>대표 썸네일 이미지 URL</label>
+                <input
+                  type="text"
+                  value={formData.thumbnail}
+                  onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
+                  placeholder="https://..."
+                  className="adm-input font-mono"
+                />
+              </div>
+
+              <div className="adm-note-card flex items-center justify-between">
+                <div>
+                  <div className="font-bold text-[#263d36]">랜딩 활성화 상태</div>
+                  <div className="text-[11px] text-[#86918a]">비활성화 시 파트너 채널 배정 목록에서 제외됩니다.</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
+                  className={`adm-switch ${formData.isActive ? 'checked' : ''}`}
                 >
-                  {modalMode === 'duplicate' ? '복제본 생성하기' : modalMode === 'edit' ? '변경사항 저장' : '새 랜딩페이지 등록'}
+                  <span />
                 </button>
               </div>
-            </form>
-          </div>
+            </div>
+
+            <div className="adm-drawer-foot">
+              <button type="button" onClick={() => setIsModalOpen(false)} className="adm-btn">
+                취소
+              </button>
+              <button type="submit" className="adm-btn primary">
+                <Save />
+                <span>
+                  {modalMode === 'duplicate'
+                    ? '복제본 생성하기'
+                    : modalMode === 'edit'
+                      ? '변경사항 저장'
+                      : '랜딩페이지 등록'}
+                </span>
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

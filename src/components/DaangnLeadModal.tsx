@@ -70,66 +70,69 @@ function onSheetChangeOrFormSubmit(e) {
   };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-white rounded-[24px] w-full max-w-[680px] max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
-        <div className="px-6 py-5 border-b border-[#E5E8EB] flex justify-between items-center bg-white shrink-0">
-          <div className="flex items-center gap-2.5">
-            <span className="px-2.5 py-1 rounded-full text-[12px] font-bold bg-orange-50 text-orange-600 border border-orange-200">
-              당근 리드폼
-            </span>
-            <h3 className="text-[18px] font-bold text-[#191F28]">Google 시트 외부 연동 설정</h3>
+    <div className="adm-modal-overlay">
+      <div className="adm-modal max-w-[680px]">
+        <div className="adm-drawer-head">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="adm-pill orange">당근 리드폼</span>
+              <h2>Google 스프레드시트 외부 웹훅 연동</h2>
+            </div>
+            <p>당근마켓 광고 리드폼 응답을 워크스페이스 고객 목록으로 실시간 자동 적재합니다.</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-[#F2F4F6] rounded-full transition-colors">
-            <X className="w-5 h-5 text-[#4E5968]" />
+          <button type="button" onClick={onClose} className="adm-icon-btn">
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#F9FAFB]">
-          <div className="bg-white p-4 rounded-[16px] border border-[#E5E8EB] space-y-2">
-            <p className="text-[13px] font-bold text-[#191F28]">
-              연동 계정: <span className="text-orange-600">jihoon3813@gmail.com</span>
+        <div className="adm-drawer-scroll space-y-5">
+          <div className="adm-note-card">
+            <p className="font-bold text-[#263d36] mb-1">
+              연동 계정: <span className="text-[#a97f3f]">jihoon3813@gmail.com</span>
             </p>
-            <p className="text-[13px] text-[#4E5968] leading-relaxed">
-              당근마켓 리드폼에서 <strong>jihoon3813@gmail.com</strong> 구글 스프레드시트로 적재되는 응답을 아래 웹훅으로 전송하면, 어드민 고객관리 목록에 <strong>당근리드폼</strong> 유입경로로 자동 등록됩니다.
+            <p>
+              당근마켓 리드폼에서 <strong>jihoon3813@gmail.com</strong> 구글 스프레드시트로 적재되는 응답을 아래 웹훅으로 전송하면, 고객관리 목록에 <strong>당근리드폼</strong> 유입경로로 자동 등록됩니다.
             </p>
           </div>
 
-          <div className="bg-white p-4 rounded-[16px] border border-[#E5E8EB] space-y-2">
+          <div className="adm-panel p-4 space-y-2.5">
             <div className="flex items-center justify-between">
-              <label className="text-[13px] font-bold text-[#191F28]">1. Webhook 수신 URL (POST)</label>
+              <span className="text-[12.5px] font-bold text-[#263d36]">1. Webhook 수신 URL (POST)</span>
               <button
+                type="button"
                 onClick={() => copyText(webhookUrl, 'url')}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-[6px] text-[12px] font-bold bg-[#F2F4F6] hover:bg-[#E5E8EB] text-[#191F28]"
+                className="adm-btn small"
               >
-                {copiedUrl ? <Check className="w-3.5 h-3.5 text-[#059669]" /> : <Copy className="w-3.5 h-3.5" />}
-                {copiedUrl ? '복사됨' : 'URL 복사'}
+                {copiedUrl ? <Check className="text-[#295e52]" /> : <Copy />}
+                <span>{copiedUrl ? '복사됨' : 'URL 복사'}</span>
               </button>
             </div>
             <input
               type="text"
               readOnly
               value={webhookUrl}
-              className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[12px] font-mono text-[#4E5968]"
+              className="adm-input w-full font-mono !bg-[#f8f9f5]"
             />
           </div>
 
-          <div className="bg-white p-4 rounded-[16px] border border-[#E5E8EB] space-y-3">
+          <div className="adm-panel p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-[13px] font-bold text-[#191F28]">2. Google 스프레드시트 Apps Script</label>
+              <span className="text-[12.5px] font-bold text-[#263d36]">2. Google 스프레드시트 Apps Script</span>
               <button
+                type="button"
                 onClick={() => copyText(appsScriptCode, 'script')}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-[6px] text-[12px] font-bold bg-orange-500 hover:bg-orange-600 text-white"
+                className="adm-btn primary small"
               >
-                {copiedScript ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                {copiedScript ? '복사됨' : '스크립트 복사'}
+                {copiedScript ? <Check /> : <Copy />}
+                <span>{copiedScript ? '복사됨' : '스크립트 복사'}</span>
               </button>
             </div>
-            <ol className="text-[12px] text-[#4E5968] space-y-1 list-decimal list-inside leading-relaxed">
+            <ol className="text-[12px] text-[#45554e] space-y-1 list-decimal list-inside leading-relaxed">
               <li><strong>jihoon3813@gmail.com</strong> 구글 드라이브에서 당근 리드폼 스프레드시트를 엽니다.</li>
               <li>상단 메뉴 <strong>확장 프로그램 &gt; Apps Script</strong>를 클릭해 아래 코드를 붙여넣고 저장합니다.</li>
               <li>좌측 <strong>트리거(시계 아이콘) &gt; 트리거 추가</strong>에서 이벤트 유형을 <strong>변경 시(On change)</strong> 또는 <strong>양식 제출 시</strong>로 설정합니다.</li>
             </ol>
-            <pre className="bg-[#191F28] text-[#E5E8EB] p-3.5 rounded-[12px] text-[11px] overflow-x-auto leading-relaxed max-h-[220px]">
+            <pre className="bg-[#193f39] text-[#e7eee4] p-4 rounded-[10px] text-[11px] overflow-x-auto leading-relaxed max-h-[210px] font-mono">
               {appsScriptCode}
             </pre>
             <div className="flex justify-end">
@@ -137,12 +140,20 @@ function onSheetChangeOrFormSubmit(e) {
                 href="https://docs.google.com/spreadsheets/u/0/"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 text-[12px] font-bold text-[#3182F6] hover:underline"
+                className="adm-btn sage small"
               >
-                Google 스프레드시트 열기 <ExternalLink className="w-3.5 h-3.5" />
+                <span>Google 스프레드시트 열기</span>
+                <ExternalLink />
               </a>
             </div>
           </div>
+        </div>
+
+        <div className="adm-drawer-foot">
+          <span className="adm-caption">실시간 웹훅 수신 활성화됨</span>
+          <button type="button" onClick={onClose} className="adm-btn primary">
+            닫기
+          </button>
         </div>
       </div>
     </div>

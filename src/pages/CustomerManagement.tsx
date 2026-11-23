@@ -1,5 +1,20 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { X, Search, Filter, History, RefreshCw, Trash2, Save, Plus, Smartphone, Send, Loader2, RotateCcw } from 'lucide-react';
+import {
+  X,
+  Search,
+  History,
+  RefreshCw,
+  Trash2,
+  Save,
+  Plus,
+  Smartphone,
+  Loader2,
+  RotateCcw,
+  Users,
+  Clock,
+  CheckCircle2,
+  Calendar,
+} from 'lucide-react';
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
@@ -65,19 +80,19 @@ const getFilterDateRange = (filter: string, customStart?: string, customEnd?: st
 
 export default function CustomerManagement({ channelId }: { channelId?: string }) {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [drawerTab, setDrawerTab] = useState<'info' | 'history'>('info');
   const [memo, setMemo] = useState('');
   const [status, setStatus] = useState('대기');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [inflowFilter, setInflowFilter] = useState<'all' | InflowType>('all');
   const [isDaangnModalOpen, setIsDaangnModalOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isSendingSms, setIsSendingSms] = useState(false);
-  
-  // Local state for editing details
+
   const [editData, setEditData] = useState<any>({});
   const [selectedChannelId, setSelectedChannelId] = useState<string>('all');
 
-  // Date filter state
   const getKstTodayStr = () => {
     const d = new Date();
     const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
@@ -102,24 +117,22 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     birth: '',
     gender: '',
     address: '',
-    detailAddress: ''
+    detailAddress: '',
   });
 
-  
   const settings = useQuery(api.settings.get);
   const channels = useQuery(api.channels.get);
-  
-  const subChannelIds = useQuery(api.channels.getSubChannelIds, 
+
+  const subChannelIds = useQuery(
+    api.channels.getSubChannelIds,
     channelId ? { subdomain: channelId } : 'skip'
   );
 
-  const inquiries = useQuery(api.inquiries.list, 
-    channelId 
-      ? (subChannelIds ? { channelIds: subChannelIds } : 'skip') 
-      : {}
+  const inquiries = useQuery(
+    api.inquiries.list,
+    channelId ? (subChannelIds ? { channelIds: subChannelIds } : 'skip') : {}
   );
 
-  // 고객관리(LG구독) 대상 고객은 일반 고객관리에서 제외
   const nonLgInquiries = useMemo(() => {
     if (!inquiries) return undefined;
     return inquiries.filter((inq) => !isLgCareCustomer(inq));
@@ -134,20 +147,23 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const allPlans = useQuery(api.plans.get);
 
   // Column Resizing Setup
-  const DEFAULT_COLUMNS = useMemo(() => [
-    { id: 'index', label: '순번', minWidth: 45, defaultWidth: 55, align: 'center' as const },
-    { id: 'checkbox', label: '', minWidth: 40, defaultWidth: 45, align: 'center' as const },
-    { id: 'source', label: '유입경로', minWidth: 65, defaultWidth: 85, align: 'center' as const },
-    { id: 'createdAt', label: '등록일시', minWidth: 100, defaultWidth: 125, align: 'left' as const },
-    { id: 'channel', label: '채널명', minWidth: 80, defaultWidth: 100, align: 'left' as const },
-    { id: 'name', label: '고객명', minWidth: 70, defaultWidth: 90, align: 'left' as const },
-    { id: 'phone', label: '연락처', minWidth: 110, defaultWidth: 125, align: 'left' as const },
-    { id: 'address', label: '주소', minWidth: 140, defaultWidth: 200, align: 'left' as const },
-    { id: 'productName', label: '신청상품', minWidth: 140, defaultWidth: 220, align: 'left' as const },
-    { id: 'appliance', label: '결합제품', minWidth: 160, defaultWidth: 260, align: 'left' as const },
-    { id: 'supplier', label: '공급사', minWidth: 70, defaultWidth: 90, align: 'center' as const },
-    { id: 'status', label: '진행상태', minWidth: 75, defaultWidth: 95, align: 'center' as const },
-  ], []);
+  const DEFAULT_COLUMNS = useMemo(
+    () => [
+      { id: 'index', label: '순번', minWidth: 45, defaultWidth: 55, align: 'center' as const },
+      { id: 'checkbox', label: '', minWidth: 40, defaultWidth: 45, align: 'center' as const },
+      { id: 'source', label: '유입경로', minWidth: 65, defaultWidth: 85, align: 'center' as const },
+      { id: 'createdAt', label: '등록일시', minWidth: 100, defaultWidth: 125, align: 'left' as const },
+      { id: 'channel', label: '채널명', minWidth: 80, defaultWidth: 100, align: 'left' as const },
+      { id: 'name', label: '고객명', minWidth: 90, defaultWidth: 115, align: 'left' as const },
+      { id: 'phone', label: '연락처', minWidth: 110, defaultWidth: 125, align: 'left' as const },
+      { id: 'address', label: '주소', minWidth: 140, defaultWidth: 200, align: 'left' as const },
+      { id: 'productName', label: '신청상품', minWidth: 140, defaultWidth: 220, align: 'left' as const },
+      { id: 'appliance', label: '결합제품', minWidth: 160, defaultWidth: 260, align: 'left' as const },
+      { id: 'supplier', label: '공급사', minWidth: 70, defaultWidth: 90, align: 'center' as const },
+      { id: 'status', label: '진행상태', minWidth: 75, defaultWidth: 95, align: 'center' as const },
+    ],
+    []
+  );
 
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>(() => {
     try {
@@ -158,17 +174,17 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
         [
           { id: 'index', defaultWidth: 55 },
           { id: 'checkbox', defaultWidth: 45 },
-          { id: 'source', defaultWidth: 55 },
+          { id: 'source', defaultWidth: 80 },
           { id: 'createdAt', defaultWidth: 125 },
           { id: 'channel', defaultWidth: 100 },
-          { id: 'name', defaultWidth: 90 },
+          { id: 'name', defaultWidth: 115 },
           { id: 'phone', defaultWidth: 125 },
           { id: 'address', defaultWidth: 200 },
           { id: 'productName', defaultWidth: 220 },
           { id: 'appliance', defaultWidth: 260 },
           { id: 'supplier', defaultWidth: 90 },
           { id: 'status', defaultWidth: 95 },
-        ].forEach(col => {
+        ].forEach((col) => {
           initial[col.id] = parsed[col.id] || col.defaultWidth;
         });
         return initial;
@@ -177,10 +193,10 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     return {
       index: 55,
       checkbox: 45,
-      source: 55,
+      source: 80,
       createdAt: 125,
       channel: 100,
-      name: 90,
+      name: 115,
       phone: 125,
       address: 200,
       productName: 220,
@@ -204,12 +220,12 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       const { colId: currentColId, startX: cStartX, startWidth: cStartWidth, minWidth: cMinWidth } = resizingRef.current;
       const delta = moveEvent.clientX - cStartX;
       const newWidth = Math.max(cMinWidth, cStartWidth + delta);
-      setColumnWidths(prev => ({ ...prev, [currentColId]: newWidth }));
+      setColumnWidths((prev) => ({ ...prev, [currentColId]: newWidth }));
     };
 
     const handleMouseUp = () => {
       if (resizingRef.current) {
-        setColumnWidths(current => {
+        setColumnWidths((current) => {
           try {
             localStorage.setItem('customer_table_column_widths', JSON.stringify(current));
           } catch (e) {}
@@ -233,10 +249,10 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     const defaults = {
       index: 55,
       checkbox: 45,
-      source: 55,
+      source: 80,
       createdAt: 125,
       channel: 100,
-      name: 90,
+      name: 115,
       phone: 125,
       address: 200,
       productName: 220,
@@ -250,14 +266,12 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     } catch (e) {}
   };
 
-  // 공급사 계산 함수 (직접 저장된 공급사 우선 -> 결합가전 매핑 -> 플랜별 기본 공급사)
   const getSupplier = (customer: any): string => {
-    // 1. 고객 데이터에 직접 저장된 공급사가 있는 경우 최우선 적용
     if (customer.supplier && String(customer.supplier).trim() !== '' && customer.supplier !== '-') {
       return String(customer.supplier).trim();
     }
 
-    const isLgCare = 
+    const isLgCare =
       customer.source === 'lg_care' ||
       customer.productName?.includes('LG구독') ||
       customer.productName?.includes('LG가전구독') ||
@@ -268,32 +282,29 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       customer.appliance?.includes('퓨리케어') ||
       customer.appliance?.includes('에어로타워');
 
-    const applianceText = (customer.appliance && customer.appliance !== '-') ? customer.appliance.trim() : '';
-    const productNameText = (customer.productName && customer.productName !== '-') ? customer.productName.trim() : '';
+    const applianceText = customer.appliance && customer.appliance !== '-' ? customer.appliance.trim() : '';
+    const productNameText = customer.productName && customer.productName !== '-' ? customer.productName.trim() : '';
     const combinedText = `${applianceText} ${productNameText}`.trim();
 
     if (allProducts && allProducts.length > 0 && combinedText) {
       const cleanCombined = combinedText.toUpperCase().replace(/\s+/g, '');
 
-      // 1. 모델명 매칭 (대소문자/공백 무시)
-      let matched = allProducts.find(p => {
+      let matched = allProducts.find((p) => {
         if (!p.model) return false;
         const cleanModel = p.model.toUpperCase().replace(/\s+/g, '');
         return cleanModel.length >= 3 && cleanCombined.includes(cleanModel);
       });
-      
-      // 2. 제품명 매칭
+
       if (!matched) {
-        matched = allProducts.find(p => {
+        matched = allProducts.find((p) => {
           if (!p.name) return false;
           const cleanName = p.name.trim();
           return cleanName.length >= 3 && (combinedText.includes(cleanName) || cleanName.includes(combinedText));
         });
       }
 
-      // 3. 브랜드 + 제품명 매칭
       if (!matched) {
-        matched = allProducts.find(p => {
+        matched = allProducts.find((p) => {
           const fullTitle = `${p.brand} ${p.name}`.trim();
           return fullTitle.length >= 3 && (combinedText.includes(fullTitle) || fullTitle.includes(combinedText));
         });
@@ -311,8 +322,12 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       return 'TU';
     }
 
-    // 4. 결합가전이 미선택되었거나 일반상담인 경우 신청상품(플랜) 기본 공급사 자동 추론
-    if (productNameText.includes('BSON') || productNameText.includes('60패키지') || productNameText.includes('UP가전') || productNameText.includes('스페셜299')) {
+    if (
+      productNameText.includes('BSON') ||
+      productNameText.includes('60패키지') ||
+      productNameText.includes('UP가전') ||
+      productNameText.includes('스페셜299')
+    ) {
       return 'BSON';
     }
     if (productNameText.includes('리빙144') || productNameText.includes('신한')) {
@@ -325,10 +340,9 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     return '-';
   };
 
-  // Group LG Official Products by categoryName for intuitive cascading selection
   const lgProductsByCategory = useMemo(() => {
     const groups: Record<string, typeof LG_OFFICIAL_PRODUCTS> = {};
-    LG_OFFICIAL_PRODUCTS?.forEach(p => {
+    LG_OFFICIAL_PRODUCTS?.forEach((p) => {
       const cat = p.categoryName || '기타';
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(p);
@@ -352,45 +366,46 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       let resolvedAccount = selectedCustomer.account;
       let resolvedAppliance = selectedCustomer.appliance;
 
-      // 1. Check if the name is already standardized (starts with 리빙144 or 스페셜299)
-      const isStandardized = selectedCustomer.productName?.startsWith('리빙144') || 
-                            selectedCustomer.productName?.startsWith('스페셜299');
+      const isStandardized =
+        selectedCustomer.productName?.startsWith('리빙144') ||
+        selectedCustomer.productName?.startsWith('스페셜299');
 
       if (!isStandardized) {
-        // 2. Try to find if productName is already a Category Name
-        const planByName = allPlans.find(p => p.name === selectedCustomer.productName);
-      
-      if (!planByName) {
-        // 2. If not, productName might be the appliance name. Try to find the product.
-        const product = allProducts.find(p => {
-          const fullName = `${p.brand} ${p.name}`;
-          const dbProductName = selectedCustomer.productName || '';
-          const dbAppliance = selectedCustomer.appliance || '';
-          
-          return (
-            dbProductName === p.name || 
-            dbProductName === fullName ||
-            (p.name && dbProductName.includes(p.name)) ||
-            (p.model && (dbAppliance.includes(p.model) || dbProductName.includes(p.model)))
-          );
-        });
+        const planByName = allPlans.find((p) => p.name === selectedCustomer.productName);
 
-        if (product) {
-          const plan = allPlans.find(pl => pl.numericId === product.planId);
-          if (plan) {
-            resolvedCategoryName = plan.name;
-            resolvedAccount = plan.accountCount;
-            // Show both name and model for clarity
-            resolvedAppliance = `${product.name} (${product.model})`;
+        if (!planByName) {
+          const product = allProducts.find((p) => {
+            const fullName = `${p.brand} ${p.name}`;
+            const dbProductName = selectedCustomer.productName || '';
+            const dbAppliance = selectedCustomer.appliance || '';
+
+            return (
+              dbProductName === p.name ||
+              dbProductName === fullName ||
+              (p.name && dbProductName.includes(p.name)) ||
+              (p.model && (dbAppliance.includes(p.model) || dbProductName.includes(p.model)))
+            );
+          });
+
+          if (product) {
+            const plan = allPlans.find((pl) => pl.numericId === product.planId);
+            if (plan) {
+              resolvedCategoryName = plan.name;
+              resolvedAccount = plan.accountCount;
+              resolvedAppliance = `${product.name} (${product.model})`;
+            }
           }
-        }
-         } else {
-          // It's already a category name, ensure account is sync'd if missing
+        } else {
           if (!resolvedAccount) resolvedAccount = planByName.accountCount;
         }
       }
 
-      if (!resolvedAccount && (resolvedCategoryName === 'LG구독할인(new)' || resolvedCategoryName?.includes('LG') || resolvedCategoryName?.includes('구독'))) {
+      if (
+        !resolvedAccount &&
+        (resolvedCategoryName === 'LG구독할인(new)' ||
+          resolvedCategoryName?.includes('LG') ||
+          resolvedCategoryName?.includes('구독'))
+      ) {
         resolvedAccount = '1구좌';
       }
 
@@ -402,20 +417,23 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       const autoSupplier = getSupplier({
         ...selectedCustomer,
         productName: resolvedCategoryName || selectedCustomer.productName,
-        appliance: initialAppliance
+        appliance: initialAppliance,
       });
       const initialSupplier = selectedCustomer.supplier || (autoSupplier !== '-' ? autoSupplier : 'BSON');
 
       setEditData({
         ...selectedCustomer,
-        newRegDate: selectedCustomer.newRegDate || new Date(selectedCustomer.createdAt + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
+        newRegDate:
+          selectedCustomer.newRegDate ||
+          new Date(selectedCustomer.createdAt + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
         productName: resolvedCategoryName || selectedCustomer.productName,
         account: resolvedAccount || selectedCustomer.account,
         appliance: initialAppliance,
-        supplier: initialSupplier
+        supplier: initialSupplier,
       });
-      setStatus(selectedCustomer.status);
+      setStatus(selectedCustomer.status || '대기');
       setMemo('');
+      setDrawerTab('info');
     }
   }, [selectedCustomer, allProducts, allPlans]);
 
@@ -425,25 +443,23 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       return;
     }
     new (window as any).daum.Postcode({
-      oncomplete: function(data: any) {
+      oncomplete: function (data: any) {
         let fullAddr = data.roadAddress || data.jibunAddress;
         let extraAddr = '';
 
         if (data.addressType === 'R') {
-          if (data.bname !== '') {
-            extraAddr += data.bname;
-          }
+          if (data.bname !== '') extraAddr += data.bname;
           if (data.buildingName !== '') {
-            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+            extraAddr += extraAddr !== '' ? ', ' + data.buildingName : data.buildingName;
           }
-          fullAddr += (extraAddr !== '' ? ' (' + extraAddr + ')' : '');
+          fullAddr += extraAddr !== '' ? ' (' + extraAddr + ')' : '';
         }
 
         setEditData((prev: any) => ({
           ...prev,
-          address: fullAddr
+          address: fullAddr,
         }));
-      }
+      },
     }).open();
   };
 
@@ -453,25 +469,23 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       return;
     }
     new (window as any).daum.Postcode({
-      oncomplete: function(data: any) {
+      oncomplete: function (data: any) {
         let fullAddr = data.roadAddress || data.jibunAddress;
         let extraAddr = '';
 
         if (data.addressType === 'R') {
-          if (data.bname !== '') {
-            extraAddr += data.bname;
-          }
+          if (data.bname !== '') extraAddr += data.bname;
           if (data.buildingName !== '') {
-            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+            extraAddr += extraAddr !== '' ? ', ' + data.buildingName : data.buildingName;
           }
-          fullAddr += (extraAddr !== '' ? ' (' + extraAddr + ')' : '');
+          fullAddr += extraAddr !== '' ? ' (' + extraAddr + ')' : '';
         }
 
         setRegisterForm((prev: any) => ({
           ...prev,
-          address: fullAddr
+          address: fullAddr,
         }));
-      }
+      },
     }).open();
   };
 
@@ -496,7 +510,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
         birth: '',
         gender: '',
         address: '',
-        detailAddress: ''
+        detailAddress: '',
       });
     } else {
       alert('고객명과 연락처는 필수 입력 사항입니다.');
@@ -504,7 +518,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   };
 
   const handleRemoveFromList = (id: number) => {
-    setRegisterList(registerList.filter(item => item.id !== id));
+    setRegisterList(registerList.filter((item) => item.id !== id));
   };
 
   const handleBulkRegister = async () => {
@@ -528,15 +542,14 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const handleOpenRegisterModal = () => {
     setRegisterForm((prev: any) => ({
       ...prev,
-      channelId: channelId || '본사'
+      channelId: channelId || '본사',
     }));
     setIsRegisterModalOpen(true);
   };
 
   const handleSendConsent = async () => {
     if (!selectedCustomer) return;
-    
-    // SMS 설정 확인
+
     const smsConfig = (settings as any)?.sms;
     if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
       alert('SMS 설정이 완료되지 않았습니다.\n환경설정 > SMS 설정에서 알리고 API 정보를 먼저 입력해주세요.');
@@ -551,13 +564,12 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
         inquiryId: selectedCustomer._id,
         customerName: selectedCustomer.name,
         customerPhone: selectedCustomer.phone,
-        productName: editData.productName, // Use current edited productName
+        productName: editData.productName,
       });
       alert(result.message || '문자 발송이 완료되었습니다.');
     } catch (e: any) {
       alert(e.message || '발송 중 오류가 발생했습니다.');
     } finally {
-      setIsSendingSms(null as any);
       setIsSendingSms(false);
     }
   };
@@ -565,7 +577,6 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const handleUpdate = async () => {
     if (!selectedCustomer) return;
     try {
-      // Only include fields accepted by inquiries.update to avoid Convex validation errors on tracking/system fields
       const allowedFields = [
         'name', 'phone', 'gender', 'birth', 'address', 'detailAddress',
         'newRegDate', 'cardPaymentDate', 'purchaseConsentDate', 'sangjoContractDate',
@@ -580,7 +591,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
           updates[key] = editData[key];
         }
       }
-      
+
       if (memo.trim()) {
         let writerName = '관리자';
         try {
@@ -603,11 +614,11 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
           date: new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
           status,
           memo: memo.trim(),
-          writer: writerName
+          writer: writerName,
         };
         updates.memoHistory = [...(selectedCustomer.memoHistory || []), newHistory];
       }
-      
+
       await updateInquiry({ id: selectedCustomer._id, ...updates });
       alert('저장되었습니다.');
       setSelectedCustomer(null);
@@ -622,7 +633,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     if (confirm('정말로 이 고객 정보를 삭제하시겠습니까?')) {
       await removeInquiry({ id: selectedCustomer._id });
       setSelectedCustomer(null);
-      setSelectedIds(prev => prev.filter(id => id !== selectedCustomer._id));
+      setSelectedIds((prev) => prev.filter((id) => id !== selectedCustomer._id));
     }
   };
 
@@ -636,29 +647,12 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     }
   };
 
-  const toggleSelectAll = () => {
-    if (selectedIds.length === filteredInquiries.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(filteredInquiries.map(inq => inq._id));
-    }
-  };
-
-  const toggleSelect = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedIds(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
-  };
-
   const formatPhoneNumber = (value: string) => {
     if (!value) return value;
     const phoneNumber = value.replace(/[^\d]/g, '');
     const phoneNumberLength = phoneNumber.length;
     if (phoneNumberLength < 4) return phoneNumber;
-    if (phoneNumberLength < 7) {
-      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
-    }
+    if (phoneNumberLength < 7) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
     if (phoneNumberLength < 11) {
       return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6)}`;
     }
@@ -669,1097 +663,1153 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     const statusSetting = settings?.statuses?.find((s: any) => s.name === statusName);
     if (statusSetting && statusSetting.color) {
       const hex = statusSetting.color;
-      let textColor = '#4E5968';
+      let textColor = '#263d36';
       try {
         const color = hex.replace('#', '');
         const r = parseInt(color.substring(0, 2), 16);
         const g = parseInt(color.substring(2, 4), 16);
         const b = parseInt(color.substring(4, 6), 16);
         const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-        textColor = brightness > 155 ? '#4E5968' : '#FFFFFF';
+        textColor = brightness > 155 ? '#263d36' : '#FFFFFF';
       } catch (e) {
-        textColor = '#4E5968';
+        textColor = '#263d36';
       }
       return { bg: hex, text: textColor };
     }
-    return { bg: '#F2F4F6', text: '#4E5968' };
-  };
-
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString('ko-KR', {
-      timeZone: 'Asia/Seoul',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return { bg: '#f0f2ed', text: '#5c6b5b' };
   };
 
   const getChannelName = (id?: string) => {
     if (!id || id === '본사' || id === 'default') return '본사';
     if (!channels) return '...';
-    return channels?.find(c => c.subdomain === id)?.channelName || id;
+    return channels?.find((c) => c.subdomain === id)?.channelName || id;
   };
-
-
 
   const getInquiryCountsByChannel = () => {
     if (!nonLgInquiries || !channels || channelId) return [];
-    
-    // Create a mapping from subdomain and landingPage to channel subdomain
+
     const pathMap: { [key: string]: string } = {};
-    channels.forEach(c => {
+    channels.forEach((c) => {
       if (c.landingPage) {
-        // Map path (e.g. /living) to subdomain (e.g. bestone)
         pathMap[c.landingPage.replace('/', '')] = c.subdomain;
       }
     });
 
     const counts: { [key: string]: number } = {};
-    nonLgInquiries.forEach(inq => {
-      let cid = (!inq.channelId || inq.channelId === '본사' || inq.channelId === 'default') ? 'default' : inq.channelId;
-      // If cid is a path (like 'living'), map it to the subdomain
-      if (pathMap[cid]) {
-        cid = pathMap[cid];
-      }
+    nonLgInquiries.forEach((inq) => {
+      let cid = !inq.channelId || inq.channelId === '본사' || inq.channelId === 'default' ? 'default' : inq.channelId;
+      if (pathMap[cid]) cid = pathMap[cid];
       counts[cid] = (counts[cid] || 0) + 1;
     });
-    
-    const result = channels.map(c => ({
+
+    const result = channels.map((c) => ({
       name: c.channelName,
       id: c.subdomain,
-      count: counts[c.subdomain] || 0
+      count: counts[c.subdomain] || 0,
     }));
-    
+
     result.unshift({ name: '본사', id: 'default', count: counts['default'] || 0 });
     return result;
   };
 
+  const usedStatuses = settings?.statuses?.filter((s: any) => s.isUsed) || [
+    { name: '대기', isUsed: true },
+    { name: '상담완료', isUsed: true },
+    { name: '거절', isUsed: true },
+  ];
 
-
+  const summaryStats = useMemo(() => {
+    const list = nonLgInquiries || [];
+    const todayRange = getFilterDateRange('today');
+    const todayCount = list.filter((i) => i.createdAt >= todayRange.start && i.createdAt <= todayRange.end).length;
+    const waitingCount = list.filter((i) => !i.status || i.status === '대기').length;
+    const completedCount = list.filter((i) => (i.status || '').includes('완료') || (i.status || '').includes('계약')).length;
+    return { total: list.length, todayCount, waitingCount, completedCount };
+  }, [nonLgInquiries]);
 
   if (!nonLgInquiries) {
     return (
-      <div className="p-8 flex flex-col items-center justify-center h-full">
-        <RefreshCw className="w-8 h-8 text-[#3182F6] animate-spin mb-4" />
-        <p className="text-[14px] font-bold text-[#4E5968]">고객 데이터를 불러오는 중...</p>
+      <div className="py-24 flex flex-col items-center justify-center">
+        <RefreshCw className="w-7 h-7 text-[#295e52] animate-spin mb-3" />
+        <p className="text-[13px] font-semibold text-[#45554e]">고객 데이터를 불러오는 중입니다...</p>
       </div>
     );
   }
 
-  const filteredInquiries = nonLgInquiries.filter(inq => {
-    // 1. Channel Filter
+  const filteredInquiries = nonLgInquiries.filter((inq) => {
     if (selectedChannelId !== 'all') {
-      const targetCid = (selectedChannelId === 'default' || selectedChannelId === '본사') ? undefined : selectedChannelId;
-      const inquiryCid = (!inq.channelId || inq.channelId === '본사' || inq.channelId === 'default') ? undefined : inq.channelId;
+      const targetCid = selectedChannelId === 'default' || selectedChannelId === '본사' ? undefined : selectedChannelId;
+      const inquiryCid = !inq.channelId || inq.channelId === '본사' || inq.channelId === 'default' ? undefined : inq.channelId;
       if (inquiryCid !== targetCid) return false;
     }
 
-    // 2. Date Filter
+    if (statusFilter !== 'all' && (inq.status || '대기') !== statusFilter) {
+      return false;
+    }
+
     if (dateFilter !== 'all') {
       const range = getFilterDateRange(dateFilter, startDate, endDate);
       const time = inq.createdAt;
       if (time < range.start || time > range.end) return false;
     }
 
-    // 2.5 Inflow Filter
     if (inflowFilter !== 'all' && getCustomerInflow(inq) !== inflowFilter) {
       return false;
     }
-    
-    // 3. Search Query Filter
+
     const search = searchQuery.toLowerCase();
+    if (!search) return true;
     const sup = getSupplier(inq).toLowerCase();
     return (
-      (inq.name || '').toLowerCase().includes(search) || 
-      (inq.phone || '').toLowerCase().includes(search) || 
-      (inq.address || '').toLowerCase().includes(search) || 
-      (inq.detailAddress || '').toLowerCase().includes(search) || 
+      (inq.name || '').toLowerCase().includes(search) ||
+      (inq.phone || '').toLowerCase().includes(search) ||
+      (inq.address || '').toLowerCase().includes(search) ||
+      (inq.detailAddress || '').toLowerCase().includes(search) ||
       (inq.productName || '').toLowerCase().includes(search) ||
       (inq.appliance || '').toLowerCase().includes(search) ||
       sup.includes(search)
     );
   });
 
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredInquiries.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredInquiries.map((inq) => inq._id));
+    }
+  };
+
+  const toggleSelect = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+  };
 
   return (
-    <div className="p-4 lg:p-8">
-      {!channelId && (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
-          <div 
-            onClick={() => setSelectedChannelId('all')}
-            className={`p-4 rounded-[16px] border cursor-pointer transition-all ${selectedChannelId === 'all' ? 'bg-[#3182F6] border-[#3182F6] text-white shadow-lg shadow-blue-500/20' : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:border-[#3182F6]'}`}
+    <div>
+      {/* Page Heading */}
+      <div className="adm-page-heading">
+        <div>
+          <div className="adm-eyebrow">HYOWON SANGJO · CUSTOMERS</div>
+          <h1>
+            고객 관리
+            {!channelId && selectedChannelId !== 'all' && (
+              <span className="text-[#295e52] text-[17px] ml-2 font-bold">
+                · {getChannelName(selectedChannelId === 'default' ? undefined : selectedChannelId)}
+              </span>
+            )}
+          </h1>
+          <p>
+            스페셜299 · 리빙144 등 가전결합상조 상담 접수 고객을 조회하고 계약 일정을 관리합니다. (검색 결과{' '}
+            <strong className="text-[#263d36]">{filteredInquiries.length}</strong>명)
+          </p>
+        </div>
+
+        <div className="adm-heading-buttons">
+          <button
+            type="button"
+            onClick={() => setIsDaangnModalOpen(true)}
+            className="adm-btn sage"
           >
-            <p className="text-[12px] font-bold opacity-80 mb-1">전체 채널</p>
-            <p className="text-[18px] font-black">{nonLgInquiries?.length || 0}건</p>
-          </div>
-          {getInquiryCountsByChannel().filter(c => c.count > 0 || c.id === 'default').map(c => (
-            <div 
-              key={c.id}
-              onClick={() => setSelectedChannelId(c.id === 'default' ? 'default' : c.id)}
-              className={`p-4 rounded-[16px] border cursor-pointer transition-all ${((c.id === 'default' && selectedChannelId === 'default') || selectedChannelId === c.id) ? 'bg-[#191F28] border-[#191F28] text-white shadow-lg' : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:border-[#191F28]'}`}
-            >
-              <p className="text-[12px] font-bold opacity-80 mb-1">{c.name}</p>
-              <p className="text-[18px] font-black">{c.count}건</p>
-            </div>
-          ))}
+            <span>당근 리드폼 연동</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenRegisterModal}
+            className="adm-btn primary"
+          >
+            <Plus />
+            <span>고객 직접 등록</span>
+          </button>
         </div>
-      )}
+      </div>
 
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <h2 className="text-[20px] lg:text-[24px] font-bold">
-          고객관리 
-          {!channelId && selectedChannelId !== 'all' && (
-            <span className="text-[#3182F6] text-[16px] ml-2">
-              ({getChannelName(selectedChannelId === 'default' ? undefined : selectedChannelId)})
+      {/* 4-Column Metric Cards */}
+      <div className="adm-metrics-grid">
+        <div className="adm-metric clickable" onClick={() => { setStatusFilter('all'); setDateFilter('all'); }}>
+          <div className="adm-metric-head">
+            <span>전체 누적 고객</span>
+            <div className="adm-metric-icon"><Users /></div>
+          </div>
+          <div className="adm-metric-value">
+            {summaryStats.total.toLocaleString()}<span>명</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">일반 결합상품</span>
+            <span>전체 누적 DB</span>
+          </div>
+        </div>
+
+        <div className="adm-metric clickable" onClick={() => setDateFilter('today')}>
+          <div className="adm-metric-head">
+            <span>당일 신규 접수</span>
+            <div className="adm-metric-icon"><Calendar /></div>
+          </div>
+          <div className="adm-metric-value">
+            {summaryStats.todayCount.toLocaleString()}<span>명</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">KST 오늘 기준</span>
+            <span>실시간 인입</span>
+          </div>
+        </div>
+
+        <div className="adm-metric clickable" onClick={() => setStatusFilter('대기')}>
+          <div className="adm-metric-head">
+            <span>상담 대기 고객</span>
+            <div className="adm-metric-icon"><Clock /></div>
+          </div>
+          <div className="adm-metric-value">
+            {summaryStats.waitingCount.toLocaleString()}<span>명</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className={`adm-metric-trend ${summaryStats.waitingCount > 0 ? 'warning' : ''}`}>
+              {summaryStats.waitingCount > 0 ? '해피콜 필요' : '대기 없음'}
             </span>
-          )}
-        </h2>
-
-        <div className="flex flex-col sm:flex-row w-full lg:w-auto gap-2">
-          <div className="flex gap-2">
-            {selectedIds.length > 0 && (
-              <button 
-                onClick={handleBulkDelete}
-                className="flex-1 lg:flex-none bg-red-50 text-red-500 border border-red-100 hover:bg-red-100 px-4 py-2 rounded-[8px] flex items-center justify-center gap-2 text-[14px] font-bold transition-colors"
-              >
-                <Trash2 className="w-4 h-4" /> 삭제 ({selectedIds.length})
-              </button>
-            )}
-            <button 
-              onClick={() => setIsDaangnModalOpen(true)}
-              className="flex-1 lg:flex-none bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100 px-3.5 py-2 rounded-[8px] flex items-center justify-center gap-1.5 text-[13px] font-bold transition-colors shrink-0"
-            >
-              당근 리드폼 연동
-            </button>
-            <button 
-              onClick={handleOpenRegisterModal}
-              className="flex-1 lg:flex-none bg-[#191F28] text-white px-4 py-2 rounded-[8px] flex items-center justify-center gap-2 text-[14px] font-bold hover:bg-[#2D3644] transition-colors"
-            >
-              <Plus className="w-4 h-4" /> 고객 직접 등록
-            </button>
+            <span>우선 상담 대상</span>
           </div>
-          <div className="flex gap-2 w-full lg:w-auto">
-            {!channelId && (
-              <select 
-                value={selectedChannelId} 
-                onChange={(e) => setSelectedChannelId(e.target.value)}
-                className="bg-white border border-[#E5E8EB] px-4 py-2 rounded-[8px] text-[14px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
-              >
-                <option value="all">모든 채널</option>
-                <option value="default">본사</option>
-                {channels?.map(c => (
-                  <option key={c._id} value={c.subdomain}>{c.channelName}</option>
-                ))}
-              </select>
-            )}
-            {channelId && subChannelIds && subChannelIds.length > 1 && (
-               <select 
-                 value={selectedChannelId} 
-                 onChange={(e) => setSelectedChannelId(e.target.value)}
-                 className="bg-white border border-[#E5E8EB] px-4 py-2 rounded-[8px] text-[14px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
-               >
-                 <option value="all">내 하위 채널 전체</option>
-                 {subChannelIds.map(sid => (
-                   <option key={sid} value={sid}>{getChannelName(sid)}</option>
-                 ))}
-               </select>
-            )}
+        </div>
 
-            <div className="flex-1 lg:w-[240px] bg-white border border-[#E5E8EB] rounded-[8px] flex items-center px-3 py-2 shadow-sm">
-              <Search className="w-4 h-4 text-[#8B95A1] mr-2" />
-              <input 
-                type="text" 
-                placeholder="고객명, 연락처, 상품 검색" 
-                className="text-[14px] focus:outline-none w-full"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+        <div className="adm-metric">
+          <div className="adm-metric-head">
+            <span>상담 · 계약 완료</span>
+            <div className="adm-metric-icon"><CheckCircle2 /></div>
+          </div>
+          <div className="adm-metric-value">
+            {summaryStats.completedCount.toLocaleString()}<span>명</span>
+          </div>
+          <div className="adm-metric-foot">
+            <span className="adm-metric-trend">누적 성과</span>
+            <span>정상 진행 건</span>
           </div>
         </div>
       </div>
 
-      {/* 유입경로 필터 탭 */}
-      <div className="flex items-center gap-2 mb-3 overflow-x-auto no-scrollbar pb-1">
-        <span className="text-[12px] font-bold text-[#8B95A1] shrink-0 mr-1">유입경로</span>
-        {(['all', 'landing', 'direct', 'daangn'] as const).map((type) => {
-          const count = type === 'all'
-            ? nonLgInquiries.length
-            : nonLgInquiries.filter(i => getCustomerInflow(i) === type).length;
-          const label = type === 'all' ? '전체' : INFLOW_META[type].label;
-          const isActive = inflowFilter === type;
-          return (
+      {/* Master Admin Quick Channel Strip */}
+      {!channelId && (
+        <div className="adm-panel p-3.5 mb-5">
+          <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar">
+            <span className="text-[11.5px] font-bold text-[#6d786c] shrink-0 px-2">채널별 현황</span>
             <button
-              key={type}
-              onClick={() => setInflowFilter(type)}
-              className={`px-3 py-1 rounded-full text-[12px] font-bold transition-all shrink-0 border ${
-                isActive
-                  ? type === 'daangn'
-                    ? 'bg-orange-500 text-white border-orange-500 shadow-sm'
-                    : 'bg-[#191F28] text-white border-[#191F28]'
-                  : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-              }`}
+              type="button"
+              onClick={() => setSelectedChannelId('all')}
+              className={`adm-btn small ${selectedChannelId === 'all' ? 'primary' : ''}`}
             >
-              {label} ({count})
+              전체 채널 ({nonLgInquiries.length})
             </button>
-          );
-        })}
-      </div>
-
-      {/* 기간 필터링 바 */}
-      <div className="bg-white p-4 rounded-[16px] border border-[#E5E8EB] mb-6 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
-        <div className="flex items-center gap-2 w-full overflow-x-auto no-scrollbar py-1">
-          <span className="text-[13px] font-bold text-[#4E5968] shrink-0 mr-2">등록기간</span>
-          {[
-            { label: '전체', value: 'all' },
-            { label: '당일', value: 'today' },
-            { label: '전일', value: 'yesterday' },
-            { label: '1주일', value: '1week' },
-            { label: '당월', value: 'thisMonth' },
-            { label: '전월', value: 'lastMonth' },
-            { label: '3개월', value: '3months' },
-            { label: '6개월', value: '6months' },
-            { label: '기간선택', value: 'custom' },
-          ].map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setDateFilter(opt.value)}
-              className={`px-3 py-1.5 rounded-[8px] text-[13px] font-bold transition-all shrink-0 ${
-                dateFilter === opt.value
-                  ? 'bg-[#3182F6] text-white shadow-sm'
-                  : 'bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        {dateFilter === 'custom' && (
-          <div className="flex items-center gap-2 w-full md:w-auto shrink-0 justify-end">
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="bg-white border border-[#E5E8EB] px-3 py-1.5 rounded-[8px] text-[13px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
-            />
-            <span className="text-[#8B95A1] text-[13px]">~</span>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="bg-white border border-[#E5E8EB] px-3 py-1.5 rounded-[8px] text-[13px] font-medium shadow-sm outline-none focus:ring-2 focus:ring-[#3182F6]/20"
-            />
-          </div>
-        )}
-
-        {/* 열 간격 초기화 버튼 */}
-        <button
-          onClick={handleResetColumnWidths}
-          className="px-2.5 py-1.5 rounded-[8px] text-[12px] font-medium text-[#8B95A1] hover:text-[#4E5968] hover:bg-[#F2F4F6] flex items-center gap-1 transition-colors border border-transparent hover:border-[#E5E8EB] shrink-0 self-end md:self-auto"
-          title="열 너비를 기본값으로 초기화합니다"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>열 간격 초기화</span>
-        </button>
-      </div>
-
-      <div className="bg-white rounded-[16px] shadow-sm border border-[#E5E8EB] overflow-x-auto custom-scrollbar">
-        <table 
-          className="text-left table-fixed min-w-full"
-          style={{ width: `${DEFAULT_COLUMNS.reduce((sum, col) => sum + (columnWidths[col.id] || col.defaultWidth), 0)}px` }}
-        >
-          <thead className="bg-[#F9FAFB] border-b border-[#E5E8EB] select-none">
-            <tr>
-              {DEFAULT_COLUMNS.map((col) => {
-                const width = columnWidths[col.id] || col.defaultWidth;
+            {getInquiryCountsByChannel()
+              .filter((c) => c.count > 0 || c.id === 'default')
+              .map((c) => {
+                const targetVal = c.id === 'default' ? 'default' : c.id;
+                const isActive = selectedChannelId === targetVal;
                 return (
-                  <th
-                    key={col.id}
-                    style={{ width: `${width}px`, minWidth: `${col.minWidth}px` }}
-                    className={`relative group px-3 py-3.5 text-[13px] font-bold text-[#4E5968] ${
-                      col.align === 'center' ? 'text-center' : 'text-left'
-                    }`}
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setSelectedChannelId(targetVal)}
+                    className={`adm-btn small ${isActive ? 'primary' : ''}`}
                   >
-                    {col.id === 'checkbox' ? (
-                      <input 
-                        type="checkbox" 
-                        checked={filteredInquiries.length > 0 && selectedIds.length === filteredInquiries.length}
-                        onChange={toggleSelectAll}
-                        className="w-4 h-4 rounded border-[#E5E8EB] text-[#3182F6] focus:ring-[#3182F6] cursor-pointer"
-                      />
-                    ) : (
-                      <span className="truncate block">{col.label}</span>
-                    )}
-
-                    {/* 열 리사이저 핸들 */}
-                    <div
-                      onMouseDown={(e) => handleResizeStart(col.id, col.minWidth, e)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 top-0 bottom-0 w-2.5 cursor-col-resize select-none flex items-center justify-center hover:bg-[#3182F6]/20 transition-colors z-10 group/resizer"
-                      title="드래그하여 열 너비 조절"
-                    >
-                      <div className="w-[1.5px] h-3.5 bg-[#D1D6DB] group-hover:bg-[#3182F6]" />
-                    </div>
-                  </th>
+                    <span>{c.name}</span>
+                    <span className="opacity-75 font-mono">({c.count})</span>
+                  </button>
                 );
               })}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#E5E8EB]">
-            {filteredInquiries.length === 0 ? (
-              <tr>
-                <td colSpan={12} className="px-6 py-20 text-center text-[#8B95A1] text-[14px]">
-                  등록된 고객이 없습니다.
-                </td>
-              </tr>
-            ) : (
-              filteredInquiries.map((customer, index) => {
-                // 신청상품 & 결합제품 노출 로직
-                let displayPlan = customer.productName;
-                let displayAppliance = customer.appliance || '-';
-
-                // 결합제품에서 불필요한 상조 결합/구독료 텍스트 정리
-                if (displayAppliance !== '-') {
-                  displayAppliance = displayAppliance.replace(/\s*\[효원상조\s*\d+구좌\s*결합[^\]]*\]/g, '').trim();
-                }
-
-                // 결합제품명이 모델명으로만 되어있을 경우 제품명(모델명)으로 변환
-                if (displayAppliance !== '-' && allProducts) {
-                  const matchedProduct = allProducts.find(p => p.model === displayAppliance);
-                  if (matchedProduct) {
-                    displayAppliance = `${matchedProduct.name} (${matchedProduct.model})`;
-                  }
-                }
-
-                // 만약 결합제품이 없는데 productName에 [1구좌] 제품명 (모델명) 형식으로 들어가 있는 경우 분리
-                if ((!customer.appliance || customer.appliance === '-') && customer.productName?.startsWith('[')) {
-                  const bracketMatch = customer.productName.match(/^\[(.*?)\]\s*(.*)$/);
-                  if (bracketMatch) {
-                    const acc = bracketMatch[1];
-                    const rest = bracketMatch[2];
-                    displayPlan = `가전상조 60패키지 (${acc})`;
-                    displayAppliance = rest;
-                  }
-                }
-
-                // LG 가전구독 랜딩 제출 건 또는 직접 등록 건 처리
-                if (customer.source === 'lg_care' || customer.productName?.includes('LG구독') || customer.productName?.includes('LG가전구독') || customer.productName?.startsWith('LG')) {
-                  const lgLanding = landings?.find(l => l.path === '/care_new' || l.path === '/care');
-                  const baseLandingTitle = lgLanding?.name || 'LG가전 구독 할인 전용 (new)';
-                  
-                  // 만약 productName에 기존처럼 가전 모델명이 들어가 있던 경우 랜딩 제목으로 교정
-                  if (!customer.productName || customer.productName.startsWith('[')) {
-                    displayPlan = baseLandingTitle;
-                  } else {
-                    displayPlan = customer.productName;
-                  }
-                } else {
-                  // 1. Prioritize standardized names (Living 144 / Special 299)
-                  const isStandardized = customer.productName?.startsWith('리빙144') || 
-                                       customer.productName?.startsWith('스페셜299');
-                  
-                  if (isStandardized) {
-                    displayPlan = customer.productName;
-                  } else {
-                    // 2. Handle legacy/appliance-named inquiries
-                    const planByName = allPlans?.find(p => p.name === customer.productName);
-                    if (!planByName && allProducts && allPlans) {
-                      const matchedProduct = allProducts.find(p => 
-                        p.name === customer.productName || 
-                        `${p.brand} ${p.name}` === customer.productName ||
-                        (p.model && customer.appliance?.includes(p.model))
-                      );
-                      if (matchedProduct) {
-                        const plan = allPlans.find(pl => pl.numericId === matchedProduct.planId);
-                        if (plan) displayPlan = plan.name;
-                      }
-                    } else if (planByName) {
-                      displayPlan = planByName.name;
-                    }
-                  }
-                }
-
-                // Ensure account info is not duplicated if it's already in the displayPlan
-                const isMainSubmission = displayPlan?.endsWith('_메인') || customer.productName?.endsWith('_메인');
-                let finalOutput = displayPlan;
-                
-                if (!isMainSubmission && customer.account) {
-                  const accountStr = `(${customer.account})`;
-                  if (!displayPlan.includes(accountStr)) {
-                    finalOutput = `${displayPlan}${accountStr}`;
-                  }
-                }
-
-                const supplierName = getSupplier(customer);
-
-                return (
-                  <tr 
-                    key={customer._id} 
-                    className={`hover:bg-[#F9FAFB] cursor-pointer transition-colors ${selectedIds.includes(customer._id) ? 'bg-[#F2F8FF]' : ''}`}
-                    onClick={() => setSelectedCustomer(customer)}
-                  >
-                    {/* 1. 순번 */}
-                    <td style={{ width: `${columnWidths.index}px` }} className="px-3 py-3 text-[13px] text-[#4E5968] font-medium text-center truncate">
-                      {filteredInquiries.length - index}
-                    </td>
-
-                    {/* 2. 체크박스 */}
-                    <td style={{ width: `${columnWidths.checkbox}px` }} className="px-3 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                      <input 
-                        type="checkbox" 
-                        checked={selectedIds.includes(customer._id)}
-                        onChange={(e) => { e.stopPropagation(); toggleSelect(customer._id, e as any); }}
-                        className="w-4 h-4 rounded border-[#E5E8EB] text-[#3182F6] focus:ring-[#3182F6] cursor-pointer"
-                      />
-                    </td>
-
-                    {/* 3. 유입경로 */}
-                    <td style={{ width: `${Math.max(columnWidths.source, 70)}px` }} className="px-2 py-3 text-center truncate">
-                      {(() => {
-                        const inflow = getCustomerInflow(customer);
-                        const meta = INFLOW_META[inflow];
-                        const detail = getCustomerTrafficDetail(customer);
-                        return (
-                          <div className="flex flex-col items-center gap-0.5">
-                            <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${meta.badgeClass}`}>
-                              {meta.label}
-                            </span>
-                            {detail && (
-                              <span
-                                title={detail.tooltip}
-                                className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold max-w-full truncate ${detail.badgeClass}`}
-                              >
-                                {detail.label}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })()}
-                    </td>
-
-                    {/* 4. 등록일시 (시간은 한 줄 내려서 표시) */}
-                    <td style={{ width: `${columnWidths.createdAt}px` }} className="px-3 py-3 truncate">
-                      <div className="text-[12px] text-[#191F28] font-medium leading-tight">
-                        {new Date(customer.createdAt).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '')}
-                      </div>
-                      <div className="text-[11px] text-[#8B95A1] leading-tight mt-1">
-                        {new Date(customer.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    </td>
-
-                    {/* 5. 채널명 */}
-                    <td style={{ width: `${columnWidths.channel}px` }} className="px-3 py-3 truncate">
-                      <span className={`inline-block max-w-full truncate text-[12px] font-bold px-2 py-0.5 rounded-md ${(!customer.channelId || customer.channelId === '본사') ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-[#3182F6]'}`} title={getChannelName(customer.channelId)}>
-                        {getChannelName(customer.channelId)}
-                      </span>
-                    </td>
-
-                    {/* 6. 고객명 */}
-                    <td style={{ width: `${columnWidths.name}px` }} className="px-3 py-3 text-[13px] font-bold text-[#191F28] truncate" title={customer.name}>
-                      {customer.name}
-                    </td>
-
-                    {/* 7. 연락처 */}
-                    <td style={{ width: `${columnWidths.phone}px` }} className="px-3 py-3 text-[13px] text-[#4E5968] truncate" title={customer.phone}>
-                      {customer.phone}
-                    </td>
-
-                    {/* 8. 주소 (2줄 표시) */}
-                    <td style={{ width: `${columnWidths.address}px` }} className="px-3 py-3">
-                      {customer.address ? (
-                        <div className="text-[12px] leading-tight">
-                          <div className="truncate text-[#191F28] font-medium" title={customer.address}>
-                            {customer.address}
-                          </div>
-                          <div className="truncate text-[11px] text-[#8B95A1] mt-0.5" title={customer.detailAddress || ''}>
-                            {customer.detailAddress || '-'}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-[#8B95A1] text-[12px]">-</span>
-                      )}
-                    </td>
-
-                    {/* 9. 신청상품 */}
-                    <td style={{ width: `${columnWidths.productName}px` }} className="px-3 py-3 text-[13px] text-[#4E5968] font-medium truncate" title={finalOutput}>
-                      {finalOutput}
-                    </td>
-
-                    {/* 10. 결합제품 (길면 2줄로 표시) */}
-                    <td style={{ width: `${columnWidths.appliance}px` }} className="px-3 py-3 text-[13px] text-[#4E5968]">
-                      <div 
-                        className="line-clamp-2 leading-snug break-keep"
-                        title={displayAppliance}
-                        style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                          wordBreak: 'break-all'
-                        }}
-                      >
-                        {displayAppliance}
-                      </div>
-                    </td>
-
-                    {/* 11. 공급사 (진행상태 왼쪽 옆) */}
-                    <td style={{ width: `${columnWidths.supplier}px` }} className="px-3 py-3 text-center truncate">
-                      <span className={`inline-block text-[11px] font-bold px-2 py-0.5 rounded ${
-                        supplierName === 'TU' 
-                          ? 'bg-red-50 text-red-600 border border-red-200' 
-                          : supplierName !== '-' 
-                            ? 'bg-blue-50 text-[#3182F6] border border-blue-200' 
-                            : 'text-[#8B95A1]'
-                      }`} title={supplierName}>
-                        {supplierName}
-                      </span>
-                    </td>
-
-                    {/* 12. 진행상태 */}
-                    <td style={{ width: `${columnWidths.status}px` }} className="px-3 py-3 text-center truncate">
-                      <span 
-                        className="inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full"
-                        style={{ 
-                          backgroundColor: getStatusStyle(customer.status).bg, 
-                          color: getStatusStyle(customer.status).text 
-                        }}
-                      >
-                        {customer.status}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {selectedCustomer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 lg:p-4">
-          <div className="bg-white lg:rounded-[24px] w-full max-w-[800px] h-full lg:h-auto lg:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
-            <div className="px-6 py-5 border-b border-[#E5E8EB] flex justify-between items-center bg-white z-10 shrink-0">
-              <div className="flex items-center gap-3">
-                <h3 className="text-[20px] font-bold">상담 고객 상세정보</h3>
-                <span 
-                  className="inline-block text-[12px] font-bold px-2.5 py-1 rounded-full"
-                  style={{ 
-                    backgroundColor: getStatusStyle(status).bg, 
-                    color: getStatusStyle(status).text 
-                  }}
-                >
-                  {status}
-                </span>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={handleDelete} className="p-2 hover:bg-red-50 text-red-500 rounded-full transition-colors" title="삭제">
-                  <Trash2 className="w-5 h-5" />
-                </button>
-                {(selectedCustomer.productName?.toLowerCase().includes('living') || selectedCustomer.productName?.includes('리빙') || editData.productName?.includes('리빙')) && (
-                  <button 
-                    onClick={handleSendConsent} 
-                    disabled={isSendingSms}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-[13px] font-bold transition-all ${isSendingSms ? 'bg-gray-100 text-gray-400' : 'bg-[#3182F6] text-white hover:bg-[#1B64DA] shadow-sm'}`}
-                    title="구매동의 문자 발송"
-                  >
-                    {isSendingSms ? <Loader2 className="w-4 h-4 animate-spin" /> : <Smartphone className="w-4 h-4" />}
-                    구매동의 문자발송
-                  </button>
-                )}
-                <button onClick={() => setSelectedCustomer(null)} className="p-2 hover:bg-[#F2F4F6] rounded-full transition-colors">
-                  <X className="w-6 h-6 text-[#4E5968]" />
-                </button>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-6 bg-[#F9FAFB] hide-scrollbar">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* 1. 기본 고객 정보 */}
-                <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                  <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#3182F6]"></span>기본 고객 정보
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">고객명</label>
-                      <input type="text" value={editData.name || ''} onChange={e => setEditData({...editData, name: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">연락처</label>
-                      <input type="text" value={editData.phone || ''} onChange={e => setEditData({...editData, phone: formatPhoneNumber(e.target.value)})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">성별</label>
-                      <select value={editData.gender || ''} onChange={e => setEditData({...editData, gender: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]">
-                        <option value="">선택</option>
-                        <option>남성</option>
-                        <option>여성</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">생년월일 (6자리)</label>
-                      <input type="text" value={editData.birth || ''} onChange={e => setEditData({...editData, birth: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="YYMMDD" />
-                    </div>
-                    <div className="col-span-2">
-                      <div className="flex justify-between items-end mb-1">
-                        <label className="block text-[12px] font-medium text-[#8B95A1]">주소</label>
-                        <button onClick={openPostcode} className="text-[11px] bg-[#3182F6] text-white px-2.5 py-1 rounded-[4px] font-bold hover:bg-[#1B64DA] transition-colors">주소 검색</button>
-                      </div>
-                      <input type="text" value={editData.address || ''} readOnly onClick={openPostcode} className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] mb-2 cursor-pointer text-[#4E5968]" placeholder="기본 주소 (검색 버튼을 눌러주세요)" />
-                      <input type="text" value={editData.detailAddress || ''} onChange={e => setEditData({...editData, detailAddress: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="상세 주소 입력" />
-                    </div>
-                  </div>
-                </section>
-
-                {/* 2. 상담/계약 일정 정보 */}
-                <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                  <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#BE123C]"></span>상담/계약 일정 정보
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                    {/* If product is living (신한카드 144) */}
-                    {(selectedCustomer.productName?.toLowerCase().includes('living') || selectedCustomer.productName?.includes('리빙') || editData.productName?.includes('리빙')) ? (
-                      <>
-                        <div>
-                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">신규 접수일</label>
-                          <input type="date" value={editData.newRegDate || ''} onChange={e => setEditData({...editData, newRegDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-bold text-[#3182F6] mb-1">카드 결제일</label>
-                          <input type="date" value={editData.cardPaymentDate || ''} onChange={e => setEditData({...editData, cardPaymentDate: e.target.value})} className="w-full bg-[#F0F7FF] border border-[#3182F6]/30 px-3 py-2 rounded-[8px] text-[13px] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-bold text-[#059669] mb-1">구매 동의일 (자동)</label>
-                          <input type="date" value={editData.purchaseConsentDate || ''} readOnly className="w-full bg-[#ECFDF5] border border-[#059669]/30 px-3 py-2 rounded-[8px] text-[13px] text-[#059669] cursor-default" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-bold text-[#D97706] mb-1">상조 계약일</label>
-                          <input type="date" value={editData.sangjoContractDate || ''} onChange={e => setEditData({...editData, sangjoContractDate: e.target.value})} className="w-full bg-[#FFFBEB] border border-[#D97706]/30 px-3 py-2 rounded-[8px] text-[13px] focus:outline-none focus:ring-2 focus:ring-[#D97706]/20" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">청약 철회일</label>
-                          <input type="date" value={editData.cancelDate || ''} onChange={e => setEditData({...editData, cancelDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">계약 해지일</label>
-                          <input type="date" value={editData.terminationDate || ''} onChange={e => setEditData({...editData, terminationDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">가전 배송일</label>
-                          <input type="date" value={editData.deliveryDate || ''} onChange={e => setEditData({...editData, deliveryDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div>
-                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">신규 접수일</label>
-                          <input type="date" value={editData.newRegDate || ''} onChange={e => setEditData({...editData, newRegDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">상조 계약일</label>
-                          <input type="date" value={editData.sangjoContractDate || ''} onChange={e => setEditData({...editData, sangjoContractDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">렌탈 계약일</label>
-                          <input type="date" value={editData.rentalContractDate || ''} onChange={e => setEditData({...editData, rentalContractDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">청약 철회일</label>
-                          <input type="date" value={editData.cancelDate || ''} onChange={e => setEditData({...editData, cancelDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">계약 해지일</label>
-                          <input type="date" value={editData.terminationDate || ''} onChange={e => setEditData({...editData, terminationDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                        </div>
-                        <div>
-                          <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">가전 배송일</label>
-                          <input type="date" value={editData.deliveryDate || ''} onChange={e => setEditData({...editData, deliveryDate: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                        </div>
-                      </>
-                    )}
-                    <div className="col-span-2">
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">특이사항</label>
-                      <input type="text" value={editData.note || ''} onChange={e => setEditData({...editData, note: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" />
-                    </div>
-                  </div>
-                </section>
-              </div>
-
-              {/* 3. 신청 상품 정보 */}
-              <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#059669]"></span>신청 상품 정보
-                </h4>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="bg-[#F2F4F6] p-4 rounded-[12px] space-y-3">
-                    <div>
-                      <label className="block text-[12px] font-bold text-[#8B95A1] mb-1">신청상품 (카테고리)</label>
-                      <select 
-                        value={editData.productName || ''} 
-                        onChange={e => {
-                          const val = e.target.value;
-                          const plan = allPlans?.find(p => p.name === val);
-                          let resolvedAcc = plan ? plan.accountCount : '';
-                          if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독')) {
-                            resolvedAcc = '1구좌';
-                          }
-                          setEditData({
-                            ...editData, 
-                            productName: val,
-                            account: resolvedAcc,
-                            appliance: ''
-                          });
-                        }} 
-                        className="w-full bg-white border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold"
-                      >
-                        <option value="">카테고리 선택</option>
-                        {allPlans?.map(plan => (
-                          <option key={plan._id} value={plan.name}>{plan.name}</option>
-                        ))}
-                        <option value="LG구독할인(new)">LG구독할인(new)</option>
-                        {/* Ensure standardized name is shown if not in the plan list */}
-                        {editData.productName && 
-                         editData.productName !== 'LG구독할인(new)' && 
-                         !allPlans?.some(p => p.name === editData.productName) && (
-                          <option value={editData.productName}>{editData.productName}</option>
-                        )}
-                      </select>
-                    </div>
-                    {selectedCustomer.message && (
-                      <div className="mt-2 text-[13px] text-[#4E5968] bg-white/50 p-2 rounded border border-[#E5E8EB]">
-                        <span className="text-[11px] font-bold text-[#8B95A1] block mb-0.5">고객 문의 메시지</span>
-                        {selectedCustomer.message}
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">구좌수</label>
-                      <input 
-                        type="text" 
-                        value={editData.account || ''} 
-                        readOnly 
-                        className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#4E5968]" 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">결합 가전명 (제품명, 모델명)</label>
-                      <select 
-                        value={editData.appliance || ''} 
-                        onChange={e => {
-                          const val = e.target.value;
-                          let newSupplier = editData.supplier;
-                          if (val) {
-                            const found = allProducts?.find(p => `${p.name} (${p.model})` === val || p.model === val || `${p.brand} ${p.name} (${p.model})` === val);
-                            if (found) {
-                              const supp = (found as any).supplier || found.supplyPrice;
-                              if (supp) newSupplier = String(supp).trim();
-                            } else if (val.includes('LG') || editData.productName?.includes('LG')) {
-                              newSupplier = 'TU';
-                            }
-                          }
-                          setEditData({
-                            ...editData, 
-                            appliance: val,
-                            supplier: newSupplier
-                          });
-                        }}
-                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
-                      >
-                        <option value="">가전 선택</option>
-
-                        {/* 1. 랜딩페이지에서 접수된 고객 결합가전명 (어드민 목록에 없는 경우 최우선 노출하여 자동 선택) */}
-                        {editData.appliance && 
-                         !allProducts?.some(p => `${p.name} (${p.model})` === editData.appliance || p.model === editData.appliance || `${p.brand} ${p.name} (${p.model})` === editData.appliance) &&
-                         !LG_OFFICIAL_PRODUCTS?.some(p => `[${p.categoryName}] ${p.name} (${p.model})` === editData.appliance || p.model === editData.appliance) && (
-                          <option value={editData.appliance}>
-                            {editData.appliance} (랜딩페이지 접수 가전)
-                          </option>
-                        )}
-
-                        {/* 2. LG 가전구독 상품 목록 (LG 가전구독 접수 건 또는 관련 카테고리 시) */}
-                        {(selectedCustomer?.source === 'lg_care' || editData.productName?.includes('LG') || editData.productName?.includes('가전구독') || editData.productName?.includes('구독')) && (
-                          <>
-                            <option value="상담 시 제품선택 (전문 상담원 맞춤 추천)">상담 시 제품선택 (전문 상담원 맞춤 추천)</option>
-                            {Object.entries(lgProductsByCategory).map(([catName, prods]: [string, any]) => (
-                              <optgroup key={catName} label={`LG 가전구독 - ${catName} (${prods.length})`}>
-                                {prods.map((p: any) => {
-                                  const itemText = `[${p.categoryName}] ${p.name} (${p.model})`;
-                                  return (
-                                    <option key={p.id} value={itemText}>
-                                      {itemText}
-                                    </option>
-                                  );
-                                })}
-                              </optgroup>
-                            ))}
-                          </>
-                        )}
-
-                        {/* 3. 어드민 등록 결합가전 상품 목록 */}
-                        <optgroup label="결합 가전 상품 목록">
-                          {allProducts?.filter(p => {
-                            if (!p.model) return false;
-                            if (!editData.productName) return true;
-                            
-                            // 1. Try to find plan by exact name
-                            const plan = allPlans?.find(pl => pl.name === editData.productName);
-                            if (plan) return p.planId === plan.numericId;
-
-                            // 2. Handle standardized naming mapping
-                            if (editData.productName.includes('리빙144')) {
-                              const targetId = (editData.productName.includes('2구좌') || editData.productName.includes('더블')) ? 2 : 3;
-                              return p.planId === targetId;
-                            }
-                            if (editData.productName.includes('스페셜299')) {
-                              const targetId = editData.productName.includes('BSON') ? 1 : 4;
-                              return p.planId === targetId;
-                            }
-
-                            return true;
-                          }).map(p => (
-                            <option key={p._id} value={`${p.name} (${p.model})`}>{p.brand} {p.name} ({p.model})</option>
-                          ))}
-                        </optgroup>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">공급사</label>
-                      <select 
-                        value={editData.supplier || 'BSON'} 
-                        onChange={e => setEditData({...editData, supplier: e.target.value})}
-                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
-                      >
-                        <option value="BSON">BSON</option>
-                        <option value="TU">TU</option>
-                        <option value="신한48">신한48</option>
-                        <option value="KCC">KCC</option>
-                        <option value="라이프앤조이">라이프앤조이</option>
-                        <option value="기타">기타</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* 4. 상태 변경 및 메모 */}
-              <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#191F28]"></span>상태 변경 및 메모
-                </h4>
-                <div className="flex flex-col lg:flex-row gap-3">
-                  <select 
-                    value={status} 
-                    onChange={(e) => setStatus(e.target.value)}
-                    className="w-[140px] bg-white border border-[#D1D6DB] px-3 py-2 rounded-[8px] text-[13px] font-bold focus:outline-none"
-                    style={{ 
-                      backgroundColor: getStatusStyle(status).bg,
-                      color: getStatusStyle(status).text
-                    }}
-                  >
-                    {settings?.statuses?.filter((s: any) => s.isUsed).map((s: any) => (
-                      <option key={s.name} value={s.name} style={{ backgroundColor: '#ffffff', color: '#191F28' }}>{s.name}</option>
-                    ))}
-                  </select>
-                  <input 
-                    type="text" 
-                    value={memo} 
-                    onChange={(e) => setMemo(e.target.value)} 
-                    placeholder="변경 사유 또는 메모를 입력하세요 (선택)" 
-                    className="flex-1 bg-[#F9FAFB] border border-[#E5E8EB] px-4 py-2 rounded-[8px] text-[13px] focus:outline-none"
-                  />
-                  <button onClick={handleUpdate} className="w-full lg:w-auto bg-[#3182F6] text-white px-6 py-3 lg:py-2 rounded-[8px] font-bold text-[14px] lg:text-[13px] flex items-center justify-center gap-2 hover:bg-[#1B64DA] transition-colors shadow-sm">
-                    <Save className="w-4 h-4" /> 저장
-                  </button>
-                </div>
-
-                {selectedCustomer.memoHistory && selectedCustomer.memoHistory.length > 0 && (
-                  <div className="mt-5 border-t border-[#E5E8EB] pt-5">
-                    <h5 className="text-[13px] font-bold text-[#8B95A1] mb-3 flex items-center gap-1">
-                      <History className="w-4 h-4" /> 상태 변경 이력
-                    </h5>
-                    <div className="space-y-3 bg-[#F9FAFB] p-4 rounded-[12px] max-h-[150px] overflow-y-auto">
-                      {selectedCustomer.memoHistory.map((history: any, idx: number) => (
-                        <div key={idx} className="flex gap-3 text-[13px] items-start justify-between">
-                          <div className="flex gap-3 flex-1 min-w-0 items-start">
-                            <span className="text-[#8B95A1] shrink-0 font-medium">{history.date}</span>
-                            <span className="font-bold text-[#3182F6] shrink-0 w-[60px]">{history.status}</span>
-                            <span className="text-[#4E5968] break-all">{history.memo}</span>
-                          </div>
-                          {history.writer && (
-                            <span className="text-[#8B95A1] shrink-0 text-[11px] bg-[#E5E8EB]/50 px-1.5 py-0.5 rounded font-medium">
-                              {history.writer}
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </section>
-            </div>
           </div>
         </div>
       )}
 
-      {isRegisterModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 lg:p-4">
-          <div className="bg-white lg:rounded-[24px] w-full max-w-[900px] h-full lg:h-auto lg:max-h-[95vh] flex flex-col overflow-hidden shadow-2xl">
-            <div className="px-6 py-5 border-b border-[#E5E8EB] flex justify-between items-center bg-white z-10 shrink-0">
-              <h3 className="text-[20px] font-bold">고객 직접 등록</h3>
-              <button onClick={() => setIsRegisterModalOpen(false)} className="p-2 hover:bg-[#F2F4F6] rounded-full transition-colors">
-                <X className="w-6 h-6 text-[#4E5968]" />
+      {/* Bulk Action Bar */}
+      {selectedIds.length > 0 && (
+        <div className="adm-bulk-bar">
+          <div className="text-[12.5px] font-semibold">
+            현재 <strong className="text-white">{selectedIds.length}명</strong>의 고객이 선택되었습니다.
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedIds([])}
+              className="adm-btn small"
+            >
+              선택 해제
+            </button>
+            <button
+              type="button"
+              onClick={handleBulkDelete}
+              className="adm-btn danger small"
+            >
+              <Trash2 />
+              <span>선택 삭제 ({selectedIds.length})</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Panel: Tabs + Filter Bar + Table */}
+      <div className="adm-panel">
+        {/* Status Tabs */}
+        <div className="adm-tabs">
+          <button
+            type="button"
+            onClick={() => setStatusFilter('all')}
+            className={`adm-tab ${statusFilter === 'all' ? 'active' : ''}`}
+          >
+            <span>전체 상태</span>
+            <span className="adm-tab-count">{nonLgInquiries.length}</span>
+          </button>
+          {usedStatuses.map((s: any) => {
+            const cnt = nonLgInquiries.filter((i) => (i.status || '대기') === s.name).length;
+            return (
+              <button
+                key={s.name}
+                type="button"
+                onClick={() => setStatusFilter(s.name)}
+                className={`adm-tab ${statusFilter === s.name ? 'active' : ''}`}
+              >
+                <span>{s.name}</span>
+                <span className="adm-tab-count">{cnt}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Filter Row 1: Search + Channel Select + Inflow Segmented */}
+        <div className="adm-filter-bar">
+          <div className="adm-search-field">
+            <Search />
+            <input
+              type="text"
+              placeholder="고객명, 연락처, 주소, 상품, 공급사 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {!channelId && (
+            <select
+              value={selectedChannelId}
+              onChange={(e) => setSelectedChannelId(e.target.value)}
+              className="adm-select"
+            >
+              <option value="all">모든 파트너 채널</option>
+              <option value="default">본사 직접유입</option>
+              {channels?.map((c) => (
+                <option key={c._id} value={c.subdomain}>
+                  {c.channelName}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {channelId && subChannelIds && subChannelIds.length > 1 && (
+            <select
+              value={selectedChannelId}
+              onChange={(e) => setSelectedChannelId(e.target.value)}
+              className="adm-select"
+            >
+              <option value="all">내 하위 채널 전체</option>
+              {subChannelIds.map((sid) => (
+                <option key={sid} value={sid}>
+                  {getChannelName(sid)}
+                </option>
+              ))}
+            </select>
+          )}
+
+          <div className="adm-segmented">
+            {(['all', 'landing', 'direct', 'daangn'] as const).map((type) => {
+              const count =
+                type === 'all'
+                  ? nonLgInquiries.length
+                  : nonLgInquiries.filter((i) => getCustomerInflow(i) === type).length;
+              const label = type === 'all' ? '유입 전체' : INFLOW_META[type].label;
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setInflowFilter(type)}
+                  className={inflowFilter === type ? 'active' : ''}
+                >
+                  {label} ({count})
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Filter Row 2: Date Range Segmented + Column Reset */}
+        <div className="adm-filter-bar">
+          <span className="text-[11.5px] font-semibold text-[#6d786c]">접수 기간</span>
+          <div className="adm-segmented">
+            {[
+              { label: '전체', value: 'all' },
+              { label: '당일', value: 'today' },
+              { label: '전일', value: 'yesterday' },
+              { label: '1주일', value: '1week' },
+              { label: '당월', value: 'thisMonth' },
+              { label: '전월', value: 'lastMonth' },
+              { label: '3개월', value: '3months' },
+              { label: '6개월', value: '6months' },
+              { label: '기간선택', value: 'custom' },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setDateFilter(opt.value)}
+                className={dateFilter === opt.value ? 'active' : ''}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          {dateFilter === 'custom' && (
+            <div className="inline-flex items-center gap-1.5">
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="adm-input"
+              />
+              <span className="text-[#86918a] text-[12px]">~</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="adm-input"
+              />
+            </div>
+          )}
+
+          <div className="adm-filter-end">
+            <button
+              type="button"
+              onClick={handleResetColumnWidths}
+              className="adm-btn small"
+              title="열 너비를 기본값으로 초기화합니다"
+            >
+              <RotateCcw />
+              <span>열 간격 초기화</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Resizable Data Table */}
+        <div className="adm-table-scroll custom-scrollbar">
+          <table
+            className="adm-table table-fixed min-w-full"
+            style={{
+              width: `${DEFAULT_COLUMNS.reduce((sum, col) => sum + (columnWidths[col.id] || col.defaultWidth), 0)}px`,
+            }}
+          >
+            <thead className="select-none">
+              <tr>
+                {DEFAULT_COLUMNS.map((col) => {
+                  const width = columnWidths[col.id] || col.defaultWidth;
+                  return (
+                    <th
+                      key={col.id}
+                      style={{ width: `${width}px`, minWidth: `${col.minWidth}px` }}
+                      className={`relative group ${col.align === 'center' ? 'text-center' : 'text-left'}`}
+                    >
+                      {col.id === 'checkbox' ? (
+                        <input
+                          type="checkbox"
+                          checked={filteredInquiries.length > 0 && selectedIds.length === filteredInquiries.length}
+                          onChange={toggleSelectAll}
+                          className="w-4 h-4 rounded cursor-pointer"
+                        />
+                      ) : (
+                        <span className="truncate block">{col.label}</span>
+                      )}
+
+                      <div
+                        onMouseDown={(e) => handleResizeStart(col.id, col.minWidth, e)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize select-none flex items-center justify-center hover:bg-[#295e52]/15 transition-colors z-10"
+                        title="드래그하여 열 너비 조절"
+                      >
+                        <div className="w-[1px] h-3.5 bg-[#dce2d8]" />
+                      </div>
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredInquiries.length === 0 ? (
+                <tr>
+                  <td colSpan={12} className="text-center !py-20 text-[#86918a]">
+                    조건에 일치하는 고객 데이터가 없습니다.
+                  </td>
+                </tr>
+              ) : (
+                filteredInquiries.map((customer, index) => {
+                  let displayPlan = customer.productName;
+                  let displayAppliance = customer.appliance || '-';
+
+                  if (displayAppliance !== '-') {
+                    displayAppliance = displayAppliance.replace(/\s*\[효원상조\s*\d+구좌\s*결합[^\]]*\]/g, '').trim();
+                  }
+
+                  if (displayAppliance !== '-' && allProducts) {
+                    const matchedProduct = allProducts.find((p) => p.model === displayAppliance);
+                    if (matchedProduct) {
+                      displayAppliance = `${matchedProduct.name} (${matchedProduct.model})`;
+                    }
+                  }
+
+                  if ((!customer.appliance || customer.appliance === '-') && customer.productName?.startsWith('[')) {
+                    const bracketMatch = customer.productName.match(/^\[(.*?)\]\s*(.*)$/);
+                    if (bracketMatch) {
+                      const acc = bracketMatch[1];
+                      const rest = bracketMatch[2];
+                      displayPlan = `가전상조 60패키지 (${acc})`;
+                      displayAppliance = rest;
+                    }
+                  }
+
+                  if (
+                    customer.source === 'lg_care' ||
+                    customer.productName?.includes('LG구독') ||
+                    customer.productName?.includes('LG가전구독') ||
+                    customer.productName?.startsWith('LG')
+                  ) {
+                    const lgLanding = landings?.find((l) => l.path === '/care_new' || l.path === '/care');
+                    const baseLandingTitle = lgLanding?.name || 'LG가전 구독 할인 전용 (new)';
+                    if (!customer.productName || customer.productName.startsWith('[')) {
+                      displayPlan = baseLandingTitle;
+                    } else {
+                      displayPlan = customer.productName;
+                    }
+                  } else {
+                    const isStandardized =
+                      customer.productName?.startsWith('리빙144') ||
+                      customer.productName?.startsWith('스페셜299');
+
+                    if (isStandardized) {
+                      displayPlan = customer.productName;
+                    } else {
+                      const planByName = allPlans?.find((p) => p.name === customer.productName);
+                      if (!planByName && allProducts && allPlans) {
+                        const matchedProduct = allProducts.find(
+                          (p) =>
+                            p.name === customer.productName ||
+                            `${p.brand} ${p.name}` === customer.productName ||
+                            (p.model && customer.appliance?.includes(p.model))
+                        );
+                        if (matchedProduct) {
+                          const plan = allPlans.find((pl) => pl.numericId === matchedProduct.planId);
+                          if (plan) displayPlan = plan.name;
+                        }
+                      } else if (planByName) {
+                        displayPlan = planByName.name;
+                      }
+                    }
+                  }
+
+                  const isMainSubmission =
+                    displayPlan?.endsWith('_메인') || customer.productName?.endsWith('_메인');
+                  let finalOutput = displayPlan;
+
+                  if (!isMainSubmission && customer.account) {
+                    const accountStr = `(${customer.account})`;
+                    if (displayPlan && !displayPlan.includes(accountStr)) {
+                      finalOutput = `${displayPlan}${accountStr}`;
+                    }
+                  }
+
+                  const supplierName = getSupplier(customer);
+                  const isRowSelected = selectedIds.includes(customer._id);
+
+                  return (
+                    <tr
+                      key={customer._id}
+                      className={`adm-clickable-row ${isRowSelected ? '!bg-[#f2f6ef]' : ''}`}
+                      onClick={() => setSelectedCustomer(customer)}
+                    >
+                      <td style={{ width: `${columnWidths.index}px` }} className="text-center font-mono text-[11.5px] text-[#7d8879] truncate">
+                        {filteredInquiries.length - index}
+                      </td>
+
+                      <td style={{ width: `${columnWidths.checkbox}px` }} className="text-center" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={isRowSelected}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            toggleSelect(customer._id, e as any);
+                          }}
+                          className="w-4 h-4 rounded cursor-pointer"
+                        />
+                      </td>
+
+                      <td style={{ width: `${Math.max(columnWidths.source, 70)}px` }} className="text-center truncate">
+                        {(() => {
+                          const inflow = getCustomerInflow(customer);
+                          const meta = INFLOW_META[inflow];
+                          const detail = getCustomerTrafficDetail(customer);
+                          const pillColor = inflow === 'daangn' ? 'orange' : inflow === 'direct' ? 'gray' : 'green';
+                          return (
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span className={`adm-pill ${pillColor}`}>{meta.label}</span>
+                              {detail && (
+                                <span
+                                  title={detail.tooltip}
+                                  className="text-[10px] font-medium text-[#7d8879] max-w-full truncate"
+                                >
+                                  {detail.label}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </td>
+
+                      <td style={{ width: `${columnWidths.createdAt}px` }} className="truncate">
+                        <div className="text-[12px] text-[#263d36] font-semibold font-mono leading-tight">
+                          {new Date(customer.createdAt)
+                            .toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
+                            .replace(/\. /g, '.')
+                            .replace(/\.$/, '')}
+                        </div>
+                        <div className="text-[10.5px] text-[#86918a] font-mono leading-tight mt-0.5">
+                          {new Date(customer.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </td>
+
+                      <td style={{ width: `${columnWidths.channel}px` }} className="truncate">
+                        <span
+                          className={`adm-pill ${!customer.channelId || customer.channelId === '본사' ? 'gray' : 'teal'} max-w-full truncate`}
+                          title={getChannelName(customer.channelId)}
+                        >
+                          {getChannelName(customer.channelId)}
+                        </span>
+                      </td>
+
+                      <td style={{ width: `${columnWidths.name}px` }} className="truncate" title={customer.name}>
+                        <div className="adm-person">
+                          <div className="adm-person-circle">{(customer.name || '고').slice(0, 1)}</div>
+                          <strong className="truncate">{customer.name}</strong>
+                        </div>
+                      </td>
+
+                      <td style={{ width: `${columnWidths.phone}px` }} className="font-mono text-[12px] text-[#45554e] truncate" title={customer.phone}>
+                        {customer.phone}
+                      </td>
+
+                      <td style={{ width: `${columnWidths.address}px` }}>
+                        {customer.address ? (
+                          <div className="text-[12px] leading-tight">
+                            <div className="truncate text-[#263d36] font-medium" title={customer.address}>
+                              {customer.address}
+                            </div>
+                            <div className="truncate text-[10.5px] text-[#86918a] mt-0.5" title={customer.detailAddress || ''}>
+                              {customer.detailAddress || '-'}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-[#9ba594] text-[12px]">-</span>
+                        )}
+                      </td>
+
+                      <td style={{ width: `${columnWidths.productName}px` }} className="font-semibold text-[#263d36] truncate" title={finalOutput}>
+                        {finalOutput}
+                      </td>
+
+                      <td style={{ width: `${columnWidths.appliance}px` }} className="whitespace-normal">
+                        <div
+                          className="line-clamp-2 text-[12px] text-[#45554e] leading-snug break-keep"
+                          title={displayAppliance}
+                        >
+                          {displayAppliance}
+                        </div>
+                      </td>
+
+                      <td style={{ width: `${columnWidths.supplier}px` }} className="text-center truncate">
+                        {supplierName !== '-' ? (
+                          <span className={`adm-pill ${supplierName === 'TU' ? 'orange' : 'blue'}`}>
+                            {supplierName}
+                          </span>
+                        ) : (
+                          <span className="text-[#9ba594]">-</span>
+                        )}
+                      </td>
+
+                      <td style={{ width: `${columnWidths.status}px` }} className="text-center truncate">
+                        <span
+                          className="inline-block text-[11px] font-bold px-2.5 py-1 rounded-[5px]"
+                          style={{
+                            backgroundColor: getStatusStyle(customer.status).bg,
+                            color: getStatusStyle(customer.status).text,
+                          }}
+                        >
+                          {customer.status || '대기'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="adm-table-foot">
+          <span>
+            전체 {nonLgInquiries.length}명 중 검색 결과 <strong className="text-[#263d36]">{filteredInquiries.length}</strong>명
+          </span>
+          <span>행을 클릭하면 우측 상세 슬라이드 패널에서 수정할 수 있습니다.</span>
+        </div>
+      </div>
+
+      {/* Slide-over Customer Detail Drawer (Sono Partner Center Style) */}
+      {selectedCustomer && (
+        <div className="adm-drawer-overlay" onClick={() => setSelectedCustomer(null)}>
+          <div className="adm-drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="adm-drawer-head">
+              <div>
+                <div className="flex items-center gap-2.5">
+                  <h2>고객 상세 정보</h2>
+                  <span
+                    className="inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-[5px]"
+                    style={{
+                      backgroundColor: getStatusStyle(status).bg,
+                      color: getStatusStyle(status).text,
+                    }}
+                  >
+                    {status}
+                  </span>
+                </div>
+                <p>
+                  {getChannelName(selectedCustomer.channelId)} · 접수일시{' '}
+                  {new Date(selectedCustomer.createdAt).toLocaleString('ko-KR')}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {(selectedCustomer.productName?.toLowerCase().includes('living') ||
+                  selectedCustomer.productName?.includes('리빙') ||
+                  editData.productName?.includes('리빙')) && (
+                  <button
+                    type="button"
+                    onClick={handleSendConsent}
+                    disabled={isSendingSms}
+                    className="adm-btn sage small"
+                    title="구매동의 문자 발송"
+                  >
+                    {isSendingSms ? <Loader2 className="animate-spin" /> : <Smartphone />}
+                    <span>구매동의 발송</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="adm-btn danger small"
+                  title="고객 삭제"
+                >
+                  <Trash2 />
+                  <span>삭제</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCustomer(null)}
+                  className="adm-icon-btn"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Drawer Tabs */}
+            <div className="adm-drawer-tabs">
+              <button
+                type="button"
+                onClick={() => setDrawerTab('info')}
+                className={`adm-drawer-tab ${drawerTab === 'info' ? 'active' : ''}`}
+              >
+                고객 · 계약 정보
+              </button>
+              <button
+                type="button"
+                onClick={() => setDrawerTab('history')}
+                className={`adm-drawer-tab ${drawerTab === 'history' ? 'active' : ''}`}
+              >
+                상담 · 상태 이력
+                <span className="adm-tab-count">{selectedCustomer.memoHistory?.length || 0}</span>
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col lg:flex-row gap-6 bg-[#F9FAFB] hide-scrollbar">
-              {/* Left: Input Form */}
-              <div className="flex-1 space-y-6">
-                <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                  <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#3182F6]"></span>고객 정보 입력
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">파트너사</label>
-                      <select value={registerForm.channelId} onChange={e => setRegisterForm({...registerForm, channelId: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]">
-                        {!channelId ? (
-                          <>
-                            <option value="본사">본사</option>
-                            {channels?.map(c => (
-                              <option key={c._id} value={c.subdomain}>{c.channelName}</option>
-                            ))}
-                          </>
-                        ) : (
-                          channels?.filter(c => subChannelIds?.includes(c.subdomain)).map(c => (
-                            <option key={c._id} value={c.subdomain}>{c.channelName}</option>
-                          ))
-                        )}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">고객명 <span className="text-red-500">*</span></label>
-                      <input type="text" value={registerForm.name} onChange={e => setRegisterForm({...registerForm, name: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="성함 입력" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">연락처 <span className="text-red-500">*</span></label>
-                      <input type="tel" inputMode="numeric" value={registerForm.phone} onChange={e => setRegisterForm({...registerForm, phone: formatPhoneNumber(e.target.value)})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="010-0000-0000" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">생년월일 (6자리)</label>
-                      <input type="text" inputMode="numeric" value={registerForm.birth} onChange={e => setRegisterForm({...registerForm, birth: formatBirthDate(e.target.value)})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="YY-MM-DD" maxLength={8} />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">성별</label>
-                      <div className="flex gap-2">
-                        {['남성', '여성'].map(g => (
-                          <button key={g} onClick={() => setRegisterForm({...registerForm, gender: g})} className={`flex-1 py-2 rounded-[8px] text-[13px] font-bold border transition-all ${registerForm.gender === g ? 'bg-[#191F28] border-[#191F28] text-white' : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:bg-[#F9FAFB]'}`}>{g}</button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="col-span-2">
-                      <div className="flex justify-between items-end mb-1">
-                        <label className="block text-[12px] font-medium text-[#8B95A1]">주소</label>
-                        <button onClick={openRegisterPostcode} className="text-[11px] bg-[#3182F6] text-white px-2.5 py-1 rounded-[4px] font-bold hover:bg-[#1B64DA]">주소 검색</button>
-                      </div>
-                      <input type="text" value={registerForm.address} readOnly onClick={openRegisterPostcode} className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] mb-2 cursor-pointer" placeholder="주소 검색을 클릭해주세요" />
-                      <input type="text" value={registerForm.detailAddress} onChange={e => setRegisterForm({...registerForm, detailAddress: e.target.value})} className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]" placeholder="상세 주소 입력" />
-                    </div>
+            <div className="adm-drawer-scroll space-y-5">
+              {/* Customer Header Summary & Progress Flow */}
+              <div className="flex items-center gap-3.5 p-4 rounded-[12px] bg-white border border-[#e6eae3]">
+                <div className="w-11 h-11 rounded-full bg-[#eaf0e4] text-[#295e52] font-bold text-[15px] grid place-items-center shrink-0">
+                  {(editData.name || selectedCustomer.name || '고').slice(0, 1)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[15px] font-bold text-[#263d36]">
+                    {editData.name || selectedCustomer.name}{' '}
+                    <span className="text-[12.5px] font-mono font-medium text-[#6d786c] ml-1">
+                      {editData.phone || selectedCustomer.phone}
+                    </span>
                   </div>
-                </section>
+                  <div className="text-[12px] text-[#7d877f] truncate mt-0.5">
+                    {editData.productName || '-'} {editData.appliance ? `· ${editData.appliance}` : ''}
+                  </div>
+                </div>
+              </div>
 
-                <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
-                  <h4 className="text-[15px] font-bold mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#059669]"></span>상품 정보 입력
-                  </h4>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">신청상품 (카테고리)</label>
-                      <select 
-                        value={registerForm.productName} 
-                        onChange={e => {
-                          const val = e.target.value;
-                          const plan = allPlans?.find(p => p.name === val);
-                          let resolvedAccount = plan ? plan.accountCount : '';
-                          if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독')) {
-                            resolvedAccount = '1구좌';
-                          }
-                          let defaultSupplier = 'BSON';
-                          if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독') || val.includes('LG')) {
-                            defaultSupplier = 'TU';
-                          } else if (val.includes('리빙144') || val.includes('신한')) {
-                            defaultSupplier = '신한48';
-                          } else if (val.includes('KCC')) {
-                            defaultSupplier = 'KCC';
-                          }
-                          setRegisterForm({
-                            ...registerForm, 
-                            productName: val,
-                            account: resolvedAccount,
-                            supplier: defaultSupplier,
-                            appliance: ''
-                          });
-                        }} 
-                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold"
-                      >
-                        <option value="">카테고리 선택</option>
-                        {allPlans?.map(plan => (
-                          <option key={plan._id} value={plan.name}>{plan.name}</option>
-                        ))}
-                        <option value="LG구독할인(new)">LG구독할인(new)</option>
-                      </select>
+              <div className="adm-flow-mini">
+                <span className="done">✓ 1. 상담 접수</span>
+                <span className={status !== '대기' ? 'done' : ''}>
+                  {status !== '대기' ? '✓' : '•'} 2. 해피콜 · 상담진행
+                </span>
+                <span className={editData.purchaseConsentDate || editData.rentalContractDate ? 'done' : ''}>
+                  {editData.purchaseConsentDate || editData.rentalContractDate ? '✓' : '•'} 3. 동의 · 가전접수
+                </span>
+                <span className={editData.sangjoContractDate || status.includes('완료') ? 'done' : ''}>
+                  {editData.sangjoContractDate || status.includes('완료') ? '✓' : '•'} 4. 정상 계약
+                </span>
+              </div>
+
+              {/* Quick Status & Memo Update Card */}
+              <div className="adm-note-card space-y-3">
+                <div className="text-[12px] font-bold text-[#263d36]">진행상태 변경 및 상담 메모 기록</div>
+                <div className="flex flex-col sm:flex-row gap-2.5">
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="adm-select sm:w-[160px] font-bold"
+                  >
+                    {usedStatuses.map((s: any) => (
+                      <option key={s.name} value={s.name}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    value={memo}
+                    onChange={(e) => setMemo(e.target.value)}
+                    placeholder="상담 내용 또는 상태 변경 사유를 입력하세요 (저장 시 이력에 기록됨)"
+                    className="adm-input flex-1"
+                  />
+                </div>
+              </div>
+
+              {drawerTab === 'info' ? (
+                <>
+                  {/* 1. 기본 고객 정보 */}
+                  <div>
+                    <div className="adm-section-label">
+                      <span>기본 고객 정보</span>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">구좌수</label>
-                        <input 
-                          type="text" 
-                          value={registerForm.account} 
-                          readOnly 
-                          className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#4E5968]" 
-                          placeholder="카테고리 선택 시 자동 입력"
+                    <div className="adm-field-grid">
+                      <div className="adm-field">
+                        <label>고객명</label>
+                        <input
+                          type="text"
+                          value={editData.name || ''}
+                          onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                          className="adm-input"
                         />
                       </div>
-                      <div>
-                        <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">공급사</label>
-                        <select 
-                          value={registerForm.supplier || 'BSON'} 
-                          onChange={e => setRegisterForm({ ...registerForm, supplier: e.target.value })}
-                          className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+                      <div className="adm-field">
+                        <label>연락처</label>
+                        <input
+                          type="text"
+                          value={editData.phone || ''}
+                          onChange={(e) => setEditData({ ...editData, phone: formatPhoneNumber(e.target.value) })}
+                          className="adm-input font-mono"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>성별</label>
+                        <select
+                          value={editData.gender || ''}
+                          onChange={(e) => setEditData({ ...editData, gender: e.target.value })}
+                          className="adm-select"
                         >
-                          <option value="BSON">BSON</option>
-                          <option value="TU">TU</option>
-                          <option value="신한48">신한48</option>
-                          <option value="KCC">KCC</option>
-                          <option value="라이프앤조이">라이프앤조이</option>
-                          <option value="기타">기타</option>
+                          <option value="">선택</option>
+                          <option>남성</option>
+                          <option>여성</option>
                         </select>
                       </div>
-                      <div>
-                        <label className="block text-[12px] font-medium text-[#8B95A1] mb-1">결합 가전제품</label>
-                        <select 
-                          value={registerForm.appliance} 
-                          onChange={e => {
-                            const appVal = e.target.value;
-                            let newSupplier = registerForm.supplier;
-                            if (appVal) {
-                              const found = allProducts?.find(p => `${p.name} (${p.model})` === appVal || p.model === appVal || `${p.brand} ${p.name} (${p.model})` === appVal);
+                      <div className="adm-field">
+                        <label>생년월일 (6자리)</label>
+                        <input
+                          type="text"
+                          value={editData.birth || ''}
+                          onChange={(e) => setEditData({ ...editData, birth: e.target.value })}
+                          className="adm-input font-mono"
+                          placeholder="YYMMDD"
+                        />
+                      </div>
+                      <div className="adm-field full">
+                        <div className="flex items-center justify-between">
+                          <label>배송지 주소</label>
+                          <button type="button" onClick={openPostcode} className="adm-btn sage small">
+                            우편번호 검색
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          value={editData.address || ''}
+                          readOnly
+                          onClick={openPostcode}
+                          className="adm-input cursor-pointer !bg-[#f8f9f5]"
+                          placeholder="우편번호 검색을 클릭해 기본 주소를 선택하세요"
+                        />
+                        <input
+                          type="text"
+                          value={editData.detailAddress || ''}
+                          onChange={(e) => setEditData({ ...editData, detailAddress: e.target.value })}
+                          className="adm-input"
+                          placeholder="상세 주소 입력"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. 상담/계약 일정 정보 */}
+                  <div>
+                    <div className="adm-section-label">
+                      <span>상담 · 계약 일정 관리</span>
+                    </div>
+                    <div className="adm-field-grid">
+                      {selectedCustomer.productName?.toLowerCase().includes('living') ||
+                      selectedCustomer.productName?.includes('리빙') ||
+                      editData.productName?.includes('리빙') ? (
+                        <>
+                          <div className="adm-field">
+                            <label>신규 접수일</label>
+                            <input
+                              type="date"
+                              value={editData.newRegDate || ''}
+                              onChange={(e) => setEditData({ ...editData, newRegDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>카드 결제일 (신한48)</label>
+                            <input
+                              type="date"
+                              value={editData.cardPaymentDate || ''}
+                              onChange={(e) => setEditData({ ...editData, cardPaymentDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>구매 동의일 (자동 기록)</label>
+                            <input
+                              type="date"
+                              value={editData.purchaseConsentDate || ''}
+                              readOnly
+                              className="adm-input !bg-[#edf3e8] text-[#295e52] font-bold"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>상조 계약일</label>
+                            <input
+                              type="date"
+                              value={editData.sangjoContractDate || ''}
+                              onChange={(e) => setEditData({ ...editData, sangjoContractDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>청약 철회일</label>
+                            <input
+                              type="date"
+                              value={editData.cancelDate || ''}
+                              onChange={(e) => setEditData({ ...editData, cancelDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>계약 해지일</label>
+                            <input
+                              type="date"
+                              value={editData.terminationDate || ''}
+                              onChange={(e) => setEditData({ ...editData, terminationDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>가전 배송일</label>
+                            <input
+                              type="date"
+                              value={editData.deliveryDate || ''}
+                              onChange={(e) => setEditData({ ...editData, deliveryDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="adm-field">
+                            <label>신규 접수일</label>
+                            <input
+                              type="date"
+                              value={editData.newRegDate || ''}
+                              onChange={(e) => setEditData({ ...editData, newRegDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>상조 계약일</label>
+                            <input
+                              type="date"
+                              value={editData.sangjoContractDate || ''}
+                              onChange={(e) => setEditData({ ...editData, sangjoContractDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>렌탈 계약일</label>
+                            <input
+                              type="date"
+                              value={editData.rentalContractDate || ''}
+                              onChange={(e) => setEditData({ ...editData, rentalContractDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>청약 철회일</label>
+                            <input
+                              type="date"
+                              value={editData.cancelDate || ''}
+                              onChange={(e) => setEditData({ ...editData, cancelDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>계약 해지일</label>
+                            <input
+                              type="date"
+                              value={editData.terminationDate || ''}
+                              onChange={(e) => setEditData({ ...editData, terminationDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                          <div className="adm-field">
+                            <label>가전 배송일</label>
+                            <input
+                              type="date"
+                              value={editData.deliveryDate || ''}
+                              onChange={(e) => setEditData({ ...editData, deliveryDate: e.target.value })}
+                              className="adm-input"
+                            />
+                          </div>
+                        </>
+                      )}
+                      <div className="adm-field full">
+                        <label>특이사항 메모</label>
+                        <input
+                          type="text"
+                          value={editData.note || ''}
+                          onChange={(e) => setEditData({ ...editData, note: e.target.value })}
+                          className="adm-input"
+                          placeholder="해피콜 가능 시간대 등 참고사항 기록"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3. 신청 상품 정보 */}
+                  <div>
+                    <div className="adm-section-label">
+                      <span>신청 상품 및 결합가전 정보</span>
+                    </div>
+                    <div className="adm-field-grid">
+                      <div className="adm-field">
+                        <label>신청상품 (플랜 카테고리)</label>
+                        <select
+                          value={editData.productName || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const plan = allPlans?.find((p) => p.name === val);
+                            let resolvedAcc = plan ? plan.accountCount : '';
+                            if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독')) {
+                              resolvedAcc = '1구좌';
+                            }
+                            setEditData({
+                              ...editData,
+                              productName: val,
+                              account: resolvedAcc,
+                              appliance: '',
+                            });
+                          }}
+                          className="adm-select font-bold"
+                        >
+                          <option value="">카테고리 선택</option>
+                          {allPlans?.map((plan) => (
+                            <option key={plan._id} value={plan.name}>
+                              {plan.name}
+                            </option>
+                          ))}
+                          <option value="LG구독할인(new)">LG구독할인(new)</option>
+                          {editData.productName &&
+                            editData.productName !== 'LG구독할인(new)' &&
+                            !allPlans?.some((p) => p.name === editData.productName) && (
+                              <option value={editData.productName}>{editData.productName}</option>
+                            )}
+                        </select>
+                      </div>
+
+                      <div className="adm-field">
+                        <label>구좌수</label>
+                        <input
+                          type="text"
+                          value={editData.account || ''}
+                          readOnly
+                          className="adm-input !bg-[#f8f9f5] font-bold"
+                        />
+                      </div>
+
+                      <div className="adm-field">
+                        <label>결합 가전명 (제품명 · 모델명)</label>
+                        <select
+                          value={editData.appliance || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            let newSupplier = editData.supplier;
+                            if (val) {
+                              const found = allProducts?.find(
+                                (p) =>
+                                  `${p.name} (${p.model})` === val ||
+                                  p.model === val ||
+                                  `${p.brand} ${p.name} (${p.model})` === val
+                              );
                               if (found) {
                                 const supp = (found as any).supplier || found.supplyPrice;
                                 if (supp) newSupplier = String(supp).trim();
-                              } else if (appVal.includes('LG') || registerForm.productName?.includes('LG')) {
+                              } else if (val.includes('LG') || editData.productName?.includes('LG')) {
                                 newSupplier = 'TU';
                               }
                             }
-                            setRegisterForm({ ...registerForm, appliance: appVal, supplier: newSupplier });
+                            setEditData({
+                              ...editData,
+                              appliance: val,
+                              supplier: newSupplier,
+                            });
                           }}
-                          className="w-full bg-[#F9FAFB] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px]"
+                          className="adm-select"
                         >
                           <option value="">가전 선택</option>
-                          {(registerForm.productName === 'LG구독할인(new)' || registerForm.productName?.includes('LG') || registerForm.productName?.includes('구독')) ? (
+                          {editData.appliance &&
+                            !allProducts?.some(
+                              (p) =>
+                                `${p.name} (${p.model})` === editData.appliance ||
+                                p.model === editData.appliance ||
+                                `${p.brand} ${p.name} (${p.model})` === editData.appliance
+                            ) &&
+                            !LG_OFFICIAL_PRODUCTS?.some(
+                              (p) => `[${p.categoryName}] ${p.name} (${p.model})` === editData.appliance || p.model === editData.appliance
+                            ) && <option value={editData.appliance}>{editData.appliance} (랜딩페이지 접수 가전)</option>}
+
+                          {(selectedCustomer?.source === 'lg_care' ||
+                            editData.productName?.includes('LG') ||
+                            editData.productName?.includes('가전구독') ||
+                            editData.productName?.includes('구독')) && (
                             <>
                               <option value="상담 시 제품선택 (전문 상담원 맞춤 추천)">상담 시 제품선택 (전문 상담원 맞춤 추천)</option>
                               {Object.entries(lgProductsByCategory).map(([catName, prods]: [string, any]) => (
@@ -1775,71 +1825,424 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                                 </optgroup>
                               ))}
                             </>
-                          ) : (
-                            allProducts?.filter(p => {
-                              if (!p.model) return false;
-                              if (!registerForm.productName) return true;
-                              const plan = allPlans?.find(pl => pl.name === registerForm.productName);
-                              return plan && p.planId === plan.numericId;
-                            }).map(p => (
-                              <option key={p._id} value={`${p.name} (${p.model})`}>{p.brand} {p.name} ({p.model})</option>
-                            ))
                           )}
+
+                          <optgroup label="결합 가전 상품 목록">
+                            {allProducts
+                              ?.filter((p) => {
+                                if (!p.model) return false;
+                                if (!editData.productName) return true;
+                                const plan = allPlans?.find((pl) => pl.name === editData.productName);
+                                if (plan) return p.planId === plan.numericId;
+                                if (editData.productName.includes('리빙144')) {
+                                  const targetId =
+                                    editData.productName.includes('2구좌') || editData.productName.includes('더블') ? 2 : 3;
+                                  return p.planId === targetId;
+                                }
+                                if (editData.productName.includes('스페셜299')) {
+                                  const targetId = editData.productName.includes('BSON') ? 1 : 4;
+                                  return p.planId === targetId;
+                                }
+                                return true;
+                              })
+                              .map((p) => (
+                                <option key={p._id} value={`${p.name} (${p.model})`}>
+                                  {p.brand} {p.name} ({p.model})
+                                </option>
+                              ))}
+                          </optgroup>
                         </select>
                       </div>
+
+                      <div className="adm-field">
+                        <label>공급사</label>
+                        <select
+                          value={editData.supplier || 'BSON'}
+                          onChange={(e) => setEditData({ ...editData, supplier: e.target.value })}
+                          className="adm-select font-bold"
+                        >
+                          <option value="BSON">BSON</option>
+                          <option value="TU">TU</option>
+                          <option value="신한48">신한48</option>
+                          <option value="KCC">KCC</option>
+                          <option value="라이프앤조이">라이프앤조이</option>
+                          <option value="기타">기타</option>
+                        </select>
+                      </div>
+
+                      {selectedCustomer.message && (
+                        <div className="adm-field full">
+                          <label>고객 접수 문의 메시지</label>
+                          <div className="adm-note-card">{selectedCustomer.message}</div>
+                        </div>
+                      )}
                     </div>
-                    <button onClick={handleAddToList} className="w-full bg-[#3182F6] text-white py-3 rounded-[12px] font-bold text-[14px] hover:bg-[#1B64DA] mt-2 shadow-sm transition-all active:scale-[0.98]">등록대기 목록에 추가</button>
                   </div>
-                </section>
+                </>
+              ) : (
+                <div>
+                  <div className="adm-section-label !mt-0">
+                    <span>상담 및 상태 변경 이력</span>
+                  </div>
+                  {selectedCustomer.memoHistory && selectedCustomer.memoHistory.length > 0 ? (
+                    <div className="space-y-2.5">
+                      {selectedCustomer.memoHistory.map((history: any, idx: number) => (
+                        <div key={idx} className="adm-note-card !bg-white flex items-start justify-between gap-3">
+                          <div className="space-y-1 min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="adm-pill green">{history.status}</span>
+                              <span className="font-mono text-[11px] text-[#86918a]">{history.date}</span>
+                            </div>
+                            <p className="text-[12.5px] text-[#263d36] break-all">{history.memo}</p>
+                          </div>
+                          {history.writer && <span className="adm-pill gray shrink-0">{history.writer}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="adm-note-card text-center py-12 text-[#86918a]">
+                      <History className="w-6 h-6 mx-auto mb-2 opacity-50" />
+                      기록된 상담/상태 변경 이력이 없습니다.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="adm-drawer-foot">
+              <span className="adm-caption">변경사항은 저장하기 버튼을 누르면 즉시 반영됩니다.</span>
+              <button type="button" onClick={() => setSelectedCustomer(null)} className="adm-btn">
+                닫기
+              </button>
+              <button type="button" onClick={handleUpdate} className="adm-btn primary">
+                <Save />
+                <span>수정사항 저장하기</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Direct Customer Registration Modal */}
+      {isRegisterModalOpen && (
+        <div className="adm-modal-overlay">
+          <div className="adm-modal max-w-[920px]">
+            <div className="adm-drawer-head">
+              <div>
+                <h2>신규 고객 직접 등록</h2>
+                <p>수기 접수 고객을 단일 또는 복수 대기열에 담아 일괄 등록할 수 있습니다.</p>
+              </div>
+              <button type="button" onClick={() => setIsRegisterModalOpen(false)} className="adm-icon-btn">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="adm-drawer-scroll flex flex-col lg:flex-row gap-6">
+              {/* Left Form */}
+              <div className="flex-1 space-y-5">
+                <div className="adm-panel p-5">
+                  <div className="adm-section-label !mt-0">
+                    <span>고객 기본 정보</span>
+                  </div>
+                  <div className="adm-field-grid">
+                    <div className="adm-field">
+                      <label>파트너 채널</label>
+                      <select
+                        value={registerForm.channelId}
+                        onChange={(e) => setRegisterForm({ ...registerForm, channelId: e.target.value })}
+                        className="adm-select"
+                      >
+                        {!channelId ? (
+                          <>
+                            <option value="본사">본사</option>
+                            {channels?.map((c) => (
+                              <option key={c._id} value={c.subdomain}>
+                                {c.channelName}
+                              </option>
+                            ))}
+                          </>
+                        ) : (
+                          channels
+                            ?.filter((c) => subChannelIds?.includes(c.subdomain))
+                            .map((c) => (
+                              <option key={c._id} value={c.subdomain}>
+                                {c.channelName}
+                              </option>
+                            ))
+                        )}
+                      </select>
+                    </div>
+
+                    <div className="adm-field">
+                      <label>고객명 *</label>
+                      <input
+                        type="text"
+                        value={registerForm.name}
+                        onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
+                        className="adm-input"
+                        placeholder="성함 입력"
+                      />
+                    </div>
+
+                    <div className="adm-field">
+                      <label>연락처 *</label>
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        value={registerForm.phone}
+                        onChange={(e) => setRegisterForm({ ...registerForm, phone: formatPhoneNumber(e.target.value) })}
+                        className="adm-input font-mono"
+                        placeholder="010-0000-0000"
+                      />
+                    </div>
+
+                    <div className="adm-field">
+                      <label>생년월일 (6자리)</label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={registerForm.birth}
+                        onChange={(e) => setRegisterForm({ ...registerForm, birth: formatBirthDate(e.target.value) })}
+                        className="adm-input font-mono"
+                        placeholder="YY-MM-DD"
+                        maxLength={8}
+                      />
+                    </div>
+
+                    <div className="adm-field full">
+                      <label>성별</label>
+                      <div className="adm-segmented w-fit">
+                        {['남성', '여성'].map((g) => (
+                          <button
+                            key={g}
+                            type="button"
+                            onClick={() => setRegisterForm({ ...registerForm, gender: g })}
+                            className={registerForm.gender === g ? 'active' : ''}
+                          >
+                            {g}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="adm-field full">
+                      <div className="flex items-center justify-between">
+                        <label>주소</label>
+                        <button type="button" onClick={openRegisterPostcode} className="adm-btn sage small">
+                          주소 검색
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={registerForm.address}
+                        readOnly
+                        onClick={openRegisterPostcode}
+                        className="adm-input cursor-pointer !bg-[#f8f9f5]"
+                        placeholder="주소 검색 버튼을 클릭해주세요"
+                      />
+                      <input
+                        type="text"
+                        value={registerForm.detailAddress}
+                        onChange={(e) => setRegisterForm({ ...registerForm, detailAddress: e.target.value })}
+                        className="adm-input"
+                        placeholder="상세 주소 입력"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="adm-panel p-5 space-y-4">
+                  <div className="adm-section-label !mt-0">
+                    <span>상품 및 가전 선택</span>
+                  </div>
+                  <div className="adm-field-grid">
+                    <div className="adm-field full">
+                      <label>신청상품 (카테고리)</label>
+                      <select
+                        value={registerForm.productName}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const plan = allPlans?.find((p) => p.name === val);
+                          let resolvedAccount = plan ? plan.accountCount : '';
+                          if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독')) {
+                            resolvedAccount = '1구좌';
+                          }
+                          let defaultSupplier = 'BSON';
+                          if (val === 'LG구독할인(new)' || val.includes('LG구독') || val.includes('LG가전구독') || val.includes('LG')) {
+                            defaultSupplier = 'TU';
+                          } else if (val.includes('리빙144') || val.includes('신한')) {
+                            defaultSupplier = '신한48';
+                          } else if (val.includes('KCC')) {
+                            defaultSupplier = 'KCC';
+                          }
+                          setRegisterForm({
+                            ...registerForm,
+                            productName: val,
+                            account: resolvedAccount,
+                            supplier: defaultSupplier,
+                            appliance: '',
+                          });
+                        }}
+                        className="adm-select font-bold"
+                      >
+                        <option value="">카테고리 선택</option>
+                        {allPlans?.map((plan) => (
+                          <option key={plan._id} value={plan.name}>
+                            {plan.name}
+                          </option>
+                        ))}
+                        <option value="LG구독할인(new)">LG구독할인(new)</option>
+                      </select>
+                    </div>
+
+                    <div className="adm-field">
+                      <label>구좌수</label>
+                      <input
+                        type="text"
+                        value={registerForm.account}
+                        readOnly
+                        className="adm-input !bg-[#f8f9f5] font-bold"
+                        placeholder="자동 입력"
+                      />
+                    </div>
+
+                    <div className="adm-field">
+                      <label>공급사</label>
+                      <select
+                        value={registerForm.supplier || 'BSON'}
+                        onChange={(e) => setRegisterForm({ ...registerForm, supplier: e.target.value })}
+                        className="adm-select font-bold"
+                      >
+                        <option value="BSON">BSON</option>
+                        <option value="TU">TU</option>
+                        <option value="신한48">신한48</option>
+                        <option value="KCC">KCC</option>
+                        <option value="라이프앤조이">라이프앤조이</option>
+                        <option value="기타">기타</option>
+                      </select>
+                    </div>
+
+                    <div className="adm-field full">
+                      <label>결합 가전제품</label>
+                      <select
+                        value={registerForm.appliance}
+                        onChange={(e) => {
+                          const appVal = e.target.value;
+                          let newSupplier = registerForm.supplier;
+                          if (appVal) {
+                            const found = allProducts?.find(
+                              (p) =>
+                                `${p.name} (${p.model})` === appVal ||
+                                p.model === appVal ||
+                                `${p.brand} ${p.name} (${p.model})` === appVal
+                            );
+                            if (found) {
+                              const supp = (found as any).supplier || found.supplyPrice;
+                              if (supp) newSupplier = String(supp).trim();
+                            } else if (appVal.includes('LG') || registerForm.productName?.includes('LG')) {
+                              newSupplier = 'TU';
+                            }
+                          }
+                          setRegisterForm({ ...registerForm, appliance: appVal, supplier: newSupplier });
+                        }}
+                        className="adm-select"
+                      >
+                        <option value="">가전 선택</option>
+                        {registerForm.productName === 'LG구독할인(new)' ||
+                        registerForm.productName?.includes('LG') ||
+                        registerForm.productName?.includes('구독') ? (
+                          <>
+                            <option value="상담 시 제품선택 (전문 상담원 맞춤 추천)">상담 시 제품선택 (전문 상담원 맞춤 추천)</option>
+                            {Object.entries(lgProductsByCategory).map(([catName, prods]: [string, any]) => (
+                              <optgroup key={catName} label={`LG 가전구독 - ${catName} (${prods.length})`}>
+                                {prods.map((p: any) => {
+                                  const itemText = `[${p.categoryName}] ${p.name} (${p.model})`;
+                                  return (
+                                    <option key={p.id} value={itemText}>
+                                      {itemText}
+                                    </option>
+                                  );
+                                })}
+                              </optgroup>
+                            ))}
+                          </>
+                        ) : (
+                          allProducts
+                            ?.filter((p) => {
+                              if (!p.model) return false;
+                              if (!registerForm.productName) return true;
+                              const plan = allPlans?.find((pl) => pl.name === registerForm.productName);
+                              return plan && p.planId === plan.numericId;
+                            })
+                            .map((p) => (
+                              <option key={p._id} value={`${p.name} (${p.model})`}>
+                                {p.brand} {p.name} ({p.model})
+                              </option>
+                            ))
+                        )}
+                      </select>
+                    </div>
+                  </div>
+
+                  <button type="button" onClick={handleAddToList} className="adm-btn sage w-full">
+                    <Plus />
+                    <span>등록대기 목록에 추가</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Right: Wait List */}
-              <div className="w-full lg:w-[320px] flex flex-col gap-4">
-                <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB] flex-1 flex flex-col overflow-hidden">
-                  <h4 className="text-[15px] font-bold mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#191F28]"></span>등록대기 목록
-                    </div>
-                    <span className="text-[12px] bg-[#F2F4F6] text-[#4E5968] px-2 py-0.5 rounded-full font-bold">{registerList.length}건</span>
-                  </h4>
-                  
-                  <div className="flex-1 overflow-y-auto space-y-3 pr-1 hide-scrollbar">
+              {/* Right Wait List */}
+              <div className="w-full lg:w-[300px] flex flex-col">
+                <div className="adm-panel p-5 flex-1 flex flex-col">
+                  <div className="adm-section-label !mt-0">
+                    <span>등록대기 목록</span>
+                    <span className="adm-pill green">{registerList.length}건</span>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto space-y-2.5 max-h-[420px]">
                     {registerList.length === 0 ? (
-                      <div className="h-full flex flex-col items-center justify-center text-center py-10">
-                        <Plus className="w-8 h-8 text-[#E5E8EB] mb-2" />
-                        <p className="text-[13px] text-[#8B95A1]">목록이 비어있습니다.<br/>좌측 폼을 입력해 추가해주세요.</p>
+                      <div className="py-16 text-center text-[#86918a] text-[12px]">
+                        대기 목록이 비어있습니다.<br />좌측 폼을 입력해 추가해 주세요.
                       </div>
                     ) : (
                       registerList.map((item) => (
-                        <div key={item.id} className="p-3 bg-[#F9FAFB] rounded-[12px] border border-[#E5E8EB] relative group">
-                          <button onClick={() => handleRemoveFromList(item.id)} className="absolute top-2 right-2 p-1 text-[#8B95A1] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div key={item.id} className="adm-note-card relative group">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFromList(item.id)}
+                            className="absolute top-2.5 right-2.5 text-[#86918a] hover:text-[#a85042]"
+                          >
                             <X className="w-4 h-4" />
                           </button>
-                          <div className="text-[14px] font-bold text-[#191F28] mb-1">{item.name}</div>
-                          <div className="text-[12px] text-[#4E5968] mb-2">{item.phone}</div>
+                          <div className="font-bold text-[#263d36]">{item.name}</div>
+                          <div className="font-mono text-[11.5px] text-[#6d786c] mb-2">{item.phone}</div>
                           <div className="flex flex-wrap gap-1">
-                            <span className="text-[10px] bg-white border border-[#E5E8EB] text-[#8B95A1] px-1.5 py-0.5 rounded">{getChannelName(item.channelId)}</span>
-                            {item.productName && <span className="text-[10px] bg-blue-50 text-[#3182F6] px-1.5 py-0.5 rounded">{item.productName}</span>}
-                            {item.appliance && <span className="text-[10px] bg-emerald-50 text-[#059669] px-1.5 py-0.5 rounded truncate max-w-[180px]">{item.appliance}</span>}
+                            <span className="adm-pill gray">{getChannelName(item.channelId)}</span>
+                            {item.productName && <span className="adm-pill green">{item.productName}</span>}
+                            {item.appliance && (
+                              <span className="adm-pill teal truncate max-w-[180px]">{item.appliance}</span>
+                            )}
                           </div>
                         </div>
                       ))
                     )}
                   </div>
 
-                  <button 
-                    onClick={handleBulkRegister} 
+                  <button
+                    type="button"
+                    onClick={handleBulkRegister}
                     disabled={registerList.length === 0}
-                    className={`w-full py-4 rounded-[16px] font-bold text-[15px] mt-6 shadow-lg transition-all active:scale-[0.98] ${registerList.length > 0 ? 'bg-[#191F28] text-white hover:bg-[#2D3644] shadow-black/10' : 'bg-[#E5E8EB] text-[#8B95A1] cursor-not-allowed shadow-none'}`}
+                    className="adm-btn primary w-full mt-5"
                   >
-                    총 {registerList.length}명 등록하기
+                    총 {registerList.length}명 최종 등록하기
                   </button>
-                </section>
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
+
       <DaangnLeadModal
         isOpen={isDaangnModalOpen}
         onClose={() => setIsDaangnModalOpen(false)}
@@ -1848,7 +2251,3 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
     </div>
   );
 }
-
-// Separate components or inline modals can be added here
-// For simplicity and matching the existing pattern, adding the Direct Register Modal below the existing code
-

@@ -1378,21 +1378,18 @@ export default function ProductManagement() {
   };
 
   return (
-    <div ref={mainContainerRef} className="p-8 h-full flex flex-col no-scrollbar overflow-y-auto relative">
+    <div ref={mainContainerRef} className="relative">
       {/* Upload Loading Overlay */}
       {isUploading && (
-        <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white p-8 rounded-[32px] shadow-2xl flex flex-col items-center max-w-[300px] w-full mx-4">
-            <div className="w-12 h-12 border-4 border-[#3182F6] border-t-transparent rounded-full animate-spin mb-6"></div>
-            <h3 className="font-bold text-[18px] text-[#191F28] mb-2">제품 등록 중...</h3>
-            <p className="text-[#8B95A1] text-[14px] mb-6">잠시만 기다려 주세요.</p>
-            <div className="w-full bg-[#F2F4F6] h-2.5 rounded-full overflow-hidden">
-              <div 
-                className="bg-[#3182F6] h-full transition-all duration-300"
-                style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
-              ></div>
+        <div className="adm-modal-overlay !z-[1000]">
+          <div className="adm-modal p-8 flex flex-col items-center max-w-[320px] text-center">
+            <div className="w-10 h-10 border-[3px] border-[#295e52] border-t-transparent rounded-full animate-spin mb-5"></div>
+            <h3 className="font-bold text-[17px] text-[#263d36] mb-1">제품 일괄 등록 중...</h3>
+            <p className="text-[#86918a] text-[12.5px] mb-5">잠시만 기다려 주세요.</p>
+            <div className="adm-bar-track w-full">
+              <span style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }} />
             </div>
-            <div className="mt-3 text-[13px] font-bold text-[#4E5968]">
+            <div className="mt-2.5 text-[12px] font-bold font-mono text-[#45554e]">
               {uploadProgress.current} / {uploadProgress.total}
             </div>
           </div>
@@ -1401,342 +1398,378 @@ export default function ProductManagement() {
 
       {/* Smart Registration Progress Overlay */}
       {smartProgress && (
-        <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white p-8 rounded-[32px] shadow-2xl flex flex-col items-center max-w-[360px] w-full mx-4 text-center border border-[#E5E8EB]">
-            <div className="relative mb-5">
-              <div className="w-16 h-16 border-4 border-[#3182F6] border-t-transparent rounded-full animate-spin"></div>
-              <Sparkles className="w-7 h-7 text-[#3182F6] absolute inset-0 m-auto animate-pulse" />
+        <div className="adm-modal-overlay !z-[1000]">
+          <div className="adm-modal p-8 flex flex-col items-center max-w-[360px] text-center">
+            <div className="relative mb-4">
+              <div className="w-14 h-14 border-[3px] border-[#295e52] border-t-transparent rounded-full animate-spin"></div>
+              <Sparkles className="w-6 h-6 text-[#295e52] absolute inset-0 m-auto animate-pulse" />
             </div>
-            <h3 className="font-bold text-[19px] text-[#191F28] mb-1">⚡ 스마트 자동 등록 중...</h3>
-            <p className="text-[#3182F6] font-bold text-[14px] mb-2 truncate max-w-full px-2">
+            <h3 className="font-bold text-[17px] text-[#263d36] mb-1">스마트 자동 수집 등록 중...</h3>
+            <p className="text-[#295e52] font-bold font-mono text-[13px] mb-2 truncate max-w-full px-2">
               {smartProgress.currentModel}
             </p>
-            <p className="text-[#8B95A1] text-[13px] mb-6 leading-relaxed">
-              참고 URL에서 썸네일, 제품명, 카테고리,<br />상세페이지 정보를 수집하여 매칭 중입니다.
+            <p className="text-[#86918a] text-[12px] mb-5 leading-relaxed">
+              공식 사이트에서 썸네일, 제품명, 카테고리,<br />상세 스펙 정보를 수집하여 매칭하고 있습니다.
             </p>
-            <div className="w-full bg-[#F2F4F6] h-3 rounded-full overflow-hidden mb-2">
-              <div 
-                className="bg-gradient-to-r from-[#3182F6] to-[#1B64DA] h-full transition-all duration-300"
-                style={{ width: `${(smartProgress.current / smartProgress.total) * 100}%` }}
-              ></div>
+            <div className="adm-bar-track w-full mb-2">
+              <span style={{ width: `${(smartProgress.current / smartProgress.total) * 100}%` }} />
             </div>
-            <div className="text-[13px] font-bold text-[#4E5968]">
+            <div className="text-[12px] font-bold font-mono text-[#45554e]">
               {smartProgress.current} / {smartProgress.total} 건 진행 중
             </div>
           </div>
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <h2 className="text-[20px] lg:text-[24px] font-bold text-[#191F28]">제품관리</h2>
-          <span className="text-[13px] font-extrabold bg-[#E8F3FF] text-[#3182F6] px-3 py-1 rounded-full border border-[#3182F6]/20">
-            총 등록 제품 <strong className="text-[14px] font-black">{allProducts?.length || 0}</strong>개
-          </span>
+      {/* Page Heading */}
+      <div className="adm-page-heading">
+        <div>
+          <div className="adm-eyebrow">OPERATIONS · PRODUCTS</div>
+          <h1>제품 관리</h1>
+          <p>
+            구좌(상품군)별 결합 가전 라인업, 노출 순서, 대표 썸네일 및 상세 스펙을 통합 관리합니다. (총 등록 제품{' '}
+            <strong className="text-[#263d36]">{allProducts?.length || 0}</strong>개)
+          </p>
         </div>
-        <div className="text-[13px] text-[#8B95A1] lg:block hidden">드래그로 순서 변경, 일괄 복사/삭제가 가능합니다.</div>
+
+        <div className="adm-heading-buttons">
+          <input
+            type="file"
+            ref={smartExcelInputRef}
+            className="hidden"
+            accept=".xlsx, .xls"
+            onChange={handleSmartExcelUpload}
+          />
+          <input
+            type="file"
+            ref={excelInputRef}
+            className="hidden"
+            accept=".xlsx, .xls"
+            onChange={handleExcelUpload}
+          />
+          <button type="button" onClick={downloadSmartTemplate} className="adm-btn">
+            <Zap />
+            <span>스마트 양식</span>
+          </button>
+          <button type="button" onClick={() => setIsSmartModalOpen(true)} className="adm-btn sage">
+            <Sparkles />
+            <span>스마트 수집 등록</span>
+          </button>
+          <button type="button" onClick={downloadTemplate} className="adm-btn">
+            <Download />
+            <span>기본 양식</span>
+          </button>
+          <button type="button" onClick={() => excelInputRef.current?.click()} className="adm-btn">
+            <Upload />
+            <span>엑셀 업로드</span>
+          </button>
+          <button type="button" onClick={handleAddProduct} className="adm-btn primary">
+            <Plus />
+            <span>개별 제품 등록</span>
+          </button>
+        </div>
       </div>
 
-      <div className="flex flex-1 flex-col lg:flex-row gap-6 overflow-hidden min-h-0">
+      {/* 2-Column Layout: Left Plan Nav + Right Product Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-5 items-start">
         {/* Left: Plan List */}
-        <div className="w-full lg:w-[260px] flex flex-col bg-white rounded-[24px] border border-[#E5E8EB] overflow-hidden shadow-sm shrink-0">
-          <div className="p-4 lg:p-5 border-b border-[#F2F4F6] bg-[#F9FAFB] flex justify-between items-center">
-            <h3 className="font-bold text-[14px] text-[#4E5968]">구좌 선택</h3>
-             <button 
+        <div className="adm-panel">
+          <div className="p-4 border-b border-[#edf0e7] bg-[#f8f9f5] flex justify-between items-center">
+            <div>
+              <h3 className="font-bold text-[13.5px] text-[#263d36]">구좌 · 상품군 목록</h3>
+              <p className="text-[11px] text-[#86918a] mt-0.5">드래그하여 순서 변경</p>
+            </div>
+            <button
+              type="button"
               onClick={() => {
-                setEditingPlan({ name: '', basePrice: '', benefitPrice: '', mainCount: 4, isMainActive: true, accountCount: '1구좌', numericId: (plans[plans.length-1]?.id || 0) + 1 });
+                setEditingPlan({
+                  name: '',
+                  basePrice: '',
+                  benefitPrice: '',
+                  mainCount: 4,
+                  isMainActive: true,
+                  accountCount: '1구좌',
+                  numericId: (plans[plans.length - 1]?.id || 0) + 1,
+                });
                 setViewMode('edit_plan');
               }}
-              className="p-1.5 bg-[#3182F6] text-white rounded-[8px] hover:bg-[#1B64DA] transition-colors"
+              className="adm-btn primary small !px-2.5"
+              title="구좌 추가"
             >
-              <Plus className="w-4 h-4"/>
+              <Plus />
             </button>
           </div>
-           <div className="flex lg:flex-col overflow-x-auto lg:overflow-y-auto p-3 gap-2 no-scrollbar">
-            {plans.map((plan, idx) => (
-              <div 
-                key={plan._id || plan.id}
-                draggable
-                onDragStart={() => handlePlanDragStart(idx)}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => handlePlanDrop(idx)}
-                onDragEnd={() => setDraggedPlanIndex(null)}
-                onClick={() => { setSelectedPlanId(plan.id); setViewMode('list'); setSelectedIds([]); }}
-                className={`flex-none lg:w-full p-4 rounded-[16px] cursor-pointer border transition-all whitespace-nowrap lg:whitespace-normal flex flex-col gap-1 ${
-                  selectedPlanId === plan.id ? 'bg-[#3182F6] text-white shadow-md border-[#3182F6]' : 'bg-white border-transparent hover:bg-[#F2F4F6]'
-                } ${draggedPlanIndex === idx ? 'opacity-50 border-dashed border-[#3182F6]' : ''}`}
-              >
-                 <div className="flex justify-between items-start gap-2">
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <MoveVertical className={`w-3.5 h-3.5 shrink-0 ${selectedPlanId === plan.id ? 'text-white/50' : 'text-[#D1D6DB]'}`} />
-                    <div className="text-[14px] font-bold truncate">{plan.name}</div>
+
+          <div className="flex lg:flex-col overflow-x-auto lg:overflow-y-auto p-2.5 gap-1.5 hide-scrollbar">
+            {plans.map((plan, idx) => {
+              const isSelected = activePlanId === plan.id;
+              return (
+                <div
+                  key={plan._id || plan.id}
+                  draggable
+                  onDragStart={() => handlePlanDragStart(idx)}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handlePlanDrop(idx)}
+                  onDragEnd={() => setDraggedPlanIndex(null)}
+                  onClick={() => {
+                    setSelectedPlanId(plan.id);
+                    setViewMode('list');
+                    setSelectedIds([]);
+                  }}
+                  className={`flex-none lg:w-full p-3 rounded-[9px] cursor-pointer border transition-all whitespace-nowrap lg:whitespace-normal flex flex-col gap-1.5 ${
+                    isSelected
+                      ? 'bg-[#eaf1e4] text-[#295e52] border-[#cfe0c7]'
+                      : 'bg-white border-transparent hover:bg-[#f6f8f3] text-[#45554e]'
+                  } ${draggedPlanIndex === idx ? 'opacity-40 border-dashed border-[#295e52]' : ''}`}
+                >
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex items-center gap-1.5 overflow-hidden">
+                      <MoveVertical className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-[#295e52]/60' : 'text-[#b7c2b0]'}`} />
+                      <div className={`text-[13px] truncate ${isSelected ? 'font-bold text-[#263d36]' : 'font-semibold'}`}>
+                        {plan.name}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingPlan({ ...plan, numericId: plan.id });
+                        setViewMode('edit_plan');
+                      }}
+                      className="p-1 rounded hover:bg-black/5 text-[#6d786c] shrink-0"
+                      title="구좌 정보 수정"
+                    >
+                      <Edit className="w-3 h-3" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={(e) => { 
-                      e.stopPropagation(); 
-                      setEditingPlan({ ...plan, numericId: plan.id }); 
-                      setViewMode('edit_plan'); 
-                    }}
-                    className={`p-1 rounded-md transition-colors shrink-0 ${selectedPlanId === plan.id ? 'hover:bg-white/20' : 'hover:bg-[#E5E8EB]'}`}
-                  >
-                    <Edit className="w-3 h-3" />
-                  </button>
+                  <div className="flex justify-between items-center text-[11px] pl-5">
+                    <span className="text-[#7d877f] font-mono">
+                      {formatNumber(plan.basePrice)}원{plan.accountCount && ` · ${plan.accountCount}`}
+                    </span>
+                    <span className={`adm-pill ${isSelected ? 'green' : 'gray'}`}>
+                      {allProducts?.filter((p) => p.planId === plan.id).length || 0}개
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-[11px]">
-                  <span className={selectedPlanId === plan.id ? 'text-white/70' : 'text-[#8B95A1]'}>
-                    {formatNumber(plan.basePrice)}원
-                    {plan.accountCount && ` · ${plan.accountCount}`}
-                  </span>
-                  <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-full ${
-                    selectedPlanId === plan.id ? 'bg-white/20 text-white' : 'bg-[#E8F3FF] text-[#3182F6]'
-                  }`}>
-                    {allProducts?.filter(p => p.planId === plan.id).length || 0}개
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-        {/* Right: Product List */}
-        <div className="flex-1 flex flex-col bg-white rounded-[24px] border border-[#E5E8EB] overflow-hidden shadow-sm">
+        {/* Right: Product List / Editor */}
+        <div className="adm-panel">
           {viewMode === 'list' && selectedPlan ? (
             <>
-              <div className="p-4 lg:p-6 border-b border-[#F2F4F6] bg-[#F9FAFB] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="w-full sm:w-auto">
-                  <div className="flex items-center gap-2.5 mb-2">
-                    <h3 className="font-bold text-[16px] lg:text-[18px]">{selectedPlan.name} 리스트</h3>
-                    <span className="text-[12px] font-extrabold bg-[#E8F3FF] text-[#3182F6] px-2.5 py-0.5 rounded-full border border-[#3182F6]/20">
-                      등록 {filteredProducts.length}개
-                    </span>
+              <div className="adm-panel-top !pb-4 border-b border-[#edf0e7]">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2>{selectedPlan.name}</h2>
+                    <span className="adm-pill green">등록 {filteredProducts.length}개</span>
                   </div>
-                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                    <button 
-                      onClick={() => setSortConfig({ key: 'order', direction: 'asc' })} 
-                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
-                        sortConfig.key === 'order' 
-                          ? 'bg-[#3182F6] text-white border-[#3182F6] shadow-sm' 
-                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-                      }`}
-                    >
-                      노출순
-                    </button>
-                    <button 
-                      onClick={() => setSortConfig({ key: 'createdAt', direction: 'desc' })} 
-                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
-                        sortConfig.key === 'createdAt' && sortConfig.direction === 'desc' 
-                          ? 'bg-[#3182F6] text-white border-[#3182F6] shadow-sm' 
-                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-                      }`}
-                    >
-                      최신순
-                    </button>
-                    <button 
-                      onClick={() => setSortConfig({ key: 'createdAt', direction: 'asc' })} 
-                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
-                        sortConfig.key === 'createdAt' && sortConfig.direction === 'asc' 
-                          ? 'bg-[#3182F6] text-white border-[#3182F6] shadow-sm' 
-                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-                      }`}
-                    >
-                      등록일순
-                    </button>
-                    <button 
-                      onClick={() => toggleSort('brand')} 
-                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
-                        sortConfig.key === 'brand' 
-                          ? 'bg-[#3182F6] text-white border-[#3182F6]' 
-                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-                      }`}
-                    >
-                      브랜드 {sortConfig.key === 'brand' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </button>
-                    <button 
-                      onClick={() => toggleSort('category')} 
-                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
-                        sortConfig.key === 'category' 
-                          ? 'bg-[#3182F6] text-white border-[#3182F6]' 
-                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-                      }`}
-                    >
-                      카테고리 {sortConfig.key === 'category' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </button>
-                    <button 
-                      onClick={() => toggleSort('supplyPrice')} 
-                      className={`flex-1 sm:flex-none px-3 py-2 border rounded-[8px] text-[12px] font-bold transition-all ${
-                        sortConfig.key === 'supplyPrice' 
-                          ? 'bg-[#3182F6] text-white border-[#3182F6]' 
-                          : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:bg-[#F2F4F6]'
-                      }`}
-                    >
-                      공급사 {sortConfig.key === 'supplyPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </button>
+                  <div className="adm-panel-subtitle">
+                    항목을 드래그해 랜딩 노출 순서를 변경하거나 체크박스로 일괄 작업할 수 있습니다.
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                  <input 
-                    type="file" 
-                    ref={smartExcelInputRef} 
-                    className="hidden" 
-                    accept=".xlsx, .xls" 
-                    onChange={handleSmartExcelUpload} 
-                  />
-                  <input 
-                    type="file" 
-                    ref={excelInputRef} 
-                    className="hidden" 
-                    accept=".xlsx, .xls" 
-                    onChange={handleExcelUpload} 
-                  />
-                  <button 
-                    onClick={downloadSmartTemplate}
-                    className="flex-1 sm:flex-none bg-[#F2F8FF] border border-[#3182F6]/30 text-[#3182F6] px-3 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-[#E5F0FF] transition-all"
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={handleBatchSmartFetch}
+                    className="adm-btn sage small"
+                    title="선택 항목 또는 전체 항목의 스마트 정보를 모델명으로 일괄 수집합니다"
                   >
-                    <Zap className="w-4 h-4" /> 스마트양식
+                    <Zap />
+                    <span>스마트 정보 일괄 동기화</span>
                   </button>
-                  <button 
-                    onClick={() => setIsSmartModalOpen(true)}
-                    className="flex-1 sm:flex-none bg-gradient-to-r from-[#3182F6] to-[#1B64DA] text-white px-3.5 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-1.5 shadow-md shadow-[#3182F6]/20 cursor-pointer"
-                  >
-                    <Sparkles className="w-4 h-4" /> 스마트 등록
-                  </button>
-                  <button 
-                    onClick={downloadTemplate}
-                    className="flex-1 sm:flex-none bg-white border border-[#E5E8EB] text-[#4E5968] px-3 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-2"
-                  >
-                    <Download className="w-4 h-4" /> 양식
-                  </button>
-                  <button 
-                    onClick={() => excelInputRef.current?.click()}
-                    className="flex-1 sm:flex-none bg-white border border-[#E5E8EB] text-[#3182F6] px-3 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-2"
-                  >
-                    <Upload className="w-4 h-4" /> 엑셀
-                  </button>
-                  <button 
+                  <button
+                    type="button"
                     onClick={handleDownloadSelectedProducts}
-                    className={`flex-1 sm:flex-none px-3.5 py-2.5 rounded-[10px] text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                      selectedIds.length > 0
-                        ? 'bg-[#10B981] hover:bg-[#059669] text-white shadow-md shadow-emerald-500/20'
-                        : 'bg-white border border-[#E5E8EB] text-[#4E5968] hover:bg-[#F2F4F6]'
-                    }`}
-                    title={selectedIds.length > 0 ? `선택한 ${selectedIds.length}개 제품 정보 및 썸네일 다운로드` : "선택한 제품 다운로드 (목록에서 체크박스 선택)"}
+                    className={`adm-btn small ${selectedIds.length > 0 ? 'primary' : ''}`}
                   >
-                    <Download className="w-4 h-4" /> 제품정보 다운로드 {selectedIds.length > 0 && `(${selectedIds.length})`}
-                  </button>
-                  <button onClick={handleAddProduct} className="w-full sm:w-auto bg-[#3182F6] text-white px-5 py-3 rounded-[12px] font-bold text-[14px] flex items-center justify-center gap-2">
-                    <Plus className="w-4 h-4" /> 등록
+                    <Download />
+                    <span>제품정보 ZIP 다운로드 {selectedIds.length > 0 && `(${selectedIds.length})`}</span>
                   </button>
                 </div>
               </div>
 
-              {/* Batch Actions Bar */}
-              <div className="px-6 py-3 bg-[#F2F4F6] border-b border-[#E5E8EB] flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 text-[13px] font-bold text-[#4E5968]">
-                    <span className="text-[#3182F6]">{selectedIds.length}</span>개 선택됨
-                  </div>
-                  <div className="h-4 w-[1px] bg-[#D1D6DB]"></div>
-                  <div className="flex gap-2 items-center">
-                    <button onClick={handleBatchCopy} className="p-1.5 hover:bg-white rounded-md text-[#3182F6] transition-colors" title="선택 복사"><Copy className="w-4 h-4"/></button>
-                    <button onClick={() => handleBatchToggleVisibility(true)} className="p-1.5 hover:bg-white rounded-md text-[#1B64DA] transition-colors" title="선택 노출"><Eye className="w-4 h-4"/></button>
-                    <button onClick={() => handleBatchToggleVisibility(false)} className="p-1.5 hover:bg-white rounded-md text-[#8B95A1] transition-colors" title="선택 숨김"><EyeOff className="w-4 h-4"/></button>
-                    <button onClick={handleBatchDelete} className="p-1.5 hover:bg-white rounded-md text-red-500 transition-colors" title="선택 삭제"><Trash2 className="w-4 h-4"/></button>
-                    <div className="h-4 w-[1px] bg-[#D1D6DB] mx-1"></div>
-                    <button 
-                      onClick={handleDownloadSelectedProducts}
-                      disabled={selectedIds.length === 0}
-                      className={`px-2.5 py-1 text-[11px] font-bold rounded-[6px] transition-colors flex items-center gap-1 cursor-pointer shadow-2xs ${
-                        selectedIds.length > 0 
-                          ? 'bg-[#10B981] hover:bg-[#059669] text-white border border-[#10B981]' 
-                          : 'bg-white border border-[#D1D6DB] text-[#8B95A1] opacity-60 cursor-not-allowed'
-                      }`}
-                      title="선택한 제품의 엑셀 리스트와 썸네일 이미지를 다운로드합니다"
-                    >
-                      <Download className="w-3.5 h-3.5" /> 선택 다운로드 ({selectedIds.length})
-                    </button>
+              {/* Sort Filter Bar */}
+              <div className="adm-filter-bar">
+                <span className="text-[11.5px] font-semibold text-[#6d786c]">정렬 기준</span>
+                <div className="adm-segmented">
+                  <button
+                    type="button"
+                    onClick={() => setSortConfig({ key: 'order', direction: 'asc' })}
+                    className={sortConfig.key === 'order' ? 'active' : ''}
+                  >
+                    노출순
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSortConfig({ key: 'createdAt', direction: 'desc' })}
+                    className={sortConfig.key === 'createdAt' && sortConfig.direction === 'desc' ? 'active' : ''}
+                  >
+                    최신순
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSortConfig({ key: 'createdAt', direction: 'asc' })}
+                    className={sortConfig.key === 'createdAt' && sortConfig.direction === 'asc' ? 'active' : ''}
+                  >
+                    등록일순
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleSort('brand')}
+                    className={sortConfig.key === 'brand' ? 'active' : ''}
+                  >
+                    브랜드 {sortConfig.key === 'brand' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleSort('category')}
+                    className={sortConfig.key === 'category' ? 'active' : ''}
+                  >
+                    카테고리 {sortConfig.key === 'category' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleSort('supplyPrice')}
+                    className={sortConfig.key === 'supplyPrice' ? 'active' : ''}
+                  >
+                    공급사 {sortConfig.key === 'supplyPrice' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </button>
+                </div>
 
-                    <div className="h-4 w-[1px] bg-[#D1D6DB] mx-1"></div>
-                    <span className="text-[11px] font-bold text-[#4E5968]">대표 썸네일:</span>
-                    <select 
-                      onChange={(e) => {
-                        if (e.target.value !== "") {
-                          handleBatchSetRepresentativeIndex(parseInt(e.target.value, 10));
-                          e.target.value = "";
-                        }
-                      }}
-                      className="text-[11px] font-bold bg-white border border-[#D1D6DB] rounded-[6px] px-2 py-1 text-[#3182F6] focus:outline-none cursor-pointer"
-                    >
-                      <option value="">순번 선택 ▾</option>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                        <option key={n} value={n - 1}>{n}번 이미지로 설정</option>
-                      ))}
-                    </select>
-                    <div className="h-4 w-[1px] bg-[#D1D6DB] mx-1"></div>
-                    <button 
-                      onClick={handleBatchSmartFetch}
-                      className="px-3 py-1 bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[11px] font-extrabold rounded-[6px] transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
-                      title="선택 항목 또는 전체 항목의 스마트 정보(이미지, 스펙)를 모델명으로 일괄 수집합니다"
-                    >
-                      <Zap className="w-3.5 h-3.5" /> 스마트 정보 일괄 수집
+                <div className="adm-filter-end">
+                  <span className="text-[11.5px] text-[#6d786c]">대표 썸네일 일괄 지정:</span>
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value !== '') {
+                        handleBatchSetRepresentativeIndex(parseInt(e.target.value, 10));
+                        e.target.value = '';
+                      }
+                    }}
+                    className="adm-select !min-h-[30px] !py-1 !text-[11.5px]"
+                  >
+                    <option value="">순번 선택 ▾</option>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                      <option key={n} value={n - 1}>
+                        {n}번 이미지로 설정
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Bulk Actions Bar when Selected */}
+              {selectedIds.length > 0 && (
+                <div className="px-5 py-2.5 bg-[#193f39] text-[#edf2e9] flex flex-wrap items-center justify-between gap-3">
+                  <span className="text-[12px] font-semibold">
+                    <strong>{selectedIds.length}개</strong> 제품 선택됨
+                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <button type="button" onClick={handleBatchCopy} className="adm-btn small">
+                      <Copy /> 복사
+                    </button>
+                    <button type="button" onClick={() => handleBatchToggleVisibility(true)} className="adm-btn sage small">
+                      <Eye /> 노출 전환
+                    </button>
+                    <button type="button" onClick={() => handleBatchToggleVisibility(false)} className="adm-btn small">
+                      <EyeOff /> 숨김 전환
+                    </button>
+                    <button type="button" onClick={handleBatchDelete} className="adm-btn danger small">
+                      <Trash2 /> 선택 삭제
                     </button>
                   </div>
                 </div>
-            <div className="text-[12px] text-[#8B95A1]">목록에서 개별 관리도 가능합니다.</div>
-              </div>
+              )}
 
-              <div ref={tableContainerRef} className="flex-1 overflow-auto no-scrollbar hide-scrollbar">
-                <table className="w-full text-left border-collapse min-w-[1000px]">
-                  <thead className="sticky top-0 bg-[#F9FAFB] border-b border-[#E5E8EB] z-10">
+              <div ref={tableContainerRef} className="adm-table-scroll">
+                <table className="adm-table min-w-[980px]">
+                  <thead>
                     <tr>
-                      <th className="px-4 py-4 w-12 text-center">
-                        <button onClick={() => setSelectedIds(selectedIds.length === filteredProducts.length ? [] : filteredProducts.map(p => p._id))}>
-                          {selectedIds.length === filteredProducts.length && filteredProducts.length > 0 ? <CheckSquare className="w-5 h-5 text-[#3182F6]"/> : <Square className="w-5 h-5 text-[#D1D6DB]"/>}
+                      <th className="w-11 text-center">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSelectedIds(
+                              selectedIds.length === filteredProducts.length
+                                ? []
+                                : filteredProducts.map((p) => p._id)
+                            )
+                          }
+                        >
+                          {selectedIds.length === filteredProducts.length && filteredProducts.length > 0 ? (
+                            <CheckSquare className="w-4 h-4 text-[#295e52]" />
+                          ) : (
+                            <Square className="w-4 h-4 text-[#b7c2b0]" />
+                          )}
                         </button>
                       </th>
-                      <th className="px-4 py-4 w-10"></th>
-                      <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">이미지</th>
-                      <th className="px-4 py-4 w-24 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">브랜드</th>
-                      <th className="px-4 py-4 w-28 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">카테고리</th>
-                      <th className="px-4 py-4 text-[13px] font-bold text-[#4E5968] whitespace-nowrap">제품명 / 모델명</th>
-                      <th className="px-4 py-4 w-28 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">공급사</th>
-                      <th className="px-4 py-4 w-32 text-[13px] font-bold text-[#4E5968] text-right whitespace-nowrap">월납입금</th>
-                      <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">노출</th>
-                      <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">메인</th>
-                      <th className="px-4 py-4 w-20 text-[13px] font-bold text-[#4E5968] text-center whitespace-nowrap">히어로</th>
-                      <th className="px-4 py-4 w-28 text-[13px] font-bold text-[#4E5968] text-right whitespace-nowrap">개별관리</th>
+                      <th className="w-9"></th>
+                      <th className="w-20 text-center">썸네일</th>
+                      <th className="w-24">브랜드</th>
+                      <th className="w-28">카테고리</th>
+                      <th>제품명 · 모델명</th>
+                      <th className="w-24 text-center">공급사</th>
+                      <th className="w-32 text-right">월납입금</th>
+                      <th className="w-16 text-center">노출</th>
+                      <th className="w-16 text-center">메인</th>
+                      <th className="w-16 text-center">히어로</th>
+                      <th className="w-28 text-right">관리</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#F2F4F6]">
+                  <tbody>
                     {filteredProducts.length === 0 ? (
                       <tr>
-                        <td colSpan={12} className="px-4 py-20 text-center text-[#8B95A1] text-[14px]">
-                          등록된 제품이 없습니다. '등록' 버튼을 눌러 제품을 추가해 주세요.
+                        <td colSpan={12} className="text-center !py-20 text-[#86918a]">
+                          등록된 제품이 없습니다. 우측 상단의 [개별 제품 등록] 또는 [스마트 수집 등록]을 이용해 주세요.
                         </td>
                       </tr>
                     ) : (
                       filteredProducts.map((p, index) => (
-                        <tr 
-                          key={p._id} 
+                        <tr
+                          key={p._id}
                           draggable
                           onDragStart={() => onDragStart(index)}
                           onDragOver={onDragOver}
                           onDrop={() => onDrop(index)}
                           onDragEnd={() => setDraggedItemIndex(null)}
-                          className={`hover:bg-[#F9FAFB] cursor-move group ${draggedItemIndex === index ? 'opacity-50 border-dashed border-[#3182F6] bg-[#F2F4F6]' : 'transition-colors'} ${selectedIds.includes(p._id) ? 'bg-[#E8F3FF]/30' : ''}`}
+                          className={`cursor-move group ${
+                            draggedItemIndex === index ? 'opacity-40 bg-[#f3f5ef]' : ''
+                          } ${selectedIds.includes(p._id) ? '!bg-[#f2f6ef]' : ''}`}
                         >
-                          <td className="px-4 py-4 text-center">
-                            <button onClick={(e) => { e.stopPropagation(); setSelectedIds(prev => prev.includes(p._id) ? prev.filter(i => i !== p._id) : [...prev, p._id]); }}>
-                              {selectedIds.includes(p._id) ? <CheckSquare className="w-5 h-5 text-[#3182F6]"/> : <Square className="w-5 h-5 text-[#D1D6DB]"/>}
+                          <td className="text-center">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedIds((prev) =>
+                                  prev.includes(p._id) ? prev.filter((i) => i !== p._id) : [...prev, p._id]
+                                );
+                              }}
+                            >
+                              {selectedIds.includes(p._id) ? (
+                                <CheckSquare className="w-4 h-4 text-[#295e52]" />
+                              ) : (
+                                <Square className="w-4 h-4 text-[#b7c2b0]" />
+                              )}
                             </button>
                           </td>
-                          <td className="px-2 py-4 text-[#D1D6DB] group-hover:text-[#3182F6]"><MoveVertical className="w-5 h-5" /></td>
-                          <td className="px-2 py-4">
-                            <div className="flex flex-col items-center gap-1.5">
-                              <div className="w-12 h-12 bg-white border border-[#F2F4F6] rounded-lg overflow-hidden flex items-center justify-center shadow-xs">
-                                {(p.image || (p.images && p.images.length > 0)) ? (
-                                  <img src={p.image || p.images[0]} className="w-full h-full object-contain" alt="thumb" />
+                          <td className="text-[#b7c2b0] group-hover:text-[#295e52]">
+                            <MoveVertical className="w-4 h-4" />
+                          </td>
+                          <td>
+                            <div className="flex flex-col items-center gap-1">
+                              <div className="w-11 h-11 bg-[#f8f9f5] border border-[#e6eae3] rounded-[8px] overflow-hidden flex items-center justify-center">
+                                {p.image || (p.images && p.images.length > 0) ? (
+                                  <img
+                                    src={p.image || p.images[0]}
+                                    className="w-full h-full object-contain p-0.5"
+                                    alt="thumb"
+                                  />
                                 ) : (
-                                  <ImageIcon className="w-5 h-5 text-[#D1D6DB]" />
+                                  <ImageIcon className="w-4 h-4 text-[#b7c2b0]" />
                                 )}
                               </div>
                               {p.images && p.images.length > 0 && (
@@ -1753,57 +1786,136 @@ export default function ProductManagement() {
                                     }
                                   }}
                                   onClick={(e) => e.stopPropagation()}
-                                  className="text-[10px] font-bold bg-[#F2F4F6] border border-[#D1D6DB] rounded px-1 py-0.5 w-16 text-center text-[#191F28] focus:outline-none hover:border-[#3182F6] cursor-pointer"
+                                  className="text-[10px] font-semibold bg-[#f4f5f0] border border-[#dfe5d9] rounded px-1 py-0.5 w-14 text-center text-[#263d36] cursor-pointer"
                                   title="대표 썸네일 순번 선택"
                                 >
                                   {p.images.map((_: string, imgIdx: number) => (
                                     <option key={imgIdx} value={imgIdx}>
-                                      {imgIdx + 1}번 썸네일
+                                      {imgIdx + 1}번
                                     </option>
                                   ))}
                                 </select>
                               )}
                             </div>
                           </td>
-                          <td className="px-4 py-4 text-[14px] text-[#4E5968] font-bold">{p.brand}</td>
-                          <td className="px-4 py-4 text-[13px] text-[#8B95A1] font-medium">{p.category}</td>
-                          <td className="px-4 py-4">
-                            <div className="flex items-center gap-2 mb-1">
-                              {(selectedPlan?.accountCount || p.accountCount) && <span className="text-[10px] font-bold bg-[#191F28] text-white px-1.5 py-0.5 rounded">{selectedPlan?.accountCount || p.accountCount}</span>}
-                              {p.tag && <span className="text-[10px] font-bold bg-[#3182F6] text-white px-1.5 py-0.5 rounded">{p.tag}</span>}
-                              <div className="text-[14px] font-bold text-[#191F28]">{p.name}</div>
+                          <td className="font-bold text-[#263d36]">{p.brand}</td>
+                          <td>
+                            <span className="adm-pill gray">{p.category}</span>
+                          </td>
+                          <td className="whitespace-normal min-w-[240px]">
+                            <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                              {(selectedPlan?.accountCount || p.accountCount) && (
+                                <span className="adm-pill green">
+                                  {selectedPlan?.accountCount || p.accountCount}
+                                </span>
+                              )}
+                              {p.tag && <span className="adm-pill orange">{p.tag}</span>}
+                              <span className="font-bold text-[#263d36]">{p.name}</span>
                             </div>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <div className="text-[12px] text-[#A3B1C6]">{p.model}</div>
+                            <div className="flex items-center gap-2 text-[11px] font-mono text-[#86918a]">
+                              <span>{p.model}</span>
                               {p._creationTime && (
-                                <span className="text-[10px] text-[#8B95A1] bg-[#F2F4F6] px-1.5 py-0.5 rounded font-medium">
-                                  {new Date(p._creationTime).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' })} 등록
+                                <span>
+                                  ·{' '}
+                                  {new Date(p._creationTime).toLocaleDateString('ko-KR', {
+                                    year: '2-digit',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                  })}
                                 </span>
                               )}
                             </div>
                           </td>
-                          <td className="px-4 py-4 text-[13px] font-bold text-center text-[#191F28] whitespace-nowrap">{p.supplier || p.supplyPrice || '-'}</td>
-                          <td className="px-4 py-4 text-[14px] font-bold text-right text-[#3182F6]">{formatNumber(selectedPlan?.basePrice || p.price)}원</td>
-                          <td className="px-4 py-4 text-center">
-                            <button onClick={(e) => { e.stopPropagation(); toggleVisibility(p._id, p.isVisible); }} className={`p-1.5 rounded-full transition-colors ${p.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-400'}`}>
-                              {p.isVisible ? <Eye className="w-4 h-4"/> : <EyeOff className="w-4 h-4"/>}
+                          <td className="text-center font-semibold text-[#263d36]">
+                            {p.supplier || p.supplyPrice ? (
+                              <span className="adm-pill teal">{p.supplier || p.supplyPrice}</span>
+                            ) : (
+                              '-'
+                            )}
+                          </td>
+                          <td className="text-right font-bold font-mono text-[#295e52]">
+                            {formatNumber(selectedPlan?.basePrice || p.price)}원
+                          </td>
+                          <td className="text-center">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleVisibility(p._id, p.isVisible);
+                              }}
+                              className={`adm-icon-btn mx-auto ${
+                                p.isVisible ? '!text-[#295e52] !bg-[#edf3e8]' : 'opacity-45'
+                              }`}
+                            >
+                              {p.isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                             </button>
                           </td>
-                          <td className="px-4 py-4 text-center">
-                            <button onClick={(e) => { e.stopPropagation(); toggleMainExposure(p._id, p.showOnMain); }} className={`p-1.5 rounded-full transition-colors ${p.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-400'}`} title="메인 노출 (최대 8개)">
-                              {p.showOnMain ? <Star className="w-4 h-4 fill-current"/> : <Star className="w-4 h-4"/>}
+                          <td className="text-center">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleMainExposure(p._id, p.showOnMain);
+                              }}
+                              className={`adm-icon-btn mx-auto ${
+                                p.showOnMain ? '!text-[#a97f3f] !bg-[#faf0df]' : 'opacity-45'
+                              }`}
+                              title="메인 노출 (최대 8개)"
+                            >
+                              <Star className={`w-4 h-4 ${p.showOnMain ? 'fill-current' : ''}`} />
                             </button>
                           </td>
-                          <td className="px-4 py-4 text-center">
-                            <button onClick={(e) => { e.stopPropagation(); toggleHeroExposure(p._id, p.showOnHero); }} className={`p-1.5 rounded-full transition-colors ${p.showOnHero ? 'bg-[#E8F3FF] text-[#3182F6]' : 'bg-gray-100 text-gray-400'}`} title="히어로 노출 (최대 4개)">
-                              {p.showOnHero ? <Sparkles className="w-4 h-4 fill-current"/> : <Sparkles className="w-4 h-4"/>}
+                          <td className="text-center">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleHeroExposure(p._id, p.showOnHero);
+                              }}
+                              className={`adm-icon-btn mx-auto ${
+                                p.showOnHero ? '!text-[#295e52] !bg-[#eaf3e8]' : 'opacity-45'
+                              }`}
+                              title="히어로 노출 (최대 4개)"
+                            >
+                              <Sparkles className={`w-4 h-4 ${p.showOnHero ? 'fill-current' : ''}`} />
                             </button>
                           </td>
-                          <td className="px-4 py-4 text-right">
-                            <div className="flex justify-end gap-1">
-                              <button onClick={(e) => { e.stopPropagation(); copyProduct(p._id); }} className="p-1.5 hover:bg-white rounded-md text-[#3182F6]" title="복사"><Copy className="w-4 h-4"/></button>
-                              <button onClick={(e) => { e.stopPropagation(); setEditingProduct(p); setViewMode('edit_product'); }} className="p-1.5 hover:bg-white rounded-md text-[#4E5968]" title="수정"><Edit className="w-4 h-4"/></button>
-                              <button onClick={(e) => { e.stopPropagation(); deleteProduct(p._id); }} className="p-1.5 hover:bg-white rounded-md text-red-500" title="삭제"><Trash2 className="w-4 h-4"/></button>
+                          <td className="text-right">
+                            <div className="inline-flex items-center justify-end gap-0.5">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyProduct(p._id);
+                                }}
+                                className="adm-icon-btn !p-1.5"
+                                title="복사"
+                              >
+                                <Copy className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingProduct(p);
+                                  setViewMode('edit_product');
+                                }}
+                                className="adm-icon-btn !p-1.5"
+                                title="수정"
+                              >
+                                <Edit className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteProduct(p._id);
+                                }}
+                                className="adm-icon-btn !p-1.5 hover:!text-[#a85042]"
+                                title="삭제"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -1812,18 +1924,26 @@ export default function ProductManagement() {
                   </tbody>
                 </table>
               </div>
+
+              <div className="adm-table-foot">
+                <span>{selectedPlan.name} 구좌 총 {filteredProducts.length}개 제품</span>
+                <span>메인 노출 최대 8개 · 히어로 노출 최대 4개 지원</span>
+              </div>
             </>
           ) : viewMode === 'list' && dbPlans === undefined ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-20 text-[#8B95A1]">
-              <div className="w-12 h-12 border-4 border-[#3182F6] border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-[14px] font-bold">상품 정보를 불러오는 중입니다...</p>
+            <div className="py-24 flex flex-col items-center justify-center text-[#86918a]">
+              <div className="w-8 h-8 border-[3px] border-[#295e52] border-t-transparent rounded-full animate-spin mb-3"></div>
+              <p className="text-[13px] font-semibold">상품 정보를 불러오는 중입니다...</p>
             </div>
           ) : viewMode === 'list' && plans.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-20 text-center">
-              <Settings2 className="w-12 h-12 text-[#D1D6DB] mb-4" />
-              <h3 className="text-[18px] font-bold text-[#191F28] mb-2">설정된 구좌 정보가 없습니다.</h3>
-              <p className="text-[#8B95A1] text-[14px] mb-6">먼저 왼쪽의 '+' 버튼을 눌러 구좌(Plan)를 생성하거나<br/>초기 데이터를 생성해 주세요.</p>
-              <button 
+            <div className="py-20 flex flex-col items-center justify-center text-center px-6">
+              <Settings2 className="w-10 h-10 text-[#b7c2b0] mb-3" />
+              <h3 className="text-[16px] font-bold text-[#263d36] mb-1.5">설정된 구좌 정보가 없습니다.</h3>
+              <p className="text-[#86918a] text-[12.5px] mb-5">
+                좌측의 [+] 버튼을 눌러 구좌(Plan)를 생성하거나 초기 데이터를 생성해 주세요.
+              </p>
+              <button
+                type="button"
                 onClick={async () => {
                   if (window.confirm('기본 구좌 데이터(리빙144, 스페셜299 등)를 생성하시겠습니까?')) {
                     await createPlan({ numericId: 1, name: '스페셜299-UP가전', basePrice: '59,800', benefitPrice: '29,800', mainCount: 4, isMainActive: true, accountCount: '2구좌' });
@@ -1831,31 +1951,33 @@ export default function ProductManagement() {
                     await createPlan({ numericId: 3, name: '리빙144(신한카드)-1구좌', basePrice: '35,000', benefitPrice: '0', mainCount: 4, isMainActive: true, accountCount: '1구좌' });
                   }
                 }}
-                className="bg-[#3182F6] text-white px-6 py-3 rounded-[12px] font-bold text-[14px]"
+                className="adm-btn primary"
               >
-                초기 데이터 생성하기
+                초기 구좌 데이터 생성하기
               </button>
             </div>
           ) : viewMode === 'list' ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-20 text-[#8B95A1]">
-              <p className="text-[14px] font-bold">구좌를 선택해 주세요.</p>
-            </div>
+            <div className="py-20 text-center text-[#86918a] text-[13px]">좌측에서 구좌를 선택해 주세요.</div>
           ) : viewMode === 'edit_product' && editingProduct ? (
-            <div className="flex flex-col h-full overflow-hidden">
-              <div className="px-4 lg:px-8 py-6 border-b border-[#F2F4F6] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0 bg-[#F9FAFB]">
+            <div className="flex flex-col">
+              <div className="adm-panel-top" style={{ padding: '18px 24px', background: '#fafbf9' }}>
                 <div>
-                  <h3 className="font-bold text-[18px] lg:text-[20px] mb-1">제품 정보 관리</h3>
-                  <p className="text-[12px] lg:text-[13px] text-[#8B95A1]">제품 정보와 노출 상태를 설정합니다.</p>
+                  <span className="adm-eyebrow">PRODUCT EDITOR</span>
+                  <h3 className="adm-panel-title" style={{ fontSize: 18 }}>제품 정보 관리</h3>
+                  <p className="adm-panel-sub">제품 정보, 상세 스펙 및 메인/히어로 노출 상태를 설정합니다.</p>
                 </div>
-                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                   <button 
-                    onClick={() => { toggleVisibility(editingProduct._id, editingProduct.isVisible); setEditingProduct({...editingProduct, isVisible: !editingProduct.isVisible}); }}
-                    className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2.5 rounded-[10px] text-[12px] font-bold transition-all ${editingProduct.isVisible ? 'bg-[#E8F3FF] text-[#1B64DA]' : 'bg-gray-100 text-gray-500'}`}
-                   >
-                     {editingProduct.isVisible ? <><Eye className="w-4 h-4"/> 노출</> : <><EyeOff className="w-4 h-4"/> 숨김</>}
-                   </button>
-                   <button 
-                    onClick={() => { 
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      toggleVisibility(editingProduct._id, editingProduct.isVisible);
+                      setEditingProduct({ ...editingProduct, isVisible: !editingProduct.isVisible });
+                    }}
+                    className={`adm-btn sm ${editingProduct.isVisible ? 'sage' : ''}`}
+                  >
+                    {editingProduct.isVisible ? <><Eye className="w-3.5 h-3.5" /> 노출</> : <><EyeOff className="w-3.5 h-3.5" /> 숨김</>}
+                  </button>
+                  <button
+                    onClick={() => {
                       const nextState = !editingProduct.showOnMain;
                       if (nextState) {
                         const mainCount = allProducts.filter(p => !!p.showOnMain).length;
@@ -1864,15 +1986,16 @@ export default function ProductManagement() {
                           return;
                         }
                       }
-                      toggleMainExposure(editingProduct._id, editingProduct.showOnMain); 
-                      setEditingProduct({...editingProduct, showOnMain: nextState}); 
+                      toggleMainExposure(editingProduct._id, editingProduct.showOnMain);
+                      setEditingProduct({ ...editingProduct, showOnMain: nextState });
                     }}
-                    className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2.5 rounded-[10px] text-[12px] font-bold transition-all ${editingProduct.showOnMain ? 'bg-[#FFF2F2] text-[#F04452]' : 'bg-gray-100 text-gray-500'}`}
-                   >
-                     {editingProduct.showOnMain ? <><Star className="w-4 h-4 fill-current"/> 메인</> : <><Star className="w-4 h-4"/> 메인</>}
-                   </button>
-                   <button 
-                    onClick={() => { 
+                    className={`adm-btn sm ${editingProduct.showOnMain ? 'sage' : ''}`}
+                    style={editingProduct.showOnMain ? { background: '#faf5ea', color: '#8f6d2c', borderColor: '#eadbc0' } : undefined}
+                  >
+                    {editingProduct.showOnMain ? <><Star className="w-3.5 h-3.5 fill-current" /> 메인</> : <><Star className="w-3.5 h-3.5" /> 메인</>}
+                  </button>
+                  <button
+                    onClick={() => {
                       const nextState = !editingProduct.showOnHero;
                       if (nextState) {
                         const heroCount = allProducts.filter(p => !!p.showOnHero).length;
@@ -1881,174 +2004,180 @@ export default function ProductManagement() {
                           return;
                         }
                       }
-                      toggleHeroExposure(editingProduct._id, editingProduct.showOnHero); 
-                      setEditingProduct({...editingProduct, showOnHero: nextState}); 
+                      toggleHeroExposure(editingProduct._id, editingProduct.showOnHero);
+                      setEditingProduct({ ...editingProduct, showOnHero: nextState });
                     }}
-                    className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2.5 rounded-[10px] text-[12px] font-bold transition-all ${editingProduct.showOnHero ? 'bg-[#E8F3FF] text-[#3182F6]' : 'bg-gray-100 text-gray-500'}`}
-                   >
-                     {editingProduct.showOnHero ? <><Sparkles className="w-4 h-4 fill-current"/> 히어로</> : <><Sparkles className="w-4 h-4"/> 히어로</>}
-                   </button>
-                   <button 
-                    onClick={() => { deleteProduct(editingProduct._id); setViewMode('list'); }}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2.5 bg-red-50 text-red-500 rounded-[10px] text-[12px] font-bold"
-                   >
-                     <Trash2 className="w-4 h-4"/> 삭제
-                   </button>
-                   <button onClick={() => setViewMode('list')} className="flex-1 sm:flex-none bg-[#F2F4F6] text-[#4E5968] font-bold text-[12px] px-3 py-2.5 rounded-[10px]">닫기</button>
+                    className={`adm-btn sm ${editingProduct.showOnHero ? 'sage' : ''}`}
+                  >
+                    {editingProduct.showOnHero ? <><Sparkles className="w-3.5 h-3.5 fill-current" /> 히어로</> : <><Sparkles className="w-3.5 h-3.5" /> 히어로</>}
+                  </button>
+                  {editingProduct._id && (
+                    <button
+                      onClick={() => { deleteProduct(editingProduct._id); setViewMode('list'); }}
+                      className="adm-btn sm danger"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> 삭제
+                    </button>
+                  )}
+                  <button onClick={() => setViewMode('list')} className="adm-btn sm">닫기</button>
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
-                <div className="max-w-3xl space-y-8 pb-10">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">브랜드</label>
-                      <select value={editingProduct.brand} onChange={(e) => setEditingProduct({...editingProduct, brand: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold">
-                        {settings?.brands?.map((brand: string) => <option key={brand}>{brand}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">카테고리</label>
-                      <select value={editingProduct.category} onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold">
-                        {settings?.categories?.map((cat: string) => <option key={cat}>{cat}</option>)}
-                      </select>
-                    </div>
-                    <div className="col-span-2">
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">제품명</label>
-                      <input type="text" value={editingProduct.name} onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between items-center mb-2 px-1">
-                        <label className="block text-[13px] font-bold text-[#4E5968]">모델명</label>
-                        <button
-                          type="button"
-                          onClick={handleSingleSmartFetch}
-                          disabled={isSingleFetching}
-                          className="text-[11px] font-extrabold text-[#3182F6] hover:text-[#1B64DA] bg-[#E8F3FF] hover:bg-[#D4E8FF] px-2.5 py-1 rounded-[6px] transition-colors flex items-center gap-1 cursor-pointer"
-                          title="입력한 모델명으로 LG전자 공식 웹사이트에서 이미지, 제품명, 스펙 정보를 가져옵니다"
-                        >
-                          <Zap className="w-3 h-3" />
-                          {isSingleFetching ? '수집 중...' : '스마트 수집'}
-                        </button>
+
+              <div className="p-6 lg:p-8">
+                <div className="max-w-3xl space-y-8 pb-6">
+                  <div>
+                    <div className="adm-section-label">기본 상품 및 납입 정보</div>
+                    <div className="adm-field-grid">
+                      <div className="adm-field">
+                        <label>브랜드</label>
+                        <select value={editingProduct.brand} onChange={(e) => setEditingProduct({ ...editingProduct, brand: e.target.value })} className="adm-select">
+                          {settings?.brands?.map((brand: string) => <option key={brand}>{brand}</option>)}
+                        </select>
                       </div>
-                      <input type="text" value={editingProduct.model} onChange={(e) => setEditingProduct({...editingProduct, model: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none" placeholder="예: AS195DWWA" />
-                    </div>
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">공급사</label>
-                      <input 
-                        type="text" 
-                        value={editingProduct.supplier ?? editingProduct.supplyPrice ?? ''} 
-                        onChange={(e) => setEditingProduct({
-                          ...editingProduct, 
-                          supplier: e.target.value, 
-                          supplyPrice: e.target.value 
-                        })} 
-                        className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#191F28]" 
-                        placeholder="예: TU, 쿠쿠, 위니아 등 공급사명 입력" 
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">사은품 내역</label>
-                      <input type="text" value={editingProduct.giftText || ''} onChange={(e) => setEditingProduct({...editingProduct, giftText: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#191F28]" placeholder="예: 현금 30만원 지원, 상품권 등" />
-                    </div>
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">월 납입금</label>
-                      <input type="text" value={formatNumber(editingProduct.price)} onChange={(e) => setEditingProduct({...editingProduct, price: e.target.value.replace(/\D/g, '')})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#3182F6] text-right" />
-                    </div>
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">제휴카드 혜택가</label>
-                      <input type="text" value={formatNumber(editingProduct.discountPrice)} onChange={(e) => setEditingProduct({...editingProduct, discountPrice: e.target.value.replace(/\D/g, '')})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] font-bold text-[#F04452] text-right" />
-                    </div>
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">라벨 (태그)</label>
-                      <input type="text" value={editingProduct.tag || ''} onChange={(e) => setEditingProduct({...editingProduct, tag: e.target.value})} className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none" placeholder="예: BEST, HOT, 특가" />
-                    </div>
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">구좌 구분</label>
-                      <select 
-                        value={editingProduct.accountCount || (plans.find(p => p.id === editingProduct.planId)?.accountCount) || '1구좌'} 
-                        onChange={(e) => setEditingProduct({...editingProduct, accountCount: e.target.value})} 
-                        className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold text-[#191F28]"
-                      >
-                        <option value="1구좌">1구좌 (싱글)</option>
-                        <option value="2구좌">2구좌 (더블)</option>
-                        <option value="3구좌">3구좌 (트리플)</option>
-                        <option value="4구좌">4구좌 (쿼드)</option>
-                      </select>
-                    </div>
-                    <div className="col-span-1 sm:col-span-2">
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1">노출 랜딩페이지</label>
-                      <div className="flex flex-wrap gap-2 p-3 bg-[#F2F4F6] rounded-[16px]">
-                        {dbLandings.filter(l => l.isActive).map(landing => {
-                          const currentLandingPages = editingProduct.landingPages || [];
-                          const isChecked = currentLandingPages.includes(landing.path);
-                          return (
-                            <label 
-                              key={landing._id} 
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-[12px] font-bold cursor-pointer transition-colors select-none ${
-                                isChecked ? 'bg-[#3182F6] text-white shadow-xs' : 'bg-white text-[#4E5968] hover:bg-gray-100 border border-[#E5E8EB]'
-                              }`}
-                            >
-                              <input 
-                                type="checkbox" 
-                                className="hidden" 
-                                checked={isChecked} 
-                                onChange={(e) => {
-                                  const updated = e.target.checked 
-                                    ? [...currentLandingPages, landing.path] 
-                                    : currentLandingPages.filter((p: string) => p !== landing.path);
-                                  setEditingProduct({ ...editingProduct, landingPages: updated });
-                                }} 
-                              />
-                              <span>{landing.name}</span>
-                              <span className={`text-[10px] ${isChecked ? 'text-blue-100' : 'text-[#8B95A1]'}`}>({landing.path})</span>
-                            </label>
-                          );
-                        })}
+                      <div className="adm-field">
+                        <label>카테고리</label>
+                        <select value={editingProduct.category} onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })} className="adm-select">
+                          {settings?.categories?.map((cat: string) => <option key={cat}>{cat}</option>)}
+                        </select>
+                      </div>
+                      <div className="adm-field full">
+                        <label>제품명</label>
+                        <input type="text" value={editingProduct.name} onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })} className="adm-input font-semibold" />
+                      </div>
+                      <div className="adm-field">
+                        <div className="flex justify-between items-center">
+                          <label>모델명</label>
+                          <button
+                            type="button"
+                            onClick={handleSingleSmartFetch}
+                            disabled={isSingleFetching}
+                            className="adm-btn xs sage"
+                            title="입력한 모델명으로 LG전자 공식 웹사이트에서 이미지, 제품명, 스펙 정보를 가져옵니다"
+                          >
+                            <Zap className="w-3 h-3" />
+                            {isSingleFetching ? '수집 중...' : '스마트 수집'}
+                          </button>
+                        </div>
+                        <input type="text" value={editingProduct.model} onChange={(e) => setEditingProduct({ ...editingProduct, model: e.target.value })} className="adm-input font-mono" placeholder="예: AS195DWWA" />
+                      </div>
+                      <div className="adm-field">
+                        <label>공급사</label>
+                        <input
+                          type="text"
+                          value={editingProduct.supplier ?? editingProduct.supplyPrice ?? ''}
+                          onChange={(e) => setEditingProduct({
+                            ...editingProduct,
+                            supplier: e.target.value,
+                            supplyPrice: e.target.value,
+                          })}
+                          className="adm-input"
+                          placeholder="예: TU, 쿠쿠, 위니아 등 공급사명 입력"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>사은품 내역</label>
+                        <input type="text" value={editingProduct.giftText || ''} onChange={(e) => setEditingProduct({ ...editingProduct, giftText: e.target.value })} className="adm-input" placeholder="예: 현금 30만원 지원, 상품권 등" />
+                      </div>
+                      <div className="adm-field">
+                        <label>월 납입금</label>
+                        <input type="text" value={formatNumber(editingProduct.price)} onChange={(e) => setEditingProduct({ ...editingProduct, price: e.target.value.replace(/\D/g, '') })} className="adm-input font-bold text-[#263d36] text-right" />
+                      </div>
+                      <div className="adm-field">
+                        <label>제휴카드 혜택가</label>
+                        <input type="text" value={formatNumber(editingProduct.discountPrice)} onChange={(e) => setEditingProduct({ ...editingProduct, discountPrice: e.target.value.replace(/\D/g, '') })} className="adm-input font-bold text-[#295e52] text-right" />
+                      </div>
+                      <div className="adm-field">
+                        <label>라벨 (태그)</label>
+                        <input type="text" value={editingProduct.tag || ''} onChange={(e) => setEditingProduct({ ...editingProduct, tag: e.target.value })} className="adm-input" placeholder="예: BEST, HOT, 특가" />
+                      </div>
+                      <div className="adm-field">
+                        <label>구좌 구분</label>
+                        <select
+                          value={editingProduct.accountCount || (plans.find(p => p.id === editingProduct.planId)?.accountCount) || '1구좌'}
+                          onChange={(e) => setEditingProduct({ ...editingProduct, accountCount: e.target.value })}
+                          className="adm-select"
+                        >
+                          <option value="1구좌">1구좌 (싱글)</option>
+                          <option value="2구좌">2구좌 (더블)</option>
+                          <option value="3구좌">3구좌 (트리플)</option>
+                          <option value="4구좌">4구좌 (쿼드)</option>
+                        </select>
+                      </div>
+                      <div className="adm-field full">
+                        <label>노출 랜딩페이지</label>
+                        <div className="flex flex-wrap gap-2 p-3 bg-[#f9faf7] border border-[#e6eae3] rounded-[12px]">
+                          {dbLandings.filter(l => l.isActive).map(landing => {
+                            const currentLandingPages = editingProduct.landingPages || [];
+                            const isChecked = currentLandingPages.includes(landing.path);
+                            return (
+                              <label
+                                key={landing._id}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-[12px] font-semibold cursor-pointer transition-colors select-none border ${
+                                  isChecked ? 'bg-[#295e52] text-white border-[#295e52]' : 'bg-white text-[#526058] hover:bg-[#f2f5f0] border-[#e6eae3]'
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  className="hidden"
+                                  checked={isChecked}
+                                  onChange={(e) => {
+                                    const updated = e.target.checked
+                                      ? [...currentLandingPages, landing.path]
+                                      : currentLandingPages.filter((p: string) => p !== landing.path);
+                                    setEditingProduct({ ...editingProduct, landingPages: updated });
+                                  }}
+                                />
+                                <span>{landing.name}</span>
+                                <span className={`text-[10.5px] font-mono ${isChecked ? 'text-[#cfe0cb]' : 'text-[#86918a]'}`}>({landing.path})</span>
+                              </label>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* 제품 스펙 정보 설정 (표 형태) */}
-                  <div className="pt-8 border-t border-[#F2F4F6]">
-                    <div className="flex justify-between items-center mb-4">
+                  <div className="pt-6 border-t border-[#e6eae3]">
+                    <div className="flex justify-between items-center mb-3">
                       <div>
-                        <h3 className="font-bold text-[18px] text-[#191F28] flex items-center gap-2">
-                          <Zap className="w-5 h-5 text-[#3182F6]" /> 제품 스펙 정보 (표 형태)
+                        <h3 className="font-bold text-[15px] text-[#263d36] flex items-center gap-2">
+                          <Zap className="w-4 h-4 text-[#295e52]" /> 제품 스펙 정보 (표 형태)
                         </h3>
-                        <p className="text-[12px] text-[#8B95A1] mt-0.5">스마트 등록 시 자동 수집된 상세 스펙 정보 표입니다.</p>
+                        <p className="text-[12px] text-[#86918a] mt-0.5">스마트 등록 시 자동 수집된 상세 스펙 정보 표입니다.</p>
                       </div>
-                      <button 
+                      <button
                         onClick={() => {
                           const updated = [...(editingProduct.specifications || []), { category: '주요스펙', name: '', value: '' }];
                           setEditingProduct({ ...editingProduct, specifications: updated });
                         }}
-                        className="bg-[#3182F6] text-white px-3.5 py-2 rounded-[10px] text-[12px] font-bold flex items-center gap-1 shadow-sm"
+                        className="adm-btn sm sage"
                       >
-                        <Plus className="w-4 h-4"/> 스펙 항목 추가
+                        <Plus className="w-3.5 h-3.5" /> 스펙 항목 추가
                       </button>
                     </div>
 
                     {(!editingProduct.specifications || editingProduct.specifications.length === 0) ? (
-                      <div className="bg-[#F9FAFB] p-6 rounded-[20px] border border-[#E5E8EB] text-center text-[#8B95A1] text-[13px]">
+                      <div className="adm-note-card text-center py-6 text-[#86918a] text-[13px]">
                         등록된 상세 스펙 정보가 없습니다. [스펙 항목 추가] 버튼을 눌러 스펙 항목을 작성해 주세요.
                       </div>
                     ) : (
-                      <div className="bg-[#F9FAFB] rounded-[20px] border border-[#E5E8EB] overflow-hidden shadow-sm">
-                        <div className="max-h-[420px] overflow-y-auto hide-scrollbar">
-                          <table className="w-full text-left border-collapse">
-                            <thead className="bg-[#F2F4F6] sticky top-0 border-b border-[#E5E8EB] z-10">
+                      <div className="rounded-[12px] border border-[#e6eae3] overflow-hidden">
+                        <div className="max-h-[420px] overflow-y-auto">
+                          <table className="adm-table">
+                            <thead>
                               <tr>
-                                <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968] w-[140px]">분류 (카테고리)</th>
-                                <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968] w-[200px]">스펙 항목명</th>
-                                <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968]">상세값</th>
-                                <th className="px-4 py-3 text-[12px] font-bold text-[#4E5968] w-12 text-center">삭제</th>
+                                <th className="w-[140px]">분류 (카테고리)</th>
+                                <th className="w-[200px]">스펙 항목명</th>
+                                <th>상세값</th>
+                                <th className="w-12 text-center">삭제</th>
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-[#E5E8EB] bg-white">
+                            <tbody>
                               {editingProduct.specifications.map((spec: any, sIdx: number) => (
-                                <tr key={sIdx} className="hover:bg-[#F9FAFB] transition-colors">
+                                <tr key={sIdx}>
                                   <td className="px-3 py-2">
-                                    <input 
+                                    <input
                                       type="text"
                                       value={spec.category || ''}
                                       onChange={(e) => {
@@ -2056,12 +2185,13 @@ export default function ProductManagement() {
                                         updated[sIdx] = { ...updated[sIdx], category: e.target.value };
                                         setEditingProduct({ ...editingProduct, specifications: updated });
                                       }}
-                                      className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#3182F6]"
+                                      className="adm-input font-semibold text-[#295e52]"
+                                      style={{ height: 34 }}
                                       placeholder="예: 크기, 용량"
                                     />
                                   </td>
                                   <td className="px-3 py-2">
-                                    <input 
+                                    <input
                                       type="text"
                                       value={spec.name || ''}
                                       onChange={(e) => {
@@ -2069,12 +2199,13 @@ export default function ProductManagement() {
                                         updated[sIdx] = { ...updated[sIdx], name: e.target.value };
                                         setEditingProduct({ ...editingProduct, specifications: updated });
                                       }}
-                                      className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] font-bold text-[#191F28]"
+                                      className="adm-input font-semibold"
+                                      style={{ height: 34 }}
                                       placeholder="예: 전체 용량"
                                     />
                                   </td>
                                   <td className="px-3 py-2">
-                                    <input 
+                                    <input
                                       type="text"
                                       value={spec.value || ''}
                                       onChange={(e) => {
@@ -2082,21 +2213,22 @@ export default function ProductManagement() {
                                         updated[sIdx] = { ...updated[sIdx], value: e.target.value };
                                         setEditingProduct({ ...editingProduct, specifications: updated });
                                       }}
-                                      className="w-full bg-[#F2F4F6] border border-[#E5E8EB] px-3 py-2 rounded-[8px] text-[13px] text-[#4E5968]"
+                                      className="adm-input"
+                                      style={{ height: 34 }}
                                       placeholder="예: 870L"
                                     />
                                   </td>
                                   <td className="px-3 py-2 text-center">
-                                    <button 
+                                    <button
                                       onClick={() => {
                                         const updated = [...editingProduct.specifications];
                                         updated.splice(sIdx, 1);
                                         setEditingProduct({ ...editingProduct, specifications: updated });
                                       }}
-                                      className="text-red-500 hover:bg-red-50 p-1.5 rounded-[6px] transition-colors"
+                                      className="adm-btn icon-only sm danger"
                                       title="스펙 항목 삭제"
                                     >
-                                      <Trash2 className="w-4 h-4" />
+                                      <Trash2 className="w-3.5 h-3.5" />
                                     </button>
                                   </td>
                                 </tr>
@@ -2108,12 +2240,12 @@ export default function ProductManagement() {
                     )}
                   </div>
 
-                  {/* 타사 비교 정보 편집 (스마트 등록이 아니거나 수동 설정 시) */}
+                  {/* 타사 비교 정보 편집 */}
                   {(!editingProduct.isSmartRegistered || editingProduct.showCompetitors) && (
-                    <div className="pt-8 border-t border-[#F2F4F6]">
-                      <div className="flex justify-between items-center mb-6">
-                        <h3 className="font-bold text-[18px]">타사 비교 정보 설정</h3>
-                        <button 
+                    <div className="pt-6 border-t border-[#e6eae3]">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-bold text-[15px] text-[#263d36]">타사 비교 정보 설정</h3>
+                        <button
                           onClick={() => {
                             const defaultPartner = competitors[0] || { name: '타사', months: 60, type: '타사' };
                             const newComp = {
@@ -2122,64 +2254,64 @@ export default function ProductManagement() {
                               price: '0',
                               period: (defaultPartner.months || 60) + '개월',
                               isOurs: defaultPartner.type === '자사',
-                              benefit: ''
+                              benefit: '',
                             };
                             setEditingProduct({
                               ...editingProduct,
-                              comparisons: [...(editingProduct.comparisons || []), newComp]
+                              comparisons: [...(editingProduct.comparisons || []), newComp],
                             });
                           }}
-                          className="bg-[#3182F6] text-white px-4 py-2 rounded-[10px] text-[13px] font-bold flex items-center gap-1 shadow-sm"
+                          className="adm-btn sm sage"
                         >
-                          <Plus className="w-4 h-4"/> 비교 대상 추가
+                          <Plus className="w-3.5 h-3.5" /> 비교 대상 추가
                         </button>
                       </div>
-                      
-                      <div className="space-y-4">
+
+                      <div className="space-y-3">
                         {editingProduct.comparisons?.map((comp: any, idx: number) => (
-                          <div key={idx} className="flex items-center gap-4 bg-[#F9FAFB] p-5 rounded-[20px] border border-[#E5E8EB]">
+                          <div key={idx} className="flex items-center gap-3 bg-[#f9faf7] p-4 rounded-[12px] border border-[#e6eae3]">
                             <div className="w-[180px]">
-                              <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">비교 업체</label>
-                              <select 
-                                value={comp.company} 
+                              <label className="block text-[11px] font-semibold text-[#86918a] mb-1">비교 업체</label>
+                              <select
+                                value={comp.company}
                                 onChange={(e) => {
                                   const partner = competitors.find(c => c.name === e.target.value);
                                   const updated = [...editingProduct.comparisons];
-                                  updated[idx] = { 
-                                    ...updated[idx], 
+                                  updated[idx] = {
+                                    ...updated[idx],
                                     company: e.target.value,
                                     isOurs: partner?.type === '자사',
-                                    period: (partner?.months || 60) + '개월'
+                                    period: (partner?.months || 60) + '개월',
                                   };
                                   setEditingProduct({ ...editingProduct, comparisons: updated });
                                 }}
-                                className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none"
+                                className="adm-select"
                               >
                                 {competitors.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
                               </select>
                             </div>
-                            <div className="w-[140px]">
-                              <label className="block text-[11px] font-bold text-[#8B95A1] mb-1 px-1">월 납입금</label>
-                              <input 
-                                type="text" 
-                                value={formatNumber(comp.price)} 
+                            <div className="w-[160px]">
+                              <label className="block text-[11px] font-semibold text-[#86918a] mb-1">월 납입금</label>
+                              <input
+                                type="text"
+                                value={formatNumber(comp.price)}
                                 onChange={(e) => {
                                   const updated = [...editingProduct.comparisons];
                                   updated[idx] = { ...updated[idx], price: e.target.value.replace(/\D/g, '') };
                                   setEditingProduct({ ...editingProduct, comparisons: updated });
                                 }}
-                                className="w-full bg-white border border-[#D1D6DB] px-4 py-2.5 rounded-[10px] text-[14px] font-bold focus:outline-none text-right" 
+                                className="adm-input font-semibold text-right"
                               />
                             </div>
-                            <button 
+                            <button
                               onClick={() => {
                                 const updated = [...editingProduct.comparisons];
                                 updated.splice(idx, 1);
                                 setEditingProduct({ ...editingProduct, comparisons: updated });
                               }}
-                              className="text-red-500 hover:bg-red-50 p-2.5 rounded-[10px] mt-4"
+                              className="adm-btn icon-only sm danger mt-5"
                             >
-                              <Trash2 className="w-5 h-5"/>
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         ))}
@@ -2188,50 +2320,44 @@ export default function ProductManagement() {
                   )}
 
                   {editingProduct.isSmartRegistered && !editingProduct.showCompetitors && (
-                    <div className="pt-4 text-center">
-                      <button 
+                    <div className="pt-2 text-center">
+                      <button
                         onClick={() => setEditingProduct({ ...editingProduct, showCompetitors: true })}
-                        className="text-[12px] font-bold text-[#8B95A1] hover:text-[#3182F6] underline"
+                        className="text-[12px] font-semibold text-[#6b7870] hover:text-[#295e52] underline cursor-pointer"
                       >
                         + 타사 비교 정보 설정 펼치기
                       </button>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 gap-8 pt-8">
+                  <div className="grid grid-cols-1 gap-8 pt-6 border-t border-[#e6eae3]">
                     {/* Thumbnail Images */}
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center px-1">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
                         <div className="flex flex-wrap items-center gap-2">
-                          <label className="block text-[13px] font-bold text-[#4E5968]">썸네일 리스트 (여러 개 등록 가능)</label>
-                          <span className="text-[11px] text-[#3182F6] font-bold bg-[#E8F3FF] px-2.5 py-0.5 rounded-full border border-[#3182F6]/20">
+                          <label className="block text-[13px] font-bold text-[#263d36]">썸네일 리스트 (여러 개 등록 가능)</label>
+                          <span className="adm-pill active" style={{ fontSize: 10.5, padding: '2px 8px' }}>
                             드래그하여 순서 변경 (1번이 대표)
                           </span>
                         </div>
                         <div className="flex gap-2">
-                          <button 
-                            onClick={() => addImageUrl('images')}
-                            className="text-[12px] font-bold text-[#3182F6] flex items-center gap-1 hover:underline"
-                          >
-                            <Link className="w-3 h-3"/> URL 추가
+                          <button onClick={() => addImageUrl('images')} className="adm-btn xs">
+                            <Link className="w-3 h-3" /> URL 추가
                           </button>
-                          <button 
-                            onClick={() => thumbInputRef.current?.click()}
-                            className="text-[12px] font-bold text-[#3182F6] flex items-center gap-1 hover:underline"
-                          >
-                            <Upload className="w-3 h-3"/> 이미지 업로드
+                          <button onClick={() => thumbInputRef.current?.click()} className="adm-btn xs sage">
+                            <Upload className="w-3 h-3" /> 이미지 업로드
                           </button>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                         {(editingProduct.images || []).map((img: string, idx: number) => {
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                        {(editingProduct.images || []).map((img: string, idx: number) => {
                           const isRepresentative = (editingProduct.image ? editingProduct.image === img : idx === 0);
                           const isDragging = draggedThumbIdx === idx;
                           const isDragOver = dragOverThumbIdx === idx;
 
                           return (
-                            <div 
-                              key={idx} 
+                            <div
+                              key={idx}
                               draggable
                               onDragStart={(e) => {
                                 setDraggedThumbIdx(idx);
@@ -2255,74 +2381,66 @@ export default function ProductManagement() {
                                 setDragOverThumbIdx(null);
                               }}
                               onClick={() => setEditingProduct({ ...editingProduct, image: img })}
-                              className={`aspect-square bg-[#F9FAFB] border rounded-[16px] overflow-hidden relative group cursor-grab active:cursor-grabbing transition-all select-none ${
-                                isDragging ? 'opacity-30 scale-95 border-dashed border-[#3182F6]' :
-                                isDragOver ? 'border-2 border-[#3182F6] ring-4 ring-[#3182F6]/20 scale-105 shadow-md' :
-                                isRepresentative ? 'border-2 border-[#3182F6] shadow-sm' : 'border-[#E5E8EB] hover:border-[#3182F6]'
+                              className={`aspect-square bg-[#f9faf7] border rounded-[12px] overflow-hidden relative group cursor-grab active:cursor-grabbing transition-all select-none ${
+                                isDragging ? 'opacity-30 scale-95 border-dashed border-[#295e52]' :
+                                isDragOver ? 'border-2 border-[#295e52] ring-4 ring-[#295e52]/15 scale-105' :
+                                isRepresentative ? 'border-2 border-[#295e52]' : 'border-[#e6eae3] hover:border-[#295e52]'
                               }`}
                               title="드래그하여 위치 변경, 클릭 시 대표 썸네일 지정"
                             >
                               <PreviewImage src={img} className="w-full h-full object-cover pointer-events-none" />
-                              
-                              <div className="absolute top-1 left-1 bg-black/40 text-white/90 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                              <div className="absolute top-1.5 left-1.5 bg-black/45 text-white/90 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                 <GripVertical className="w-3.5 h-3.5" />
                               </div>
-
-                              <button 
+                              <button
                                 onClick={(e) => { e.stopPropagation(); removeImage('images', idx); }}
-                                className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80"
+                                className="absolute top-1.5 right-1.5 bg-black/55 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80"
                                 title="이미지 삭제"
                               >
-                                <X className="w-3 h-3"/>
+                                <X className="w-3 h-3" />
                               </button>
-                              <div className={`absolute bottom-0 left-0 right-0 text-[10px] text-center py-0.5 font-bold ${isRepresentative ? 'bg-[#3182F6] text-white' : 'bg-black/40 text-white/90 group-hover:bg-[#3182F6]/80'}`}>
+                              <div className={`absolute bottom-0 left-0 right-0 text-[10px] text-center py-0.5 font-bold ${isRepresentative ? 'bg-[#295e52] text-white' : 'bg-black/45 text-white/90 group-hover:bg-[#295e52]/85'}`}>
                                 {idx + 1}번 {isRepresentative ? '(대표)' : '지정'}
                               </div>
                             </div>
                           );
                         })}
-                        <div 
+                        <div
                           onClick={() => thumbInputRef.current?.click()}
-                          className="aspect-square bg-[#F9FAFB] border-2 border-dashed border-[#E5E8EB] rounded-[16px] flex flex-col items-center justify-center cursor-pointer hover:border-[#3182F6] hover:bg-[#F2F4F6] transition-all group"
+                          className="aspect-square bg-[#f9faf7] border-2 border-dashed border-[#dce2d8] rounded-[12px] flex flex-col items-center justify-center cursor-pointer hover:border-[#295e52] hover:bg-[#f2f5f0] transition-all group"
                         >
-                          <Plus className="w-6 h-6 text-[#D1D6DB] group-hover:text-[#3182F6] mb-1" />
-                          <span className="text-[11px] text-[#8B95A1] group-hover:text-[#3182F6]">추가하기</span>
+                          <Plus className="w-6 h-6 text-[#9aa89f] group-hover:text-[#295e52] mb-1" />
+                          <span className="text-[11px] text-[#86918a] group-hover:text-[#295e52] font-semibold">추가하기</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Detail Images */}
-                    <div className="space-y-4 pt-4 border-t border-[#F2F4F6]">
-                      <div className="flex justify-between items-center px-1">
+                    <div className="space-y-3 pt-4 border-t border-[#e6eae3]">
+                      <div className="flex justify-between items-center">
                         <div className="flex flex-wrap items-center gap-2">
-                          <label className="block text-[13px] font-bold text-[#4E5968]">상세 이미지 리스트 (여러 개 등록 가능)</label>
-                          <span className="text-[11px] text-[#8B95A1] font-bold bg-[#F2F4F6] px-2.5 py-0.5 rounded-full">
+                          <label className="block text-[13px] font-bold text-[#263d36]">상세 이미지 리스트 (여러 개 등록 가능)</label>
+                          <span className="adm-pill neutral" style={{ fontSize: 10.5, padding: '2px 8px' }}>
                             드래그하여 순서 변경
                           </span>
                         </div>
                         <div className="flex gap-2">
-                          <button 
-                            onClick={() => addImageUrl('detailImages')}
-                            className="text-[12px] font-bold text-[#3182F6] flex items-center gap-1 hover:underline"
-                          >
-                            <Link className="w-3 h-3"/> URL 추가
+                          <button onClick={() => addImageUrl('detailImages')} className="adm-btn xs">
+                            <Link className="w-3 h-3" /> URL 추가
                           </button>
-                          <button 
-                            onClick={() => detailInputRef.current?.click()}
-                            className="text-[12px] font-bold text-[#3182F6] flex items-center gap-1 hover:underline"
-                          >
-                            <Upload className="w-3 h-3"/> 이미지 업로드
+                          <button onClick={() => detailInputRef.current?.click()} className="adm-btn xs sage">
+                            <Upload className="w-3 h-3" /> 이미지 업로드
                           </button>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                         {(editingProduct.detailImages || []).map((img: string, idx: number) => {
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                        {(editingProduct.detailImages || []).map((img: string, idx: number) => {
                           const isDragging = draggedDetailIdx === idx;
                           const isDragOver = dragOverDetailIdx === idx;
 
                           return (
-                            <div 
-                              key={idx} 
+                            <div
+                              key={idx}
                               draggable
                               onDragStart={(e) => {
                                 setDraggedDetailIdx(idx);
@@ -2343,55 +2461,54 @@ export default function ProductManagement() {
                               }}
                               onDragEnd={() => {
                                 setDraggedDetailIdx(null);
+                                setDragOverThumbIdx(null);
                                 setDragOverDetailIdx(null);
                               }}
-                              className={`aspect-square bg-[#F9FAFB] border rounded-[16px] overflow-hidden relative group cursor-grab active:cursor-grabbing transition-all select-none ${
-                                isDragging ? 'opacity-30 scale-95 border-dashed border-[#3182F6]' :
-                                isDragOver ? 'border-2 border-[#3182F6] ring-4 ring-[#3182F6]/20 scale-105 shadow-md' :
-                                'border-[#E5E8EB] hover:border-[#3182F6]'
+                              className={`aspect-square bg-[#f9faf7] border rounded-[12px] overflow-hidden relative group cursor-grab active:cursor-grabbing transition-all select-none ${
+                                isDragging ? 'opacity-30 scale-95 border-dashed border-[#295e52]' :
+                                isDragOver ? 'border-2 border-[#295e52] ring-4 ring-[#295e52]/15 scale-105' :
+                                'border-[#e6eae3] hover:border-[#295e52]'
                               }`}
                               title="드래그하여 위치 변경"
                             >
                               <PreviewImage src={img} className="w-full h-full object-cover pointer-events-none" />
-                              
-                              <div className="absolute top-1 left-1 bg-black/40 text-white/90 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                              <div className="absolute top-1.5 left-1.5 bg-black/45 text-white/90 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                 <GripVertical className="w-3.5 h-3.5" />
                               </div>
-
-                              <button 
+                              <button
                                 onClick={(e) => { e.stopPropagation(); removeImage('detailImages', idx); }}
-                                className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80"
+                                className="absolute top-1.5 right-1.5 bg-black/55 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/80"
                                 title="이미지 삭제"
                               >
-                                <X className="w-3 h-3"/>
+                                <X className="w-3 h-3" />
                               </button>
-                              <div className="absolute bottom-0 left-0 right-0 text-[10px] text-center py-0.5 font-bold bg-black/40 text-white/90">
+                              <div className="absolute bottom-0 left-0 right-0 text-[10px] text-center py-0.5 font-bold bg-black/45 text-white/90">
                                 {idx + 1}번 상세이미지
                               </div>
                             </div>
                           );
                         })}
-                        <div 
+                        <div
                           onClick={() => detailInputRef.current?.click()}
-                          className="aspect-square bg-[#F9FAFB] border-2 border-dashed border-[#E5E8EB] rounded-[16px] flex flex-col items-center justify-center cursor-pointer hover:border-[#3182F6] hover:bg-[#F2F4F6] transition-all group"
+                          className="aspect-square bg-[#f9faf7] border-2 border-dashed border-[#dce2d8] rounded-[12px] flex flex-col items-center justify-center cursor-pointer hover:border-[#295e52] hover:bg-[#f2f5f0] transition-all group"
                         >
-                          <Plus className="w-6 h-6 text-[#D1D6DB] group-hover:text-[#3182F6] mb-1" />
-                          <span className="text-[11px] text-[#8B95A1] group-hover:text-[#3182F6]">추가하기</span>
+                          <Plus className="w-6 h-6 text-[#9aa89f] group-hover:text-[#295e52] mb-1" />
+                          <span className="text-[11px] text-[#86918a] group-hover:text-[#295e52] font-semibold">추가하기</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-<div className="pt-8 flex gap-4">
-                    <button onClick={() => { setViewMode('list'); setEditingProduct(null); }} className="flex-1 bg-[#F2F4F6] text-[#4E5968] font-bold py-4 rounded-[20px] transition-all hover:bg-[#E5E8EB]">취소하기</button>
-                    <button 
+                  <div className="pt-6 border-t border-[#e6eae3] flex justify-end gap-2.5">
+                    <button onClick={() => { setViewMode('list'); setEditingProduct(null); }} className="adm-btn lg">취소하기</button>
+                    <button
                       onClick={async () => {
                         if (!editingProduct) return;
                         try {
                           const curPlan = plans.find(p => p.id === editingProduct.planId) || selectedPlan;
                           const planAccount = editingProduct.accountCount || curPlan?.accountCount || (editingProduct.planId ? `${editingProduct.planId}구좌` : '1구좌');
                           const is60 = [5, 6, 7, 8].includes(editingProduct.planId ?? 0) || (curPlan?.name && curPlan.name.includes('60패키지'));
-                          
+
                           let defaultLandings = editingProduct.landingPages;
                           if (!defaultLandings || defaultLandings.length === 0) {
                             if (is60) {
@@ -2406,17 +2523,17 @@ export default function ProductManagement() {
                           }
 
                           const images = editingProduct.images || [];
-                          const primaryImg = (editingProduct.image && editingProduct.image.trim() !== '') 
-                            ? editingProduct.image 
+                          const primaryImg = (editingProduct.image && editingProduct.image.trim() !== '')
+                            ? editingProduct.image
                             : (images.length > 0 ? images[0] : '');
 
                           const sortedComparisons = [...(editingProduct.comparisons || [])].sort((a: any, b: any) => parseInt(a.price) - parseInt(b.price));
-                          const productData = { 
-                            ...editingProduct, 
+                          const productData = {
+                            ...editingProduct,
                             accountCount: planAccount,
                             landingPages: defaultLandings,
                             image: primaryImg,
-                            comparisons: sortedComparisons 
+                            comparisons: sortedComparisons,
                           };
 
                           if (editingProduct._id) {
@@ -2432,7 +2549,8 @@ export default function ProductManagement() {
                           console.error(e);
                         }
                       }}
-                      className="flex-[2] bg-[#3182F6] text-white font-bold py-4 rounded-[20px] shadow-lg shadow-[#3182F6]/20 transition-transform active:scale-95"
+                      className="adm-btn primary lg"
+                      style={{ minWidth: 180 }}
                     >
                       정보 저장하기
                     </button>
@@ -2441,94 +2559,97 @@ export default function ProductManagement() {
               </div>
             </div>
           ) : viewMode === 'edit_plan' && editingPlan ? (
-            <div className="flex flex-col h-full overflow-hidden">
-              <div className="px-4 lg:px-8 py-6 border-b border-[#F2F4F6] flex justify-between items-center bg-[#F9FAFB]">
+            <div className="flex flex-col">
+              <div className="adm-panel-top" style={{ padding: '18px 24px', background: '#fafbf9' }}>
                 <div>
-                  <h3 className="font-bold text-[18px] lg:text-[20px] mb-1">구좌(상품군) 관리</h3>
-                  <p className="text-[12px] text-[#8B95A1]">상품군별 명칭과 기본 가격을 설정합니다.</p>
+                  <span className="adm-eyebrow">PLAN CATEGORY</span>
+                  <h3 className="adm-panel-title" style={{ fontSize: 18 }}>구좌(상품군) 관리</h3>
+                  <p className="adm-panel-sub">상품군별 명칭과 기본 납입 가격을 설정합니다.</p>
                 </div>
-                <button onClick={() => setViewMode('list')} className="p-2 hover:bg-[#F2F4F6] rounded-full transition-colors">
-                  <X className="w-6 h-6 text-[#4E5968]" />
+                <button onClick={() => setViewMode('list')} className="adm-btn icon-only sm">
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto p-8 bg-white no-scrollbar">
-                <div className="max-w-xl mx-auto space-y-6">
-                  <div>
-                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2">구좌 고유 ID (숫자)</label>
-                    <input 
-                      type="number" 
-                      value={editingPlan.numericId} 
-                      onChange={(e) => setEditingPlan({...editingPlan, numericId: parseInt(e.target.value)})} 
-                      className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold"
+              <div className="p-6 lg:p-8">
+                <div className="max-w-xl space-y-5">
+                  <div className="adm-field">
+                    <label>구좌 고유 ID (숫자)</label>
+                    <input
+                      type="number"
+                      value={editingPlan.numericId}
+                      onChange={(e) => setEditingPlan({ ...editingPlan, numericId: parseInt(e.target.value) })}
+                      className="adm-input font-semibold"
                     />
-                    <p className="mt-1 text-[11px] text-[#8B95A1]">이 숫자는 제품 등록 시 '구좌 ID'로 사용됩니다.</p>
+                    <span className="adm-field-hint">이 숫자는 제품 등록 시 &apos;구좌 ID&apos;로 사용됩니다.</span>
                   </div>
-                  <div>
-                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2">구좌명</label>
-                    <input 
-                      type="text" 
-                      value={editingPlan.name} 
-                      onChange={(e) => setEditingPlan({...editingPlan, name: e.target.value})} 
-                      className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold"
+                  <div className="adm-field">
+                    <label>구좌명</label>
+                    <input
+                      type="text"
+                      value={editingPlan.name}
+                      onChange={(e) => setEditingPlan({ ...editingPlan, name: e.target.value })}
+                      className="adm-input font-semibold"
                       placeholder="예: 스페셜 299 더블"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2">기본 월납입금</label>
-                      <input 
-                        type="text" 
-                        value={editingPlan.basePrice} 
-                        onChange={(e) => setEditingPlan({...editingPlan, basePrice: formatNumber(e.target.value)})} 
-                        className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold"
+                  <div className="adm-field-grid">
+                    <div className="adm-field">
+                      <label>기본 월납입금</label>
+                      <input
+                        type="text"
+                        value={editingPlan.basePrice}
+                        onChange={(e) => setEditingPlan({ ...editingPlan, basePrice: formatNumber(e.target.value) })}
+                        className="adm-input font-semibold"
                       />
                     </div>
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#4E5968] mb-2">제휴카드 혜택가</label>
-                      <input 
-                        type="text" 
-                        value={editingPlan.benefitPrice} 
-                        onChange={(e) => setEditingPlan({...editingPlan, benefitPrice: formatNumber(e.target.value)})} 
-                        className="w-full bg-[#F2F4F6] px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold"
+                    <div className="adm-field">
+                      <label>제휴카드 혜택가</label>
+                      <input
+                        type="text"
+                        value={editingPlan.benefitPrice}
+                        onChange={(e) => setEditingPlan({ ...editingPlan, benefitPrice: formatNumber(e.target.value) })}
+                        className="adm-input font-semibold text-[#295e52]"
                       />
                     </div>
-                    </div>
-                  <div>
-                    <label className="block text-[13px] font-bold text-[#4E5968] mb-2 px-1 text-[#3182F6]">기본 구좌수 설정</label>
-                    <input 
-                      type="text" 
-                      value={editingPlan.accountCount || ''} 
-                      onChange={(e) => setEditingPlan({...editingPlan, accountCount: e.target.value})} 
-                      className="w-full bg-[#F0F7FF] border border-[#3182F6]/20 px-5 py-3.5 rounded-[16px] text-[15px] focus:outline-none font-bold"
+                  </div>
+                  <div className="adm-field">
+                    <label>기본 구좌수 설정</label>
+                    <input
+                      type="text"
+                      value={editingPlan.accountCount || ''}
+                      onChange={(e) => setEditingPlan({ ...editingPlan, accountCount: e.target.value })}
+                      className="adm-input font-semibold"
                       placeholder="예: 1구좌, 2구좌"
                     />
-                    <p className="mt-1 text-[11px] text-[#8B95A1]">이 구좌수 정보는 해당 카테고리 모든 제품의 기본 정보로 활용됩니다.</p>
+                    <span className="adm-field-hint">이 구좌수 정보는 해당 카테고리 모든 제품의 기본 정보로 활용됩니다.</span>
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-[#F9FAFB] rounded-[16px]">
-                    <div className="text-[14px] font-bold text-[#4E5968]">메인 페이지 노출 활성화</div>
-                    <button 
-                      onClick={() => setEditingPlan({...editingPlan, isMainActive: !editingPlan.isMainActive})}
-                      className={`w-12 h-6 rounded-full transition-all relative ${editingPlan.isMainActive ? 'bg-[#3182F6]' : 'bg-[#D1D6DB]'}`}
-                    >
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${editingPlan.isMainActive ? 'left-7' : 'left-1'}`}></div>
-                    </button>
+                  <div className="adm-setting-row" style={{ border: '1px solid #e6eae3', borderRadius: 12, padding: '14px 16px', background: '#f9faf7' }}>
+                    <div className="adm-setting-meta">
+                      <strong>메인 페이지 노출 활성화</strong>
+                      <span>고객 메인 상품군 탭에 이 구좌를 표시합니다.</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditingPlan({ ...editingPlan, isMainActive: !editingPlan.isMainActive })}
+                      className={`adm-switch ${editingPlan.isMainActive ? 'on' : ''}`}
+                    />
                   </div>
-                  
-                  <div className="pt-10 flex gap-4">
+
+                  <div className="pt-6 border-t border-[#e6eae3] flex justify-end gap-2.5">
                     {editingPlan._id && (
-                      <button 
+                      <button
                         onClick={async () => {
                           if (window.confirm('정말 이 구좌를 삭제하시겠습니까? 연결된 제품들이 표시되지 않을 수 있습니다.')) {
                             await deletePlan({ id: editingPlan._id });
                             setViewMode('list');
                           }
                         }}
-                        className="flex-1 bg-red-50 text-red-500 font-bold py-4 rounded-[20px] hover:bg-red-100 transition-all"
+                        className="adm-btn danger lg"
                       >
                         삭제하기
                       </button>
                     )}
-                    <button 
+                    <button
                       onClick={async () => {
                         if (!editingPlan.name) return alert('구좌명을 입력해주세요.');
                         try {
@@ -2544,7 +2665,8 @@ export default function ProductManagement() {
                           alert('저장 중 오류가 발생했습니다.');
                         }
                       }}
-                      className="flex-[2] bg-[#3182F6] text-white font-bold py-4 rounded-[20px] shadow-lg shadow-[#3182F6]/20 active:scale-95 transition-all"
+                      className="adm-btn primary lg"
+                      style={{ minWidth: 160 }}
                     >
                       저장하기
                     </button>
@@ -2554,155 +2676,136 @@ export default function ProductManagement() {
             </div>
           ) : null}
 
-          <input 
-            type="file" 
-            ref={thumbInputRef} 
-            className="hidden" 
-            accept="image/*" 
+          <input
+            type="file"
+            ref={thumbInputRef}
+            className="hidden"
+            accept="image/*"
             multiple
-            onChange={handleImageUpload} 
+            onChange={handleImageUpload}
           />
-          <input 
-            type="file" 
-            ref={detailInputRef} 
-            className="hidden" 
-            accept="image/*" 
+          <input
+            type="file"
+            ref={detailInputRef}
+            className="hidden"
+            accept="image/*"
             multiple
-            onChange={handleDetailImageUpload} 
+            onChange={handleDetailImageUpload}
           />
-          {/* 스마트 등록 선택 모달 (개별 모델명 직접 입력 또는 엑셀 업로드) */}
+
+          {/* 스마트 등록 선택 모달 */}
           {isSmartModalOpen && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
-              <div className="bg-white w-full max-w-lg rounded-[28px] p-6 sm:p-8 shadow-2xl space-y-6">
-                <div className="flex justify-between items-center pb-4 border-b border-[#F2F4F6]">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-[14px] bg-[#E8F3FF] text-[#3182F6] flex items-center justify-center">
-                      <Sparkles className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-extrabold text-[18px] text-[#191F28]">스마트 제품 수집 등록</h3>
-                      <p className="text-[12px] text-[#8B95A1]">개별 모델명 직접 입력 또는 엑셀 파일로 수집합니다.</p>
-                    </div>
+            <div className="adm-modal-overlay">
+              <div className="adm-modal">
+                <div className="adm-modal-head">
+                  <div>
+                    <span className="adm-eyebrow">SMART CRAWLER</span>
+                    <h3 className="adm-modal-title">스마트 제품 수집 등록</h3>
+                    <p className="text-[12px] text-[#86918a] mt-0.5">개별 모델명 직접 입력 또는 엑셀 파일로 수집합니다.</p>
                   </div>
-                  <button 
-                    onClick={() => setIsSmartModalOpen(false)}
-                    className="p-2 hover:bg-[#F2F4F6] rounded-full text-[#8B95A1] transition-colors cursor-pointer"
-                  >
-                    <X className="w-5 h-5"/>
+                  <button onClick={() => setIsSmartModalOpen(false)} className="adm-btn icon-only sm">
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* 1. 개별 모델명 직접 입력 영역 */}
-                <div className="space-y-3">
-                  <label className="block text-[13px] font-bold text-[#4E5968] flex justify-between items-center">
-                    <span>⚡ 개별 모델명 직접 입력</span>
-                    <span className="text-[11px] font-normal text-[#8B95A1]">여러 개 입력 시 쉼표(,)나 줄바꿈 구분</span>
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={directModelsText}
-                    onChange={(e) => setDirectModelsText(e.target.value)}
-                    placeholder="예시:&#10;AS195DWWA&#10;AS186LSAA, T18MX7, M344MB14&#10;FX23VVE + RD20WVE"
-                    className="w-full bg-[#F9FAFB] border border-[#E5E8EB] focus:border-[#3182F6] p-4 rounded-[16px] text-[14px] font-mono focus:outline-none resize-none"
-                  />
-                  <button
-                    onClick={handleDirectSmartRegister}
-                    disabled={isDirectRegistering || !directModelsText.trim()}
-                    className="w-full bg-gradient-to-r from-[#3182F6] to-[#1B64DA] disabled:opacity-50 text-white font-bold py-3.5 rounded-[16px] text-[14px] flex items-center justify-center gap-2 shadow-md shadow-[#3182F6]/20 transition-all cursor-pointer"
-                  >
-                    <Zap className="w-4 h-4" />
-                    {isDirectRegistering ? '스마트 수집 등록 중...' : '입력한 모델명으로 스마트 등록 시작'}
-                  </button>
-                </div>
-
-                <div className="relative flex py-1 items-center">
-                  <div className="flex-grow border-t border-[#E5E8EB]"></div>
-                  <span className="flex-shrink mx-4 text-[12px] font-bold text-[#8B95A1]">또는</span>
-                  <div className="flex-grow border-t border-[#E5E8EB]"></div>
-                </div>
-
-                {/* 2. 엑셀 파일 업로드 & 양식 다운로드 */}
-                <div className="space-y-2.5">
-                  <div className="p-3.5 bg-[#F8FAFC] border border-[#E5E8EB] rounded-[16px] text-[12px] text-[#4E5968] space-y-1.5">
-                    <div className="font-bold text-[#191F28] flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#3182F6]" /> 스마트 등록 엑셀 양식 컬럼 안내:
+                <div className="adm-modal-body space-y-5">
+                  <div className="adm-field">
+                    <div className="flex justify-between items-center">
+                      <label>개별 모델명 직접 입력</label>
+                      <span className="text-[11px] text-[#86918a]">쉼표(,) 또는 줄바꿈 구분</span>
                     </div>
-                    <div className="font-mono text-[11px] text-[#3182F6] font-semibold bg-white p-2 rounded-[8px] border border-[#E5E8EB] break-all leading-relaxed">
-                      구좌 | 브랜드 | 카테고리 | 모델명1 | 제품명1 | 모델명2 | 제품명2 | 참고 URL
-                    </div>
-                    <p className="text-[11px] text-[#8B95A1] leading-relaxed">
-                      • 단일 제품: 모델명1에만 입력하고 모델명2는 비워두시면 됩니다.<br />
-                      • 결합 제품: 모델명1과 모델명2를 모두 입력하시면 1개 결합 상품으로 자동 수집됩니다.<br />
-                      • 제품명1, 제품명2를 입력하면 해당 명칭으로 등록되며, 비워두면 공식 제품명으로 자동 수집됩니다.
-                    </p>
+                    <textarea
+                      rows={4}
+                      value={directModelsText}
+                      onChange={(e) => setDirectModelsText(e.target.value)}
+                      placeholder="예시:&#10;AS195DWWA&#10;AS186LSAA, T18MX7, M344MB14&#10;FX23VVE + RD20WVE"
+                      className="adm-textarea font-mono"
+                    />
+                    <button
+                      onClick={handleDirectSmartRegister}
+                      disabled={isDirectRegistering || !directModelsText.trim()}
+                      className="adm-btn primary lg w-full mt-2"
+                    >
+                      <Zap className="w-4 h-4" />
+                      {isDirectRegistering ? '스마트 수집 등록 중...' : '입력한 모델명으로 스마트 등록 시작'}
+                    </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button 
-                      onClick={downloadSmartTemplate}
-                      className="bg-[#F2F8FF] border border-[#3182F6]/30 text-[#3182F6] py-3 rounded-[14px] text-[13px] font-bold flex items-center justify-center gap-1.5 hover:bg-[#E5F0FF] transition-all cursor-pointer"
-                    >
-                      <Zap className="w-4 h-4" /> 스마트 엑셀 양식 다운
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setIsSmartModalOpen(false);
-                        smartExcelInputRef.current?.click();
-                      }}
-                      className="bg-[#3182F6] hover:bg-[#1B64DA] text-white py-3 rounded-[14px] text-[13px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md shadow-[#3182F6]/20"
-                    >
-                      <Upload className="w-4 h-4" /> 엑셀 파일 업로드
-                    </button>
+
+                  <div className="relative flex py-1 items-center">
+                    <div className="flex-grow border-t border-[#e6eae3]" />
+                    <span className="flex-shrink mx-4 text-[11.5px] font-semibold text-[#86918a]">또는 엑셀 일괄 업로드</span>
+                    <div className="flex-grow border-t border-[#e6eae3]" />
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="adm-note-card space-y-1.5">
+                      <div className="font-bold text-[#263d36] flex items-center gap-1.5 text-[12.5px]">
+                        <Sparkles className="w-3.5 h-3.5 text-[#295e52]" /> 스마트 등록 엑셀 양식 컬럼 안내
+                      </div>
+                      <div className="font-mono text-[11px] text-[#295e52] font-semibold bg-white p-2 rounded-[8px] border border-[#e6eae3] break-all">
+                        구좌 | 브랜드 | 카테고리 | 모델명1 | 제품명1 | 모델명2 | 제품명2 | 참고 URL
+                      </div>
+                      <p className="text-[11px] text-[#6b7870] leading-relaxed">
+                        • 단일 제품은 모델명1만 입력하고, 결합 제품은 모델명1·모델명2를 함께 입력합니다.<br />
+                        • 제품명을 비워두면 LG전자 공식 제품명으로 자동 수집됩니다.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <button onClick={downloadSmartTemplate} className="adm-btn sage lg w-full">
+                        <Zap className="w-4 h-4" /> 스마트 엑셀 양식 다운
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsSmartModalOpen(false);
+                          smartExcelInputRef.current?.click();
+                        }}
+                        className="adm-btn primary lg w-full"
+                      >
+                        <Upload className="w-4 h-4" /> 엑셀 파일 업로드
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* 스마트 수집 등록 처리 결과 모달 (성공/실패 리스트 및 상세 사유 확인) */}
+          {/* 스마트 수집 등록 처리 결과 모달 */}
           {smartResultModal?.isOpen && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-[1100] animate-fadeIn">
-              <div className="bg-white w-full max-w-2xl rounded-[28px] p-6 sm:p-8 shadow-2xl space-y-6 max-h-[85vh] flex flex-col">
-                {/* Header */}
-                <div className="flex justify-between items-center pb-4 border-b border-[#F2F4F6] shrink-0">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-[14px] bg-[#E8F3FF] text-[#3182F6] flex items-center justify-center font-bold">
-                      <Sparkles className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-extrabold text-[18px] text-[#191F28]">⚡ 스마트 수집 등록 결과</h3>
-                      <p className="text-[12px] text-[#8B95A1]">총 {smartResultModal.total}건 중 성공 {smartResultModal.successCount}건 / 실패 {smartResultModal.failCount}건</p>
-                    </div>
+            <div className="adm-modal-overlay">
+              <div className="adm-modal lg">
+                <div className="adm-modal-head">
+                  <div>
+                    <span className="adm-eyebrow">SMART IMPORT REPORT</span>
+                    <h3 className="adm-modal-title">스마트 수집 등록 결과</h3>
+                    <p className="text-[12px] text-[#86918a] mt-0.5">
+                      총 {smartResultModal.total}건 중 성공 {smartResultModal.successCount}건 / 실패 {smartResultModal.failCount}건
+                    </p>
                   </div>
-                  <button 
-                    onClick={() => setSmartResultModal(null)}
-                    className="p-2 hover:bg-[#F2F4F6] rounded-full text-[#8B95A1] transition-colors cursor-pointer"
-                  >
-                    <X className="w-5 h-5"/>
+                  <button onClick={() => setSmartResultModal(null)} className="adm-btn icon-only sm">
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Summary Scoreboard */}
-                <div className="grid grid-cols-3 gap-3 shrink-0">
-                  <div className="bg-[#F8FAFC] border border-[#E5E8EB] p-4 rounded-[16px] text-center">
-                    <div className="text-[12px] font-bold text-[#8B95A1]">전체 시도</div>
-                    <div className="text-[20px] font-black text-[#191F28]">{smartResultModal.total}건</div>
+                <div className="adm-modal-body space-y-4">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="adm-note-card text-center">
+                      <div className="text-[11.5px] font-semibold text-[#86918a]">전체 시도</div>
+                      <div className="text-[20px] font-extrabold text-[#263d36] mt-0.5">{smartResultModal.total}건</div>
+                    </div>
+                    <div className="adm-note-card text-center" style={{ background: '#eaf1e4', borderColor: '#d4e2cb' }}>
+                      <div className="text-[11.5px] font-semibold text-[#295e52]">수집 성공</div>
+                      <div className="text-[20px] font-extrabold text-[#295e52] mt-0.5">{smartResultModal.successCount}건</div>
+                    </div>
+                    <div className="adm-note-card text-center" style={{ background: '#faecea', borderColor: '#f0d2cd' }}>
+                      <div className="text-[11.5px] font-semibold text-[#b8473a]">수집 실패</div>
+                      <div className="text-[20px] font-extrabold text-[#b8473a] mt-0.5">{smartResultModal.failCount}건</div>
+                    </div>
                   </div>
-                  <div className="bg-[#E8F3FF] border border-[#3182F6]/20 p-4 rounded-[16px] text-center">
-                    <div className="text-[12px] font-bold text-[#3182F6]">🟢 수집 성공</div>
-                    <div className="text-[20px] font-black text-[#3182F6]">{smartResultModal.successCount}건</div>
-                  </div>
-                  <div className="bg-[#FFF0F0] border border-[#FF4D4D]/20 p-4 rounded-[16px] text-center">
-                    <div className="text-[12px] font-bold text-[#E53E3E]">🔴 수집 실패</div>
-                    <div className="text-[20px] font-black text-[#E53E3E]">{smartResultModal.failCount}건</div>
-                  </div>
-                </div>
 
-                {/* Detailed Result List Container */}
-                <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-                  {/* Failed items section first */}
                   {smartResultModal.failCount > 0 && (
                     <div className="space-y-2">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[13px] font-extrabold text-[#E53E3E] bg-[#FFF0F0] px-3.5 py-2 rounded-[12px] border border-[#FF4D4D]/20">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[12.5px] font-bold text-[#b8473a] bg-[#faecea] px-3.5 py-2.5 rounded-[10px] border border-[#f0d2cd]">
                         <div className="flex items-center gap-2">
                           <AlertTriangle className="w-4 h-4 shrink-0" />
                           <span>등록 실패한 모델 목록 ({smartResultModal.failCount}건)</span>
@@ -2714,7 +2817,7 @@ export default function ProductManagement() {
                               navigator.clipboard.writeText(failedStr);
                               alert(`실패한 ${smartResultModal.failCount}개 모델명이 클립보드에 복사되었습니다!`);
                             }}
-                            className="bg-white hover:bg-rose-100 text-[#E53E3E] border border-rose-300 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+                            className="adm-btn xs"
                           >
                             <Copy className="w-3 h-3" /> 실패 모델명 복사
                           </button>
@@ -2725,55 +2828,50 @@ export default function ProductManagement() {
                               setSmartResultModal(null);
                               setIsSmartModalOpen(true);
                             }}
-                            className="bg-[#E53E3E] hover:bg-rose-700 text-white px-2.5 py-1 rounded-md text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+                            className="adm-btn xs danger"
                           >
                             <Zap className="w-3 h-3" /> 실패 모델 재시도
                           </button>
                         </div>
                       </div>
-                      <div className="divide-y divide-[#F2F4F6] border border-[#FF4D4D]/30 rounded-[16px] overflow-hidden bg-[#FFF5F5]/30">
+                      <div className="divide-y divide-[#eef1ec] border border-[#e6eae3] rounded-[12px] overflow-hidden bg-white">
                         {smartResultModal.results.filter(r => !r.success).map((r, idx) => (
-                          <div key={idx} className="p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-white">
+                          <div key={idx} className="p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                             <div className="flex items-center gap-3">
-                              <span className="text-[11px] font-bold bg-[#FF4D4D] text-white px-2 py-0.5 rounded-full shrink-0">실패</span>
+                              <span className="adm-pill danger">실패</span>
                               <div>
-                                <div className="font-mono font-bold text-[14px] text-[#191F28]">{r.model}</div>
-                                <div className="text-[12px] text-[#E53E3E] font-medium">{r.reason || 'LG 공식 사이트에서 제품 페이지를 찾을 수 없음 (404 미등록 모델)'}</div>
+                                <div className="font-mono font-bold text-[13.5px] text-[#263d36]">{r.model}</div>
+                                <div className="text-[12px] text-[#b8473a]">{r.reason || 'LG 공식 사이트에서 제품 페이지를 찾을 수 없음'}</div>
                               </div>
                             </div>
-                            <div className="text-[11px] font-bold text-[#8B95A1] bg-[#F2F4F6] px-2.5 py-1 rounded-md shrink-0">
-                              모델명/철자 확인 필요
-                            </div>
+                            <span className="adm-pill neutral">모델명 확인 필요</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* Successful items section */}
                   {smartResultModal.successCount > 0 && (
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-[13px] font-extrabold text-[#3182F6] bg-[#E8F3FF] px-3.5 py-2 rounded-[12px]">
+                      <div className="flex items-center gap-2 text-[12.5px] font-bold text-[#295e52] bg-[#eaf1e4] px-3.5 py-2 rounded-[10px]">
                         <CheckCircle className="w-4 h-4 shrink-0" />
                         <span>등록 성공한 모델 목록 ({smartResultModal.successCount}건)</span>
                       </div>
-                      <div className="divide-y divide-[#F2F4F6] border border-[#E5E8EB] rounded-[16px] overflow-hidden bg-white">
+                      <div className="divide-y divide-[#eef1ec] border border-[#e6eae3] rounded-[12px] overflow-hidden bg-white">
                         {smartResultModal.results.filter(r => r.success).map((r, idx) => (
                           <div key={idx} className="p-3 flex items-center justify-between gap-3">
                             <div className="flex items-center gap-3 overflow-hidden">
                               {r.thumbnail ? (
-                                <img src={r.thumbnail} className="w-10 h-10 object-contain rounded-md border border-[#E5E8EB] shrink-0" alt="thumb" />
+                                <img src={r.thumbnail} className="w-10 h-10 object-contain rounded-[8px] border border-[#e6eae3] shrink-0" alt="thumb" />
                               ) : (
-                                <div className="w-10 h-10 bg-[#F8FAFC] rounded-md border border-[#E5E8EB] flex items-center justify-center shrink-0 text-[#8B95A1] text-[10px]">No Img</div>
+                                <div className="w-10 h-10 bg-[#f9faf7] rounded-[8px] border border-[#e6eae3] flex items-center justify-center shrink-0 text-[#86918a] text-[10px]">No Img</div>
                               )}
                               <div className="truncate">
-                                <div className="font-bold text-[13px] text-[#191F28] truncate">{r.name || r.model}</div>
-                                <div className="font-mono text-[11px] text-[#8B95A1]">{r.model}</div>
+                                <div className="font-semibold text-[13px] text-[#263d36] truncate">{r.name || r.model}</div>
+                                <div className="font-mono text-[11px] text-[#86918a]">{r.model}</div>
                               </div>
                             </div>
-                            <span className="text-[11px] font-bold bg-[#E8F3FF] text-[#3182F6] px-2.5 py-1 rounded-full shrink-0">
-                              스펙 {r.specCount || 0}개 수집
-                            </span>
+                            <span className="adm-pill active shrink-0">스펙 {r.specCount || 0}개 수집</span>
                           </div>
                         ))}
                       </div>
@@ -2781,12 +2879,8 @@ export default function ProductManagement() {
                   )}
                 </div>
 
-                {/* Footer */}
-                <div className="pt-3 border-t border-[#F2F4F6] shrink-0 flex justify-end">
-                  <button
-                    onClick={() => setSmartResultModal(null)}
-                    className="bg-[#3182F6] hover:bg-[#1B64DA] text-white font-bold px-6 py-3 rounded-[14px] text-[14px] shadow-md shadow-[#3182F6]/20 transition-all cursor-pointer"
-                  >
+                <div className="adm-modal-foot">
+                  <button onClick={() => setSmartResultModal(null)} className="adm-btn primary">
                     확인 완료
                   </button>
                 </div>
@@ -2796,26 +2890,28 @@ export default function ProductManagement() {
 
           {/* Download Progress Modal */}
           {downloadProgress && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-              <div className="bg-white rounded-[24px] p-6 max-w-sm w-full shadow-2xl flex flex-col items-center text-center space-y-4 border border-[#E5E8EB]">
-                <div className="w-14 h-14 rounded-full bg-[#EBF4FF] text-[#3182F6] flex items-center justify-center">
-                  <Download className="w-7 h-7 animate-bounce" />
-                </div>
-                <div>
-                  <h3 className="text-[17px] font-bold text-[#191F28]">제품 정보 다운로드 중</h3>
-                  <p className="text-[13px] text-[#4E5968] mt-1 break-keep">{downloadProgress.message}</p>
-                </div>
-                <div className="w-full bg-[#F2F4F6] rounded-full h-3 overflow-hidden">
-                  <div 
-                    className="bg-[#3182F6] h-full transition-all duration-300 rounded-full"
-                    style={{ 
-                      width: `${downloadProgress.total > 0 ? Math.min(100, Math.round((downloadProgress.current / downloadProgress.total) * 100)) : 0}%` 
-                    }}
-                  />
-                </div>
-                <div className="flex justify-between w-full text-[12px] text-[#8B95A1] font-bold">
-                  <span>진행률</span>
-                  <span>{downloadProgress.current} / {downloadProgress.total}</span>
+            <div className="adm-modal-overlay">
+              <div className="adm-modal sm">
+                <div className="adm-modal-body text-center space-y-4 py-7">
+                  <div className="w-14 h-14 rounded-full bg-[#eaf1e4] text-[#295e52] flex items-center justify-center mx-auto">
+                    <Download className="w-6 h-6 animate-bounce" />
+                  </div>
+                  <div>
+                    <h3 className="text-[16px] font-bold text-[#263d36]">제품 정보 다운로드 중</h3>
+                    <p className="text-[12.5px] text-[#6b7870] mt-1 break-keep">{downloadProgress.message}</p>
+                  </div>
+                  <div className="w-full bg-[#eef1ec] rounded-full h-2.5 overflow-hidden">
+                    <div
+                      className="bg-[#295e52] h-full transition-all duration-300 rounded-full"
+                      style={{
+                        width: `${downloadProgress.total > 0 ? Math.min(100, Math.round((downloadProgress.current / downloadProgress.total) * 100)) : 0}%`,
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-between w-full text-[12px] text-[#86918a] font-semibold">
+                    <span>진행률</span>
+                    <span>{downloadProgress.current} / {downloadProgress.total}</span>
+                  </div>
                 </div>
               </div>
             </div>
