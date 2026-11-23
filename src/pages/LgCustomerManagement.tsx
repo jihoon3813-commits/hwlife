@@ -23,6 +23,7 @@ import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
 import { getCustomerInflow, getCustomerTrafficDetail, INFLOW_META, InflowType } from '../utils/inflow';
 import DaangnLeadModal from '../components/DaangnLeadModal';
 import { DEFAULT_GUIDE_TEMPLATES, formatGuideMessage, GuideTemplate } from '../constants/guideTemplates';
+import { downloadCustomersVCard } from '../utils/vcard';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
   const now = new Date();
@@ -1172,6 +1173,38 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
         </div>
 
         <div className="adm-heading-buttons">
+          <button
+            type="button"
+            onClick={() => {
+              const targets =
+                selectedIds.length > 0
+                  ? filteredInquiries.filter((c: any) => selectedIds.includes(c._id))
+                  : filteredInquiries;
+              const count = downloadCustomersVCard(targets, '효원_LG구독_고객연락처');
+              if (count === 0) {
+                alert('저장할 유효한 고객 연락처가 없습니다.');
+                return;
+              }
+              alert(
+                `${count}명의 연락처 파일(.vcf)을 다운로드했습니다!\n\n` +
+                  '• 스마트폰에서 다운받은 파일을 터치하면 연락처 앱에 한 번에 저장됩니다.\n' +
+                  '• PC에서는 구글 주소록(contacts.google.com) > [가져오기]로 올리면 회사폰에 자동 동기화됩니다.'
+              );
+            }}
+            className="adm-btn sage"
+            title={
+              selectedIds.length > 0
+                ? `선택한 ${selectedIds.length}명 연락처 파일(.vcf) 저장`
+                : `현재 목록 ${filteredInquiries.length}명 연락처 파일(.vcf) 일괄 저장`
+            }
+          >
+            <Smartphone />
+            <span>
+              {selectedIds.length > 0
+                ? `폰 연락처 저장 (${selectedIds.length}명)`
+                : '폰 연락처 일괄 저장'}
+            </span>
+          </button>
           <button
             type="button"
             onClick={() => setIsDaangnModalOpen(true)}
