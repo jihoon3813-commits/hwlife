@@ -334,13 +334,17 @@ export default defineSchema({
     inquiryId: v.optional(v.id("inquiries")),
     customerName: v.optional(v.string()),
     customerPhone: v.string(),
-    smsType: v.string(),                   // "자유문자", "상품안내", "구매동의서", "자동안내"
+    smsType: v.string(),                   // "자유문자", "상품안내", "구매동의서", "자동안내", "고객답장"
     title: v.optional(v.string()),
     message: v.string(),
-    status: v.string(),                    // "성공", "실패"
+    status: v.string(),                    // "성공", "실패", "수신"
     errorMessage: v.optional(v.string()),
     senderName: v.optional(v.string()),    // 발송자 (관리자/채널명)
+    direction: v.optional(v.union(v.literal("outbound"), v.literal("inbound"))),
+    isRead: v.optional(v.boolean()),
+    receiverNumber: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_inquiryId_and_createdAt", ["inquiryId", "createdAt"])
+    .index("by_direction_and_isRead", ["direction", "isRead"])
     .index("by_createdAt", ["createdAt"]),
 });

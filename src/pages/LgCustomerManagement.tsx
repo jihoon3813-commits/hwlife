@@ -529,6 +529,8 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const lgDbProducts = useQuery(api.lgProducts.getAll);
   const sendConsentSms = useAction(api.sms.sendConsentSms);
   const sendCustomGuideSms = useAction(api.sms.sendCustomGuideSms);
+  const markInboundRead = useMutation(api.sms.markInboundRead);
+  const unreadSmsCounts = useQuery(api.sms.getUnreadInboundCounts) ?? {};
   const landings = useQuery(api.landings.get);
   const allPlans = useQuery(api.plans.get);
 
@@ -540,9 +542,12 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const [guideDraft, setGuideDraft] = useState('');
   const [customSmsTitle, setCustomSmsTitle] = useState('[효원상조 × LG가전구독] 안내');
   const [customSmsDraft, setCustomSmsDraft] = useState('');
+  const [quickReplyDraft, setQuickReplyDraft] = useState('');
+  const [isSendingQuickReply, setIsSendingQuickReply] = useState(false);
   const [guideCopied, setGuideCopied] = useState(false);
   const [isSendingGuideSms, setIsSendingGuideSms] = useState(false);
   const [expandedSmsLogId, setExpandedSmsLogId] = useState<string | null>(null);
+  const chatScrollRef = useRef<HTMLDivElement | null>(null);
 
   const smsLogs = useQuery(
     api.sms.listByInquiry,
@@ -551,8 +556,27 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
 
   useEffect(() => {
     setCustomSmsDraft('');
+    setQuickReplyDraft('');
     setExpandedSmsLogId(null);
   }, [selectedCustomer?._id]);
+
+  useEffect(() => {
+    if (!selectedCustomer?._id) return;
+    const hasUnread =
+      (unreadSmsCounts[String(selectedCustomer._id)] ?? 0) > 0 ||
+      Boolean(smsLogs?.some((log: any) => log.direction === 'inbound' && log.isRead !== true));
+    if (hasUnread) {
+      markInboundRead({ inquiryId: selectedCustomer._id }).catch((err) =>
+        console.error('Failed to mark inbound SMS as read:', err)
+      );
+    }
+  }, [selectedCustomer?._id, smsLogs, unreadSmsCounts, markInboundRead]);
+
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [smsLogs?.length, selectedCustomer?._id]);
 
   useEffect(() => {
     if (!selectedCustomer || selectedGuideIdx < 0) return;
@@ -1444,11 +1468,18 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                 }
 
                 const supplierName = getSupplier(customer);
+                const unreadSmsCount = unreadSmsCounts[String(customer._id)] || 0;
 
                 return (
                   <tr
                     key={customer._id}
-                    className={`hover:bg-[#F9FAFB] cursor-pointer transition-colors ${selectedIds.includes(customer._id) ? 'bg-[#F2F8FF]' : ''}`}
+                    className={`hover:bg-[#F9FAFB] cursor-pointer transition-colors ${
+                      selectedIds.includes(customer._id)
+                        ? 'bg-[#F2F8FF]'
+                        : unreadSmsCount > 0
+                          ? 'bg-red-50/40'
+                          : ''
+                    }`}
                     onClick={() => setSelectedCustomer(customer)}
                   >
                     {/* 1. 순번 */}
@@ -1519,7 +1550,17 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
 
                     {/* 6. 고객명 */}
                     <td style={{ width: `${columnWidths.name}px` }} className="px-3 py-3 text-[13px] font-bold text-[#191F28] truncate" title={customer.name}>
-                      {customer.name}
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="truncate">{customer.name}</span>
+                        {unreadSmsCount > 0 && (
+                          <span
+                            title={`읽지 않은 고객 답장 ${unreadSmsCount}건`}
+                            className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-[#F04452] text-white text-[10px] font-bold leading-none shrink-0"
+                          >
+                            {unreadSmsCount > 99 ? '99+' : unreadSmsCount}
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     {/* 7. 연락처 */}
@@ -1801,83 +1842,158 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                   </div>
                 )}
 
-                {/* 문자 발송 내역 */}
+                {/* 문자 대화 내역 (양방향 채팅) */}
                 <div className="mt-4 pt-4 border-t border-[#E5E8EB]">
                   <div className="flex items-center justify-between mb-2.5">
                     <h5 className="text-[13px] font-bold text-[#4E5968] flex items-center gap-1.5">
-                      <History className="w-4 h-4 text-[#3182F6]" />
-                      문자 발송 내역
+                      <MessageCircle className="w-4 h-4 text-[#3182F6]" />
+                      문자 대화 내역
                       <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#F2F4F6] text-[#4E5968]">
                         {smsLogs ? `${smsLogs.length}건` : '조회중...'}
                       </span>
                     </h5>
+                    <span className="text-[11px] text-[#8B95A1]">
+                      왼쪽: 고객 답장 · 오른쪽: 발신 문자
+                    </span>
                   </div>
                   {smsLogs && smsLogs.length > 0 ? (
-                    <div className="space-y-2 max-h-[210px] overflow-y-auto pr-1">
-                      {smsLogs.map((log: any) => {
+                    <div
+                      ref={chatScrollRef}
+                      className="space-y-2.5 max-h-[280px] overflow-y-auto p-3 rounded-[12px] bg-[#F2F4F6]/70 border border-[#E5E8EB]"
+                    >
+                      {[...smsLogs].reverse().map((log: any) => {
+                        const isInbound = log.direction === 'inbound';
                         const isExpanded = expandedSmsLogId === log._id;
+                        const isLongMessage =
+                          (log.message?.length || 0) > 160 ||
+                          (log.message?.split('\n').length || 0) > 4;
                         const kst = new Date(log.createdAt + 9 * 60 * 60 * 1000);
-                        const formattedDate = `${kst.getUTCFullYear()}-${String(kst.getUTCMonth() + 1).padStart(2, '0')}-${String(kst.getUTCDate()).padStart(2, '0')} ${String(kst.getUTCHours()).padStart(2, '0')}:${String(kst.getUTCMinutes()).padStart(2, '0')}`;
+                        const formattedDate = `${String(kst.getUTCMonth() + 1).padStart(2, '0')}.${String(kst.getUTCDate()).padStart(2, '0')} ${String(kst.getUTCHours()).padStart(2, '0')}:${String(kst.getUTCMinutes()).padStart(2, '0')}`;
                         return (
                           <div
                             key={log._id}
-                            className="bg-[#F9FAFB] border border-[#E5E8EB] rounded-[10px] p-3 text-[12px]"
+                            className={`flex flex-col ${isInbound ? 'items-start' : 'items-end'}`}
                           >
-                            <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <span
-                                  className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
-                                    log.status === '성공'
-                                      ? 'bg-emerald-50 text-emerald-700'
-                                      : 'bg-red-50 text-red-600'
-                                  }`}
-                                >
-                                  {log.status}
-                                </span>
-                                <span className="px-2 py-0.5 rounded-[6px] bg-white border border-[#E5E8EB] text-[#333D4B] font-semibold text-[11px]">
-                                  {log.smsType}
-                                </span>
-                                <span className="text-[#8B95A1] font-medium">{formattedDate}</span>
-                                {log.senderName && (
-                                  <span className="text-[#6B7684] bg-[#E5E8EB]/60 px-1.5 py-0.5 rounded text-[11px]">
-                                    {log.senderName}
-                                  </span>
-                                )}
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => setExpandedSmsLogId(isExpanded ? null : log._id)}
-                                className="text-[11px] font-semibold text-[#3182F6] hover:underline"
-                              >
-                                {isExpanded ? '접기' : '전체보기'}
-                              </button>
-                            </div>
-                            {log.title && (
-                              <div className="font-semibold text-[#333D4B] mb-1 truncate">
-                                {log.title}
-                              </div>
-                            )}
-                            <p
-                              className={`text-[#4E5968] whitespace-pre-wrap break-words leading-relaxed ${
-                                isExpanded ? '' : 'line-clamp-2'
+                            <div
+                              className={`max-w-[85%] rounded-[12px] px-3.5 py-2.5 text-[12px] shadow-xs border ${
+                                isInbound
+                                  ? 'bg-white border-[#E5E8EB] text-[#191F28] rounded-tl-[4px]'
+                                  : log.status === '실패'
+                                    ? 'bg-red-50 border-red-200 text-[#191F28] rounded-tr-[4px]'
+                                    : 'bg-[#EFF6FF] border-[#BFDBFE] text-[#191F28] rounded-tr-[4px]'
                               }`}
                             >
-                              {log.message}
-                            </p>
-                            {log.status === '실패' && log.errorMessage && (
-                              <div className="mt-1.5 text-[11px] text-red-600 bg-red-50/70 px-2 py-1 rounded">
-                                실패 사유: {log.errorMessage}
+                              <div className="flex items-center justify-between gap-2 mb-1">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span
+                                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                                      isInbound
+                                        ? 'bg-emerald-50 text-emerald-700'
+                                        : log.status === '성공'
+                                          ? 'bg-[#3182F6] text-white'
+                                          : 'bg-red-500 text-white'
+                                    }`}
+                                  >
+                                    {isInbound ? '고객 답장' : log.smsType || '발신'}
+                                  </span>
+                                  {!isInbound && log.senderName && (
+                                    <span className="text-[10px] text-[#6B7684] font-medium">
+                                      {log.senderName}
+                                    </span>
+                                  )}
+                                  {!isInbound && log.status === '실패' && (
+                                    <span className="text-[10px] text-red-600 font-bold">실패</span>
+                                  )}
+                                </div>
+                                <span className="text-[10px] text-[#8B95A1] shrink-0">
+                                  {formattedDate}
+                                </span>
                               </div>
-                            )}
+                              {log.title && !isInbound && (
+                                <div className="text-[11px] font-semibold text-[#333D4B] mb-1 truncate">
+                                  {log.title}
+                                </div>
+                              )}
+                              <p
+                                className={`text-[#333D4B] whitespace-pre-wrap break-words leading-relaxed ${
+                                  isLongMessage && !isExpanded ? 'line-clamp-4' : ''
+                                }`}
+                              >
+                                {log.message}
+                              </p>
+                              {isLongMessage && (
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedSmsLogId(isExpanded ? null : log._id)}
+                                  className="mt-1 text-[11px] font-semibold text-[#3182F6] hover:underline"
+                                >
+                                  {isExpanded ? '접기' : '전체보기'}
+                                </button>
+                              )}
+                              {log.status === '실패' && log.errorMessage && (
+                                <div className="mt-1.5 text-[11px] text-red-600 bg-red-100/60 px-2 py-1 rounded">
+                                  실패 사유: {log.errorMessage}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         );
                       })}
                     </div>
                   ) : (
                     <div className="bg-[#F9FAFB] border border-dashed border-[#E5E8EB] rounded-[10px] py-4 text-center text-[12px] text-[#8B95A1]">
-                      {smsLogs ? '아직 발송된 문자 내역이 없습니다.' : '문자 발송 내역을 불러오는 중입니다...'}
+                      {smsLogs ? '아직 주고받은 문자 내역이 없습니다.' : '문자 대화 내역을 불러오는 중입니다...'}
                     </div>
                   )}
+
+                  {/* 빠른 문자 답장 입력바 */}
+                  <div className="mt-2.5 flex items-end gap-2">
+                    <textarea
+                      rows={2}
+                      value={quickReplyDraft}
+                      onChange={(e) => setQuickReplyDraft(e.target.value)}
+                      placeholder="고객에게 바로 보낼 답장 내용을 입력하세요..."
+                      className="flex-1 bg-[#F9FAFB] border border-[#E5E8EB] rounded-[10px] px-3 py-2 text-[12.5px] leading-relaxed outline-none focus:border-[#3182F6] resize-none"
+                    />
+                    <button
+                      type="button"
+                      disabled={isSendingQuickReply || !quickReplyDraft.trim()}
+                      onClick={async () => {
+                        const targetPhone = editData.phone || selectedCustomer.phone;
+                        if (!targetPhone) {
+                          alert('고객 연락처가 없습니다.');
+                          return;
+                        }
+                        if (!quickReplyDraft.trim()) return;
+                        if (!confirm(`${selectedCustomer.name}님(${targetPhone})에게 문자를 발송하시겠습니까?`)) return;
+                        setIsSendingQuickReply(true);
+                        try {
+                          await sendCustomGuideSms({
+                            inquiryId: selectedCustomer._id,
+                            customerName: selectedCustomer.name,
+                            customerPhone: targetPhone,
+                            smsType: '자유문자',
+                            senderName: getCurrentWriterName(),
+                            title: '[효원상조 × LG가전구독] 안내',
+                            message: quickReplyDraft.trim(),
+                          });
+                          setQuickReplyDraft('');
+                        } catch (err: any) {
+                          alert(err?.message || '문자 발송에 실패했습니다.');
+                        } finally {
+                          setIsSendingQuickReply(false);
+                        }
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3.5 h-[54px] rounded-[10px] bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[12px] font-bold transition-colors disabled:opacity-50 shrink-0"
+                    >
+                      {isSendingQuickReply ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
+                      답장
+                    </button>
+                  </div>
                 </div>
               </section>
 
