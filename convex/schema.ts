@@ -214,6 +214,9 @@ export default defineSchema({
       title: v.string(),
       content: v.string(),
     }))),
+    googleContacts: v.optional(v.object({
+      clientId: v.string(),
+    })),
   }),
   visits: defineTable({
     ip: v.string(),

@@ -127,6 +127,9 @@ export const update = mutation({
       title: v.string(),
       content: v.string(),
     }))),
+    googleContacts: v.optional(v.object({
+      clientId: v.string(),
+    })),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db.query("settings").first();
@@ -140,6 +143,7 @@ export const update = mutation({
     if (args.headOfficeAccount !== undefined) data.headOfficeAccount = args.headOfficeAccount;
     if (args.staffAccounts !== undefined) data.staffAccounts = args.staffAccounts;
     if (args.guideTemplates !== undefined) data.guideTemplates = args.guideTemplates;
+    if (args.googleContacts !== undefined) data.googleContacts = args.googleContacts;
 
     if (existing) {
       await ctx.db.patch(existing._id, data);

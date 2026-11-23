@@ -60,6 +60,7 @@ export default function Settings({ user }: { user?: any }) {
   const [guideSaved, setGuideSaved] = useState(false);
   const [isSavingSms, setIsSavingSms] = useState(false);
   const [smsSaved, setSmsSaved] = useState(false);
+  const [localGoogleClientId, setLocalGoogleClientId] = useState('');
   const [smsTestPhone, setSmsTestPhone] = useState('');
   const [smsTestResult, setSmsTestResult] = useState<any>(null);
 
@@ -84,6 +85,9 @@ export default function Settings({ user }: { user?: any }) {
           bridgeSecret: remoteSms.bridgeSecret || '',
         });
         smsInitializedRef.current = true;
+      }
+      if ((settings as any).googleContacts?.clientId && !localGoogleClientId) {
+        setLocalGoogleClientId((settings as any).googleContacts.clientId);
       }
       if ((settings as any).guideTemplates?.length) {
         setLocalGuideTemplates((settings as any).guideTemplates);
@@ -720,7 +724,10 @@ export default function Settings({ user }: { user?: any }) {
               setIsSavingSms(true);
               setSmsSaved(false);
               try {
-                await updateSettings({ sms: buildSmsPayload() });
+                await updateSettings({
+                  sms: buildSmsPayload(),
+                  googleContacts: { clientId: localGoogleClientId.trim() },
+                });
                 setSmsSaved(true);
                 setTimeout(() => setSmsSaved(false), 3000);
               } catch (err: any) {
@@ -1011,6 +1018,72 @@ export default function Settings({ user }: { user?: any }) {
                       <span className="adm-pill gray">{'{고객명}'} = 고객 성함</span>
                       <span className="adm-pill gray">{'{동의서링크}'} = 전자동의서 URL</span>
                       <span className="adm-pill gray">{'{상품명}'} = 신청 상품명</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 구글 주소록 자동 등록 연동 설정 */}
+                <div className="pt-5 border-t border-[#edf0e7] space-y-3">
+                  <div>
+                    <div className="text-[13px] font-bold text-[#263d36]">
+                      구글 주소록 자동 등록 연동 (고객관리 → 회사폰 자동 동기화)
+                    </div>
+                    <p className="text-[12px] text-[#86918a] mt-0.5">
+                      Google OAuth 클라이언트 ID를 등록해 두면, 고객관리에서 버튼 한 번으로 회사폰 구글 계정 주소록에 고객 연락처를 자동 등록(중복 제외)할 수 있습니다.
+                    </p>
+                  </div>
+                  <div className="adm-field-grid">
+                    <div className="adm-field full">
+                      <label>Google OAuth 클라이언트 ID</label>
+                      <input
+                        type="text"
+                        value={localGoogleClientId}
+                        onChange={(e) => setLocalGoogleClientId(e.target.value)}
+                        placeholder="예: 1234567890-abcdefg.apps.googleusercontent.com"
+                        className="adm-input font-mono"
+                      />
+                    </div>
+                  </div>
+                  <div className="adm-section-note">
+                    <AlertCircle />
+                    <div className="space-y-1 text-[12px] leading-relaxed">
+                      <strong className="text-[#263d36] block">Google Cloud 클라이언트 ID 발급 방법 (최초 1회):</strong>
+                      <div>
+                        1.{' '}
+                        <a
+                          href="https://console.cloud.google.com/apis/library/people.googleapis.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline font-bold text-[#295e52]"
+                        >
+                          Google Cloud People API
+                        </a>
+                        에서 <strong>[사용]</strong> 클릭 → 좌측 메뉴 <strong>OAuth 동의 화면</strong> (외부 · 테스트 사용자에 회사폰 Gmail 추가)
+                      </div>
+                      <div>
+                        2. <strong>사용자 인증 정보 → + 사용자 인증 정보 만들기 → OAuth 클라이언트 ID (웹 애플리케이션)</strong> 선택
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span>
+                          3. <strong>승인된 자바스크립트 원본</strong>에 현재 주소 추가:
+                        </span>
+                        <code className="px-2 py-0.5 bg-white border border-[#e5e8eb] rounded font-mono text-[11px]">
+                          {typeof window !== 'undefined' ? window.location.origin : ''}
+                        </code>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (typeof window !== 'undefined') {
+                              navigator.clipboard.writeText(window.location.origin);
+                              alert('현재 사이트 주소가 복사되었습니다.');
+                            }
+                          }}
+                          className="adm-btn sage !py-1 !px-2 !text-[11px]"
+                        >
+                          <Copy className="w-3 h-3" />
+                          <span>복사</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

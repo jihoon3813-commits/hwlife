@@ -23,7 +23,7 @@ import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
 import { getCustomerInflow, getCustomerTrafficDetail, INFLOW_META, InflowType } from '../utils/inflow';
 import DaangnLeadModal from '../components/DaangnLeadModal';
 import { DEFAULT_GUIDE_TEMPLATES, formatGuideMessage, GuideTemplate } from '../constants/guideTemplates';
-import { downloadCustomersVCard } from '../utils/vcard';
+import { syncCustomersToGoogleContacts } from '../utils/googleContacts';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
   const now = new Date();
@@ -561,6 +561,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const [customSmsDraft, setCustomSmsDraft] = useState('');
   const [quickReplyDraft, setQuickReplyDraft] = useState('');
   const [isSendingQuickReply, setIsSendingQuickReply] = useState(false);
+  const [isSyncingGoogleContacts, setIsSyncingGoogleContacts] = useState(false);
   const [guideCopied, setGuideCopied] = useState(false);
   const [isSendingGuideSms, setIsSendingGuideSms] = useState(false);
   const [expandedSmsLogId, setExpandedSmsLogId] = useState<string | null>(null);
@@ -1175,34 +1176,57 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
         <div className="adm-heading-buttons">
           <button
             type="button"
-            onClick={() => {
+            disabled={isSyncingGoogleContacts}
+            onClick={async () => {
+              const clientId = (settings as any)?.googleContacts?.clientId || '';
+              if (!clientId) {
+                alert(
+                  'Google OAuth 클라이언트 ID가 아직 설정되지 않았습니다.\n환경설정 > 문자(SMS) 연동 설정 > [구글 주소록 자동 등록 연동]에 클라이언트 ID를 먼저 입력해주세요.'
+                );
+                return;
+              }
               const targets =
                 selectedIds.length > 0
                   ? filteredInquiries.filter((c: any) => selectedIds.includes(c._id))
                   : filteredInquiries;
-              const count = downloadCustomersVCard(targets, '효원_LG구독_고객연락처');
-              if (count === 0) {
-                alert('저장할 유효한 고객 연락처가 없습니다.');
+              if (targets.length === 0) {
+                alert('등록할 고객이 없습니다.');
                 return;
               }
-              alert(
-                `${count}명의 연락처 파일(.vcf)을 다운로드했습니다!\n\n` +
-                  '• 스마트폰에서 다운받은 파일을 터치하면 연락처 앱에 한 번에 저장됩니다.\n' +
-                  '• PC에서는 구글 주소록(contacts.google.com) > [가져오기]로 올리면 회사폰에 자동 동기화됩니다.'
-              );
+              if (
+                !confirm(
+                  `${
+                    selectedIds.length > 0 ? `선택한 ${targets.length}명` : `현재 목록 ${targets.length}명`
+                  }을 구글 주소록에 자동 등록하시겠습니까?\n(이미 등록된 번호는 자동으로 건너뜁니다)`
+                )
+              ) {
+                return;
+              }
+              setIsSyncingGoogleContacts(true);
+              try {
+                const res = await syncCustomersToGoogleContacts(targets, clientId);
+                alert(
+                  `구글 주소록 동기화가 완료되었습니다!\n\n` +
+                    `• 신규 등록: ${res.createdCount}명\n` +
+                    `• 이미 등록됨(건너뜀): ${res.skippedDuplicateCount}명` +
+                    (res.failedCount > 0 ? `\n• 실패: ${res.failedCount}명` : '') +
+                    `\n\n잠시 후 회사폰 연락처에 자동으로 반영됩니다.`
+                );
+              } catch (err: any) {
+                alert(`구글 주소록 등록 실패: ${err?.message || '알 수 없는 오류'}`);
+              } finally {
+                setIsSyncingGoogleContacts(false);
+              }
             }}
             className="adm-btn sage"
-            title={
-              selectedIds.length > 0
-                ? `선택한 ${selectedIds.length}명 연락처 파일(.vcf) 저장`
-                : `현재 목록 ${filteredInquiries.length}명 연락처 파일(.vcf) 일괄 저장`
-            }
           >
-            <Smartphone />
+            {isSyncingGoogleContacts ? <Loader2 className="animate-spin" /> : <Smartphone />}
             <span>
-              {selectedIds.length > 0
-                ? `폰 연락처 저장 (${selectedIds.length}명)`
-                : '폰 연락처 일괄 저장'}
+              {isSyncingGoogleContacts
+                ? '구글 주소록 등록 중...'
+                : selectedIds.length > 0
+                  ? `구글 주소록 등록 (${selectedIds.length}명)`
+                  : '구글 주소록 자동 등록'}
             </span>
           </button>
           <button
