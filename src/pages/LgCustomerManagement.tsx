@@ -900,8 +900,12 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const handleSendConsent = async () => {
     if (!selectedCustomer) return;
     const smsConfig = (settings as any)?.sms;
-    if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
-      alert('SMS 설정이 완료되지 않았습니다.\n환경설정 > SMS 설정에서 알리고 API 정보를 먼저 입력해주세요.');
+    const isSmsReady =
+      smsConfig?.provider === 'phone_bridge'
+        ? Boolean(smsConfig?.bridgeSecret)
+        : Boolean(smsConfig?.apiKey && smsConfig?.userId && smsConfig?.sender);
+    if (!isSmsReady) {
+      alert('SMS 설정이 완료되지 않았습니다.\n환경설정 > 문자(SMS) 연동 설정을 먼저 확인해주세요.');
       return;
     }
     if (!window.confirm(`${selectedCustomer.name}님에게 동의서 문자를 발송하시겠습니까?`)) return;
@@ -2023,10 +2027,22 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                                   <div className="flex items-center gap-1.5 flex-wrap">
                                     <span
                                       className={`adm-pill ${
-                                        isInbound ? 'teal' : log.status === '성공' ? 'green' : 'red'
+                                        isInbound
+                                          ? 'teal'
+                                          : log.status === '발송대기'
+                                            ? 'orange'
+                                            : log.status === '성공'
+                                              ? log.smsType === '휴대폰발신'
+                                                ? 'blue'
+                                                : 'green'
+                                              : 'red'
                                       }`}
                                     >
-                                      {isInbound ? '고객 답장' : log.smsType || '발신'}
+                                      {isInbound
+                                        ? '고객 답장'
+                                        : log.status === '발송대기'
+                                          ? `${log.smsType || '발신'} (회사폰 전송중)`
+                                          : log.smsType || '발신'}
                                     </span>
                                     {!isInbound && log.senderName && (
                                       <span className="text-[10.5px] text-[#5c6b5b] font-semibold">

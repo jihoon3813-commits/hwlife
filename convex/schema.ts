@@ -189,11 +189,15 @@ export default defineSchema({
       notice: v.string(),
     }),
     sms: v.optional(v.object({
-      apiKey: v.string(),
-      userId: v.string(),
-      sender: v.string(),
+      provider: v.optional(v.union(v.literal("aligo"), v.literal("phone_bridge"))),
+      apiKey: v.optional(v.string()),
+      userId: v.optional(v.string()),
+      sender: v.optional(v.string()),
       consentMessage: v.optional(v.string()),
       consentPageUrl: v.optional(v.string()),
+      bridgeSecret: v.optional(v.string()),
+      bridgeLastSeenAt: v.optional(v.number()),
+      bridgeDeviceName: v.optional(v.string()),
     })),
     headOfficeAccount: v.optional(v.object({
       accountId: v.string(),
@@ -334,10 +338,10 @@ export default defineSchema({
     inquiryId: v.optional(v.id("inquiries")),
     customerName: v.optional(v.string()),
     customerPhone: v.string(),
-    smsType: v.string(),                   // "자유문자", "상품안내", "구매동의서", "자동안내", "고객답장"
+    smsType: v.string(),                   // "자유문자", "상품안내", "구매동의서", "자동안내", "고객답장", "휴대폰발신"
     title: v.optional(v.string()),
     message: v.string(),
-    status: v.string(),                    // "성공", "실패", "수신"
+    status: v.string(),                    // "성공", "실패", "수신", "발송대기"
     errorMessage: v.optional(v.string()),
     senderName: v.optional(v.string()),    // 발송자 (관리자/채널명)
     direction: v.optional(v.union(v.literal("outbound"), v.literal("inbound"))),
@@ -345,6 +349,26 @@ export default defineSchema({
     receiverNumber: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_inquiryId_and_createdAt", ["inquiryId", "createdAt"])
+    .index("by_customerPhone_and_createdAt", ["customerPhone", "createdAt"])
     .index("by_direction_and_isRead", ["direction", "isRead"])
+    .index("by_createdAt", ["createdAt"]),
+
+  sms_outbox: defineTable({
+    smsLogId: v.optional(v.id("sms_logs")),
+    inquiryId: v.optional(v.id("inquiries")),
+    receiverPhone: v.string(),
+    title: v.optional(v.string()),
+    message: v.string(),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("processing"),
+      v.literal("sent"),
+      v.literal("failed")
+    ),
+    errorMessage: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_status_and_createdAt", ["status", "createdAt"])
     .index("by_createdAt", ["createdAt"]),
 });

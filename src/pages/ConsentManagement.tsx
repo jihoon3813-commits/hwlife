@@ -47,8 +47,12 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
   const smsConfig = (settings as any)?.sms;
 
   const handleSendConsent = async (customer: any) => {
-    if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
-      alert('SMS 설정이 완료되지 않았습니다.\n환경설정 > SMS 설정에서 알리고 API 정보를 먼저 입력해주세요.');
+    const isSmsReady =
+      smsConfig?.provider === 'phone_bridge'
+        ? Boolean(smsConfig?.bridgeSecret)
+        : Boolean(smsConfig?.apiKey && smsConfig?.userId && smsConfig?.sender);
+    if (!isSmsReady) {
+      alert('SMS 설정이 완료되지 않았습니다.\n환경설정 > 문자(SMS) 연동 설정을 먼저 확인해주세요.');
       return;
     }
 

@@ -17,8 +17,10 @@ import {
   Smartphone,
   Shield,
   RefreshCw,
+  Copy,
+  Download,
 } from 'lucide-react';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import VideoManagement from '../components/VideoManagement';
 import { DEFAULT_GUIDE_TEMPLATES, GuideTemplate } from '../constants/guideTemplates';
@@ -34,8 +36,10 @@ export default function Settings({ user }: { user?: any }) {
 
   const settings = useQuery(api.settings.get);
   const updateSettings = useMutation(api.settings.update);
+  const sendTestSmsAction = useAction(api.sms.sendTestSms);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const smsInitializedRef = useRef(false);
   const [currentUploadingId, setCurrentUploadingId] = useState<string | null>(null);
 
   const [localStatuses, setLocalStatuses] = useState<any[]>([]);
@@ -43,11 +47,13 @@ export default function Settings({ user }: { user?: any }) {
   const [localCategories, setLocalCategories] = useState<string[]>([]);
   const [localFooter, setLocalFooter] = useState<any>(null);
   const [localSms, setLocalSms] = useState<any>({
+    provider: 'phone_bridge',
     apiKey: '',
     userId: '',
     sender: '',
     consentMessage: '',
     consentPageUrl: '',
+    bridgeSecret: '',
   });
   const [localGuideTemplates, setLocalGuideTemplates] = useState<GuideTemplate[]>(DEFAULT_GUIDE_TEMPLATES);
   const [isSavingGuide, setIsSavingGuide] = useState(false);
@@ -64,8 +70,18 @@ export default function Settings({ user }: { user?: any }) {
       setLocalBrands(settings.brands || []);
       setLocalCategories(settings.categories || []);
       setLocalFooter(settings.footer || null);
-      if ((settings as any).sms) {
-        setLocalSms((settings as any).sms);
+      if ((settings as any).sms && !smsInitializedRef.current) {
+        const remoteSms = (settings as any).sms;
+        setLocalSms({
+          provider: remoteSms.provider || 'aligo',
+          apiKey: remoteSms.apiKey || '',
+          userId: remoteSms.userId || '',
+          sender: remoteSms.sender || '',
+          consentMessage: remoteSms.consentMessage || '',
+          consentPageUrl: remoteSms.consentPageUrl || '',
+          bridgeSecret: remoteSms.bridgeSecret || '',
+        });
+        smsInitializedRef.current = true;
       }
       if ((settings as any).guideTemplates?.length) {
         setLocalGuideTemplates((settings as any).guideTemplates);
@@ -81,7 +97,7 @@ export default function Settings({ user }: { user?: any }) {
     { id: 'category', label: '브랜드 · 카테고리', icon: Tags },
     { id: 'video', label: '랜딩 영상 관리', icon: Video },
     { id: 'guide', label: '안내 문구 설정', icon: MessageSquare },
-    { id: 'sms', label: '알리고 SMS 설정', icon: Smartphone },
+    { id: 'sms', label: '문자(SMS) 연동 설정', icon: Smartphone },
     { id: 'footer', label: '푸터 사업자 정보', icon: FileText },
     { id: 'admin', label: '계정 · 권한 관리', icon: Shield },
   ].filter((tab) => {
@@ -660,147 +676,352 @@ export default function Settings({ user }: { user?: any }) {
             </div>
           )}
 
-          {/* 6. 알리고 SMS 설정 */}
-          {activeTab === 'sms' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-[#edf0e7]">
-                <div>
-                  <h3 className="text-[16px] font-bold text-[#263d36]">알리고 SMS API 연동 설정</h3>
-                  <p className="text-[12px] text-[#86918a] mt-1">
-                    구매동의서 발송 및 고객 안내 LMS 발송에 사용되는 알리고 연동 정보입니다.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => saveSettings({ sms: localSms })}
-                  className="adm-btn primary"
-                >
-                  <Save />
-                  <span>설정 저장하기</span>
-                </button>
-              </div>
+          {/* 6. 문자(SMS) 연동 설정 */}
+          {activeTab === 'sms' && (() => {
+            const remoteSms = (settings as any)?.sms || {};
+            const convexUrl = (import.meta as any).env?.VITE_CONVEX_URL || '';
+            const convexSiteUrl = convexUrl
+              ? convexUrl.replace('.convex.cloud', '.convex.site')
+              : 'https://<CONVEX_DEPLOYMENT>.convex.site';
+            const apkDownloadUrl =
+              'https://github.com/jihoon3813-commits/hwlife/releases/latest/download/hyowon-sms-bridge.apk';
+            const activeProvider = localSms.provider || 'aligo';
+            const lastSeenAt = remoteSms.bridgeLastSeenAt || 0;
+            const isBridgeOnline = lastSeenAt > 0 && Date.now() - lastSeenAt < 65_000;
+            const generateRandomSecret = () => {
+              const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+              let token = 'hw-';
+              for (let i = 0; i < 16; i += 1) {
+                token += chars[Math.floor(Math.random() * chars.length)];
+              }
+              setLocalSms({ ...localSms, bridgeSecret: token });
+            };
+            const buildSmsPayload = () => ({
+              ...localSms,
+              bridgeLastSeenAt: remoteSms.bridgeLastSeenAt,
+              bridgeDeviceName: remoteSms.bridgeDeviceName,
+            });
 
-              <div className="adm-section-note">
-                <AlertCircle />
-                <div>
-                  <strong className="text-[#263d36]">알리고 사전 준비사항:</strong>{' '}
-                  <a
-                    href="https://smartsms.aligo.in/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline font-bold text-[#295e52]"
-                  >
-                    알리고 홈페이지
-                  </a>
-                  에서 API Key 발급 및 발신번호 사전 등록 승인이 완료되어야 정상 발송됩니다.
-                </div>
-              </div>
-
-              <div className="adm-field-grid">
-                <div className="adm-field">
-                  <label>API Key *</label>
-                  <input
-                    type="password"
-                    value={localSms.apiKey || ''}
-                    onChange={(e) => setLocalSms({ ...localSms, apiKey: e.target.value })}
-                    placeholder="알리고 발급 API Key"
-                    className="adm-input font-mono"
-                  />
-                </div>
-                <div className="adm-field">
-                  <label>알리고 사용자 ID *</label>
-                  <input
-                    type="text"
-                    value={localSms.userId || ''}
-                    onChange={(e) => setLocalSms({ ...localSms, userId: e.target.value })}
-                    placeholder="알리고 로그인 아이디"
-                    className="adm-input font-mono"
-                  />
-                </div>
-                <div className="adm-field">
-                  <label>승인된 발신번호 *</label>
-                  <input
-                    type="text"
-                    value={localSms.sender || ''}
-                    onChange={(e) => setLocalSms({ ...localSms, sender: e.target.value })}
-                    placeholder="예: 15880883"
-                    className="adm-input font-mono"
-                  />
-                </div>
-                <div className="adm-field">
-                  <label>동의서 기본 도메인 URL</label>
-                  <input
-                    type="text"
-                    value={localSms.consentPageUrl || ''}
-                    onChange={(e) => setLocalSms({ ...localSms, consentPageUrl: e.target.value })}
-                    placeholder="예: https://hyowon-life.com/consent"
-                    className="adm-input font-mono"
-                  />
-                </div>
-                <div className="adm-field full">
-                  <label>구매동의서 발송 메시지 템플릿</label>
-                  <textarea
-                    value={localSms.consentMessage || ''}
-                    onChange={(e) => setLocalSms({ ...localSms, consentMessage: e.target.value })}
-                    placeholder={`[효원상조] {고객명}님, 결합제품 구매동의서가 도착했습니다.\n\n아래 링크를 클릭하여 동의서를 확인하고 서명해주세요.\n{동의서링크}\n\n문의: 1588-0883`}
-                    className="adm-textarea !min-h-[120px]"
-                  />
-                  <div className="flex flex-wrap gap-1.5 mt-1">
-                    <span className="adm-pill gray">{'{고객명}'} = 고객 성함</span>
-                    <span className="adm-pill gray">{'{동의서링크}'} = 전자동의서 URL</span>
-                    <span className="adm-pill gray">{'{상품명}'} = 신청 상품명</span>
+            return (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between pb-4 border-b border-[#edf0e7]">
+                  <div>
+                    <h3 className="text-[16px] font-bold text-[#263d36]">문자(SMS) 발송 · 수신 연동 설정</h3>
+                    <p className="text-[12px] text-[#86918a] mt-1">
+                      회사 안드로이드폰 양방향 직접 연동 또는 알리고 웹 발송 중 원하는 방식을 선택할 수 있습니다.
+                    </p>
                   </div>
-                </div>
-              </div>
-
-              <div className="pt-5 border-t border-[#edf0e7] space-y-3">
-                <div className="text-[13px] font-bold text-[#263d36]">연동 저장 및 발송 테스트</div>
-                <div className="flex flex-col sm:flex-row gap-2.5">
-                  <input
-                    type="text"
-                    value={smsTestPhone}
-                    onChange={(e) => setSmsTestPhone(e.target.value)}
-                    placeholder="테스트 수신번호 (예: 010-1234-5678)"
-                    className="adm-input flex-1 font-mono"
-                  />
                   <button
                     type="button"
-                    onClick={async () => {
-                      if (!smsTestPhone) {
-                        alert('테스트 수신번호를 입력해주세요.');
-                        return;
-                      }
-                      await saveSettings({ sms: localSms });
-                      try {
-                        const result = await (window as any).__convex_test_sms?.({ phone: smsTestPhone });
-                        setSmsTestResult(
-                          result || {
-                            success: true,
-                            message: '설정이 저장되었습니다. 구매동의 관리에서 실제 발송을 테스트해주세요.',
-                          }
-                        );
-                      } catch {
-                        setSmsTestResult({
-                          success: true,
-                          message: '설정이 저장되었습니다. 구매동의 관리에서 실제 발송을 테스트해주세요.',
-                        });
-                      }
-                    }}
-                    className="adm-btn sage shrink-0"
+                    onClick={() => saveSettings({ sms: buildSmsPayload() })}
+                    className="adm-btn primary"
                   >
-                    <Send />
-                    <span>설정 저장 · 테스트</span>
+                    <Save />
+                    <span>설정 저장하기</span>
                   </button>
                 </div>
-                {smsTestResult && (
-                  <div className={`adm-pill ${smsTestResult.success ? 'green' : 'red'} !py-2 !px-3`}>
-                    {smsTestResult.success ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-                    <span>{smsTestResult.message}</span>
+
+                {/* 발송 방식 선택 스위치 */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextSecret = localSms.bridgeSecret || (() => {
+                        const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+                        let token = 'hw-';
+                        for (let i = 0; i < 16; i += 1) token += chars[Math.floor(Math.random() * chars.length)];
+                        return token;
+                      })();
+                      setLocalSms({ ...localSms, provider: 'phone_bridge', bridgeSecret: nextSecret });
+                    }}
+                    className={`text-left p-4 rounded-[12px] border-2 transition-all ${
+                      activeProvider === 'phone_bridge'
+                        ? 'border-[#295e52] bg-[#f3f8f6]'
+                        : 'border-[#e5e8eb] bg-white hover:bg-[#f9fafb]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[14px] font-bold text-[#263d36]">
+                        📱 회사폰 직접 연동 (양방향 · 추천)
+                      </span>
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#295e52] text-white">
+                        양방향 동기화
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-[#6b7684] leading-relaxed">
+                      어드민 발송 문자가 회사폰 문자함에도 남고, 고객 답장 및 회사폰 직접 발신 문자도 어드민 대화창에 자동 기록됩니다.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setLocalSms({ ...localSms, provider: 'aligo' })}
+                    className={`text-left p-4 rounded-[12px] border-2 transition-all ${
+                      activeProvider === 'aligo'
+                        ? 'border-[#295e52] bg-[#f3f8f6]'
+                        : 'border-[#e5e8eb] bg-white hover:bg-[#f9fafb]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[14px] font-bold text-[#263d36]">
+                        ☁️ 알리고 웹 발송 (단방향)
+                      </span>
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#f2f4f6] text-[#4e5968]">
+                        기존 방식
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-[#6b7684] leading-relaxed">
+                      알리고 API 서버를 통해 발송합니다. 회사폰 배터리가 방전되었거나 대량 발송이 필요할 때 전환해 사용하세요.
+                    </p>
+                  </button>
+                </div>
+
+                {activeProvider === 'phone_bridge' ? (
+                  <div className="space-y-5">
+                    {/* 실시간 연결 상태 표시 */}
+                    <div
+                      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-[12px] border ${
+                        isBridgeOnline
+                          ? 'bg-emerald-50/70 border-emerald-200'
+                          : 'bg-amber-50/70 border-amber-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className={`w-2.5 h-2.5 rounded-full ${
+                            isBridgeOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+                          }`}
+                        />
+                        <div>
+                          <div className="text-[13px] font-bold text-[#263d36]">
+                            {isBridgeOnline
+                              ? `회사폰 실시간 연결됨 (${remoteSms.bridgeDeviceName || 'Android'})`
+                              : '회사폰 연결 대기 중'}
+                          </div>
+                          <div className="text-[11.5px] text-[#6b7684] mt-0.5">
+                            {lastSeenAt > 0
+                              ? `최근 통신: ${new Date(lastSeenAt).toLocaleString('ko-KR')}`
+                              : '아직 회사폰 앱과 연결된 기록이 없습니다. 아래 보안키를 저장한 뒤 앱에서 [연동 시작]을 눌러주세요.'}
+                          </div>
+                        </div>
+                      </div>
+                      <a
+                        href={apkDownloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[8px] bg-[#295e52] hover:bg-[#1f493f] text-white text-[12px] font-bold transition-colors shrink-0"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        효원 문자연동 앱(APK) 다운로드
+                      </a>
+                    </div>
+
+                    {/* 앱에 입력할 연결 정보 */}
+                    <div className="adm-field-grid">
+                      <div className="adm-field">
+                        <label>앱에 입력할 서버 주소</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            readOnly
+                            value={convexSiteUrl}
+                            className="adm-input font-mono bg-[#f9fafb]"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(convexSiteUrl);
+                              alert('서버 주소가 복사되었습니다.');
+                            }}
+                            className="adm-btn sage shrink-0"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>복사</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="adm-field">
+                        <label>앱 연동 보안키 *</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={localSms.bridgeSecret || ''}
+                            onChange={(e) =>
+                              setLocalSms({ ...localSms, bridgeSecret: e.target.value.trim() })
+                            }
+                            placeholder="예: hw-a1b2c3d4..."
+                            className="adm-input font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={generateRandomSecret}
+                            className="adm-btn shrink-0"
+                            title="새 보안키 생성"
+                          >
+                            <RefreshCw className="w-3.5 h-3.5" />
+                            <span>생성</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!localSms.bridgeSecret) return;
+                              navigator.clipboard.writeText(localSms.bridgeSecret);
+                              alert('연동 보안키가 복사되었습니다. 꼭 상단의 [설정 저장하기]도 눌러주세요!');
+                            }}
+                            className="adm-btn sage shrink-0"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>복사</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 갤럭시 최초 1회 설정 안내 */}
+                    <div className="adm-section-note">
+                      <AlertCircle />
+                      <div className="space-y-1 text-[12px] leading-relaxed">
+                        <strong className="text-[#263d36] block">
+                          갤럭시 회사폰 최초 1회 설정 순서 (중요):
+                        </strong>
+                        <div>
+                          1. 회사폰 기본 <strong>메시지 앱 설정 → 채팅+ 설정 → 채팅+ 기능 끄기</strong> (일반 문자로 송수신되어야 누락 없이 동기화됩니다)
+                        </div>
+                        <div>
+                          2. 위 <strong>APK 다운로드 링크</strong>를 회사폰에서 열어 설치 후 실행합니다. (안드로이드 13 이상에서 SMS 권한 허용이 막혀 있으면 휴대폰 <code>설정 → 애플리케이션 → 효원 문자연동 → 우측 상단 ⋮ → 제한된 설정 허용</code> 후 권한 허용)
+                        </div>
+                        <div>
+                          3. 앱에서 <strong>배터리 최적화 제외(제한 없음)</strong>를 허용한 뒤, 위의 <strong>서버 주소</strong>와 <strong>연동 보안키</strong>를 입력하고 <strong>[연동 시작]</strong>을 누르면 완료됩니다.
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                ) : (
+                  <>
+                    <div className="adm-section-note">
+                      <AlertCircle />
+                      <div>
+                        <strong className="text-[#263d36]">알리고 사전 준비사항:</strong>{' '}
+                        <a
+                          href="https://smartsms.aligo.in/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline font-bold text-[#295e52]"
+                        >
+                          알리고 홈페이지
+                        </a>
+                        에서 API Key 발급 및 발신번호 사전 등록 승인이 완료되어야 정상 발송됩니다.
+                      </div>
+                    </div>
+
+                    <div className="adm-field-grid">
+                      <div className="adm-field">
+                        <label>API Key *</label>
+                        <input
+                          type="password"
+                          value={localSms.apiKey || ''}
+                          onChange={(e) => setLocalSms({ ...localSms, apiKey: e.target.value })}
+                          placeholder="알리고 발급 API Key"
+                          className="adm-input font-mono"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>알리고 사용자 ID *</label>
+                        <input
+                          type="text"
+                          value={localSms.userId || ''}
+                          onChange={(e) => setLocalSms({ ...localSms, userId: e.target.value })}
+                          placeholder="알리고 로그인 아이디"
+                          className="adm-input font-mono"
+                        />
+                      </div>
+                      <div className="adm-field">
+                        <label>승인된 발신번호 *</label>
+                        <input
+                          type="text"
+                          value={localSms.sender || ''}
+                          onChange={(e) => setLocalSms({ ...localSms, sender: e.target.value })}
+                          placeholder="예: 15880883"
+                          className="adm-input font-mono"
+                        />
+                      </div>
+                    </div>
+                  </>
                 )}
+
+                {/* 공통: 전자동의서 URL 및 메시지 템플릿 */}
+                <div className="adm-field-grid pt-4 border-t border-[#edf0e7]">
+                  <div className="adm-field full">
+                    <label>동의서 기본 도메인 URL</label>
+                    <input
+                      type="text"
+                      value={localSms.consentPageUrl || ''}
+                      onChange={(e) => setLocalSms({ ...localSms, consentPageUrl: e.target.value })}
+                      placeholder="예: https://hyowon-life.com/consent"
+                      className="adm-input font-mono"
+                    />
+                  </div>
+                  <div className="adm-field full">
+                    <label>구매동의서 발송 메시지 템플릿</label>
+                    <textarea
+                      value={localSms.consentMessage || ''}
+                      onChange={(e) => setLocalSms({ ...localSms, consentMessage: e.target.value })}
+                      placeholder={`[효원상조] {고객명}님, 결합제품 구매동의서가 도착했습니다.\n\n아래 링크를 클릭하여 동의서를 확인하고 서명해주세요.\n{동의서링크}\n\n문의: 1588-0883`}
+                      className="adm-textarea !min-h-[120px]"
+                    />
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      <span className="adm-pill gray">{'{고객명}'} = 고객 성함</span>
+                      <span className="adm-pill gray">{'{동의서링크}'} = 전자동의서 URL</span>
+                      <span className="adm-pill gray">{'{상품명}'} = 신청 상품명</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-5 border-t border-[#edf0e7] space-y-3">
+                  <div className="text-[13px] font-bold text-[#263d36]">연동 저장 및 발송 테스트</div>
+                  <div className="flex flex-col sm:flex-row gap-2.5">
+                    <input
+                      type="text"
+                      value={smsTestPhone}
+                      onChange={(e) => setSmsTestPhone(e.target.value)}
+                      placeholder="테스트 수신번호 (예: 010-1234-5678)"
+                      className="adm-input flex-1 font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!smsTestPhone) {
+                          alert('테스트 수신번호를 입력해주세요.');
+                          return;
+                        }
+                        await saveSettings({ sms: buildSmsPayload() });
+                        try {
+                          const result = await sendTestSmsAction({ phone: smsTestPhone });
+                          setSmsTestResult(result);
+                        } catch (err: any) {
+                          setSmsTestResult({
+                            success: false,
+                            message: err?.message || '테스트 발송 중 오류가 발생했습니다.',
+                          });
+                        }
+                      }}
+                      className="adm-btn sage shrink-0"
+                    >
+                      <Send />
+                      <span>설정 저장 · 테스트</span>
+                    </button>
+                  </div>
+                  {smsTestResult && (
+                    <div className={`adm-pill ${smsTestResult.success ? 'green' : 'red'} !py-2 !px-3`}>
+                      {smsTestResult.success ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                      <span>{smsTestResult.message}</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* 7. 푸터 정보 설정 */}
           {activeTab === 'footer' && localFooter && (

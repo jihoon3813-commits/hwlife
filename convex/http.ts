@@ -7,7 +7,7 @@ const http = httpRouter();
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Bridge-Secret",
 };
 
 http.route({
@@ -300,6 +300,105 @@ http.route({
       }
 
       return jsonReply({ ok: true, processed: results.length, results }, 200);
+    } catch (err: any) {
+      return jsonReply({ ok: false, error: err?.message || "Invalid request" }, 400);
+    }
+  }),
+});
+
+http.route({
+  path: "/api/sms-bridge/poll",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders })),
+});
+
+http.route({
+  path: "/api/sms-bridge/poll",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    try {
+      const body = await req.json().catch(() => ({}));
+      const secret = String(req.headers.get("x-bridge-secret") || body?.secret || "").trim();
+      const deviceName = typeof body?.deviceName === "string" ? body.deviceName.trim() : undefined;
+
+      const res = await ctx.runMutation(internal.sms.pollBridgeOutbox, {
+        secret,
+        deviceName,
+      });
+      return jsonReply(res, res.ok ? 200 : 401);
+    } catch (err: any) {
+      return jsonReply({ ok: false, error: err?.message || "Invalid request", jobs: [] }, 400);
+    }
+  }),
+});
+
+http.route({
+  path: "/api/sms-bridge/ack",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders })),
+});
+
+http.route({
+  path: "/api/sms-bridge/ack",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    try {
+      const body = await req.json();
+      const secret = String(req.headers.get("x-bridge-secret") || body?.secret || "").trim();
+      const outboxId = body?.outboxId;
+      if (!outboxId) {
+        return jsonReply({ ok: false, error: "outboxId is required" }, 400);
+      }
+
+      const res = await ctx.runMutation(internal.sms.ackBridgeOutbox, {
+        secret,
+        outboxId,
+        success: Boolean(body?.success),
+        errorMessage: typeof body?.errorMessage === "string" ? body.errorMessage : undefined,
+      });
+      return jsonReply(res, res.ok ? 200 : 401);
+    } catch (err: any) {
+      return jsonReply({ ok: false, error: err?.message || "Invalid request" }, 400);
+    }
+  }),
+});
+
+http.route({
+  path: "/api/sms-bridge/sync",
+  method: "OPTIONS",
+  handler: httpAction(async () => new Response(null, { status: 204, headers: corsHeaders })),
+});
+
+http.route({
+  path: "/api/sms-bridge/sync",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    try {
+      const body = await req.json();
+      const secret = String(req.headers.get("x-bridge-secret") || body?.secret || "").trim();
+      const deviceName = typeof body?.deviceName === "string" ? body.deviceName.trim() : undefined;
+      const rawMessages = Array.isArray(body?.messages) ? body.messages : [];
+
+      const messages = rawMessages
+        .filter(
+          (m: any) =>
+            (m?.direction === "inbound" || m?.direction === "outbound") &&
+            typeof m?.phone === "string" &&
+            typeof m?.message === "string"
+        )
+        .map((m: any) => ({
+          direction: m.direction as "inbound" | "outbound",
+          phone: String(m.phone),
+          message: String(m.message),
+          timestamp: typeof m.timestamp === "number" ? m.timestamp : undefined,
+        }));
+
+      const res = await ctx.runMutation(internal.sms.syncBridgeMessages, {
+        secret,
+        deviceName,
+        messages,
+      });
+      return jsonReply(res, res.ok ? 200 : 401);
     } catch (err: any) {
       return jsonReply({ ok: false, error: err?.message || "Invalid request" }, 400);
     }

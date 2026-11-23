@@ -102,11 +102,15 @@ export const update = mutation({
       notice: v.string(),
     })),
     sms: v.optional(v.object({
-      apiKey: v.string(),
-      userId: v.string(),
-      sender: v.string(),
+      provider: v.optional(v.union(v.literal("aligo"), v.literal("phone_bridge"))),
+      apiKey: v.optional(v.string()),
+      userId: v.optional(v.string()),
+      sender: v.optional(v.string()),
       consentMessage: v.optional(v.string()),
       consentPageUrl: v.optional(v.string()),
+      bridgeSecret: v.optional(v.string()),
+      bridgeLastSeenAt: v.optional(v.number()),
+      bridgeDeviceName: v.optional(v.string()),
     })),
     headOfficeAccount: v.optional(v.object({
       accountId: v.string(),
