@@ -637,12 +637,11 @@ export default function LgCustomerManagement({
       { id: 'channel', label: '채널명', minWidth: 80, defaultWidth: 100, align: 'left' as const },
       { id: 'name', label: '고객명', minWidth: 95, defaultWidth: 125, align: 'left' as const },
       { id: 'phone', label: '연락처', minWidth: 110, defaultWidth: 125, align: 'left' as const },
-      { id: 'address', label: '주소', minWidth: 140, defaultWidth: 200, align: 'left' as const },
       { id: 'productName', label: '신청상품', minWidth: 140, defaultWidth: 220, align: 'left' as const },
-      { id: 'appliance', label: '결합제품 · 조건', minWidth: 170, defaultWidth: 270, align: 'left' as const },
+      { id: 'appliance', label: '결합제품 · 조건', minWidth: 170, defaultWidth: 310, align: 'left' as const },
       { id: 'supplier', label: '공급사', minWidth: 70, defaultWidth: 90, align: 'center' as const },
       ...(isMasterAdmin
-        ? [{ id: 'recentSms', label: '최근 문자', minWidth: 150, defaultWidth: 190, align: 'left' as const }]
+        ? [{ id: 'recentSms', label: '최근 문자', minWidth: 150, defaultWidth: 240, align: 'left' as const }]
         : []),
       { id: 'status', label: '진행상태', minWidth: 75, defaultWidth: 95, align: 'center' as const },
     ],
@@ -663,11 +662,10 @@ export default function LgCustomerManagement({
           { id: 'channel', defaultWidth: 100 },
           { id: 'name', defaultWidth: 125 },
           { id: 'phone', defaultWidth: 125 },
-          { id: 'address', defaultWidth: 200 },
           { id: 'productName', defaultWidth: 220 },
-          { id: 'appliance', defaultWidth: 270 },
+          { id: 'appliance', defaultWidth: 310 },
           { id: 'supplier', defaultWidth: 90 },
-          { id: 'recentSms', defaultWidth: 190 },
+          { id: 'recentSms', defaultWidth: 240 },
           { id: 'status', defaultWidth: 95 },
         ].forEach((col) => {
           initial[col.id] = parsed[col.id] || col.defaultWidth;
@@ -683,11 +681,10 @@ export default function LgCustomerManagement({
       channel: 100,
       name: 125,
       phone: 125,
-      address: 200,
       productName: 220,
-      appliance: 270,
+      appliance: 310,
       supplier: 90,
-      recentSms: 190,
+      recentSms: 240,
       status: 95,
     };
   });
@@ -740,11 +737,10 @@ export default function LgCustomerManagement({
       channel: 100,
       name: 125,
       phone: 125,
-      address: 200,
       productName: 220,
-      appliance: 270,
+      appliance: 310,
       supplier: 90,
-      recentSms: 190,
+      recentSms: 240,
       status: 95,
     };
     setColumnWidths(defaults);
@@ -1566,7 +1562,12 @@ export default function LgCustomerManagement({
         <div className="adm-table-scroll custom-scrollbar">
           <table
             className="adm-table table-fixed"
-            style={{ minWidth: Object.values(columnWidths).reduce((a: number, b) => a + Number(b), 0) }}
+            style={{
+              minWidth: DEFAULT_COLUMNS.reduce(
+                (sum, col) => sum + Number(columnWidths[col.id] || col.defaultWidth),
+                0
+              ),
+            }}
           >
             <thead className="select-none">
               <tr>
@@ -1743,21 +1744,6 @@ export default function LgCustomerManagement({
                             </span>
                           );
                         })()}
-                      </td>
-
-                      <td style={{ width: `${columnWidths.address}px` }}>
-                        {customer.address ? (
-                          <div className="text-[12px] leading-tight">
-                            <div className="truncate text-[#263d36] font-medium" title={customer.address}>
-                              {customer.address}
-                            </div>
-                            <div className="truncate text-[10.5px] text-[#86918a] mt-0.5" title={customer.detailAddress || ''}>
-                              {customer.detailAddress || '-'}
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-[#9ba594] text-[12px]">-</span>
-                        )}
                       </td>
 
                       <td style={{ width: `${columnWidths.productName}px` }} className="font-semibold text-[#263d36] truncate" title={finalOutput}>
