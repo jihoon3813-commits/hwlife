@@ -886,8 +886,21 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const handleUpdate = async () => {
     if (!selectedCustomer) return;
     try {
-      const { _id, _creationTime, createdAt, message, ...validUpdates } = editData;
-      const updates: any = { ...validUpdates, status };
+      // Only include fields accepted by inquiries.update to avoid Convex validation errors on tracking/system fields
+      const allowedFields = [
+        'name', 'phone', 'gender', 'birth', 'address', 'detailAddress',
+        'newRegDate', 'cardPaymentDate', 'purchaseConsentDate', 'sangjoContractDate',
+        'rentalContractDate', 'cancelDate', 'terminationDate', 'deliveryDate',
+        'consentStatus', 'consentFileUrl', 'consentSentDate', 'note',
+        'account', 'appliance', 'supplier', 'subscriptionPeriod', 'careCycle', 'careType',
+        'memoHistory', 'productName', 'channelId', 'source', 'inflow',
+      ];
+      const updates: Record<string, any> = { status };
+      for (const key of allowedFields) {
+        if (editData[key] !== undefined && editData[key] !== null) {
+          updates[key] = editData[key];
+        }
+      }
 
       if (memo.trim()) {
         let writerName = '관리자';
