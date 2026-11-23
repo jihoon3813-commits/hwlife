@@ -538,11 +538,24 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       : DEFAULT_GUIDE_TEMPLATES;
   const [selectedGuideIdx, setSelectedGuideIdx] = useState(0);
   const [guideDraft, setGuideDraft] = useState('');
+  const [customSmsTitle, setCustomSmsTitle] = useState('[효원상조 × LG가전구독] 안내');
+  const [customSmsDraft, setCustomSmsDraft] = useState('');
   const [guideCopied, setGuideCopied] = useState(false);
   const [isSendingGuideSms, setIsSendingGuideSms] = useState(false);
+  const [expandedSmsLogId, setExpandedSmsLogId] = useState<string | null>(null);
+
+  const smsLogs = useQuery(
+    api.sms.listByInquiry,
+    selectedCustomer?._id ? { inquiryId: selectedCustomer._id } : 'skip'
+  );
 
   useEffect(() => {
-    if (!selectedCustomer) return;
+    setCustomSmsDraft('');
+    setExpandedSmsLogId(null);
+  }, [selectedCustomer?._id]);
+
+  useEffect(() => {
+    if (!selectedCustomer || selectedGuideIdx < 0) return;
     const tpl = guideTemplates[selectedGuideIdx] || guideTemplates[0];
     if (tpl) {
       setGuideDraft(formatGuideMessage(tpl.content, selectedCustomer.name, selectedCustomer.appliance));
@@ -883,6 +896,26 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     }
   };
 
+  const getCurrentWriterName = () => {
+    let writerName = '관리자';
+    try {
+      const savedProxy = sessionStorage.getItem('admin_proxy_user');
+      if (savedProxy && savedProxy !== 'null') {
+        const user = JSON.parse(savedProxy);
+        writerName = user.channelName || user.accountId || '관리자';
+      } else {
+        const saved = localStorage.getItem('admin_user');
+        if (saved && saved !== 'null') {
+          const user = JSON.parse(saved);
+          writerName = user.channelName || user.accountId || '관리자';
+        }
+      }
+    } catch (e) {
+      console.error('Failed to get current user info:', e);
+    }
+    return writerName;
+  };
+
   const handleUpdate = async () => {
     if (!selectedCustomer) return;
     try {
@@ -903,22 +936,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       }
 
       if (memo.trim()) {
-        let writerName = '관리자';
-        try {
-          const savedProxy = sessionStorage.getItem('admin_proxy_user');
-          if (savedProxy && savedProxy !== 'null') {
-            const user = JSON.parse(savedProxy);
-            writerName = user.channelName || user.accountId || '관리자';
-          } else {
-            const saved = localStorage.getItem('admin_user');
-            if (saved && saved !== 'null') {
-              const user = JSON.parse(saved);
-              writerName = user.channelName || user.accountId || '관리자';
-            }
-          }
-        } catch (e) {
-          console.error('Failed to get current user info:', e);
-        }
+        const writerName = getCurrentWriterName();
 
         const newHistory = {
           date: new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -1638,20 +1656,25 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 lg:p-6 flex flex-col gap-6 bg-[#F9FAFB] hide-scrollbar">
-              {/* 카톡 · 문자 상품 안내 발송 */}
+              {/* 카톡 · 문자 상품 안내 및 자유문자 발송 */}
               <section className="bg-white p-5 rounded-[16px] border border-[#E5E8EB]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                   <h4 className="text-[15px] font-bold flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#EAB308]"></span>
-                    카톡 · 문자 상품 안내
-                    <span className="text-[12px] font-normal text-[#8B95A1]">(문구는 설정 &gt; 안내 문구 설정에서 변경 가능)</span>
+                    카톡 · 문자 발송
+                    <span className="text-[12px] font-normal text-[#8B95A1]">(안내 문구 및 자유문자)</span>
                   </h4>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={async () => {
+                        const textToCopy = selectedGuideIdx === -1 ? customSmsDraft : guideDraft;
+                        if (!textToCopy.trim()) {
+                          alert('복사할 내용이 없습니다.');
+                          return;
+                        }
                         try {
-                          await navigator.clipboard.writeText(guideDraft);
+                          await navigator.clipboard.writeText(textToCopy);
                           setGuideCopied(true);
                           setTimeout(() => setGuideCopied(false), 2000);
                         } catch {
@@ -1672,14 +1695,29 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                           alert('고객 연락처가 없습니다.');
                           return;
                         }
-                        if (!confirm(`${selectedCustomer.name}님(${targetPhone})에게 안내 문자를 발송하시겠습니까?`)) return;
+                        const isCustomMode = selectedGuideIdx === -1;
+                        const activeMessage = isCustomMode ? customSmsDraft : guideDraft;
+                        if (!activeMessage.trim()) {
+                          alert('발송할 문자 내용을 입력해주세요.');
+                          return;
+                        }
+                        if (!confirm(`${selectedCustomer.name}님(${targetPhone})에게 ${isCustomMode ? '자유문자' : '안내 문자'}를 발송하시겠습니까?`)) return;
                         setIsSendingGuideSms(true);
                         try {
                           const res = await sendCustomGuideSms({
+                            inquiryId: selectedCustomer._id,
+                            customerName: selectedCustomer.name,
                             customerPhone: targetPhone,
-                            title: '[효원상조 × LG가전구독] 상품 안내',
-                            message: guideDraft,
+                            smsType: isCustomMode ? '자유문자' : '상품안내',
+                            senderName: getCurrentWriterName(),
+                            title: isCustomMode
+                              ? (customSmsTitle.trim() || '[효원상조 × LG가전구독] 안내')
+                              : '[효원상조 × LG가전구독] 상품 안내',
+                            message: activeMessage,
                           });
+                          if (isCustomMode) {
+                            setCustomSmsDraft('');
+                          }
                           alert(res?.message || '문자 발송이 완료되었습니다.');
                         } catch (err: any) {
                           alert(err?.message || '문자 발송에 실패했습니다.');
@@ -1710,14 +1748,137 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                       {tpl.title}
                     </button>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedGuideIdx(-1)}
+                    className={`px-3 py-1.5 rounded-[8px] text-[12px] font-bold border transition-colors ${
+                      selectedGuideIdx === -1
+                        ? 'bg-[#3182F6] text-white border-[#3182F6]'
+                        : 'bg-[#EFF6FF] text-[#3182F6] border-[#BFDBFE] hover:bg-[#DBEAFE]'
+                    }`}
+                  >
+                    ✏️ 자유문자 (직접 입력)
+                  </button>
                 </div>
 
-                <textarea
-                  rows={6}
-                  value={guideDraft}
-                  onChange={(e) => setGuideDraft(e.target.value)}
-                  className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[10px] p-3.5 text-[13px] leading-relaxed outline-none focus:border-[#3182F6]"
-                />
+                {selectedGuideIdx === -1 ? (
+                  <div className="space-y-2.5">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#8B95A1] mb-1">문자 제목 (LMS)</label>
+                      <input
+                        type="text"
+                        value={customSmsTitle}
+                        onChange={(e) => setCustomSmsTitle(e.target.value)}
+                        placeholder="[효원상조 × LG가전구독] 안내"
+                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[8px] px-3 py-2 text-[13px] outline-none focus:border-[#3182F6]"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-[11px] font-semibold text-[#8B95A1]">자유문자 내용</label>
+                        <span className="text-[11px] text-[#8B95A1]">{customSmsDraft.length}자 (LMS)</span>
+                      </div>
+                      <textarea
+                        rows={5}
+                        value={customSmsDraft}
+                        onChange={(e) => setCustomSmsDraft(e.target.value)}
+                        placeholder="고객님께 발송할 자유 문자 내용을 직접 입력하세요..."
+                        className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[10px] p-3.5 text-[13px] leading-relaxed outline-none focus:border-[#3182F6]"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex justify-end mb-1">
+                      <span className="text-[11px] text-[#8B95A1]">{guideDraft.length}자 (LMS)</span>
+                    </div>
+                    <textarea
+                      rows={6}
+                      value={guideDraft}
+                      onChange={(e) => setGuideDraft(e.target.value)}
+                      className="w-full bg-[#F9FAFB] border border-[#E5E8EB] rounded-[10px] p-3.5 text-[13px] leading-relaxed outline-none focus:border-[#3182F6]"
+                    />
+                  </div>
+                )}
+
+                {/* 문자 발송 내역 */}
+                <div className="mt-4 pt-4 border-t border-[#E5E8EB]">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <h5 className="text-[13px] font-bold text-[#4E5968] flex items-center gap-1.5">
+                      <History className="w-4 h-4 text-[#3182F6]" />
+                      문자 발송 내역
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#F2F4F6] text-[#4E5968]">
+                        {smsLogs ? `${smsLogs.length}건` : '조회중...'}
+                      </span>
+                    </h5>
+                  </div>
+                  {smsLogs && smsLogs.length > 0 ? (
+                    <div className="space-y-2 max-h-[210px] overflow-y-auto pr-1">
+                      {smsLogs.map((log: any) => {
+                        const isExpanded = expandedSmsLogId === log._id;
+                        const kst = new Date(log.createdAt + 9 * 60 * 60 * 1000);
+                        const formattedDate = `${kst.getUTCFullYear()}-${String(kst.getUTCMonth() + 1).padStart(2, '0')}-${String(kst.getUTCDate()).padStart(2, '0')} ${String(kst.getUTCHours()).padStart(2, '0')}:${String(kst.getUTCMinutes()).padStart(2, '0')}`;
+                        return (
+                          <div
+                            key={log._id}
+                            className="bg-[#F9FAFB] border border-[#E5E8EB] rounded-[10px] p-3 text-[12px]"
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                                    log.status === '성공'
+                                      ? 'bg-emerald-50 text-emerald-700'
+                                      : 'bg-red-50 text-red-600'
+                                  }`}
+                                >
+                                  {log.status}
+                                </span>
+                                <span className="px-2 py-0.5 rounded-[6px] bg-white border border-[#E5E8EB] text-[#333D4B] font-semibold text-[11px]">
+                                  {log.smsType}
+                                </span>
+                                <span className="text-[#8B95A1] font-medium">{formattedDate}</span>
+                                {log.senderName && (
+                                  <span className="text-[#6B7684] bg-[#E5E8EB]/60 px-1.5 py-0.5 rounded text-[11px]">
+                                    {log.senderName}
+                                  </span>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setExpandedSmsLogId(isExpanded ? null : log._id)}
+                                className="text-[11px] font-semibold text-[#3182F6] hover:underline"
+                              >
+                                {isExpanded ? '접기' : '전체보기'}
+                              </button>
+                            </div>
+                            {log.title && (
+                              <div className="font-semibold text-[#333D4B] mb-1 truncate">
+                                {log.title}
+                              </div>
+                            )}
+                            <p
+                              className={`text-[#4E5968] whitespace-pre-wrap break-words leading-relaxed ${
+                                isExpanded ? '' : 'line-clamp-2'
+                              }`}
+                            >
+                              {log.message}
+                            </p>
+                            {log.status === '실패' && log.errorMessage && (
+                              <div className="mt-1.5 text-[11px] text-red-600 bg-red-50/70 px-2 py-1 rounded">
+                                실패 사유: {log.errorMessage}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="bg-[#F9FAFB] border border-dashed border-[#E5E8EB] rounded-[10px] py-4 text-center text-[12px] text-[#8B95A1]">
+                      {smsLogs ? '아직 발송된 문자 내역이 없습니다.' : '문자 발송 내역을 불러오는 중입니다...'}
+                    </div>
+                  )}
+                </div>
               </section>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

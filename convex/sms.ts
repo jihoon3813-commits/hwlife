@@ -1,7 +1,40 @@
 import { v } from "convex/values";
-import { action, internalAction } from "./_generated/server";
-import { api } from "./_generated/api";
+import { action, internalAction, internalMutation, query } from "./_generated/server";
+import { api, internal } from "./_generated/api";
 import { DEFAULT_GUIDE_TEMPLATES } from "./settings";
+
+export const logSms = internalMutation({
+  args: {
+    inquiryId: v.optional(v.id("inquiries")),
+    customerName: v.optional(v.string()),
+    customerPhone: v.string(),
+    smsType: v.string(),
+    title: v.optional(v.string()),
+    message: v.string(),
+    status: v.string(),
+    errorMessage: v.optional(v.string()),
+    senderName: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("sms_logs", {
+      ...args,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+export const listByInquiry = query({
+  args: {
+    inquiryId: v.id("inquiries"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("sms_logs")
+      .withIndex("by_inquiryId_and_createdAt", (q) => q.eq("inquiryId", args.inquiryId))
+      .order("desc")
+      .take(50);
+  },
+});
 
 // 알리고 SMS 발송 Action
 // fetch()는 Convex 기본 런타임에서 사용 가능하므로 "use node" 불필요
@@ -64,11 +97,43 @@ export const sendConsentSms = action({
           consentStatus: "발송완료",
           consentSentDate: new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().split("T")[0],
         });
+        await ctx.runMutation(internal.sms.logSms, {
+          inquiryId: args.inquiryId,
+          customerName: args.customerName,
+          customerPhone: args.customerPhone,
+          smsType: "구매동의서",
+          title: "[효원상조] 구매동의서 안내",
+          message,
+          status: "성공",
+        });
         return { success: true, message: "문자 발송이 완료되었습니다." };
       } else {
-        throw new Error(`알리고 발송 실패: ${result.message || "알 수 없는 오류"}`);
+        const errMsg = `알리고 발송 실패: ${result.message || "알 수 없는 오류"}`;
+        await ctx.runMutation(internal.sms.logSms, {
+          inquiryId: args.inquiryId,
+          customerName: args.customerName,
+          customerPhone: args.customerPhone,
+          smsType: "구매동의서",
+          title: "[효원상조] 구매동의서 안내",
+          message,
+          status: "실패",
+          errorMessage: errMsg,
+        });
+        throw new Error(errMsg);
       }
     } catch (error: any) {
+      if (!error.message?.startsWith("알리고 발송 실패:")) {
+        await ctx.runMutation(internal.sms.logSms, {
+          inquiryId: args.inquiryId,
+          customerName: args.customerName,
+          customerPhone: args.customerPhone,
+          smsType: "구매동의서",
+          title: "[효원상조] 구매동의서 안내",
+          message,
+          status: "실패",
+          errorMessage: error.message || "알 수 없는 오류",
+        });
+      }
       throw new Error(`SMS 발송 중 오류: ${error.message}`);
     }
   },
@@ -165,7 +230,11 @@ export const getRemainCount = action({
 
 export const sendCustomGuideSms = action({
   args: {
+    inquiryId: v.optional(v.id("inquiries")),
+    customerName: v.optional(v.string()),
     customerPhone: v.string(),
+    smsType: v.optional(v.string()),
+    senderName: v.optional(v.string()),
     title: v.string(),
     message: v.string(),
   },
@@ -177,6 +246,9 @@ export const sendCustomGuideSms = action({
       throw new Error("SMS 설정이 완료되지 않았습니다. 환경설정 > SMS 설정에서 알리고 API 정보를 입력해주세요.");
     }
 
+    const smsTitle = args.title || "[효원상조] 상품 안내";
+    const smsType = args.smsType || "상품안내";
+
     const formData = new URLSearchParams();
     formData.append("key", smsConfig.apiKey);
     formData.append("user_id", smsConfig.userId);
@@ -184,7 +256,7 @@ export const sendCustomGuideSms = action({
     formData.append("receiver", args.customerPhone.replace(/-/g, ""));
     formData.append("msg", args.message);
     formData.append("msg_type", "LMS");
-    formData.append("title", args.title || "[효원상조] 상품 안내");
+    formData.append("title", smsTitle);
 
     try {
       const response = await fetch("https://apis.aligo.in/send/", {
@@ -197,10 +269,45 @@ export const sendCustomGuideSms = action({
 
       const result = await response.json();
       if (result.result_code === "1") {
-        return { success: true, message: "안내 문자 발송이 완료되었습니다." };
+        await ctx.runMutation(internal.sms.logSms, {
+          inquiryId: args.inquiryId,
+          customerName: args.customerName,
+          customerPhone: args.customerPhone,
+          smsType,
+          title: smsTitle,
+          message: args.message,
+          status: "성공",
+          senderName: args.senderName,
+        });
+        return { success: true, message: "문자 발송이 완료되었습니다." };
       }
-      throw new Error(`알리고 발송 실패: ${result.message || "알 수 없는 오류"}`);
+      const errMsg = `알리고 발송 실패: ${result.message || "알 수 없는 오류"}`;
+      await ctx.runMutation(internal.sms.logSms, {
+        inquiryId: args.inquiryId,
+        customerName: args.customerName,
+        customerPhone: args.customerPhone,
+        smsType,
+        title: smsTitle,
+        message: args.message,
+        status: "실패",
+        errorMessage: errMsg,
+        senderName: args.senderName,
+      });
+      throw new Error(errMsg);
     } catch (error: any) {
+      if (!error.message?.startsWith("알리고 발송 실패:")) {
+        await ctx.runMutation(internal.sms.logSms, {
+          inquiryId: args.inquiryId,
+          customerName: args.customerName,
+          customerPhone: args.customerPhone,
+          smsType,
+          title: smsTitle,
+          message: args.message,
+          status: "실패",
+          errorMessage: error.message || "알 수 없는 오류",
+          senderName: args.senderName,
+        });
+      }
       throw new Error(`SMS 발송 중 오류: ${error.message}`);
     }
   },
@@ -208,6 +315,7 @@ export const sendCustomGuideSms = action({
 
 export const sendLgAutoGuideSms = internalAction({
   args: {
+    inquiryId: v.optional(v.id("inquiries")),
     customerName: v.string(),
     customerPhone: v.string(),
     appliance: v.optional(v.string()),
@@ -266,9 +374,32 @@ export const sendLgAutoGuideSms = internalAction({
         body: formData.toString(),
       });
       const result = await response.json();
-      return { success: result.result_code === "1", result };
+      const isSuccess = result.result_code === "1";
+      await ctx.runMutation(internal.sms.logSms, {
+        inquiryId: args.inquiryId,
+        customerName: args.customerName,
+        customerPhone: args.customerPhone,
+        smsType: "자동안내",
+        title: "[효원상조 × LG가전구독] 상품 안내",
+        message,
+        status: isSuccess ? "성공" : "실패",
+        errorMessage: isSuccess ? undefined : (result.message || "알 수 없는 오류"),
+        senderName: "자동발송",
+      });
+      return { success: isSuccess, result };
     } catch (error: any) {
       console.error("sendLgAutoGuideSms failed:", error);
+      await ctx.runMutation(internal.sms.logSms, {
+        inquiryId: args.inquiryId,
+        customerName: args.customerName,
+        customerPhone: args.customerPhone,
+        smsType: "자동안내",
+        title: "[효원상조 × LG가전구독] 상품 안내",
+        message,
+        status: "실패",
+        errorMessage: error?.message || "알 수 없는 오류",
+        senderName: "자동발송",
+      });
       return { success: false, error: error?.message };
     }
   },

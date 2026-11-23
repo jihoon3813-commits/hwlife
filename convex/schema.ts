@@ -329,4 +329,18 @@ export default defineSchema({
   }).index("by_code", ["code"])
     .index("by_createdAt", ["createdAt"])
     .index("by_isActive", ["isActive"]),
+
+  sms_logs: defineTable({
+    inquiryId: v.optional(v.id("inquiries")),
+    customerName: v.optional(v.string()),
+    customerPhone: v.string(),
+    smsType: v.string(),                   // "자유문자", "상품안내", "구매동의서", "자동안내"
+    title: v.optional(v.string()),
+    message: v.string(),
+    status: v.string(),                    // "성공", "실패"
+    errorMessage: v.optional(v.string()),
+    senderName: v.optional(v.string()),    // 발송자 (관리자/채널명)
+    createdAt: v.number(),
+  }).index("by_inquiryId_and_createdAt", ["inquiryId", "createdAt"])
+    .index("by_createdAt", ["createdAt"]),
 });

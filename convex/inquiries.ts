@@ -148,6 +148,7 @@ export const create = mutation({
       isLgCareInquiry({ source: args.source, productName: args.productName, appliance: args.appliance })
     ) {
       await ctx.scheduler.runAfter(0, internal.sms.sendLgAutoGuideSms, {
+        inquiryId: id,
         customerName: args.name,
         customerPhone: args.phone,
         appliance: args.appliance,
@@ -394,6 +395,7 @@ export const createDaangnLead = internalMutation({
 
     if (isLg) {
       await ctx.scheduler.runAfter(0, internal.sms.sendLgAutoGuideSms, {
+        inquiryId: id,
         customerName: args.name,
         customerPhone: args.phone,
         appliance: args.appliance,
@@ -496,7 +498,7 @@ export const createLg144Application = internalMutation({
     if (args.utmContent) insertData.utmContent = args.utmContent;
     if (args.utmTerm) insertData.utmTerm = args.utmTerm;
 
-    await ctx.db.insert("inquiries", insertData as any);
+    const insertedId = await ctx.db.insert("inquiries", insertData as any);
 
     let channelName = "기본";
     if (args.channelId) {
@@ -517,6 +519,7 @@ export const createLg144Application = internalMutation({
     });
 
     await ctx.scheduler.runAfter(0, internal.sms.sendLgAutoGuideSms, {
+      inquiryId: insertedId,
       customerName: args.name,
       customerPhone: args.phone,
       appliance: applianceLabel,

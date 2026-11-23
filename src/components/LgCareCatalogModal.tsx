@@ -108,6 +108,16 @@ export default function LgCareCatalogModal({
     }
   }, [isOpen, initialCategory]);
 
+  // Lock background page scroll while modal is open on mobile/desktop
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen]);
+
   // Detail Modal States
   const [selectedProduct, setSelectedProduct] = useState<LgProduct | null>(null);
   const [detailTab, setDetailTab] = useState<'options' | 'specs'>('options');
@@ -502,13 +512,13 @@ export default function LgCareCatalogModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="bg-[#fbfbf9] rounded-2xl sm:rounded-3xl w-full max-w-5xl h-[92vh] flex flex-col shadow-2xl border border-[#dce1d9] overflow-hidden"
+        className="bg-[#fbfbf9] rounded-none sm:rounded-3xl w-full max-w-5xl h-[100dvh] sm:h-[92vh] flex flex-col shadow-2xl border-0 sm:border border-[#dce1d9] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Bar */}
-        <div className="bg-[#173f35] text-white p-4 sm:p-5 shrink-0 flex items-center justify-between">
+        <div className="bg-[#173f35] text-white px-3.5 py-2.5 sm:p-5 shrink-0 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <span className="w-8 h-8 rounded-lg bg-[#d6e8b2] text-[#173f35] flex items-center justify-center font-black text-sm">
               LG
@@ -522,7 +532,7 @@ export default function LgCareCatalogModal({
                   효원 결합 매월 10% 특별 할인
                 </span>
               </div>
-              <h2 className="text-[17px] sm:text-[20px] font-bold tracking-tight text-white mt-0.5">
+              <h2 className="text-[16px] sm:text-[20px] font-bold tracking-tight text-white mt-0.5">
                 카테고리별 인기 가전 구독 모델
               </h2>
             </div>
@@ -538,8 +548,10 @@ export default function LgCareCatalogModal({
           </button>
         </div>
 
+        {/* Mobile: scroll filters & product list together without top/bottom gaps; Desktop: keep filters pinned */}
+        <div className="flex-1 overflow-y-auto overscroll-contain sm:overflow-hidden sm:flex sm:flex-col">
         {/* Filter Controls: Search & Reset */}
-        <div className="p-3 sm:p-4 bg-white border-b border-[#e4e7de] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
+        <div className="p-2.5 sm:p-4 bg-white border-b border-[#e4e7de] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3 sm:shrink-0">
           {/* Category Chips Scroll */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0 flex-1">
             <button
@@ -611,7 +623,7 @@ export default function LgCareCatalogModal({
 
         {/* Subcategories (if available) */}
         {currentSubTabs.length > 0 && (
-          <div className="px-4 py-2 bg-[#f5f6f0] border-b border-[#e4e7de] flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+          <div className="px-3 sm:px-4 py-2 bg-[#f5f6f0] border-b border-[#e4e7de] flex items-center gap-1.5 overflow-x-auto no-scrollbar sm:shrink-0">
             <span className="text-[11px] font-bold text-[#6b746d] mr-1 shrink-0">유형/용량:</span>
             <button
               type="button"
@@ -645,7 +657,7 @@ export default function LgCareCatalogModal({
         )}
 
         {/* Products Grid Content Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="sm:flex-1 sm:overflow-y-auto sm:overscroll-contain p-3 sm:p-6">
           {filteredProducts.length === 0 ? (
             <div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center p-8">
               <div className="w-14 h-14 rounded-full bg-[#f5f6f0] flex items-center justify-center text-[#778075] mb-3">
@@ -798,9 +810,10 @@ export default function LgCareCatalogModal({
             </div>
           )}
         </div>
+        </div>
 
-        {/* Footer Info Bar */}
-        <div className="p-3 sm:p-4 bg-[#f5f6f0] border-t border-[#e4e7de] flex items-center justify-between text-[11px] sm:text-[12px] text-[#6b746d] shrink-0">
+        {/* Footer Info Bar (Desktop only; mobile uses full-height product scroll & top close button) */}
+        <div className="hidden sm:flex p-3 sm:p-4 bg-[#f5f6f0] border-t border-[#e4e7de] items-center justify-between text-[11px] sm:text-[12px] text-[#6b746d] shrink-0">
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-[#173f35]" />
             <span>선택한 모델은 아래 <strong>월 지출 계산기</strong>에 자동으로 적용됩니다.</span>
@@ -818,15 +831,15 @@ export default function LgCareCatalogModal({
       {/* Product Detail Sub-Modal */}
       {selectedProduct && (
         <div 
-          className="fixed inset-0 z-60 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-xs animate-in fade-in zoom-in duration-200"
+          className="fixed inset-0 z-60 flex items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-xs animate-in fade-in zoom-in duration-200"
           onClick={handleCloseProductDetail}
         >
           <div 
-            className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl border border-[#dce1d9] overflow-hidden"
+            className="bg-white rounded-none sm:rounded-3xl w-full max-w-2xl h-[100dvh] sm:h-auto sm:max-h-[92vh] flex flex-col shadow-2xl border-0 sm:border border-[#dce1d9] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-[#f0f2eb] flex items-center justify-between shrink-0">
+            <div className="px-3.5 py-3 sm:p-5 border-b border-[#f0f2eb] flex items-center justify-between shrink-0">
               <div className="min-w-0 pr-3">
                 <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#eaf0e1] text-[#173f35] mr-2">
                   {selectedProduct.categoryName}
@@ -845,7 +858,7 @@ export default function LgCareCatalogModal({
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
+            <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 sm:p-6 space-y-4 sm:space-y-5">
               {/* Product Preview Card */}
               <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-2xl bg-[#fbfbf9] border border-[#e4e7de]">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 bg-white rounded-xl p-2 border border-[#e4e7de] flex items-center justify-center shrink-0">
