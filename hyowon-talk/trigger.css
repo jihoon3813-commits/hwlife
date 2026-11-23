@@ -1,0 +1,8 @@
+dialog[data-lg144-guide]{box-sizing:border-box;padding:0;border:0;border-radius:22px;width:min(940px,calc(100% - 32px));max-width:none;height:auto;max-height:94dvh;margin:auto;overflow:hidden;background:#fff;color:#203d30;box-shadow:0 20px 80px #10291e3d}
+dialog[data-lg144-guide]::backdrop{background:rgb(11 27 19 / 56%)}
+dialog[data-lg144-guide][open]{display:flex;flex-direction:column}
+dialog[data-lg144-guide] iframe{display:block;width:100%;height:520px;max-height:calc(94dvh - 50px);min-height:0;flex:0 1 auto;border:0}
+dialog[data-lg144-guide] [data-lg144-top]{display:flex;justify-content:flex-end;padding:8px 12px 0}
+dialog[data-lg144-guide] [data-lg144-close]{display:grid;place-items:center;padding:0;width:42px;height:42px;border:0;border-radius:50%;background:#f0f4ef;color:#244334;font:24px/1 system-ui;cursor:pointer}
+dialog[data-lg144-guide] [data-lg144-close]:focus-visible{outline:2px solid #2b7252}
+@media(max-width:650px){dialog[data-lg144-guide]{width:100%;height:94dvh;margin:auto 0 0;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom)}}

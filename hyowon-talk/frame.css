@@ -1,0 +1,20 @@
+*{box-sizing:border-box}
+:root{font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;color:#1c3228;background:white;font-size:16px;line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
+body{margin:0}
+html{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar{display:none}
+h2,p{margin:0}
+button,select,input,textarea{font:inherit}
+button,a,select{touch-action:manipulation}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #2b7252;outline-offset:2px}
+#guide.in-assistant{width:100%;max-width:920px;max-height:none;margin:auto}
+#guide .assist-heading{padding-right:0}
+#chat-title{line-height:1.25;letter-spacing:-.055em}
+#chat-title:focus{outline:none}
+.guide-kicker{font-size:12px;font-weight:700;color:#416a52}
+#guide #consult-home{cursor:pointer;padding:8px;white-space:nowrap}
+#assistant-body a.act{text-decoration:none;display:inline-flex;align-items:center}
+#assistant-body .privacy-copy{white-space:pre-line}
+#assistant-body .channel-action{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-size:15px;font-weight:700;color:#28291c;background:#fee500;border-radius:10px;padding:10px 16px}
+[hidden]{display:none!important}
