@@ -160,6 +160,7 @@ export default defineSchema({
     receipt: v.optional(v.string()),
     payloadHash: v.optional(v.string()),
     consentVersion: v.optional(v.string()),
+    googleContactsSyncedAt: v.optional(v.number()),
   }).index("by_requestKey", ["requestKey"]),
   shorts: defineTable({
     title: v.string(),

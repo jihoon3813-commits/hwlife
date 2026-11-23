@@ -240,6 +240,11 @@
   color: #28553e;
 }
 
+.sono-admin-theme .adm-nav-link.active .adm-nav-count.alert {
+  background: #c96453;
+  color: #fff;
+}
+
 .sono-admin-theme .adm-nav-link.sub {
   font-size: 11.5px;
   padding: 8px 12px 8px 40px;

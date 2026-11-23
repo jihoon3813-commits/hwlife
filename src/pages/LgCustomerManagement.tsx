@@ -23,7 +23,13 @@ import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
 import { getCustomerInflow, getCustomerTrafficDetail, INFLOW_META, InflowType } from '../utils/inflow';
 import DaangnLeadModal from '../components/DaangnLeadModal';
 import { DEFAULT_GUIDE_TEMPLATES, formatGuideMessage, GuideTemplate } from '../constants/guideTemplates';
-import { syncCustomersToGoogleContacts } from '../utils/googleContacts';
+import {
+  syncCustomersToGoogleContacts,
+  syncSingleCustomerWithPrompt,
+  getCachedGoogleContactPhones,
+  normalizeKoreanPhone,
+} from '../utils/googleContacts';
+import { RecentSmsCell, LatestSmsSummary } from '../components/RecentSmsCell';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
   const now = new Date();
@@ -543,12 +549,14 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const updateInquiry = useMutation(api.inquiries.update);
   const removeInquiry = useMutation(api.inquiries.remove);
   const createInquiry = useMutation(api.inquiries.create);
+  const markGoogleContactsSynced = useMutation(api.inquiries.markGoogleContactsSynced);
   const allProducts = useQuery(api.products.getAllProducts);
   const lgDbProducts = useQuery(api.lgProducts.getAll);
   const sendConsentSms = useAction(api.sms.sendConsentSms);
   const sendCustomGuideSms = useAction(api.sms.sendCustomGuideSms);
   const markInboundRead = useMutation(api.sms.markInboundRead);
   const unreadSmsCounts = useQuery(api.sms.getUnreadInboundCounts) ?? {};
+  const latestSmsMap = (useQuery(api.sms.getLatestSmsByInquiry) ?? {}) as Record<string, LatestSmsSummary>;
   const landings = useQuery(api.landings.get);
   const allPlans = useQuery(api.plans.get);
 
@@ -562,6 +570,8 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const [quickReplyDraft, setQuickReplyDraft] = useState('');
   const [isSendingQuickReply, setIsSendingQuickReply] = useState(false);
   const [isSyncingGoogleContacts, setIsSyncingGoogleContacts] = useState(false);
+  const [googleContactsProgress, setGoogleContactsProgress] = useState('');
+  const [cachedGooglePhones, setCachedGooglePhones] = useState<Set<string>>(() => getCachedGoogleContactPhones());
   const [guideCopied, setGuideCopied] = useState(false);
   const [isSendingGuideSms, setIsSendingGuideSms] = useState(false);
   const [expandedSmsLogId, setExpandedSmsLogId] = useState<string | null>(null);
@@ -623,6 +633,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       { id: 'productName', label: '신청상품', minWidth: 140, defaultWidth: 220, align: 'left' as const },
       { id: 'appliance', label: '결합제품 · 조건', minWidth: 170, defaultWidth: 270, align: 'left' as const },
       { id: 'supplier', label: '공급사', minWidth: 70, defaultWidth: 90, align: 'center' as const },
+      { id: 'recentSms', label: '최근 문자', minWidth: 150, defaultWidth: 190, align: 'left' as const },
       { id: 'status', label: '진행상태', minWidth: 75, defaultWidth: 95, align: 'center' as const },
     ],
     []
@@ -646,6 +657,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
           { id: 'productName', defaultWidth: 220 },
           { id: 'appliance', defaultWidth: 270 },
           { id: 'supplier', defaultWidth: 90 },
+          { id: 'recentSms', defaultWidth: 190 },
           { id: 'status', defaultWidth: 95 },
         ].forEach((col) => {
           initial[col.id] = parsed[col.id] || col.defaultWidth;
@@ -665,6 +677,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       productName: 220,
       appliance: 270,
       supplier: 90,
+      recentSms: 190,
       status: 95,
     };
   });
@@ -721,6 +734,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       productName: 220,
       appliance: 270,
       supplier: 90,
+      recentSms: 190,
       status: 95,
     };
     setColumnWidths(defaults);
@@ -1203,8 +1217,19 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                 return;
               }
               setIsSyncingGoogleContacts(true);
+              setGoogleContactsProgress('구글 주소록 준비 중...');
               try {
-                const res = await syncCustomersToGoogleContacts(targets, clientId);
+                const res = await syncCustomersToGoogleContacts(targets, clientId, {
+                  onProgress: setGoogleContactsProgress,
+                });
+                setCachedGooglePhones(getCachedGoogleContactPhones());
+                if (res.syncedCustomerIds.length > 0) {
+                  try {
+                    await markGoogleContactsSynced({ ids: res.syncedCustomerIds as any });
+                  } catch {
+                    // 백엔드 스키마 미반영 시 로컬 캐시만 유지
+                  }
+                }
                 alert(
                   `구글 주소록 동기화가 완료되었습니다!\n\n` +
                     `• 신규 등록: ${res.createdCount}명\n` +
@@ -1216,6 +1241,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                 alert(`구글 주소록 등록 실패: ${err?.message || '알 수 없는 오류'}`);
               } finally {
                 setIsSyncingGoogleContacts(false);
+                setGoogleContactsProgress('');
               }
             }}
             className="adm-btn sage"
@@ -1223,7 +1249,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
             {isSyncingGoogleContacts ? <Loader2 className="animate-spin" /> : <Smartphone />}
             <span>
               {isSyncingGoogleContacts
-                ? '구글 주소록 등록 중...'
+                ? googleContactsProgress || '구글 주소록 등록 중...'
                 : selectedIds.length > 0
                   ? `구글 주소록 등록 (${selectedIds.length}명)`
                   : '구글 주소록 자동 등록'}
@@ -1569,7 +1595,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
             <tbody>
               {filteredInquiries.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="text-center !py-20 text-[#86918a]">
+                  <td colSpan={13} className="text-center !py-20 text-[#86918a]">
                     조건에 일치하는 LG구독 고객이 없습니다.
                   </td>
                 </tr>
@@ -1693,8 +1719,28 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                         </div>
                       </td>
 
-                      <td style={{ width: `${columnWidths.phone}px` }} className="font-mono text-[12px] text-[#45554e] truncate" title={customer.phone}>
-                        {customer.phone}
+                      <td style={{ width: `${columnWidths.phone}px` }} className="font-mono text-[12px] text-[#45554e]" title={customer.phone}>
+                        <div className="truncate">{customer.phone}</div>
+                        {(() => {
+                          const isSynced =
+                            Boolean((customer as any).googleContactsSyncedAt) ||
+                            cachedGooglePhones.has(normalizeKoreanPhone(customer.phone || ''));
+                          return isSynced ? (
+                            <span
+                              className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded bg-[#e8f4ee] text-[#295e52] text-[10px] font-sans font-semibold leading-none"
+                              title="구글 주소록에 연동된 번호입니다"
+                            >
+                              ● 구글연동
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-flex items-center mt-0.5 px-1.5 py-0.5 rounded bg-[#f1f3ef] text-[#7d8879] text-[10px] font-sans font-medium leading-none"
+                              title="구글 주소록에 아직 등록되지 않았습니다"
+                            >
+                              미연동
+                            </span>
+                          );
+                        })()}
                       </td>
 
                       <td style={{ width: `${columnWidths.address}px` }}>
@@ -1739,6 +1785,13 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                         <span className={`adm-pill ${supplierName === 'TU' ? 'orange' : 'blue'}`}>
                           {supplierName}
                         </span>
+                      </td>
+
+                      <td style={{ width: `${columnWidths.recentSms}px` }} className="truncate">
+                        <RecentSmsCell
+                          latestSms={latestSmsMap[String(customer._id)]}
+                          unreadCount={unreadSmsCount}
+                        />
                       </td>
 
                       <td style={{ width: `${columnWidths.status}px` }} className="text-center truncate">
@@ -1793,6 +1846,34 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
               </div>
 
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={isSyncingGoogleContacts}
+                  onClick={async () => {
+                    const clientId = (settings as any)?.googleContacts?.clientId || '';
+                    setIsSyncingGoogleContacts(true);
+                    try {
+                      await syncSingleCustomerWithPrompt(
+                        {
+                          _id: selectedCustomer._id,
+                          name: editData.name || selectedCustomer.name,
+                          phone: editData.phone || selectedCustomer.phone,
+                          productName: editData.productName || selectedCustomer.productName,
+                          appliance: editData.appliance || selectedCustomer.appliance,
+                          status: status || selectedCustomer.status,
+                        },
+                        clientId
+                      );
+                    } finally {
+                      setIsSyncingGoogleContacts(false);
+                    }
+                  }}
+                  className="adm-btn sage small"
+                  title="이 고객을 구글 주소록에 저장"
+                >
+                  {isSyncingGoogleContacts ? <Loader2 className="animate-spin" /> : <Smartphone />}
+                  <span>{isSyncingGoogleContacts ? '주소록 저장 중...' : '주소록 저장'}</span>
+                </button>
                 {(selectedCustomer.productName?.toLowerCase().includes('living') ||
                   selectedCustomer.productName?.includes('리빙') ||
                   editData.productName?.includes('리빙')) && (

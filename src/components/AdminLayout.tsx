@@ -80,13 +80,38 @@ export default function AdminLayout({
     const list = inquiries || [];
     const nonLgWaiting = list.filter((i) => !isLgCareCustomer(i) && (!i.status || i.status === '대기')).length;
     const lgWaiting = list.filter((i) => isLgCareCustomer(i) && (!i.status || i.status === '대기')).length;
-    const totalUnreadSms = (Object.values(unreadSmsCounts) as number[]).reduce((acc, v) => acc + (v || 0), 0);
+
+    const lgIdSet = new Set<string>();
+    const nonLgIdSet = new Set<string>();
+    for (const inq of list) {
+      if (isLgCareCustomer(inq)) {
+        lgIdSet.add(String(inq._id));
+      } else {
+        nonLgIdSet.add(String(inq._id));
+      }
+    }
+
+    let lgUnreadSms = 0;
+    let nonLgUnreadSms = 0;
+    for (const [id, cnt] of Object.entries(unreadSmsCounts as Record<string, number>)) {
+      const n = cnt || 0;
+      if (n <= 0) continue;
+      if (lgIdSet.has(id)) {
+        lgUnreadSms += n;
+      } else if (nonLgIdSet.has(id)) {
+        nonLgUnreadSms += n;
+      }
+    }
+
+    const totalUnreadSms = lgUnreadSms + nonLgUnreadSms;
     const channelCount = channels?.length || 0;
     const pendingChannels = (channels || []).filter((c) => c.status === '승인대기').length;
 
     return {
       nonLgWaiting,
       lgWaiting,
+      nonLgUnreadSms,
+      lgUnreadSms,
       totalUnreadSms,
       channelCount,
       pendingChannels,
@@ -235,11 +260,15 @@ export default function AdminLayout({
                 const isActive = activeMenu === item.id;
 
                 let badgeNode: React.ReactNode = null;
-                if (item.id === 'customers' && counts.nonLgWaiting > 0) {
-                  badgeNode = <span className="adm-nav-count">{counts.nonLgWaiting}</span>;
+                if (item.id === 'customers') {
+                  if (counts.nonLgUnreadSms > 0) {
+                    badgeNode = <span className="adm-nav-count alert">{counts.nonLgUnreadSms}</span>;
+                  } else if (counts.nonLgWaiting > 0) {
+                    badgeNode = <span className="adm-nav-count">{counts.nonLgWaiting}</span>;
+                  }
                 } else if (item.id === 'lg_customers') {
-                  if (counts.totalUnreadSms > 0) {
-                    badgeNode = <span className="adm-nav-count alert">{counts.totalUnreadSms}</span>;
+                  if (counts.lgUnreadSms > 0) {
+                    badgeNode = <span className="adm-nav-count alert">{counts.lgUnreadSms}</span>;
                   } else if (counts.lgWaiting > 0) {
                     badgeNode = <span className="adm-nav-count">{counts.lgWaiting}</span>;
                   }
@@ -406,10 +435,12 @@ export default function AdminLayout({
                   className="w-full flex items-center justify-between p-2.5 rounded-[9px] hover:bg-[#f6f8f3] transition-colors text-left cursor-pointer"
                 >
                   <div>
-                    <div className="font-semibold text-[#263d36]">신규 상담 대기 (일반 결합)</div>
-                    <div className="text-[11px] text-[#86918a]">확인 및 해피콜 진행 필요</div>
+                    <div className="font-semibold text-[#263d36]">신규 상담 대기 / 미확인 문자</div>
+                    <div className="text-[11px] text-[#86918a]">대기 {counts.nonLgWaiting}건 · 미확인 답장 {counts.nonLgUnreadSms}건</div>
                   </div>
-                  <span className="adm-pill green font-bold">{counts.nonLgWaiting}건</span>
+                  <span className={`adm-pill ${counts.nonLgUnreadSms > 0 ? 'red' : 'green'} font-bold`}>
+                    {counts.nonLgWaiting + counts.nonLgUnreadSms}건
+                  </span>
                 </button>
 
                 <button
@@ -419,10 +450,10 @@ export default function AdminLayout({
                 >
                   <div>
                     <div className="font-semibold text-[#263d36]">LG구독 상담 대기 / 미확인 문자</div>
-                    <div className="text-[11px] text-[#86918a]">대기 {counts.lgWaiting}건 · 미확인 답장 {counts.totalUnreadSms}건</div>
+                    <div className="text-[11px] text-[#86918a]">대기 {counts.lgWaiting}건 · 미확인 답장 {counts.lgUnreadSms}건</div>
                   </div>
-                  <span className={`adm-pill ${counts.totalUnreadSms > 0 ? 'red' : 'teal'} font-bold`}>
-                    {counts.lgWaiting + counts.totalUnreadSms}건
+                  <span className={`adm-pill ${counts.lgUnreadSms > 0 ? 'red' : 'teal'} font-bold`}>
+                    {counts.lgWaiting + counts.lgUnreadSms}건
                   </span>
                 </button>
 

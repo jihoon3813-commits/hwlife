@@ -14,14 +14,22 @@ import {
   Clock,
   CheckCircle2,
   Calendar,
+  MessageCircle,
+  Send,
 } from 'lucide-react';
 import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { LG_OFFICIAL_PRODUCTS } from '../data/lgCareProducts';
 import { getCustomerInflow, getCustomerTrafficDetail, INFLOW_META, InflowType } from '../utils/inflow';
 import DaangnLeadModal from '../components/DaangnLeadModal';
-import { syncCustomersToGoogleContacts } from '../utils/googleContacts';
+import {
+  syncCustomersToGoogleContacts,
+  syncSingleCustomerWithPrompt,
+  getCachedGoogleContactPhones,
+  normalizeKoreanPhone,
+} from '../utils/googleContacts';
 import { isLgCareCustomer } from './LgCustomerManagement';
+import { RecentSmsCell, LatestSmsSummary } from '../components/RecentSmsCell';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
   const now = new Date();
@@ -81,7 +89,7 @@ const getFilterDateRange = (filter: string, customStart?: string, customEnd?: st
 
 export default function CustomerManagement({ channelId }: { channelId?: string }) {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-  const [drawerTab, setDrawerTab] = useState<'info' | 'history'>('info');
+  const [drawerTab, setDrawerTab] = useState<'info' | 'sms' | 'history'>('info');
   const [memo, setMemo] = useState('');
   const [status, setStatus] = useState('대기');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -91,6 +99,8 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isSendingSms, setIsSendingSms] = useState(false);
   const [isSyncingGoogleContacts, setIsSyncingGoogleContacts] = useState(false);
+  const [googleContactsProgress, setGoogleContactsProgress] = useState('');
+  const [cachedGooglePhones, setCachedGooglePhones] = useState<Set<string>>(() => getCachedGoogleContactPhones());
 
   const [editData, setEditData] = useState<any>({});
   const [selectedChannelId, setSelectedChannelId] = useState<string>('all');
@@ -143,10 +153,84 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const updateInquiry = useMutation(api.inquiries.update);
   const removeInquiry = useMutation(api.inquiries.remove);
   const createInquiry = useMutation(api.inquiries.create);
+  const markGoogleContactsSynced = useMutation(api.inquiries.markGoogleContactsSynced);
   const allProducts = useQuery(api.products.getAllProducts);
   const sendConsentSms = useAction(api.sms.sendConsentSms);
+  const sendCustomGuideSms = useAction(api.sms.sendCustomGuideSms);
+  const markInboundRead = useMutation(api.sms.markInboundRead);
+  const unreadSmsCounts = useQuery(api.sms.getUnreadInboundCounts) ?? {};
+  const latestSmsMap = (useQuery(api.sms.getLatestSmsByInquiry) ?? {}) as Record<string, LatestSmsSummary>;
   const landings = useQuery(api.landings.get);
   const allPlans = useQuery(api.plans.get);
+
+  const [quickReplyDraft, setQuickReplyDraft] = useState('');
+  const [isSendingQuickReply, setIsSendingQuickReply] = useState(false);
+  const [expandedSmsLogId, setExpandedSmsLogId] = useState<string | null>(null);
+  const chatScrollRef = useRef<HTMLDivElement | null>(null);
+
+  const smsLogs = useQuery(
+    api.sms.listByInquiry,
+    selectedCustomer?._id ? { inquiryId: selectedCustomer._id } : 'skip'
+  );
+
+  useEffect(() => {
+    setQuickReplyDraft('');
+    setExpandedSmsLogId(null);
+  }, [selectedCustomer?._id]);
+
+  useEffect(() => {
+    if (!selectedCustomer?._id) return;
+    const hasUnread =
+      (unreadSmsCounts[String(selectedCustomer._id)] ?? 0) > 0 ||
+      Boolean(smsLogs?.some((log: any) => log.direction === 'inbound' && log.isRead !== true));
+    if (hasUnread) {
+      markInboundRead({ inquiryId: selectedCustomer._id }).catch((err) =>
+        console.error('Failed to mark inbound SMS as read:', err)
+      );
+    }
+  }, [selectedCustomer?._id, smsLogs, unreadSmsCounts, markInboundRead]);
+
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [smsLogs?.length, selectedCustomer?._id, drawerTab]);
+
+  const handleSendQuickReply = async () => {
+    if (!selectedCustomer) return;
+    const smsConfig = (settings as any)?.sms;
+    const isSmsReady =
+      smsConfig?.provider === 'phone_bridge'
+        ? Boolean(smsConfig?.bridgeSecret)
+        : Boolean(smsConfig?.apiKey && smsConfig?.userId && smsConfig?.sender);
+    if (!isSmsReady) {
+      alert('SMS 설정이 완료되지 않았습니다.\n환경설정 > 문자(SMS) 연동 설정을 먼저 확인해주세요.');
+      return;
+    }
+    const trimmed = quickReplyDraft.trim();
+    if (!trimmed) return;
+    setIsSendingQuickReply(true);
+    try {
+      const result = await sendCustomGuideSms({
+        inquiryId: selectedCustomer._id,
+        customerName: selectedCustomer.name,
+        customerPhone: selectedCustomer.phone,
+        title: '[효원상조] 상담 안내',
+        message: trimmed,
+        smsType: '자유문자',
+        senderName: channelId || '본사 관리자',
+      });
+      if (result.success) {
+        setQuickReplyDraft('');
+      } else {
+        alert(result.message || '문자 발송에 실패했습니다.');
+      }
+    } catch (err: any) {
+      alert('문자 발송 중 오류가 발생했습니다: ' + (err?.message || ''));
+    } finally {
+      setIsSendingQuickReply(false);
+    }
+  };
 
   // Column Resizing Setup
   const DEFAULT_COLUMNS = useMemo(
@@ -162,6 +246,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       { id: 'productName', label: '신청상품', minWidth: 140, defaultWidth: 220, align: 'left' as const },
       { id: 'appliance', label: '결합제품', minWidth: 160, defaultWidth: 260, align: 'left' as const },
       { id: 'supplier', label: '공급사', minWidth: 70, defaultWidth: 90, align: 'center' as const },
+      { id: 'recentSms', label: '최근 문자', minWidth: 150, defaultWidth: 190, align: 'left' as const },
       { id: 'status', label: '진행상태', minWidth: 75, defaultWidth: 95, align: 'center' as const },
     ],
     []
@@ -185,6 +270,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
           { id: 'productName', defaultWidth: 220 },
           { id: 'appliance', defaultWidth: 260 },
           { id: 'supplier', defaultWidth: 90 },
+          { id: 'recentSms', defaultWidth: 190 },
           { id: 'status', defaultWidth: 95 },
         ].forEach((col) => {
           initial[col.id] = parsed[col.id] || col.defaultWidth;
@@ -204,6 +290,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       productName: 220,
       appliance: 260,
       supplier: 90,
+      recentSms: 190,
       status: 95,
     };
   });
@@ -260,6 +347,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       productName: 220,
       appliance: 260,
       supplier: 90,
+      recentSms: 190,
       status: 95,
     };
     setColumnWidths(defaults);
@@ -840,8 +928,19 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                 return;
               }
               setIsSyncingGoogleContacts(true);
+              setGoogleContactsProgress('구글 주소록 준비 중...');
               try {
-                const res = await syncCustomersToGoogleContacts(targets, clientId);
+                const res = await syncCustomersToGoogleContacts(targets, clientId, {
+                  onProgress: setGoogleContactsProgress,
+                });
+                setCachedGooglePhones(getCachedGoogleContactPhones());
+                if (res.syncedCustomerIds.length > 0) {
+                  try {
+                    await markGoogleContactsSynced({ ids: res.syncedCustomerIds as any });
+                  } catch {
+                    // 백엔드 스키마 미반영 시 로컬 캐시만 유지
+                  }
+                }
                 alert(
                   `구글 주소록 동기화가 완료되었습니다!\n\n` +
                     `• 신규 등록: ${res.createdCount}명\n` +
@@ -853,6 +952,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                 alert(`구글 주소록 등록 실패: ${err?.message || '알 수 없는 오류'}`);
               } finally {
                 setIsSyncingGoogleContacts(false);
+                setGoogleContactsProgress('');
               }
             }}
             className="adm-btn sage"
@@ -860,7 +960,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
             {isSyncingGoogleContacts ? <Loader2 className="animate-spin" /> : <Smartphone />}
             <span>
               {isSyncingGoogleContacts
-                ? '구글 주소록 등록 중...'
+                ? googleContactsProgress || '구글 주소록 등록 중...'
                 : selectedIds.length > 0
                   ? `구글 주소록 등록 (${selectedIds.length}명)`
                   : '구글 주소록 자동 등록'}
@@ -1198,7 +1298,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
             <tbody>
               {filteredInquiries.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="text-center !py-20 text-[#86918a]">
+                  <td colSpan={13} className="text-center !py-20 text-[#86918a]">
                     조건에 일치하는 고객 데이터가 없습니다.
                   </td>
                 </tr>
@@ -1279,12 +1379,15 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                   }
 
                   const supplierName = getSupplier(customer);
+                  const unreadSmsCount = unreadSmsCounts[String(customer._id)] || 0;
                   const isRowSelected = selectedIds.includes(customer._id);
 
                   return (
                     <tr
                       key={customer._id}
-                      className={`adm-clickable-row ${isRowSelected ? '!bg-[#f2f6ef]' : ''}`}
+                      className={`adm-clickable-row ${
+                        isRowSelected ? '!bg-[#f2f6ef]' : unreadSmsCount > 0 ? '!bg-[#fdf5f3]' : ''
+                      }`}
                       onClick={() => setSelectedCustomer(customer)}
                     >
                       <td style={{ width: `${columnWidths.index}px` }} className="text-center font-mono text-[11.5px] text-[#7d8879] truncate">
@@ -1349,12 +1452,42 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                       <td style={{ width: `${columnWidths.name}px` }} className="truncate" title={customer.name}>
                         <div className="adm-person">
                           <div className="adm-person-circle">{(customer.name || '고').slice(0, 1)}</div>
-                          <strong className="truncate">{customer.name}</strong>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <strong className="truncate">{customer.name}</strong>
+                            {unreadSmsCount > 0 && (
+                              <span
+                                title={`읽지 않은 고객 답장 ${unreadSmsCount}건`}
+                                className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-[#c96453] text-white text-[10px] font-bold leading-none shrink-0"
+                              >
+                                {unreadSmsCount > 99 ? '99+' : unreadSmsCount}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
 
-                      <td style={{ width: `${columnWidths.phone}px` }} className="font-mono text-[12px] text-[#45554e] truncate" title={customer.phone}>
-                        {customer.phone}
+                      <td style={{ width: `${columnWidths.phone}px` }} className="font-mono text-[12px] text-[#45554e]" title={customer.phone}>
+                        <div className="truncate">{customer.phone}</div>
+                        {(() => {
+                          const isSynced =
+                            Boolean((customer as any).googleContactsSyncedAt) ||
+                            cachedGooglePhones.has(normalizeKoreanPhone(customer.phone || ''));
+                          return isSynced ? (
+                            <span
+                              className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded bg-[#e8f4ee] text-[#295e52] text-[10px] font-sans font-semibold leading-none"
+                              title="구글 주소록에 연동된 번호입니다"
+                            >
+                              ● 구글연동
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-flex items-center mt-0.5 px-1.5 py-0.5 rounded bg-[#f1f3ef] text-[#7d8879] text-[10px] font-sans font-medium leading-none"
+                              title="구글 주소록에 아직 등록되지 않았습니다"
+                            >
+                              미연동
+                            </span>
+                          );
+                        })()}
                       </td>
 
                       <td style={{ width: `${columnWidths.address}px` }}>
@@ -1393,6 +1526,13 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         ) : (
                           <span className="text-[#9ba594]">-</span>
                         )}
+                      </td>
+
+                      <td style={{ width: `${columnWidths.recentSms}px` }} className="truncate">
+                        <RecentSmsCell
+                          latestSms={latestSmsMap[String(customer._id)]}
+                          unreadCount={unreadSmsCount}
+                        />
                       </td>
 
                       <td style={{ width: `${columnWidths.status}px` }} className="text-center truncate">
@@ -1447,6 +1587,34 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
               </div>
 
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={isSyncingGoogleContacts}
+                  onClick={async () => {
+                    const clientId = (settings as any)?.googleContacts?.clientId || '';
+                    setIsSyncingGoogleContacts(true);
+                    try {
+                      await syncSingleCustomerWithPrompt(
+                        {
+                          _id: selectedCustomer._id,
+                          name: editData.name || selectedCustomer.name,
+                          phone: editData.phone || selectedCustomer.phone,
+                          productName: editData.productName || selectedCustomer.productName,
+                          appliance: editData.appliance || selectedCustomer.appliance,
+                          status: status || selectedCustomer.status,
+                        },
+                        clientId
+                      );
+                    } finally {
+                      setIsSyncingGoogleContacts(false);
+                    }
+                  }}
+                  className="adm-btn sage small"
+                  title="이 고객을 구글 주소록에 저장"
+                >
+                  {isSyncingGoogleContacts ? <Loader2 className="animate-spin" /> : <Smartphone />}
+                  <span>{isSyncingGoogleContacts ? '주소록 저장 중...' : '주소록 저장'}</span>
+                </button>
                 {(selectedCustomer.productName?.toLowerCase().includes('living') ||
                   selectedCustomer.productName?.includes('리빙') ||
                   editData.productName?.includes('리빙')) && (
@@ -1488,6 +1656,14 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                 className={`adm-drawer-tab ${drawerTab === 'info' ? 'active' : ''}`}
               >
                 고객 · 계약 정보
+              </button>
+              <button
+                type="button"
+                onClick={() => setDrawerTab('sms')}
+                className={`adm-drawer-tab ${drawerTab === 'sms' ? 'active' : ''}`}
+              >
+                문자 대화
+                <span className="adm-tab-count">{smsLogs?.length || 0}</span>
               </button>
               <button
                 type="button"
@@ -1940,6 +2116,151 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                     </div>
                   </div>
                 </>
+              ) : drawerTab === 'sms' ? (
+                <div className="adm-panel p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4 text-[#295e52]" />
+                      <strong className="text-[13.5px] font-bold text-[#263d36]">양방향 문자 대화 내역</strong>
+                      <span className="adm-pill green">{smsLogs ? `${smsLogs.length}건` : '조회중...'}</span>
+                    </div>
+                    <span className="text-[11px] text-[#86918a]">좌측: 고객 답장 · 우측: 발신 문자</span>
+                  </div>
+
+                  {smsLogs && smsLogs.length > 0 ? (
+                    <div
+                      ref={chatScrollRef}
+                      className="space-y-2.5 max-h-[320px] overflow-y-auto p-3.5 rounded-[10px] bg-[#f5f6f3] border border-[#e6eae3]"
+                    >
+                      {[...smsLogs].reverse().map((log: any) => {
+                        const isInbound = log.direction === 'inbound';
+                        const isExpanded = expandedSmsLogId === log._id;
+                        const isLongMessage =
+                          (log.message?.length || 0) > 160 || (log.message?.split('\n').length || 0) > 4;
+                        const kst = new Date(log.createdAt + 9 * 60 * 60 * 1000);
+                        const formattedDate = `${String(kst.getUTCMonth() + 1).padStart(2, '0')}.${String(
+                          kst.getUTCDate()
+                        ).padStart(2, '0')} ${String(kst.getUTCHours()).padStart(2, '0')}:${String(
+                          kst.getUTCMinutes()
+                        ).padStart(2, '0')}`;
+
+                        return (
+                          <div
+                            key={log._id}
+                            className={`flex flex-col ${isInbound ? 'items-start' : 'items-end'}`}
+                          >
+                            <div
+                              className={`max-w-[85%] rounded-[11px] px-3.5 py-2.5 text-[12px] border ${
+                                isInbound
+                                  ? 'bg-white border-[#e6eae3] text-[#263d36] rounded-tl-[3px]'
+                                  : log.status === '실패'
+                                    ? 'bg-[#faeae5] border-[#ead5cf] text-[#263d36] rounded-tr-[3px]'
+                                    : 'bg-[#edf3e8] border-[#cfe0c7] text-[#263d36] rounded-tr-[3px]'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-2 mb-1">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span
+                                    className={`adm-pill ${
+                                      isInbound
+                                        ? 'teal'
+                                        : log.status === '발송대기'
+                                          ? 'orange'
+                                          : log.status === '성공'
+                                            ? log.smsType === '휴대폰발신'
+                                              ? 'blue'
+                                              : 'green'
+                                            : 'red'
+                                    }`}
+                                  >
+                                    {isInbound
+                                      ? '고객 답장'
+                                      : log.status === '발송대기'
+                                        ? `${log.smsType || '발신'} (회사폰 전송중)`
+                                        : log.smsType || '발신'}
+                                  </span>
+                                  {!isInbound && log.senderName && (
+                                    <span className="text-[10.5px] text-[#5c6b5b] font-semibold">
+                                      {log.senderName}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-[10px] font-mono text-[#86918a] shrink-0">
+                                  {formattedDate}
+                                </span>
+                              </div>
+                              {log.title && !isInbound && (
+                                <div className="text-[11px] font-bold text-[#263d36] mb-1 truncate">
+                                  {log.title}
+                                </div>
+                              )}
+                              <p
+                                className={`text-[#45554e] whitespace-pre-wrap break-words leading-relaxed ${
+                                  isLongMessage && !isExpanded ? 'line-clamp-4' : ''
+                                }`}
+                              >
+                                {log.message}
+                              </p>
+                              {isLongMessage && (
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedSmsLogId(isExpanded ? null : log._id)}
+                                  className="mt-1 text-[11px] font-bold text-[#295e52] hover:underline"
+                                >
+                                  {isExpanded ? '접기' : '전체보기'}
+                                </button>
+                              )}
+                              {log.status === '실패' && log.errorMessage && (
+                                <div className="mt-1.5 text-[11px] text-[#a85042] bg-white/70 px-2 py-1 rounded">
+                                  실패 사유: {log.errorMessage}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="adm-note-card text-center py-8 text-[#86918a]">
+                      <MessageCircle className="w-6 h-6 mx-auto mb-2 opacity-40" />
+                      아직 이 고객과 주고받은 문자 내역이 없습니다.
+                    </div>
+                  )}
+
+                  <div className="pt-2 border-t border-[#edf0e7]">
+                    <label className="block text-[11.5px] font-semibold text-[#5c6b5b] mb-1.5">
+                      빠른 답장 보내기
+                    </label>
+                    <div className="flex items-end gap-2">
+                      <textarea
+                        rows={2}
+                        value={quickReplyDraft}
+                        onChange={(e) => setQuickReplyDraft(e.target.value)}
+                        onKeyDown={(e) => {
+                          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                            e.preventDefault();
+                            handleSendQuickReply();
+                          }
+                        }}
+                        placeholder="고객에게 바로 보낼 답장 내용을 입력하세요... (Ctrl+Enter 발송)"
+                        className="adm-textarea flex-1 !min-h-[54px] text-[12.5px] resize-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSendQuickReply}
+                        disabled={isSendingQuickReply || !quickReplyDraft.trim()}
+                        className="adm-btn primary shrink-0 h-[54px] px-4"
+                      >
+                        {isSendingQuickReply ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Send className="w-4 h-4" />
+                        )}
+                        <span>답장 발송</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div>
                   <div className="adm-section-label !mt-0">

@@ -330,6 +330,21 @@ export const completeConsent = mutation({
   },
 });
 
+export const markGoogleContactsSynced = mutation({
+  args: {
+    ids: v.array(v.id("inquiries")),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    for (const id of args.ids) {
+      const doc = await ctx.db.get(id);
+      if (doc && !doc.googleContactsSyncedAt) {
+        await ctx.db.patch(id, { googleContactsSyncedAt: now });
+      }
+    }
+  },
+});
+
 // 당근 리드폼 외부 연동 접수용
 export const createDaangnLead = internalMutation({
   args: {

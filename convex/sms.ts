@@ -356,6 +356,45 @@ export const getUnreadInboundCounts = query({
   },
 });
 
+export const getLatestSmsByInquiry = query({
+  args: {},
+  handler: async (ctx) => {
+    const recentLogs = await ctx.db
+      .query("sms_logs")
+      .withIndex("by_createdAt")
+      .order("desc")
+      .take(1000);
+
+    const latest: Record<
+      string,
+      {
+        message: string;
+        direction: "outbound" | "inbound";
+        smsType: string;
+        status: string;
+        isRead?: boolean;
+        createdAt: number;
+      }
+    > = {};
+
+    for (const log of recentLogs) {
+      if (!log.inquiryId) continue;
+      const key = String(log.inquiryId);
+      if (latest[key]) continue;
+      latest[key] = {
+        message: log.message,
+        direction: log.direction ?? "outbound",
+        smsType: log.smsType,
+        status: log.status,
+        isRead: log.isRead,
+        createdAt: log.createdAt,
+      };
+    }
+
+    return latest;
+  },
+});
+
 export const markInboundRead = mutation({
   args: {
     inquiryId: v.id("inquiries"),
