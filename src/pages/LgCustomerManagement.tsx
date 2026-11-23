@@ -30,6 +30,7 @@ import {
   normalizeKoreanPhone,
 } from '../utils/googleContacts';
 import { RecentSmsCell, LatestSmsSummary } from '../components/RecentSmsCell';
+import { formatPhoneNumber } from '../utils/phone';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
   const now = new Date();
@@ -488,9 +489,16 @@ function LgApplianceOptionFields({
   );
 }
 
-export default function LgCustomerManagement({ channelId }: { channelId?: string }) {
+export default function LgCustomerManagement({
+  channelId,
+  userType = 'admin',
+}: {
+  channelId?: string;
+  userType?: string;
+}) {
+  const isMasterAdmin = userType === 'admin';
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-  const [drawerTab, setDrawerTab] = useState<'sms' | 'info' | 'history'>('sms');
+  const [drawerTab, setDrawerTab] = useState<'sms' | 'info' | 'history'>(isMasterAdmin ? 'sms' : 'info');
   const [memo, setMemo] = useState('');
   const [status, setStatus] = useState('대기');
   const [searchQuery, setSearchQuery] = useState('');
@@ -555,8 +563,8 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
   const sendConsentSms = useAction(api.sms.sendConsentSms);
   const sendCustomGuideSms = useAction(api.sms.sendCustomGuideSms);
   const markInboundRead = useMutation(api.sms.markInboundRead);
-  const unreadSmsCounts = useQuery(api.sms.getUnreadInboundCounts) ?? {};
-  const latestSmsMap = (useQuery(api.sms.getLatestSmsByInquiry) ?? {}) as Record<string, LatestSmsSummary>;
+  const unreadSmsCounts = useQuery(api.sms.getUnreadInboundCounts, isMasterAdmin ? {} : 'skip') ?? {};
+  const latestSmsMap = (useQuery(api.sms.getLatestSmsByInquiry, isMasterAdmin ? {} : 'skip') ?? {}) as Record<string, LatestSmsSummary>;
   const landings = useQuery(api.landings.get);
   const allPlans = useQuery(api.plans.get);
 
@@ -579,18 +587,18 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
 
   const smsLogs = useQuery(
     api.sms.listByInquiry,
-    selectedCustomer?._id ? { inquiryId: selectedCustomer._id } : 'skip'
+    isMasterAdmin && selectedCustomer?._id ? { inquiryId: selectedCustomer._id } : 'skip'
   );
 
   useEffect(() => {
     setCustomSmsDraft('');
     setQuickReplyDraft('');
     setExpandedSmsLogId(null);
-    setDrawerTab('sms');
-  }, [selectedCustomer?._id]);
+    setDrawerTab(isMasterAdmin ? 'sms' : 'info');
+  }, [selectedCustomer?._id, isMasterAdmin]);
 
   useEffect(() => {
-    if (!selectedCustomer?._id) return;
+    if (!isMasterAdmin || !selectedCustomer?._id) return;
     const hasUnread =
       (unreadSmsCounts[String(selectedCustomer._id)] ?? 0) > 0 ||
       Boolean(smsLogs?.some((log: any) => log.direction === 'inbound' && log.isRead !== true));
@@ -633,10 +641,12 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
       { id: 'productName', label: '신청상품', minWidth: 140, defaultWidth: 220, align: 'left' as const },
       { id: 'appliance', label: '결합제품 · 조건', minWidth: 170, defaultWidth: 270, align: 'left' as const },
       { id: 'supplier', label: '공급사', minWidth: 70, defaultWidth: 90, align: 'center' as const },
-      { id: 'recentSms', label: '최근 문자', minWidth: 150, defaultWidth: 190, align: 'left' as const },
+      ...(isMasterAdmin
+        ? [{ id: 'recentSms', label: '최근 문자', minWidth: 150, defaultWidth: 190, align: 'left' as const }]
+        : []),
       { id: 'status', label: '진행상태', minWidth: 75, defaultWidth: 95, align: 'center' as const },
     ],
-    []
+    [isMasterAdmin]
   );
 
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>(() => {
@@ -782,6 +792,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
 
       setEditData({
         ...selectedCustomer,
+        phone: formatPhoneNumber(selectedCustomer.phone || ''),
         newRegDate:
           selectedCustomer.newRegDate ||
           new Date(selectedCustomer.createdAt + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -1018,18 +1029,6 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
     }
   };
 
-  const formatPhoneNumber = (value: string) => {
-    if (!value) return value;
-    const phoneNumber = value.replace(/[^\d]/g, '');
-    const phoneNumberLength = phoneNumber.length;
-    if (phoneNumberLength < 4) return phoneNumber;
-    if (phoneNumberLength < 7) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
-    if (phoneNumberLength < 11) {
-      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6)}`;
-    }
-    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`;
-  };
-
   const getStatusStyle = (statusName: string) => {
     const statusSetting = settings?.statuses?.find((s: any) => s.name === statusName);
     if (statusSetting && statusSetting.color) {
@@ -1182,7 +1181,10 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
             )}
           </h1>
           <p>
-            LG가전 구독 결합 고객의 카톡 · 문자 안내 발송, 양방향 답장 내역 및 구독 조건을 관리합니다. (검색 결과{' '}
+            {isMasterAdmin
+              ? 'LG가전 구독 결합 고객의 카톡 · 문자 안내 발송, 양방향 답장 내역 및 구독 조건을 관리합니다.'
+              : 'LG가전 구독 결합 고객의 상담 현황 및 구독 조건을 관리합니다.'}{' '}
+            (검색 결과{' '}
             <strong className="text-[#263d36]">{filteredInquiries.length}</strong>명)
           </p>
         </div>
@@ -1595,7 +1597,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
             <tbody>
               {filteredInquiries.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="text-center !py-20 text-[#86918a]">
+                  <td colSpan={DEFAULT_COLUMNS.length} className="text-center !py-20 text-[#86918a]">
                     조건에 일치하는 LG구독 고객이 없습니다.
                   </td>
                 </tr>
@@ -1707,7 +1709,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                           <div className="adm-person-circle alt">{(customer.name || '고').slice(0, 1)}</div>
                           <div className="flex items-center gap-1.5 min-w-0">
                             <strong className="truncate">{customer.name}</strong>
-                            {unreadSmsCount > 0 && (
+                            {isMasterAdmin && unreadSmsCount > 0 && (
                               <span
                                 title={`읽지 않은 고객 답장 ${unreadSmsCount}건`}
                                 className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-[#c96453] text-white text-[10px] font-bold leading-none shrink-0"
@@ -1719,8 +1721,8 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                         </div>
                       </td>
 
-                      <td style={{ width: `${columnWidths.phone}px` }} className="font-mono text-[12px] text-[#45554e]" title={customer.phone}>
-                        <div className="truncate">{customer.phone}</div>
+                      <td style={{ width: `${columnWidths.phone}px` }} className="font-mono text-[12px] text-[#45554e]" title={formatPhoneNumber(customer.phone || '')}>
+                        <div className="truncate">{formatPhoneNumber(customer.phone || '')}</div>
                         {(() => {
                           const isSynced =
                             Boolean((customer as any).googleContactsSyncedAt) ||
@@ -1787,12 +1789,14 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                         </span>
                       </td>
 
-                      <td style={{ width: `${columnWidths.recentSms}px` }} className="truncate">
-                        <RecentSmsCell
-                          latestSms={latestSmsMap[String(customer._id)]}
-                          unreadCount={unreadSmsCount}
-                        />
-                      </td>
+                      {isMasterAdmin && (
+                        <td style={{ width: `${columnWidths.recentSms}px` }} className="truncate">
+                          <RecentSmsCell
+                            latestSms={latestSmsMap[String(customer._id)]}
+                            unreadCount={unreadSmsCount}
+                          />
+                        </td>
+                      )}
 
                       <td style={{ width: `${columnWidths.status}px` }} className="text-center truncate">
                         <span
@@ -1817,7 +1821,11 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
           <span>
             전체 {lgInquiries.length}건 중 검색 결과 <strong className="text-[#263d36]">{filteredInquiries.length}</strong>건
           </span>
-          <span>행을 클릭하면 우측 드로어에서 카톡 · 문자 안내 및 구독 조건을 관리할 수 있습니다.</span>
+          <span>
+            {isMasterAdmin
+              ? '행을 클릭하면 우측 드로어에서 카톡 · 문자 안내 및 구독 조건을 관리할 수 있습니다.'
+              : '행을 클릭하면 우측 드로어에서 고객 정보 및 구독 조건을 관리할 수 있습니다.'}
+          </span>
         </div>
       </div>
 
@@ -1899,14 +1907,16 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
 
             {/* Drawer Tabs */}
             <div className="adm-drawer-tabs">
-              <button
-                type="button"
-                onClick={() => setDrawerTab('sms')}
-                className={`adm-drawer-tab ${drawerTab === 'sms' ? 'active' : ''}`}
-              >
-                카톡 · 문자 안내 &amp; 대화창
-                <span className="adm-tab-count">{smsLogs?.length || 0}</span>
-              </button>
+              {isMasterAdmin && (
+                <button
+                  type="button"
+                  onClick={() => setDrawerTab('sms')}
+                  className={`adm-drawer-tab ${drawerTab === 'sms' ? 'active' : ''}`}
+                >
+                  카톡 · 문자 안내 &amp; 대화창
+                  <span className="adm-tab-count">{smsLogs?.length || 0}</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setDrawerTab('info')}
@@ -1936,7 +1946,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                       {editData.name || selectedCustomer.name}
                     </span>
                     <span className="text-[12.5px] font-mono font-medium text-[#6d786c]">
-                      {editData.phone || selectedCustomer.phone}
+                      {formatPhoneNumber(editData.phone || selectedCustomer.phone || '')}
                     </span>
                     <span className={`adm-pill ${getLgConsultType(selectedCustomer) === 'kakao' ? 'orange' : 'green'}`}>
                       {getLgConsultType(selectedCustomer) === 'kakao' ? '카톡 안내 희망' : '전화 상담 희망'}
@@ -1973,7 +1983,7 @@ export default function LgCustomerManagement({ channelId }: { channelId?: string
                 </div>
               </div>
 
-              {drawerTab === 'sms' && (
+              {isMasterAdmin && drawerTab === 'sms' && (
                 <div className="space-y-5">
                   {/* Template & Free SMS Sender */}
                   <div className="adm-panel p-5 space-y-4">

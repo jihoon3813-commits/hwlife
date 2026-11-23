@@ -116,7 +116,7 @@ export default function AdminApp() {
       case 'customers':
         return <CustomerManagement channelId={channelScopeId} />;
       case 'lg_customers':
-        return <LgCustomerManagement channelId={channelScopeId} />;
+        return <LgCustomerManagement channelId={channelScopeId} userType={user.type} />;
       case 'consent':
         return <ConsentManagement channelId={channelScopeId} />;
       case 'products':

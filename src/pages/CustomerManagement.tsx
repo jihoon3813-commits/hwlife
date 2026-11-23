@@ -30,6 +30,7 @@ import {
 } from '../utils/googleContacts';
 import { isLgCareCustomer } from './LgCustomerManagement';
 import { RecentSmsCell, LatestSmsSummary } from '../components/RecentSmsCell';
+import { formatPhoneNumber } from '../utils/phone';
 
 const getFilterDateRange = (filter: string, customStart?: string, customEnd?: string) => {
   const now = new Date();
@@ -513,6 +514,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
 
       setEditData({
         ...selectedCustomer,
+        phone: formatPhoneNumber(selectedCustomer.phone || ''),
         newRegDate:
           selectedCustomer.newRegDate ||
           new Date(selectedCustomer.createdAt + 9 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -739,18 +741,6 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
       }
       setSelectedIds([]);
     }
-  };
-
-  const formatPhoneNumber = (value: string) => {
-    if (!value) return value;
-    const phoneNumber = value.replace(/[^\d]/g, '');
-    const phoneNumberLength = phoneNumber.length;
-    if (phoneNumberLength < 4) return phoneNumber;
-    if (phoneNumberLength < 7) return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
-    if (phoneNumberLength < 11) {
-      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6)}`;
-    }
-    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`;
   };
 
   const getStatusStyle = (statusName: string) => {
@@ -1466,8 +1456,8 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                         </div>
                       </td>
 
-                      <td style={{ width: `${columnWidths.phone}px` }} className="font-mono text-[12px] text-[#45554e]" title={customer.phone}>
-                        <div className="truncate">{customer.phone}</div>
+                      <td style={{ width: `${columnWidths.phone}px` }} className="font-mono text-[12px] text-[#45554e]" title={formatPhoneNumber(customer.phone || '')}>
+                        <div className="truncate">{formatPhoneNumber(customer.phone || '')}</div>
                         {(() => {
                           const isSynced =
                             Boolean((customer as any).googleContactsSyncedAt) ||
@@ -1685,7 +1675,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                   <div className="text-[15px] font-bold text-[#263d36]">
                     {editData.name || selectedCustomer.name}{' '}
                     <span className="text-[12.5px] font-mono font-medium text-[#6d786c] ml-1">
-                      {editData.phone || selectedCustomer.phone}
+                      {formatPhoneNumber(editData.phone || selectedCustomer.phone || '')}
                     </span>
                   </div>
                   <div className="text-[12px] text-[#7d877f] truncate mt-0.5">

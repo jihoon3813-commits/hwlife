@@ -432,7 +432,8 @@ export async function syncCustomersToGoogleContacts(
     onProgress?.(`구글 주소록 등록 중... (${Math.min(i + chunk.length, toCreate.length)}/${toCreate.length}명)`);
 
     const contactsPayload = chunk.map(({ customer: c }) => {
-      const name = (c.name || '고객').trim() || '고객';
+      const baseName = (c.name || '고객').trim() || '고객';
+      const contactName = baseName.includes('(효원구독)') ? baseName : `${baseName}(효원구독)`;
       const formattedPhone = formatKoreanPhone(c.phone || '');
       const noteParts = [c.productName, c.appliance, c.status].filter(
         (v) => typeof v === 'string' && v.trim().length > 0
@@ -440,7 +441,7 @@ export async function syncCustomersToGoogleContacts(
 
       return {
         contactPerson: {
-          names: [{ givenName: name }],
+          names: [{ givenName: contactName }],
           phoneNumbers: [{ value: formattedPhone, type: 'mobile' }],
           organizations: [{ name: '효원상조 고객' }],
           ...(noteParts.length > 0

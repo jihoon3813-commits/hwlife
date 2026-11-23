@@ -18,6 +18,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { formatPhoneNumber } from '../utils/phone';
 
 export default function ConsentManagement({ channelId }: { channelId?: string }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -392,7 +393,7 @@ export default function ConsentManagement({ channelId }: { channelId?: string })
                         </div>
                         <div>
                           <strong>{customer.name}</strong>
-                          <small>{customer.phone}</small>
+                          <small>{formatPhoneNumber(customer.phone || '')}</small>
                         </div>
                       </div>
                     </td>

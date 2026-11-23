@@ -1,6 +1,7 @@
 import { action, internalAction, internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import { formatKoreanPhone } from "./sms";
 
 const isLgCareInquiry = (fields: {
   source?: string;
@@ -73,9 +74,10 @@ export const create = mutation({
       combinedMessage = combinedMessage ? `${combinedMessage} | 유입경로: ${args.landingPath}` : `유입경로: ${args.landingPath}`;
     }
 
+    const formattedPhone = formatKoreanPhone(args.phone);
     const insertData: Record<string, any> = {
       name: args.name,
-      phone: args.phone,
+      phone: formattedPhone,
       productName: args.productName,
       status: "대기",
       createdAt: Date.now(),
@@ -280,6 +282,9 @@ export const update = mutation({
   },
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
+    if (updates.phone !== undefined) {
+      updates.phone = formatKoreanPhone(updates.phone);
+    }
     await ctx.db.patch(id, updates);
   },
 });
@@ -375,9 +380,10 @@ export const createDaangnLead = internalMutation({
       combinedText.includes("LG") ||
       combinedText.includes("구독");
 
+    const formattedPhone = formatKoreanPhone(args.phone);
     const insertData: Record<string, any> = {
       name: args.name,
-      phone: args.phone,
+      phone: formattedPhone,
       productName: isLg && !args.productName ? "LG구독할인(new)" : productText,
       status: "대기",
       createdAt: Date.now(),
@@ -483,9 +489,10 @@ export const createLg144Application = internalMutation({
 
     const combinedMessage = messageParts.join(" | ");
 
+    const formattedPhone = formatKoreanPhone(args.phone);
     const insertData: Record<string, any> = {
       name: args.name,
-      phone: args.phone,
+      phone: formattedPhone,
       productName: "LG가전구독(new) (1구좌)",
       account: "1구좌",
       appliance: applianceLabel,
@@ -541,5 +548,28 @@ export const createLg144Application = internalMutation({
     });
 
     return { ok: true as const, status: 201, receipt: args.receipt };
+  },
+});
+
+export const normalizeAllInquiryPhones = internalMutation({
+  args: { cursor: v.optional(v.union(v.string(), v.null())) },
+  handler: async (ctx, args) => {
+    const page = await ctx.db
+      .query("inquiries")
+      .paginate({ numItems: 200, cursor: args.cursor ?? null });
+    let updated = 0;
+    for (const doc of page.page) {
+      const formatted = formatKoreanPhone(doc.phone || "");
+      if (formatted && formatted !== doc.phone) {
+        await ctx.db.patch(doc._id, { phone: formatted });
+        updated += 1;
+      }
+    }
+    return {
+      updated,
+      scanned: page.page.length,
+      isDone: page.isDone,
+      continueCursor: page.continueCursor,
+    };
   },
 });
