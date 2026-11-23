@@ -58,6 +58,8 @@ export default function Settings({ user }: { user?: any }) {
   const [localGuideTemplates, setLocalGuideTemplates] = useState<GuideTemplate[]>(DEFAULT_GUIDE_TEMPLATES);
   const [isSavingGuide, setIsSavingGuide] = useState(false);
   const [guideSaved, setGuideSaved] = useState(false);
+  const [isSavingSms, setIsSavingSms] = useState(false);
+  const [smsSaved, setSmsSaved] = useState(false);
   const [smsTestPhone, setSmsTestPhone] = useState('');
   const [smsTestResult, setSmsTestResult] = useState<any>(null);
 
@@ -697,10 +699,36 @@ export default function Settings({ user }: { user?: any }) {
               setLocalSms({ ...localSms, bridgeSecret: token });
             };
             const buildSmsPayload = () => ({
-              ...localSms,
-              bridgeLastSeenAt: remoteSms.bridgeLastSeenAt,
-              bridgeDeviceName: remoteSms.bridgeDeviceName,
+              provider: (localSms.provider === 'phone_bridge' ? 'phone_bridge' : 'aligo') as
+                | 'aligo'
+                | 'phone_bridge',
+              apiKey: localSms.apiKey || '',
+              userId: localSms.userId || '',
+              sender: localSms.sender || '',
+              consentMessage: localSms.consentMessage || '',
+              consentPageUrl: localSms.consentPageUrl || '',
+              bridgeSecret: localSms.bridgeSecret || '',
+              ...(typeof remoteSms.bridgeLastSeenAt === 'number'
+                ? { bridgeLastSeenAt: remoteSms.bridgeLastSeenAt }
+                : {}),
+              ...(typeof remoteSms.bridgeDeviceName === 'string'
+                ? { bridgeDeviceName: remoteSms.bridgeDeviceName }
+                : {}),
             });
+
+            const handleSaveSmsSettings = async () => {
+              setIsSavingSms(true);
+              setSmsSaved(false);
+              try {
+                await updateSettings({ sms: buildSmsPayload() });
+                setSmsSaved(true);
+                setTimeout(() => setSmsSaved(false), 3000);
+              } catch (err: any) {
+                alert(`설정 저장 중 오류가 발생했습니다: ${err?.message || '알 수 없는 오류'}`);
+              } finally {
+                setIsSavingSms(false);
+              }
+            };
 
             return (
               <div className="space-y-6">
@@ -711,14 +739,23 @@ export default function Settings({ user }: { user?: any }) {
                       회사 안드로이드폰 양방향 직접 연동 또는 알리고 웹 발송 중 원하는 방식을 선택할 수 있습니다.
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => saveSettings({ sms: buildSmsPayload() })}
-                    className="adm-btn primary"
-                  >
-                    <Save />
-                    <span>설정 저장하기</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {smsSaved && (
+                      <span className="adm-pill green !py-1.5 !px-3">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>저장되었습니다!</span>
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      disabled={isSavingSms}
+                      onClick={handleSaveSmsSettings}
+                      className="adm-btn primary"
+                    >
+                      <Save />
+                      <span>{isSavingSms ? '저장 중...' : smsSaved ? '저장 완료!' : '설정 저장하기'}</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* 발송 방식 선택 스위치 */}
