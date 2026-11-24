@@ -15,6 +15,7 @@ const isLgCareInquiry = (fields: {
     Boolean(fields.isLgCare) ||
     fields.source === "lg_care" ||
     productName.includes("LG구독") ||
+    productName.includes("구독144") ||
     productName.includes("LG가전구독") ||
     productName.includes("LG가전 구독") ||
     productName.includes("LG가전 구독 할인 전용") ||

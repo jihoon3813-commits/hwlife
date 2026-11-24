@@ -320,10 +320,12 @@ http.route({
       const body = await req.json().catch(() => ({}));
       const secret = String(req.headers.get("x-bridge-secret") || body?.secret || "").trim();
       const deviceName = typeof body?.deviceName === "string" ? body.deviceName.trim() : undefined;
+      const appVersion = typeof body?.appVersion === "string" ? body.appVersion.trim() : undefined;
 
       const res = await ctx.runMutation(internal.sms.pollBridgeOutbox, {
         secret,
         deviceName,
+        appVersion,
       });
       return jsonReply(res, res.ok ? 200 : 401);
     } catch (err: any) {

@@ -199,6 +199,9 @@ export default defineSchema({
       bridgeSecret: v.optional(v.string()),
       bridgeLastSeenAt: v.optional(v.number()),
       bridgeDeviceName: v.optional(v.string()),
+      bridgeAppVersion: v.optional(v.string()),
+      autoFallbackAligo: v.optional(v.boolean()),
+      fallbackDelaySeconds: v.optional(v.number()),
     })),
     headOfficeAccount: v.optional(v.object({
       accountId: v.string(),
@@ -366,6 +369,7 @@ export default defineSchema({
     status: v.union(
       v.literal("pending"),
       v.literal("processing"),
+      v.literal("fallback_sending"),
       v.literal("sent"),
       v.literal("failed")
     ),
@@ -374,5 +378,6 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_status_and_createdAt", ["status", "createdAt"])
+    .index("by_smsLogId", ["smsLogId"])
     .index("by_createdAt", ["createdAt"]),
 });

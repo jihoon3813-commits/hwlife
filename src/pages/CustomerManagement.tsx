@@ -158,6 +158,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const allProducts = useQuery(api.products.getAllProducts);
   const sendConsentSms = useAction(api.sms.sendConsentSms);
   const sendCustomGuideSms = useAction(api.sms.sendCustomGuideSms);
+  const retrySmsLog = useAction(api.sms.retrySmsLog);
   const markInboundRead = useMutation(api.sms.markInboundRead);
   const unreadSmsCounts = useQuery(api.sms.getUnreadInboundCounts) ?? {};
   const latestSmsMap = (useQuery(api.sms.getLatestSmsByInquiry) ?? {}) as Record<string, LatestSmsSummary>;
@@ -167,6 +168,7 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
   const [quickReplyDraft, setQuickReplyDraft] = useState('');
   const [isSendingQuickReply, setIsSendingQuickReply] = useState(false);
   const [expandedSmsLogId, setExpandedSmsLogId] = useState<string | null>(null);
+  const [retryingSmsLogId, setRetryingSmsLogId] = useState<string | null>(null);
   const chatScrollRef = useRef<HTMLDivElement | null>(null);
 
   const smsLogs = useQuery(
@@ -2173,6 +2175,30 @@ export default function CustomerManagement({ channelId }: { channelId?: string }
                                     <span className="text-[10.5px] text-[#5c6b5b] font-semibold">
                                       {log.senderName}
                                     </span>
+                                  )}
+                                  {!isInbound && (log.status === '발송대기' || log.status === '실패') && (
+                                    <button
+                                      type="button"
+                                      disabled={retryingSmsLogId === log._id}
+                                      onClick={async () => {
+                                        setRetryingSmsLogId(log._id);
+                                        try {
+                                          const res = await retrySmsLog({ smsLogId: log._id });
+                                          alert(res.message);
+                                        } catch (err: any) {
+                                          alert(err?.message || '재발송 중 오류가 발생했습니다.');
+                                        } finally {
+                                          setRetryingSmsLogId(null);
+                                        }
+                                      }}
+                                      className="px-2 py-0.5 rounded bg-[#295e52] hover:bg-[#1f493f] text-white text-[10.5px] font-bold transition-colors disabled:opacity-50"
+                                    >
+                                      {retryingSmsLogId === log._id
+                                        ? '전송중...'
+                                        : log.status === '발송대기'
+                                          ? '즉시 클라우드 발송'
+                                          : '즉시 재발송'}
+                                    </button>
                                   )}
                                 </div>
                                 <span className="text-[10px] font-mono text-[#86918a] shrink-0">

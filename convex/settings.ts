@@ -111,6 +111,9 @@ export const update = mutation({
       bridgeSecret: v.optional(v.string()),
       bridgeLastSeenAt: v.optional(v.number()),
       bridgeDeviceName: v.optional(v.string()),
+      bridgeAppVersion: v.optional(v.string()),
+      autoFallbackAligo: v.optional(v.boolean()),
+      fallbackDelaySeconds: v.optional(v.number()),
     })),
     headOfficeAccount: v.optional(v.object({
       accountId: v.string(),

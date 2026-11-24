@@ -55,7 +55,7 @@ export function formatGuideMessage(template: string, customerName?: string, mode
   const hasSpecificModel =
     Boolean(trimmedModel) &&
     trimmedModel !== '-' &&
-    trimmedModel !== '아직 고민 중' &&
+    !trimmedModel.includes('고민 중') &&
     trimmedModel !== '가전 선택 전' &&
     !trimmedModel.includes('제품선택');
   const safeModel = hasSpecificModel ? trimmedModel : 'LG 가전구독';

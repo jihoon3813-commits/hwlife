@@ -39,10 +39,12 @@ object BridgeApiClient {
     private fun postJson(endpoint: String, secret: String, payload: JSONObject): Pair<Int, JSONObject?> {
         val conn = (URL(endpoint).openConnection() as HttpURLConnection).apply {
             requestMethod = "POST"
-            connectTimeout = 10_000
-            readTimeout = 15_000
+            connectTimeout = 8_000
+            readTimeout = 12_000
+            useCaches = false
             doOutput = true
             setRequestProperty("Content-Type", "application/json; charset=utf-8")
+            setRequestProperty("Connection", "close")
             setRequestProperty("X-Bridge-Secret", secret)
         }
         return try {
@@ -66,6 +68,7 @@ object BridgeApiClient {
         val body = JSONObject().apply {
             put("secret", secret)
             put("deviceName", deviceName)
+            put("appVersion", BridgePrefs.APP_VERSION)
         }
         val (code, json) = postJson("$serverUrl/api/sms-bridge/poll", secret, body)
         if (code !in 200..299 || json == null || !json.optBoolean("ok", false)) {

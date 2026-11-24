@@ -37,6 +37,7 @@ export default function Settings({ user }: { user?: any }) {
   const settings = useQuery(api.settings.get);
   const updateSettings = useMutation(api.settings.update);
   const sendTestSmsAction = useAction(api.sms.sendTestSms);
+  const getRemainCountAction = useAction(api.sms.getRemainCount);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const smsInitializedRef = useRef(false);
@@ -54,6 +55,8 @@ export default function Settings({ user }: { user?: any }) {
     consentMessage: '',
     consentPageUrl: '',
     bridgeSecret: '',
+    autoFallbackAligo: true,
+    fallbackDelaySeconds: 25,
   });
   const [localGuideTemplates, setLocalGuideTemplates] = useState<GuideTemplate[]>(DEFAULT_GUIDE_TEMPLATES);
   const [isSavingGuide, setIsSavingGuide] = useState(false);
@@ -63,6 +66,8 @@ export default function Settings({ user }: { user?: any }) {
   const [localGoogleClientId, setLocalGoogleClientId] = useState('');
   const [smsTestPhone, setSmsTestPhone] = useState('');
   const [smsTestResult, setSmsTestResult] = useState<any>(null);
+  const [aligoRemain, setAligoRemain] = useState<any>(null);
+  const [isCheckingRemain, setIsCheckingRemain] = useState(false);
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragType, setDragType] = useState<'status' | 'brand' | 'category' | null>(null);
@@ -83,6 +88,8 @@ export default function Settings({ user }: { user?: any }) {
           consentMessage: remoteSms.consentMessage || '',
           consentPageUrl: remoteSms.consentPageUrl || '',
           bridgeSecret: remoteSms.bridgeSecret || '',
+          autoFallbackAligo: remoteSms.autoFallbackAligo !== false,
+          fallbackDelaySeconds: remoteSms.fallbackDelaySeconds || 25,
         });
         smsInitializedRef.current = true;
       }
@@ -712,11 +719,16 @@ export default function Settings({ user }: { user?: any }) {
               consentMessage: localSms.consentMessage || '',
               consentPageUrl: localSms.consentPageUrl || '',
               bridgeSecret: localSms.bridgeSecret || '',
+              autoFallbackAligo: localSms.autoFallbackAligo !== false,
+              fallbackDelaySeconds: Math.max(10, Math.min(120, Number(localSms.fallbackDelaySeconds) || 25)),
               ...(typeof remoteSms.bridgeLastSeenAt === 'number'
                 ? { bridgeLastSeenAt: remoteSms.bridgeLastSeenAt }
                 : {}),
               ...(typeof remoteSms.bridgeDeviceName === 'string'
                 ? { bridgeDeviceName: remoteSms.bridgeDeviceName }
+                : {}),
+              ...(typeof remoteSms.bridgeAppVersion === 'string'
+                ? { bridgeAppVersion: remoteSms.bridgeAppVersion }
                 : {}),
             });
 
@@ -837,10 +849,21 @@ export default function Settings({ user }: { user?: any }) {
                           }`}
                         />
                         <div>
-                          <div className="text-[13px] font-bold text-[#263d36]">
-                            {isBridgeOnline
-                              ? `회사폰 실시간 연결됨 (${remoteSms.bridgeDeviceName || 'Android'})`
-                              : '회사폰 연결 대기 중'}
+                          <div className="text-[13px] font-bold text-[#263d36] flex items-center gap-2 flex-wrap">
+                            <span>
+                              {isBridgeOnline
+                                ? `회사폰 실시간 연결됨 (${remoteSms.bridgeDeviceName || 'Android'})`
+                                : '회사폰 연결 대기 중 (자동백업 발송 대기)'}
+                            </span>
+                            {remoteSms.bridgeAppVersion ? (
+                              <span className="adm-pill green !py-0.5 !px-2 !text-[10.5px]">
+                                앱 v{remoteSms.bridgeAppVersion}
+                              </span>
+                            ) : lastSeenAt > 0 ? (
+                              <span className="adm-pill orange !py-0.5 !px-2 !text-[10.5px]">
+                                구버전 앱 · v1.1.0 업데이트 권장
+                              </span>
+                            ) : null}
                           </div>
                           <div className="text-[11.5px] text-[#6b7684] mt-0.5">
                             {lastSeenAt > 0
@@ -856,7 +879,7 @@ export default function Settings({ user }: { user?: any }) {
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[8px] bg-[#295e52] hover:bg-[#1f493f] text-white text-[12px] font-bold transition-colors shrink-0"
                       >
                         <Download className="w-3.5 h-3.5" />
-                        효원 문자연동 앱(APK) 다운로드
+                        효원 문자연동 앱(v1.1.0 절전방지) 다운로드
                       </a>
                     </div>
 
@@ -922,21 +945,145 @@ export default function Settings({ user }: { user?: any }) {
                       </div>
                     </div>
 
+                    {/* 무중단 알리고 자동 백업 설정 */}
+                    <div className="p-4 rounded-[12px] bg-[#f8faf7] border border-[#dce4d7] space-y-3.5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-[13.5px] font-bold text-[#263d36] flex items-center gap-2">
+                            <span>🛡️ 무중단 자동 백업 발송 (알리고 클라우드 이중화)</span>
+                            <span className="adm-pill green !py-0.5 !px-2 !text-[10.5px]">권장</span>
+                          </div>
+                          <p className="text-[12px] text-[#5c6b5b] mt-1 leading-relaxed">
+                            평상시에는 회사폰 유심으로 무료 발송하고, 회사폰 화면 절전·배터리 방전·통신 지연으로{' '}
+                            <strong>{localSms.fallbackDelaySeconds || 25}초</strong>(오프라인 시 6초) 내에 발송되지 않으면{' '}
+                            <strong>멈추지 않고 동일 발신번호(알리고 클라우드)로 즉시 자동 발송</strong>합니다.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setLocalSms({
+                              ...localSms,
+                              autoFallbackAligo: localSms.autoFallbackAligo === false,
+                            })
+                          }
+                          className={`adm-switch shrink-0 mt-0.5 ${
+                            localSms.autoFallbackAligo !== false ? 'checked' : ''
+                          }`}
+                        >
+                          <span />
+                        </button>
+                      </div>
+
+                      {localSms.autoFallbackAligo !== false && (
+                        <div className="pt-3 border-t border-[#e5ece0] space-y-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+                            <div className="adm-field">
+                              <label>알리고 API Key</label>
+                              <input
+                                type="password"
+                                value={localSms.apiKey || ''}
+                                onChange={(e) => setLocalSms({ ...localSms, apiKey: e.target.value })}
+                                placeholder="알리고 API Key"
+                                className="adm-input font-mono !bg-white"
+                              />
+                            </div>
+                            <div className="adm-field">
+                              <label>알리고 사용자 ID</label>
+                              <input
+                                type="text"
+                                value={localSms.userId || ''}
+                                onChange={(e) => setLocalSms({ ...localSms, userId: e.target.value })}
+                                placeholder="lifenjoy"
+                                className="adm-input font-mono !bg-white"
+                              />
+                            </div>
+                            <div className="adm-field">
+                              <label>승인된 발신번호</label>
+                              <input
+                                type="text"
+                                value={localSms.sender || ''}
+                                onChange={(e) => setLocalSms({ ...localSms, sender: e.target.value })}
+                                placeholder="01026660883"
+                                className="adm-input font-mono !bg-white"
+                              />
+                            </div>
+                            <div className="adm-field">
+                              <label>백업 전환 대기(초)</label>
+                              <input
+                                type="number"
+                                min={10}
+                                max={120}
+                                value={localSms.fallbackDelaySeconds || 25}
+                                onChange={(e) =>
+                                  setLocalSms({
+                                    ...localSms,
+                                    fallbackDelaySeconds: Number(e.target.value) || 25,
+                                  })
+                                }
+                                className="adm-input font-mono !bg-white"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="text-[11.5px] text-[#5c6b5b]">
+                              {aligoRemain ? (
+                                aligoRemain.success ? (
+                                  <span className="font-semibold text-[#295e52]">
+                                    ✓ 알리고 잔여 발송량: 장문(LMS) {Number(aligoRemain.remain?.lms || 0).toLocaleString()}건 · 단문(SMS) {Number(aligoRemain.remain?.sms || 0).toLocaleString()}건
+                                  </span>
+                                ) : (
+                                  <span className="text-[#a85042] font-semibold">
+                                    ✗ 잔여량 조회 실패: {aligoRemain.message}
+                                  </span>
+                                )
+                              ) : (
+                                '백업용 알리고 잔여 건수가 충분한지 확인해 두면 365일 멈춤 없이 자동발송됩니다.'
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              disabled={isCheckingRemain}
+                              onClick={async () => {
+                                setIsCheckingRemain(true);
+                                try {
+                                  await saveSettings({ sms: buildSmsPayload() });
+                                  const res = await getRemainCountAction({});
+                                  setAligoRemain(res);
+                                } catch (err: any) {
+                                  setAligoRemain({
+                                    success: false,
+                                    message: err?.message || '조회 오류',
+                                  });
+                                } finally {
+                                  setIsCheckingRemain(false);
+                                }
+                              }}
+                              className="adm-btn sage small"
+                            >
+                              <RefreshCw className={`w-3.5 h-3.5 ${isCheckingRemain ? 'animate-spin' : ''}`} />
+                              <span>{isCheckingRemain ? '확인 중...' : '알리고 잔여건수 확인'}</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     {/* 갤럭시 최초 1회 설정 안내 */}
                     <div className="adm-section-note">
                       <AlertCircle />
                       <div className="space-y-1 text-[12px] leading-relaxed">
                         <strong className="text-[#263d36] block">
-                          갤럭시 회사폰 최초 1회 설정 순서 (중요):
+                          갤럭시 회사폰 상시 구동 설정 순서 (중요):
                         </strong>
                         <div>
                           1. 회사폰 기본 <strong>메시지 앱 설정 → 채팅+ 설정 → 채팅+ 기능 끄기</strong> (일반 문자로 송수신되어야 누락 없이 동기화됩니다)
                         </div>
                         <div>
-                          2. 위 <strong>APK 다운로드 링크</strong>를 회사폰에서 열어 설치 후 실행합니다. (안드로이드 13 이상에서 SMS 권한 허용이 막혀 있으면 휴대폰 <code>설정 → 애플리케이션 → 효원 문자연동 → 우측 상단 ⋮ → 제한된 설정 허용</code> 후 권한 허용)
+                          2. 위 <strong>앱(v1.1.0 절전방지) 다운로드</strong>를 회사폰에서 설치 후 실행합니다. (기존 v1.0.0이 설치되어 있어 충돌 안내가 뜨면 기존 앱 삭제 후 설치해주세요. 안드로이드 13 이상은 <code>설정 → 애플리케이션 → 효원 문자연동 → 우측 상단 ⋮ → 제한된 설정 허용</code> 후 권한 허용)
                         </div>
                         <div>
-                          3. 앱에서 <strong>배터리 최적화 제외(제한 없음)</strong>를 허용한 뒤, 위의 <strong>서버 주소</strong>와 <strong>연동 보안키</strong>를 입력하고 <strong>[연동 시작]</strong>을 누르면 완료됩니다.
+                          3. 앱에서 <strong>배터리 제한 없음 허용하기</strong>를 누르고, 갤럭시 <code>설정 → 배터리 → 백그라운드 사용 제한 → 절전 상태가 되지 않는 앱</code>에도 <strong>효원 문자연동</strong>을 추가한 뒤 충전기를 연결해 두시면 가장 안정적입니다.
                         </div>
                       </div>
                     </div>

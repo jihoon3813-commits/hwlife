@@ -14,11 +14,15 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.database.ContentObserver
+import android.net.ConnectivityManager
+import android.net.Network
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import android.telephony.SmsManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -29,6 +33,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 class SmsBridgeService : Service() {
 
@@ -81,20 +86,28 @@ class SmsBridgeService : Service() {
         }
     }
 
+    @Volatile
     private var executor: ScheduledExecutorService? = null
     private val isTickRunning = AtomicBoolean(false)
+    private val lastTickStartedAt = AtomicLong(0L)
     private val immediateInboundQueue = ConcurrentLinkedQueue<SyncItem>()
     private var smsObserver: ContentObserver? = null
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var cpuWakeLock: PowerManager.WakeLock? = null
+    private var wifiLock: WifiManager.WifiLock? = null
     private val mainHandler = Handler(Looper.getMainLooper())
     private val nudgeRunnable = Runnable { triggerImmediateTick() }
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        startAsForeground("어드민 서버와 연결 준비 중...")
+        startAsForeground("어드민 서버와 상시 연결 중...")
+        ensureKeepAliveLocks()
         SmsMmsScanner.ensureBaselineInitialized(this)
         registerSmsContentObserver()
+        registerNetworkCallback()
         startWorkerLoop()
+        WatchdogReceiver.scheduleNext(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -103,10 +116,14 @@ class SmsBridgeService : Service() {
                 BridgePrefs.setEnabled(this, false)
                 BridgePrefs.setStatusText(this, "중지됨")
                 BridgePrefs.appendLog(this, "사용자에 의해 연동이 중지되었습니다.")
+                WatchdogReceiver.cancel(this)
+                releaseKeepAliveLocks()
                 stopSelf()
                 return START_NOT_STICKY
             }
             ACTION_IMMEDIATE_INBOUND -> {
+                ensureKeepAliveLocks()
+                WatchdogReceiver.scheduleNext(this)
                 val phone = intent.getStringExtra(EXTRA_PHONE) ?: ""
                 val body = intent.getStringExtra(EXTRA_BODY) ?: ""
                 if (phone.isNotBlank() && body.isNotBlank()) {
@@ -119,27 +136,107 @@ class SmsBridgeService : Service() {
                         )
                     )
                 }
+                recoverStuckExecutorIfNeeded()
                 triggerImmediateTick()
             }
-            ACTION_NUDGE, ACTION_START -> {
-                triggerImmediateTick()
+            ACTION_NUDGE, ACTION_START, null -> {
+                if (BridgePrefs.isEnabled(this)) {
+                    ensureKeepAliveLocks()
+                    WatchdogReceiver.scheduleNext(this)
+                    recoverStuckExecutorIfNeeded()
+                    triggerImmediateTick()
+                }
             }
         }
         return START_STICKY
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        // 갤럭시 최근 앱 닫기 시에도 즉시 알람으로 자동 부활
+        if (BridgePrefs.isEnabled(this)) {
+            WatchdogReceiver.scheduleNext(this, 1_500L)
+        }
+        super.onTaskRemoved(rootIntent)
+    }
+
+    override fun onTimeout(startId: Int) {
+        if (BridgePrefs.isEnabled(this)) {
+            WatchdogReceiver.scheduleNext(this, 1_500L)
+        }
+        stopSelf(startId)
+    }
+
     override fun onDestroy() {
         mainHandler.removeCallbacks(nudgeRunnable)
         unregisterSmsContentObserver()
+        unregisterNetworkCallback()
         executor?.shutdownNow()
         executor = null
+        releaseKeepAliveLocks()
+        if (BridgePrefs.isEnabled(this)) {
+            WatchdogReceiver.scheduleNext(this, 2_000L)
+        }
         super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    @Synchronized
+    private fun ensureKeepAliveLocks() {
+        try {
+            if (cpuWakeLock == null) {
+                val pm = getSystemService(PowerManager::class.java)
+                cpuWakeLock = pm?.newWakeLock(
+                    PowerManager.PARTIAL_WAKE_LOCK,
+                    "hyowon:SmsBridgeCpuLock"
+                )?.apply {
+                    setReferenceCounted(false)
+                }
+            }
+            if (cpuWakeLock?.isHeld != true) {
+                cpuWakeLock?.acquire()
+            }
+        } catch (e: Exception) {
+            BridgePrefs.appendLog(this, "WakeLock 획득 경고: ${e.message}")
+        }
+
+        try {
+            if (wifiLock == null) {
+                val wm = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
+                val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    WifiManager.WIFI_MODE_FULL_LOW_LATENCY
+                } else {
+                    @Suppress("DEPRECATION")
+                    WifiManager.WIFI_MODE_FULL_HIGH_PERF
+                }
+                wifiLock = wm?.createWifiLock(mode, "hyowon:SmsBridgeWifiLock")?.apply {
+                    setReferenceCounted(false)
+                }
+            }
+            if (wifiLock?.isHeld != true) {
+                wifiLock?.acquire()
+            }
+        } catch (_: Exception) {
+        }
+    }
+
+    @Synchronized
+    private fun releaseKeepAliveLocks() {
+        runCatching {
+            if (cpuWakeLock?.isHeld == true) cpuWakeLock?.release()
+        }
+        cpuWakeLock = null
+
+        runCatching {
+            if (wifiLock?.isHeld == true) wifiLock?.release()
+        }
+        wifiLock = null
+    }
+
+    @Synchronized
     private fun startWorkerLoop() {
-        if (executor != null) return
+        val current = executor
+        if (current != null && !current.isShutdown) return
         val exec = Executors.newSingleThreadScheduledExecutor()
         executor = exec
         exec.scheduleWithFixedDelay(
@@ -150,8 +247,52 @@ class SmsBridgeService : Service() {
         )
     }
 
+    @Synchronized
+    private fun recoverStuckExecutorIfNeeded() {
+        val started = lastTickStartedAt.get()
+        if (isTickRunning.get() && started > 0L && System.currentTimeMillis() - started > 75_000L) {
+            BridgePrefs.appendLog(this, "[자동복구] 지연된 네트워크 스레드를 재시작합니다.")
+            runCatching { executor?.shutdownNow() }
+            executor = null
+            isTickRunning.set(false)
+            lastTickStartedAt.set(0L)
+            startWorkerLoop()
+        } else if (executor == null || executor?.isShutdown == true) {
+            startWorkerLoop()
+        }
+    }
+
     private fun triggerImmediateTick() {
-        executor?.execute { runTickSafely() }
+        val exec = executor
+        if (exec == null || exec.isShutdown) {
+            startWorkerLoop()
+            return
+        }
+        runCatching { exec.execute { runTickSafely() } }
+    }
+
+    private fun registerNetworkCallback() {
+        if (networkCallback != null) return
+        val cm = getSystemService(ConnectivityManager::class.java) ?: return
+        val cb = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                if (BridgePrefs.isEnabled(this@SmsBridgeService)) {
+                    triggerImmediateTick()
+                }
+            }
+        }
+        runCatching {
+            cm.registerDefaultNetworkCallback(cb)
+            networkCallback = cb
+        }
+    }
+
+    private fun unregisterNetworkCallback() {
+        val cb = networkCallback ?: return
+        val cm = getSystemService(ConnectivityManager::class.java)
+        runCatching { cm?.unregisterNetworkCallback(cb) }
+        networkCallback = null
     }
 
     private fun registerSmsContentObserver() {
@@ -182,8 +323,11 @@ class SmsBridgeService : Service() {
     private fun runTickSafely() {
         if (!BridgePrefs.isEnabled(this)) return
         if (!isTickRunning.compareAndSet(false, true)) return
+        lastTickStartedAt.set(System.currentTimeMillis())
 
         try {
+            ensureKeepAliveLocks()
+
             val serverUrl = BridgePrefs.getServerUrl(this)
             val secret = BridgePrefs.getSecret(this)
             if (serverUrl.isBlank() || secret.isBlank()) {
@@ -192,6 +336,17 @@ class SmsBridgeService : Service() {
             }
 
             val deviceName = "${Build.MANUFACTURER} ${Build.MODEL}".trim()
+
+            // 0. 이전에 네트워크 일시 단절로 미전송된 ACK 재전송
+            val pendingAcks = BridgePrefs.getPendingAcks(this)
+            for (item in pendingAcks) {
+                val acked = runCatching {
+                    BridgeApiClient.ack(serverUrl, secret, item.outboxId, item.success, item.errorMessage)
+                }.getOrDefault(false)
+                if (acked) {
+                    BridgePrefs.removePendingAck(this, item.outboxId)
+                }
+            }
 
             // 1. 어드민 발송 대기 큐 폴링
             val pollRes = BridgeApiClient.poll(serverUrl, secret, deviceName)
@@ -202,14 +357,35 @@ class SmsBridgeService : Service() {
                 return
             }
 
-            BridgePrefs.setStatusText(this, "실시간 연결됨 ($deviceName)")
-            updateNotification("어드민과 실시간 문자 동기화 중")
+            BridgePrefs.setStatusText(this, "실시간 상시 연결됨 ($deviceName)")
+            updateNotification("어드민과 24시간 상시 동기화 중 (v${BridgePrefs.APP_VERSION})")
 
-            // 2. 발송 대기 문자 실제 유심(SIM) 발송 처리
+            // 2. 발송 대기 문자 실제 유심(SIM) 발송 처리 (중복 발송 방지 포함)
             for (job in pollRes.jobs) {
+                if (BridgePrefs.wasOutboxSent(this, job.outboxId)) {
+                    val reAcked = runCatching {
+                        BridgeApiClient.ack(serverUrl, secret, job.outboxId, true, null)
+                    }.getOrDefault(false)
+                    if (!reAcked) {
+                        BridgePrefs.enqueuePendingAck(this, PendingAckItem(job.outboxId, true, null))
+                    }
+                    continue
+                }
+
                 SmsMmsScanner.recordBridgeDispatch(job.receiverPhone, job.message)
                 val (sentOk, errText) = sendSmsViaSim(job.receiverPhone, job.message)
-                BridgeApiClient.ack(serverUrl, secret, job.outboxId, sentOk, errText)
+                if (sentOk) {
+                    BridgePrefs.markOutboxSent(this, job.outboxId)
+                }
+
+                val ackOk = runCatching {
+                    BridgeApiClient.ack(serverUrl, secret, job.outboxId, sentOk, errText)
+                }.getOrDefault(false)
+
+                if (!ackOk) {
+                    BridgePrefs.enqueuePendingAck(this, PendingAckItem(job.outboxId, sentOk, errText))
+                }
+
                 if (sentOk) {
                     BridgePrefs.appendLog(this, "[어드민발송 완료] ${job.receiverPhone} (${job.message.length}자)")
                 } else {
@@ -268,9 +444,10 @@ class SmsBridgeService : Service() {
                 BridgePrefs.setLastSmsId(this, scanBatch.nextSmsId)
                 BridgePrefs.setLastMmsId(this, scanBatch.nextMmsId)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             BridgePrefs.setStatusText(this, "네트워크 재연결 대기 중")
         } finally {
+            lastTickStartedAt.set(0L)
             isTickRunning.set(false)
         }
     }
@@ -386,7 +563,7 @@ class SmsBridgeService : Service() {
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.sym_action_chat)
-            .setContentTitle("효원 문자연동 실행 중")
+            .setContentTitle("효원 문자연동 상시 가동 중")
             .setContentText(contentText)
             .setContentIntent(pi)
             .setOngoing(true)
@@ -396,8 +573,8 @@ class SmsBridgeService : Service() {
 
     private fun startAsForeground(contentText: String) {
         val notif = buildNotification(contentText)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(NOTIF_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(NOTIF_ID, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
         } else {
             startForeground(NOTIF_ID, notif)
         }

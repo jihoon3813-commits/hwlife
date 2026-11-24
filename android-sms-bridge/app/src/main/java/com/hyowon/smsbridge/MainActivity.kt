@@ -177,7 +177,7 @@ class MainActivity : Activity() {
 
         // 상단 헤더
         val title = TextView(this).apply {
-            text = "효원 문자연동"
+            text = "효원 문자연동 v${BridgePrefs.APP_VERSION}"
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
             setTypeface(null, Typeface.BOLD)
             setTextColor(Color.parseColor("#263D36"))
@@ -185,7 +185,7 @@ class MainActivity : Activity() {
         root.addView(title)
 
         val subtitle = TextView(this).apply {
-            text = "어드민 발송 문자와 회사폰 문자함을 실시간 양방향으로 동기화합니다."
+            text = "화면 꺼짐·절전 방지(WakeLock + 알람 워치독) 엔진이 적용되어 24시간 상시 동기화합니다."
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
             setTextColor(Color.parseColor("#6B7684"))
             setPadding(0, dp(4), 0, dp(12))

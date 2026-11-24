@@ -78,6 +78,68 @@ export const logSms = internalMutation({
   },
 });
 
+function hasAligoCredentials(smsConfig: any): boolean {
+  return Boolean(
+    smsConfig &&
+      typeof smsConfig.apiKey === "string" &&
+      smsConfig.apiKey.trim() &&
+      typeof smsConfig.userId === "string" &&
+      smsConfig.userId.trim() &&
+      typeof smsConfig.sender === "string" &&
+      normalizeKoreanPhone(smsConfig.sender).length >= 8
+  );
+}
+
+function isAligoAutoFallbackEnabled(smsConfig: any): boolean {
+  return hasAligoCredentials(smsConfig) && smsConfig?.autoFallbackAligo !== false;
+}
+
+async function sendViaAligoApi(params: {
+  apiKey: string;
+  userId: string;
+  sender: string;
+  receiver: string;
+  message: string;
+  title?: string;
+  msgType?: "SMS" | "LMS";
+  testMode?: boolean;
+}): Promise<{ ok: boolean; errorMessage?: string; raw?: any }> {
+  const senderDigits = normalizeKoreanPhone(params.sender);
+  const receiverDigits = normalizeKoreanPhone(params.receiver);
+
+  const formData = new URLSearchParams();
+  formData.append("key", params.apiKey.trim());
+  formData.append("user_id", params.userId.trim());
+  formData.append("sender", senderDigits);
+  formData.append("receiver", receiverDigits);
+  formData.append("msg", params.message);
+  formData.append("msg_type", params.msgType || "LMS");
+  if (params.title && (params.msgType || "LMS") === "LMS") {
+    formData.append("title", params.title);
+  }
+  if (params.testMode) {
+    formData.append("testmode_yn", "Y");
+  }
+
+  const response = await fetch("https://apis.aligo.in/send/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: formData.toString(),
+  });
+
+  const result = await response.json();
+  if (String(result?.result_code) === "1") {
+    return { ok: true, raw: result };
+  }
+  return {
+    ok: false,
+    errorMessage: `알리고 발송 실패: ${result?.message || "알 수 없는 오류"}`,
+    raw: result,
+  };
+}
+
 export const enqueuePhoneOutbox = internalMutation({
   args: {
     inquiryId: v.optional(v.id("inquiries")),
@@ -119,6 +181,20 @@ export const enqueuePhoneOutbox = internalMutation({
       updatedAt: now,
     });
 
+    // 회사폰 절전·방전·네트워크 지연 시 멈추지 않도록 알리고 자동 백업 발송 스케줄링
+    const settings = await ctx.db.query("settings").first();
+    const smsConfig = (settings as any)?.sms;
+    if (isAligoAutoFallbackEnabled(smsConfig)) {
+      const lastSeenAt = smsConfig?.bridgeLastSeenAt || 0;
+      const isBridgeOnline = lastSeenAt > 0 && now - lastSeenAt < 35_000;
+      const configuredSec = Math.max(10, Math.min(120, Number(smsConfig?.fallbackDelaySeconds) || 25));
+      // 회사폰이 이미 절전/오프라인이면 6초만 대기 후 즉시 클라우드 백업 발송
+      const delayMs = isBridgeOnline ? configuredSec * 1000 : 6_000;
+      await ctx.scheduler.runAfter(delayMs, internal.sms.processOutboxFallback, {
+        outboxId,
+      });
+    }
+
     return { outboxId, smsLogId };
   },
 });
@@ -127,6 +203,7 @@ export const pollBridgeOutbox = internalMutation({
   args: {
     secret: v.string(),
     deviceName: v.optional(v.string()),
+    appVersion: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const settings = await ctx.db.query("settings").first();
@@ -138,29 +215,41 @@ export const pollBridgeOutbox = internalMutation({
     }
 
     const now = Date.now();
-    // 15초 이상 지났거나 기기명이 바뀐 경우에만 하트비트 갱신 (DB 쓰기 최소화)
+    // 15초 이상 지났거나 기기명/앱버전이 바뀐 경우에만 하트비트 갱신 (DB 쓰기 최소화)
     if (
       settings &&
       smsConfig &&
       (now - (smsConfig.bridgeLastSeenAt || 0) > 15_000 ||
-        (args.deviceName && args.deviceName !== smsConfig.bridgeDeviceName))
+        (args.deviceName && args.deviceName !== smsConfig.bridgeDeviceName) ||
+        (args.appVersion && args.appVersion !== smsConfig.bridgeAppVersion))
     ) {
       await ctx.db.patch(settings._id, {
         sms: {
           ...smsConfig,
           bridgeLastSeenAt: now,
           bridgeDeviceName: args.deviceName || smsConfig.bridgeDeviceName,
+          bridgeAppVersion: args.appVersion || smsConfig.bridgeAppVersion,
         },
       });
     }
 
-    // 2분 이상 processing에 멈춘 작업은 pending으로 자동 복구
-    const stuckItems = await ctx.db
+    // 90초 이상 processing/fallback_sending에 멈춘 작업은 pending으로 자동 복구
+    const stuckProcessing = await ctx.db
       .query("sms_outbox")
       .withIndex("by_status_and_createdAt", (q) => q.eq("status", "processing"))
       .take(20);
-    for (const item of stuckItems) {
-      if (now - item.updatedAt > 120_000) {
+    for (const item of stuckProcessing) {
+      if (now - item.updatedAt > 90_000) {
+        await ctx.db.patch(item._id, { status: "pending", updatedAt: now });
+      }
+    }
+
+    const stuckFallback = await ctx.db
+      .query("sms_outbox")
+      .withIndex("by_status_and_createdAt", (q) => q.eq("status", "fallback_sending"))
+      .take(20);
+    for (const item of stuckFallback) {
+      if (now - item.updatedAt > 90_000) {
         await ctx.db.patch(item._id, { status: "pending", updatedAt: now });
       }
     }
@@ -207,7 +296,26 @@ export const ackBridgeOutbox = internalMutation({
       return { ok: false, error: "발송 대기 항목을 찾을 수 없습니다." };
     }
 
+    // 이미 클라우드 백업 또는 이전 ACK로 발송 완료된 경우 중복 덮어쓰기 방지
+    if (outbox.status === "sent") {
+      return { ok: true, alreadySent: true };
+    }
+
     const now = Date.now();
+    // 회사폰 유심 발송 실패 시 알리고 백업이 설정되어 있으면 즉시 클라우드 우회 발송
+    if (!args.success && isAligoAutoFallbackEnabled(smsConfig)) {
+      await ctx.db.patch(args.outboxId, {
+        status: "pending",
+        errorMessage: args.errorMessage || "휴대폰 발송 실패 — 클라우드 자동백업 전환 중",
+        updatedAt: now,
+      });
+      await ctx.scheduler.runAfter(0, internal.sms.processOutboxFallback, {
+        outboxId: args.outboxId,
+        force: true,
+      });
+      return { ok: true, fallbackScheduled: true };
+    }
+
     await ctx.db.patch(args.outboxId, {
       status: args.success ? "sent" : "failed",
       errorMessage: args.success ? undefined : args.errorMessage || "휴대폰 발송 실패",
@@ -225,6 +333,376 @@ export const ackBridgeOutbox = internalMutation({
     }
 
     return { ok: true };
+  },
+});
+
+export const claimOutboxForFallback = internalMutation({
+  args: {
+    outboxId: v.id("sms_outbox"),
+    force: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const outbox = await ctx.db.get(args.outboxId);
+    if (!outbox || outbox.status === "sent") {
+      return { action: "noop" as const };
+    }
+
+    const settings = await ctx.db.query("settings").first();
+    const smsConfig = (settings as any)?.sms;
+    if (!hasAligoCredentials(smsConfig)) {
+      return { action: "noop" as const };
+    }
+    if (!args.force && !isAligoAutoFallbackEnabled(smsConfig)) {
+      return { action: "noop" as const };
+    }
+
+    const now = Date.now();
+    // 회사폰이 이미 픽업하여 유심 전송 중(55초 미만)이면 중복 발송 방지를 위해 잠시 재확인 예약
+    if (!args.force && outbox.status === "processing" && now - outbox.updatedAt < 55_000) {
+      await ctx.scheduler.runAfter(35_000, internal.sms.processOutboxFallback, {
+        outboxId: args.outboxId,
+      });
+      return { action: "rescheduled" as const };
+    }
+
+    if (!args.force && outbox.status === "fallback_sending" && now - outbox.updatedAt < 60_000) {
+      return { action: "noop" as const };
+    }
+
+    // 원자적으로 fallback_sending 잠금 → 이후 회사폰이 깨어나 폴링해도 중복 발송되지 않음
+    await ctx.db.patch(args.outboxId, {
+      status: "fallback_sending",
+      updatedAt: now,
+    });
+
+    return {
+      action: "send" as const,
+      receiverPhone: outbox.receiverPhone,
+      title: outbox.title || "[효원상조] 안내",
+      message: outbox.message,
+      apiKey: String(smsConfig.apiKey),
+      userId: String(smsConfig.userId),
+      sender: String(smsConfig.sender),
+    };
+  },
+});
+
+export const completeOutboxFallback = internalMutation({
+  args: {
+    outboxId: v.id("sms_outbox"),
+    success: v.boolean(),
+    errorMessage: v.optional(v.string()),
+    markFailedOnError: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const outbox = await ctx.db.get(args.outboxId);
+    if (!outbox || outbox.status === "sent") {
+      return null;
+    }
+
+    const now = Date.now();
+    if (args.success) {
+      await ctx.db.patch(args.outboxId, {
+        status: "sent",
+        errorMessage: undefined,
+        updatedAt: now,
+      });
+
+      if (outbox.smsLogId) {
+        const logDoc = await ctx.db.get(outbox.smsLogId);
+        if (logDoc) {
+          const prevSender = logDoc.senderName || "자동발송";
+          const nextSender = prevSender.includes("(회사폰)")
+            ? prevSender.replace("(회사폰)", "(알리고 자동백업)")
+            : prevSender.includes("자동백업")
+              ? prevSender
+              : `${prevSender} (알리고 자동백업)`;
+          await ctx.db.patch(outbox.smsLogId, {
+            status: "성공",
+            errorMessage: undefined,
+            senderName: nextSender,
+          });
+        }
+      }
+      return null;
+    }
+
+    // 클라우드 백업도 실패한 경우: 회사폰이 깨어났을 때 이어서 보낼 수 있도록 기본은 pending 유지
+    const nextStatus = args.markFailedOnError ? "failed" : "pending";
+    await ctx.db.patch(args.outboxId, {
+      status: nextStatus,
+      errorMessage: args.errorMessage,
+      updatedAt: now,
+    });
+
+    if (outbox.smsLogId) {
+      const logDoc = await ctx.db.get(outbox.smsLogId);
+      if (logDoc) {
+        await ctx.db.patch(outbox.smsLogId, {
+          ...(args.markFailedOnError ? { status: "실패" } : {}),
+          errorMessage: args.errorMessage,
+        });
+      }
+    }
+    return null;
+  },
+});
+
+export const processOutboxFallback = internalAction({
+  args: {
+    outboxId: v.id("sms_outbox"),
+    force: v.optional(v.boolean()),
+    markFailedOnError: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const claimed = await ctx.runMutation(internal.sms.claimOutboxForFallback, {
+      outboxId: args.outboxId,
+      force: args.force,
+    });
+
+    if (claimed.action !== "send") {
+      return { ok: true, skipped: claimed.action };
+    }
+
+    try {
+      const sendRes = await sendViaAligoApi({
+        apiKey: claimed.apiKey,
+        userId: claimed.userId,
+        sender: claimed.sender,
+        receiver: claimed.receiverPhone,
+        title: claimed.title,
+        message: claimed.message,
+        msgType: "LMS",
+      });
+
+      await ctx.runMutation(internal.sms.completeOutboxFallback, {
+        outboxId: args.outboxId,
+        success: sendRes.ok,
+        errorMessage: sendRes.errorMessage,
+        markFailedOnError: args.markFailedOnError,
+      });
+
+      return { ok: sendRes.ok, errorMessage: sendRes.errorMessage };
+    } catch (err: any) {
+      const errMsg = `클라우드 백업 발송 오류: ${err?.message || "알 수 없는 오류"}`;
+      await ctx.runMutation(internal.sms.completeOutboxFallback, {
+        outboxId: args.outboxId,
+        success: false,
+        errorMessage: errMsg,
+        markFailedOnError: args.markFailedOnError,
+      });
+      return { ok: false, errorMessage: errMsg };
+    }
+  },
+});
+
+export const sweepStuckOutbox = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const settings = await ctx.db.query("settings").first();
+    const smsConfig = (settings as any)?.sms;
+    const fallbackEnabled = isAligoAutoFallbackEnabled(smsConfig);
+
+    // 1. 멈춘 processing / fallback_sending 복구
+    const stuckProcessing = await ctx.db
+      .query("sms_outbox")
+      .withIndex("by_status_and_createdAt", (q) => q.eq("status", "processing"))
+      .take(20);
+    for (const item of stuckProcessing) {
+      if (now - item.updatedAt > 70_000) {
+        await ctx.db.patch(item._id, { status: "pending", updatedAt: now });
+      }
+    }
+
+    const stuckFallback = await ctx.db
+      .query("sms_outbox")
+      .withIndex("by_status_and_createdAt", (q) => q.eq("status", "fallback_sending"))
+      .take(20);
+    for (const item of stuckFallback) {
+      if (now - item.updatedAt > 90_000) {
+        await ctx.db.patch(item._id, { status: "pending", updatedAt: now });
+      }
+    }
+
+    // 2. 30초 이상 pending에 머문 항목 클라우드 백업 자동 발송
+    if (fallbackEnabled) {
+      const pendingItems = await ctx.db
+        .query("sms_outbox")
+        .withIndex("by_status_and_createdAt", (q) => q.eq("status", "pending"))
+        .order("asc")
+        .take(15);
+
+      let scheduled = 0;
+      for (const item of pendingItems) {
+        if (now - item.createdAt > 25_000) {
+          await ctx.scheduler.runAfter(0, internal.sms.processOutboxFallback, {
+            outboxId: item._id,
+          });
+          scheduled += 1;
+        }
+      }
+      return { swept: scheduled };
+    }
+
+    return { swept: 0 };
+  },
+});
+
+export const getSmsRetryTarget = internalMutation({
+  args: {
+    smsLogId: v.id("sms_logs"),
+  },
+  handler: async (ctx, args) => {
+    const logDoc = await ctx.db.get(args.smsLogId);
+    if (!logDoc) {
+      throw new Error("문자 내역을 찾을 수 없습니다.");
+    }
+    if (logDoc.status === "성공") {
+      return { alreadySent: true as const };
+    }
+
+    const outbox = await ctx.db
+      .query("sms_outbox")
+      .withIndex("by_smsLogId", (q) => q.eq("smsLogId", args.smsLogId))
+      .first();
+
+    const settings = await ctx.db.query("settings").first();
+    const smsConfig = (settings as any)?.sms;
+    const now = Date.now();
+
+    if (hasAligoCredentials(smsConfig)) {
+      if (outbox && outbox.status !== "sent") {
+        await ctx.db.patch(outbox._id, {
+          status: "fallback_sending",
+          updatedAt: now,
+        });
+      }
+      return {
+        alreadySent: false as const,
+        mode: "aligo" as const,
+        outboxId: outbox?._id,
+        receiverPhone: logDoc.customerPhone,
+        title: logDoc.title || "[효원상조] 안내",
+        message: logDoc.message,
+        apiKey: String(smsConfig.apiKey),
+        userId: String(smsConfig.userId),
+        sender: String(smsConfig.sender),
+      };
+    }
+
+    // 알리고 설정이 없으면 회사폰 발송 대기열로 다시 적재/초기화
+    if (outbox) {
+      await ctx.db.patch(outbox._id, {
+        status: "pending",
+        errorMessage: undefined,
+        updatedAt: now,
+      });
+    } else {
+      await ctx.db.insert("sms_outbox", {
+        smsLogId: logDoc._id,
+        inquiryId: logDoc.inquiryId,
+        receiverPhone: normalizeKoreanPhone(logDoc.customerPhone),
+        title: logDoc.title,
+        message: logDoc.message,
+        status: "pending",
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+    await ctx.db.patch(logDoc._id, {
+      status: "발송대기",
+      errorMessage: undefined,
+    });
+    return {
+      alreadySent: false as const,
+      mode: "phone_requeued" as const,
+    };
+  },
+});
+
+export const finalizeManualAligoRetry = internalMutation({
+  args: {
+    smsLogId: v.id("sms_logs"),
+    outboxId: v.optional(v.id("sms_outbox")),
+    success: v.boolean(),
+    errorMessage: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    if (args.outboxId) {
+      const outbox = await ctx.db.get(args.outboxId);
+      if (outbox) {
+        await ctx.db.patch(args.outboxId, {
+          status: args.success ? "sent" : "pending",
+          errorMessage: args.success ? undefined : args.errorMessage,
+          updatedAt: now,
+        });
+      }
+    }
+    const logDoc = await ctx.db.get(args.smsLogId);
+    if (logDoc) {
+      const prevSender = logDoc.senderName || "관리자";
+      const nextSender = args.success
+        ? prevSender.includes("(회사폰)")
+          ? prevSender.replace("(회사폰)", "(알리고 즉시발송)")
+          : `${prevSender} (알리고 즉시발송)`
+        : prevSender;
+      await ctx.db.patch(args.smsLogId, {
+        status: args.success ? "성공" : "실패",
+        errorMessage: args.success ? undefined : args.errorMessage,
+        senderName: nextSender,
+      });
+    }
+    return null;
+  },
+});
+
+export const retrySmsLog = action({
+  args: {
+    smsLogId: v.id("sms_logs"),
+  },
+  handler: async (ctx, args): Promise<{ success: boolean; message: string }> => {
+    const target = await ctx.runMutation(internal.sms.getSmsRetryTarget, {
+      smsLogId: args.smsLogId,
+    });
+
+    if (target.alreadySent) {
+      return { success: true, message: "이미 발송 완료된 문자입니다." };
+    }
+
+    if (target.mode === "phone_requeued") {
+      return {
+        success: true,
+        message: "회사폰 대기열 맨 앞으로 다시 요청했습니다. 회사폰 앱 연결 상태를 확인해주세요.",
+      };
+    }
+
+    const sendRes = await sendViaAligoApi({
+      apiKey: target.apiKey,
+      userId: target.userId,
+      sender: target.sender,
+      receiver: target.receiverPhone,
+      title: target.title,
+      message: target.message,
+      msgType: "LMS",
+    });
+
+    await ctx.runMutation(internal.sms.finalizeManualAligoRetry, {
+      smsLogId: args.smsLogId,
+      outboxId: target.outboxId,
+      success: sendRes.ok,
+      errorMessage: sendRes.errorMessage,
+    });
+
+    if (!sendRes.ok) {
+      throw new Error(sendRes.errorMessage || "재발송에 실패했습니다.");
+    }
+
+    return {
+      success: true,
+      message: "알리고 클라우드를 통해 즉시 발송 완료되었습니다!",
+    };
   },
 });
 
@@ -311,11 +789,11 @@ export const syncBridgeMessages = internalMutation({
         });
         syncedCount += 1;
       } else {
-        // 회사폰에서 직접 보낸 문자: 최근 3분 내 어드민에서 발송한 문자(또는 분할 조각)와 겹치면 중복 제외
+        // 회사폰에서 직접 보낸 문자: 최근 15분 내 어드민에서 발송한 문자(또는 분할 조각)와 겹치면 중복 제외
         const recentLogs = await ctx.db
           .query("sms_logs")
           .withIndex("by_customerPhone_and_createdAt", (q) =>
-            q.eq("customerPhone", normalizedPhone).gte("createdAt", now - 180_000)
+            q.eq("customerPhone", normalizedPhone).gte("createdAt", now - 900_000)
           )
           .collect();
 
@@ -605,31 +1083,22 @@ export const sendConsentSms = action({
       return { success: true, message: "회사폰으로 동의서 문자 발송 요청을 전달했습니다." };
     }
 
-    if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
+    if (!hasAligoCredentials(smsConfig)) {
       throw new Error("SMS 설정이 완료되지 않았습니다. 환경설정 > 문자 연동 설정에서 정보를 입력해주세요.");
     }
 
-    const formData = new URLSearchParams();
-    formData.append("key", smsConfig.apiKey);
-    formData.append("user_id", smsConfig.userId);
-    formData.append("sender", smsConfig.sender);
-    formData.append("receiver", args.customerPhone.replace(/-/g, ""));
-    formData.append("msg", message);
-    formData.append("msg_type", "LMS");
-    formData.append("title", "[효원상조] 구매동의서 안내");
-
     try {
-      const response = await fetch("https://apis.aligo.in/send/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
+      const sendRes = await sendViaAligoApi({
+        apiKey: smsConfig.apiKey,
+        userId: smsConfig.userId,
+        sender: smsConfig.sender,
+        receiver: args.customerPhone,
+        title: "[효원상조] 구매동의서 안내",
+        message,
+        msgType: "LMS",
       });
 
-      const result = await response.json();
-
-      if (result.result_code === "1") {
+      if (sendRes.ok) {
         await ctx.runMutation(api.inquiries.update, {
           id: args.inquiryId,
           consentStatus: "발송완료",
@@ -646,7 +1115,7 @@ export const sendConsentSms = action({
         });
         return { success: true, message: "문자 발송이 완료되었습니다." };
       } else {
-        const errMsg = `알리고 발송 실패: ${result.message || "알 수 없는 오류"}`;
+        const errMsg = sendRes.errorMessage || "알리고 발송 실패";
         await ctx.runMutation(internal.sms.logSms, {
           inquiryId: args.inquiryId,
           customerName: args.customerName,
@@ -700,38 +1169,29 @@ export const sendTestSms = action({
       });
       return {
         success: true,
-        message: "회사폰으로 실제 테스트 발송 요청을 보냈습니다! 회사폰 문자함을 확인해보세요.",
+        message: "회사폰으로 실제 테스트 발송 요청을 보냈습니다! (미응답 시 알리고 자동 백업 발송)",
       };
     }
 
-    if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
+    if (!hasAligoCredentials(smsConfig)) {
       throw new Error("SMS 설정이 완료되지 않았습니다.");
     }
 
-    const formData = new URLSearchParams();
-    formData.append("key", smsConfig.apiKey);
-    formData.append("user_id", smsConfig.userId);
-    formData.append("sender", smsConfig.sender);
-    formData.append("receiver", args.phone.replace(/-/g, ""));
-    formData.append("msg", "[효원상조] SMS 연동 테스트 메시지입니다.");
-    formData.append("msg_type", "SMS");
-    formData.append("testmode_yn", "Y");
-
     try {
-      const response = await fetch("https://apis.aligo.in/send/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
+      const sendRes = await sendViaAligoApi({
+        apiKey: smsConfig.apiKey,
+        userId: smsConfig.userId,
+        sender: smsConfig.sender,
+        receiver: args.phone,
+        message: "[효원상조] SMS 연동 테스트 메시지입니다.",
+        msgType: "SMS",
+        testMode: true,
       });
 
-      const result = await response.json();
-
-      if (result.result_code === "1") {
+      if (sendRes.ok) {
         return { success: true, message: "테스트 발송 성공 (실제 발송되지 않음)" };
       } else {
-        return { success: false, message: `발송 실패: ${result.message || "알 수 없는 오류"}` };
+        return { success: false, message: sendRes.errorMessage || "발송 실패" };
       }
     } catch (error: any) {
       return { success: false, message: `오류: ${error.message}` };
@@ -765,18 +1225,18 @@ export const getRemainCount = action({
 
       const result = await response.json();
 
-      if (result.result_code === "1") {
+      if (String(result?.result_code) === "1") {
         return {
           success: true,
           remain: {
-            sms: result.SMS_CNT || 0,
-            lms: result.LMS_CNT || 0,
-            mms: result.MMS_CNT || 0,
+            sms: Number(result.SMS_CNT) || 0,
+            lms: Number(result.LMS_CNT) || 0,
+            mms: Number(result.MMS_CNT) || 0,
           },
           message: "조회 성공",
         };
       } else {
-        return { success: false, remain: 0, message: result.message || "조회 실패" };
+        return { success: false, remain: 0, message: result?.message || "조회 실패" };
       }
     } catch (error: any) {
       return { success: false, remain: 0, message: `오류: ${error.message}` };
@@ -819,34 +1279,25 @@ export const sendCustomGuideSms = action({
       });
       return {
         success: true,
-        message: "회사폰으로 문자 발송 요청을 전달했습니다. (잠시 후 회사폰에서 발송됩니다)",
+        message: "회사폰으로 문자 발송 요청을 전달했습니다. (절전·지연 시 알리고 자동 백업 발송)",
       };
     }
 
-    if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
+    if (!hasAligoCredentials(smsConfig)) {
       throw new Error("SMS 설정이 완료되지 않았습니다. 환경설정 > 문자 연동 설정에서 정보를 입력해주세요.");
     }
 
-    const formData = new URLSearchParams();
-    formData.append("key", smsConfig.apiKey);
-    formData.append("user_id", smsConfig.userId);
-    formData.append("sender", smsConfig.sender);
-    formData.append("receiver", args.customerPhone.replace(/-/g, ""));
-    formData.append("msg", args.message);
-    formData.append("msg_type", "LMS");
-    formData.append("title", smsTitle);
-
     try {
-      const response = await fetch("https://apis.aligo.in/send/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
+      const sendRes = await sendViaAligoApi({
+        apiKey: smsConfig.apiKey,
+        userId: smsConfig.userId,
+        sender: smsConfig.sender,
+        receiver: args.customerPhone,
+        title: smsTitle,
+        message: args.message,
+        msgType: "LMS",
       });
-
-      const result = await response.json();
-      if (result.result_code === "1") {
+      if (sendRes.ok) {
         await ctx.runMutation(internal.sms.logSms, {
           inquiryId: args.inquiryId,
           customerName: args.customerName,
@@ -859,7 +1310,7 @@ export const sendCustomGuideSms = action({
         });
         return { success: true, message: "문자 발송이 완료되었습니다." };
       }
-      const errMsg = `알리고 발송 실패: ${result.message || "알 수 없는 오류"}`;
+      const errMsg = sendRes.errorMessage || "알리고 발송 실패";
       await ctx.runMutation(internal.sms.logSms, {
         inquiryId: args.inquiryId,
         customerName: args.customerName,
@@ -919,7 +1370,7 @@ export const sendLgAutoGuideSms = internalAction({
     const hasSpecificModel =
       Boolean(trimmedModel) &&
       trimmedModel !== "-" &&
-      trimmedModel !== "아직 고민 중" &&
+      !trimmedModel.includes("고민 중") &&
       trimmedModel !== "가전 선택 전" &&
       !trimmedModel.includes("제품선택");
     const safeModel = hasSpecificModel ? trimmedModel : "LG 가전구독";
@@ -932,10 +1383,7 @@ export const sendLgAutoGuideSms = internalAction({
       return { success: false, skipped: true };
     }
 
-    if (provider === "phone_bridge") {
-      if (!smsConfig?.bridgeSecret) {
-        return { success: false, skipped: true };
-      }
+    if (provider === "phone_bridge" && smsConfig?.bridgeSecret) {
       await ctx.runMutation(internal.sms.enqueuePhoneOutbox, {
         inquiryId: args.inquiryId,
         customerName: args.customerName,
@@ -948,29 +1396,20 @@ export const sendLgAutoGuideSms = internalAction({
       return { success: true, queued: true };
     }
 
-    if (!smsConfig || !smsConfig.apiKey || !smsConfig.userId || !smsConfig.sender) {
+    if (!hasAligoCredentials(smsConfig)) {
       return { success: false, skipped: true };
     }
 
-    const formData = new URLSearchParams();
-    formData.append("key", smsConfig.apiKey);
-    formData.append("user_id", smsConfig.userId);
-    formData.append("sender", smsConfig.sender);
-    formData.append("receiver", receiver);
-    formData.append("msg", message);
-    formData.append("msg_type", "LMS");
-    formData.append("title", "[효원상조 × LG가전구독] 상품 안내");
-
     try {
-      const response = await fetch("https://apis.aligo.in/send/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
+      const sendRes = await sendViaAligoApi({
+        apiKey: smsConfig.apiKey,
+        userId: smsConfig.userId,
+        sender: smsConfig.sender,
+        receiver,
+        title: "[효원상조 × LG가전구독] 상품 안내",
+        message,
+        msgType: "LMS",
       });
-      const result = await response.json();
-      const isSuccess = result.result_code === "1";
       await ctx.runMutation(internal.sms.logSms, {
         inquiryId: args.inquiryId,
         customerName: args.customerName,
@@ -978,11 +1417,11 @@ export const sendLgAutoGuideSms = internalAction({
         smsType: "자동안내",
         title: "[효원상조 × LG가전구독] 상품 안내",
         message,
-        status: isSuccess ? "성공" : "실패",
-        errorMessage: isSuccess ? undefined : (result.message || "알 수 없는 오류"),
+        status: sendRes.ok ? "성공" : "실패",
+        errorMessage: sendRes.ok ? undefined : sendRes.errorMessage,
         senderName: "자동발송",
       });
-      return { success: isSuccess, result };
+      return { success: sendRes.ok, result: sendRes.raw };
     } catch (error: any) {
       console.error("sendLgAutoGuideSms failed:", error);
       await ctx.runMutation(internal.sms.logSms, {
