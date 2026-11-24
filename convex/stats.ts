@@ -443,6 +443,8 @@ export const getDashboardStats = query({
       let name = landingNameMap.get(path);
       if (!name) {
         if (path === '/') name = '메인 랜딩 (/)';
+        else if (path === '/lg_new' || path.startsWith('/lg_new/') || path === '/lg-new' || path.startsWith('/lg-new/')) name = `LG가전구독(detail) (${path})`;
+        else if (path === '/lg_new2' || path.startsWith('/lg_new2/') || path === '/lg-new2' || path.startsWith('/lg-new2/')) name = `LG가전구독(new2) (${path})`;
         else if (path === '/care_new' || path.startsWith('/care_new/') || path === '/care-new' || path.startsWith('/care-new/')) name = `LG가전구독(new) (${path})`;
         else if (path === '/care' || path.startsWith('/care/')) name = `LG가전구독 (${path})`;
         else if (path === '/care10' || path.startsWith('/care10/')) name = `LG구독 10%할인 (${path})`;

@@ -326,6 +326,18 @@ export const updateDefaultThumbnails = mutation({
       });
     }
 
+    // Ensure LG Care New 2 (/lg_new2) exists
+    const existingLgNew2 = landings.find(l => l.path === "/lg_new2");
+    if (!existingLgNew2) {
+      await ctx.db.insert("landings", {
+        name: "LG가전 구독 매월 10% 할인 (detail)",
+        path: "/lg_new2",
+        description: "LG가전 구독 매월 10% 할인 (feat. 효원상조) 에디토리얼 상세 랜딩페이지",
+        thumbnail: careNewThumb,
+        isActive: true,
+      });
+    }
+
     // Ensure CarePlus / TripleCare (해피효원라이프 간병PLUS) exists & update path to /triplecare
     const carePlusThumb = "https://res.cloudinary.com/lyjyvy54/image/upload/v1794287243/%EA%B0%80%EC%A0%84_%EB%8F%8C%EB%B4%84_%EA%B1%B4%EA%B0%95%EC%9D%84_%EC%9E%87%EB%8A%94_%EA%B0%80%EC%A1%B1_%EC%BC%80%EC%96%B4_klpbh5.png";
     const existingTripleCare = landings.find(l => l.path === "/triplecare" || l.path === "/careplus" || l.name.includes("간병PLUS") || l.name.includes("간병플러스") || l.name.includes("트리플케어"));

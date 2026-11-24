@@ -33,6 +33,8 @@ const DEFAULT_LANDING_PATHS = [
   { path: '/', name: '메인 랜딩 (/)' },
   { path: '/living', name: '리빙144 (/living)' },
   { path: '/care_new', name: 'LG가전구독(new) (/care_new)' },
+  { path: '/lg_new', name: 'LG가전구독(detail) (/lg_new)' },
+  { path: '/lg_new2', name: 'LG가전구독(new2) (/lg_new2)' },
   { path: '/care', name: 'LG가전구독 (/care)' },
   { path: '/special', name: '스페셜299 (/special)' },
   { path: '/package60', name: '가전상조 60패키지 (/package60)' },

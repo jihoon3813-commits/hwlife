@@ -14,6 +14,7 @@ import KccPage from '../pages/KccPage';
 import Package60Page from '../pages/Package60Page';
 import LgCarePage from '../pages/LgCarePage';
 import LgCareNewPage from '../pages/LgCareNewPage';
+import LgCareNew2Page from '../pages/LgCareNew2Page';
 import LivonCarePage from '../pages/LivonCarePage';
 import Special299NewPage from '../pages/Special299NewPage';
 
@@ -66,12 +67,30 @@ export default function LandingRouter() {
     return <LivonCarePage channelSubdomain={sub} landingPath={path} />;
   }
 
-  // /care_new, /care-new, /care2, /lg_new, /lg-new, /lgsub_new 경로 → LG가전 구독 할인 전용 (new) 랜딩페이지
+  // /lg_new2, /lg-new2 경로 → 기존 LG가전 구독 할인 전용 (new) 랜딩페이지 (LgCareNewPage)
+  if (path === '/lg_new2' || path.startsWith('/lg_new2/') ||
+      path === '/lg-new2' || path.startsWith('/lg-new2/')) {
+    const parts = path.split('/').filter(Boolean);
+    const sp = new URLSearchParams(window.location.search);
+    const queryCh = sp.get('channel') || Array.from(sp.keys())[0];
+    const sub = parts.length >= 2 ? parts[1] : (queryCh || undefined);
+    return <LgCareNewPage channelSubdomain={sub} landingPath="/lg_new2" />;
+  }
+
+  // /lg_new, /lg-new 경로 → LG가전 구독 매월 10% 할인 (feat. 효원상조) detail 랜딩페이지 (LgCareNew2Page)
+  if (path === '/lg_new' || path.startsWith('/lg_new/') ||
+      path === '/lg-new' || path.startsWith('/lg-new/')) {
+    const parts = path.split('/').filter(Boolean);
+    const sp = new URLSearchParams(window.location.search);
+    const queryCh = sp.get('channel') || Array.from(sp.keys())[0];
+    const sub = parts.length >= 2 ? parts[1] : (queryCh || undefined);
+    return <LgCareNew2Page channelSubdomain={sub} landingPath="/lg_new" />;
+  }
+
+  // /care_new, /care-new, /care2, /lgsub_new 경로 → LG가전 구독 할인 전용 (new) 랜딩페이지
   if (path === '/care_new' || path.startsWith('/care_new') ||
       path === '/care-new' || path.startsWith('/care-new') ||
       path === '/care2' || path.startsWith('/care2') ||
-      path === '/lg_new' || path.startsWith('/lg_new') ||
-      path === '/lg-new' || path.startsWith('/lg-new') ||
       path === '/lgsub_new' || path.startsWith('/lgsub_new')) {
     const parts = path.split('/').filter(Boolean);
     const sub = parts.length >= 2 ? parts[1] : undefined;
@@ -206,6 +225,12 @@ export default function LandingRouter() {
     }
     if (primaryPath === '/triplecare' || primaryPath === '/triple_care' || primaryPath === '/triple-care' || primaryPath === '/careplus' || primaryPath === '/care_plus' || primaryPath === '/livon') {
       return <LivonCarePage channelSubdomain={channel.subdomain} landingPath={primaryPath} />;
+    }
+    if (primaryPath === '/lg_new2' || primaryPath === '/lg-new2') {
+      return <LgCareNewPage channelSubdomain={channel.subdomain} landingPath="/lg_new2" />;
+    }
+    if (primaryPath === '/lg_new' || primaryPath === '/lg-new') {
+      return <LgCareNew2Page channelSubdomain={channel.subdomain} landingPath="/lg_new" />;
     }
     if (primaryPath === '/care_new' || primaryPath === '/care-new') {
       return <LgCareNewPage channelSubdomain={channel.subdomain} landingPath={primaryPath} />;
