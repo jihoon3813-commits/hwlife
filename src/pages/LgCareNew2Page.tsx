@@ -6,7 +6,8 @@ import { getInquiryAttribution } from '../utils/attribution';
 import SEO from '../components/SEO';
 import PrivacyModal from '../components/PrivacyModal';
 import { formatPhoneNumber } from '../utils/phone';
-import { X, CheckCircle2, ArrowUpRight, Phone } from 'lucide-react';
+import { X, CheckCircle2, ArrowUpRight, Phone, Sparkles } from 'lucide-react';
+import LgCareCatalogModal, { SelectedProductPlan } from '../components/LgCareCatalogModal';
 
 interface LgCareNew2PageProps {
   channelSubdomain?: string;
@@ -61,6 +62,8 @@ export default function LgCareNew2Page({
 
   // Inquiry Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
+  const [selectedCatalogPlan, setSelectedCatalogPlan] = useState<SelectedProductPlan | null>(null);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [selectedAppliance, setSelectedAppliance] = useState<string>(APPLIANCE_OPTIONS[0]);
   const [name, setName] = useState('');
@@ -86,6 +89,13 @@ export default function LgCareNew2Page({
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
+  const handleSelectCatalogPlan = (plan: SelectedProductPlan) => {
+    setSelectedCatalogPlan(plan);
+    setSelectedAppliance(`[${plan.product.model}] ${plan.product.name} (${plan.optionSummary})`);
+    setIsCatalogModalOpen(false);
+    setIsModalOpen(true);
+  };
+
   const handleSubmitInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
@@ -105,6 +115,9 @@ export default function LgCareNew2Page({
     try {
       const consultDetails = [
         `[LG가전구독 detail] 관심가전: ${selectedAppliance}`,
+        selectedCatalogPlan
+          ? `구독기간: ${selectedCatalogPlan.term}개월 | 할인전: ${selectedCatalogPlan.originalPrice.toLocaleString()}원 → 10%할인가: ${selectedCatalogPlan.discountedPrice.toLocaleString()}원`
+          : null,
         `상담 희망시간: ${callTime}`,
         `유입경로: ${landingPath}`,
       ]
@@ -212,14 +225,14 @@ export default function LgCareNew2Page({
 
       {/* Sticky Floating Bottom CTA */}
       <div className="fixed bottom-0 left-0 right-0 z-30 flex justify-center pointer-events-none">
-        <div className="w-full max-w-[860px] bg-[#fbf6ee]/95 backdrop-blur-md border-t border-[#dccfbc] px-5 py-3 flex items-center justify-between gap-4 shadow-[0_-4px_20px_rgba(43,33,25,0.1)] pointer-events-auto">
-          <div>
+        <div className="w-full max-w-[860px] bg-[#fbf6ee]/95 backdrop-blur-md border-t border-[#dccfbc] px-4 sm:px-5 py-3 flex items-center justify-between gap-2 sm:gap-4 shadow-[0_-4px_20px_rgba(43,33,25,0.1)] pointer-events-auto">
+          <div className="hidden sm:block">
             <small className="block text-[11px] text-[#76675a]">LG 구독료 결합 할인</small>
             <strong className="text-[18px] sm:text-[20px] font-extrabold text-[#40593e]">
               매월 10% 할인
             </strong>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="w-full sm:w-auto flex items-center gap-2">
             {channel?.managerContact && (
               <a
                 href={`tel:${channel.managerContact}`}
@@ -231,11 +244,19 @@ export default function LgCareNew2Page({
             )}
             <button
               type="button"
+              onClick={() => setIsCatalogModalOpen(true)}
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-3 rounded-full border border-[#40593e]/30 bg-white hover:bg-[#f6efe4] text-[#40593e] text-[12.5px] sm:text-[13px] font-bold shadow-xs active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+            >
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              10%할인 가전 목록 보기
+            </button>
+            <button
+              type="button"
               onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center justify-center gap-1.5 bg-[#6f9a6b] hover:bg-[#5c8458] text-[#0c0d0c] py-3 px-6 rounded-full font-extrabold text-[14px] shadow-md active:scale-95 transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-[#6f9a6b] hover:bg-[#5c8458] text-[#0c0d0c] py-3 px-4 sm:px-6 rounded-full font-extrabold text-[13px] sm:text-[14px] shadow-md active:scale-95 transition-all cursor-pointer whitespace-nowrap"
             >
               상담 신청하기
-              <ArrowUpRight className="w-4 h-4" />
+              <ArrowUpRight className="w-4 h-4 shrink-0" />
             </button>
           </div>
         </div>
@@ -304,6 +325,9 @@ export default function LgCareNew2Page({
                       onChange={(e) => setSelectedAppliance(e.target.value)}
                       className="w-full px-3.5 py-3 border border-[#dccfbc] rounded-lg text-[14px] bg-white focus:outline-none focus:border-[#40593e]"
                     >
+                      {!APPLIANCE_OPTIONS.includes(selectedAppliance) && (
+                        <option value={selectedAppliance}>{selectedAppliance}</option>
+                      )}
                       {APPLIANCE_OPTIONS.map((opt) => (
                         <option key={opt} value={opt}>
                           {opt}
@@ -392,6 +416,15 @@ export default function LgCareNew2Page({
           </div>
         </div>
       )}
+
+      {/* Appliance Catalog Modal */}
+      <LgCareCatalogModal
+        isOpen={isCatalogModalOpen}
+        onClose={() => setIsCatalogModalOpen(false)}
+        initialCategory="all"
+        onApplyToCalculator={handleSelectCatalogPlan}
+        onDirectConsult={handleSelectCatalogPlan}
+      />
 
       {/* Privacy Modal */}
       <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
