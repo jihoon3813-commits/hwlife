@@ -44,6 +44,7 @@ class SmsBridgeService : Service() {
         private const val ACTION_STOP = "com.hyowon.smsbridge.ACTION_STOP"
         private const val ACTION_NUDGE = "com.hyowon.smsbridge.ACTION_NUDGE"
         private const val ACTION_IMMEDIATE_INBOUND = "com.hyowon.smsbridge.ACTION_IMMEDIATE_INBOUND"
+        private const val ACTION_EXTERNAL_DISPATCH = "com.smsbridge.EXTERNAL_DISPATCH"
         private const val EXTRA_PHONE = "extra_phone"
         private const val EXTRA_BODY = "extra_body"
 
@@ -93,6 +94,7 @@ class SmsBridgeService : Service() {
     private val immediateInboundQueue = ConcurrentLinkedQueue<SyncItem>()
     private var smsObserver: ContentObserver? = null
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var externalDispatchReceiver: BroadcastReceiver? = null
     private var cpuWakeLock: PowerManager.WakeLock? = null
     private var wifiLock: WifiManager.WifiLock? = null
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -104,6 +106,7 @@ class SmsBridgeService : Service() {
         startAsForeground("어드민 서버와 상시 연결 중...")
         ensureKeepAliveLocks()
         SmsMmsScanner.ensureBaselineInitialized(this)
+        registerExternalDispatchReceiver()
         registerSmsContentObserver()
         registerNetworkCallback()
         startWorkerLoop()
@@ -168,6 +171,7 @@ class SmsBridgeService : Service() {
 
     override fun onDestroy() {
         mainHandler.removeCallbacks(nudgeRunnable)
+        unregisterExternalDispatchReceiver()
         unregisterSmsContentObserver()
         unregisterNetworkCallback()
         executor?.shutdownNow()
@@ -180,6 +184,56 @@ class SmsBridgeService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    private fun registerExternalDispatchReceiver() {
+        if (externalDispatchReceiver != null) return
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val sourcePkg = intent?.getStringExtra("sourcePackage") ?: ""
+                if (sourcePkg.isBlank() || sourcePkg == packageName) return
+                val phone = intent?.getStringExtra("phone") ?: return
+                val message = intent.getStringExtra("message") ?: ""
+                val ts = intent.getLongExtra("timestamp", System.currentTimeMillis())
+                BridgePrefs.recordOutboundTimestamp(
+                    this@SmsBridgeService,
+                    BridgePrefs.EXTERNAL_OWNER,
+                    phone,
+                    ts
+                )
+                if (message.isNotBlank()) {
+                    SmsMmsScanner.recordExternalDispatch(phone, message)
+                }
+            }
+        }
+        runCatching {
+            ContextCompat.registerReceiver(
+                this,
+                receiver,
+                IntentFilter(ACTION_EXTERNAL_DISPATCH),
+                ContextCompat.RECEIVER_EXPORTED
+            )
+            externalDispatchReceiver = receiver
+        }
+    }
+
+    private fun unregisterExternalDispatchReceiver() {
+        externalDispatchReceiver?.let {
+            runCatching { unregisterReceiver(it) }
+        }
+        externalDispatchReceiver = null
+    }
+
+    private fun broadcastOutboundDispatch(phone: String, message: String, timestamp: Long) {
+        runCatching {
+            val intent = Intent(ACTION_EXTERNAL_DISPATCH).apply {
+                putExtra("sourcePackage", packageName)
+                putExtra("phone", phone)
+                putExtra("message", message)
+                putExtra("timestamp", timestamp)
+            }
+            sendBroadcast(intent)
+        }
+    }
 
     @Synchronized
     private fun ensureKeepAliveLocks() {
@@ -320,6 +374,43 @@ class SmsBridgeService : Service() {
         smsObserver = null
     }
 
+    private fun resolveTargetServer(
+        item: SyncItem,
+        servers: List<BridgeServerConfig>
+    ): BridgeServerConfig? {
+        if (servers.isEmpty()) return null
+        val normPhone = SmsMmsScanner.normalizePhone(item.phone)
+        val cutoff = item.timestamp + 15_000L
+
+        var bestServer: BridgeServerConfig? = null
+        var bestServerTime = 0L
+
+        for (srv in servers) {
+            val t = BridgePrefs.getLatestOutboundTimestamp(this, srv.url, normPhone, cutoff)
+            if (t > bestServerTime) {
+                bestServerTime = t
+                bestServer = srv
+            }
+        }
+
+        if (item.direction == "inbound" && normPhone.length >= 9) {
+            val tExternalCached = BridgePrefs.getLatestOutboundTimestamp(
+                this,
+                BridgePrefs.EXTERNAL_OWNER,
+                normPhone,
+                cutoff
+            )
+            val tExternalQuery = SmsMmsScanner.findLatestSonoOutboundAt(this, normPhone, cutoff)
+            val tExternal = maxOf(tExternalCached, tExternalQuery)
+            if (tExternal > 0L && tExternal > bestServerTime) {
+                BridgePrefs.appendLog(this, "[수신 제외] 타사(소노) 발신 답장 분리: $normPhone")
+                return null
+            }
+        }
+
+        return bestServer ?: servers.first()
+    }
+
     private fun runTickSafely() {
         if (!BridgePrefs.isEnabled(this)) return
         if (!isTickRunning.compareAndSet(false, true)) return
@@ -328,72 +419,109 @@ class SmsBridgeService : Service() {
         try {
             ensureKeepAliveLocks()
 
-            val serverUrl = BridgePrefs.getServerUrl(this)
-            val secret = BridgePrefs.getSecret(this)
-            if (serverUrl.isBlank() || secret.isBlank()) {
+            val servers = BridgePrefs.getConfiguredServers(this)
+            if (servers.isEmpty()) {
                 BridgePrefs.setStatusText(this, "설정 필요 (서버주소/보안키)")
                 return
             }
 
             val deviceName = "${Build.MANUFACTURER} ${Build.MODEL}".trim()
+            val primary = servers.first()
 
             // 0. 이전에 네트워크 일시 단절로 미전송된 ACK 재전송
             val pendingAcks = BridgePrefs.getPendingAcks(this)
             for (item in pendingAcks) {
+                val targetUrl = item.serverUrl.ifBlank { primary.url }
+                val targetSecret = item.secret.ifBlank {
+                    servers.firstOrNull { it.url == targetUrl }?.secret ?: primary.secret
+                }
                 val acked = runCatching {
-                    BridgeApiClient.ack(serverUrl, secret, item.outboxId, item.success, item.errorMessage)
+                    BridgeApiClient.ack(targetUrl, targetSecret, item.outboxId, item.success, item.errorMessage)
                 }.getOrDefault(false)
                 if (acked) {
-                    BridgePrefs.removePendingAck(this, item.outboxId)
+                    BridgePrefs.removePendingAck(this, item.outboxId, item.serverUrl)
                 }
             }
 
-            // 1. 어드민 발송 대기 큐 폴링
-            val pollRes = BridgeApiClient.poll(serverUrl, secret, deviceName)
-            if (!pollRes.ok) {
-                val errMsg = pollRes.error ?: "연결 실패"
+            // 1. 설정된 모든 효원 어드민 서버(운영 / 선택적 개발) 폴링 및 발송 큐 처리
+            val connectedLabels = mutableListOf<String>()
+            var lastPollErr: String? = null
+
+            for (srv in servers) {
+                val pollRes = runCatching {
+                    BridgeApiClient.poll(srv.url, srv.secret, deviceName)
+                }.getOrElse {
+                    PollResponse(ok = false, error = it.message ?: "네트워크 오류", jobs = emptyList())
+                }
+
+                if (!pollRes.ok) {
+                    lastPollErr = "${srv.label}: ${pollRes.error ?: "연결 실패"}"
+                    continue
+                }
+
+                connectedLabels.add(srv.label)
+                BridgePrefs.mergeServerOutbounds(this, srv.url, pollRes.recentOutbounds, pollRes.serverNow)
+
+                for (job in pollRes.jobs) {
+                    if (BridgePrefs.wasOutboxSent(this, job.outboxId)) {
+                        val reAcked = runCatching {
+                            BridgeApiClient.ack(srv.url, srv.secret, job.outboxId, true, null)
+                        }.getOrDefault(false)
+                        if (!reAcked) {
+                            BridgePrefs.enqueuePendingAck(
+                                this,
+                                PendingAckItem(job.outboxId, true, null, srv.url, srv.secret)
+                            )
+                        }
+                        continue
+                    }
+
+                    val dispatchNow = System.currentTimeMillis()
+                    SmsMmsScanner.recordBridgeDispatch(srv.url, job.receiverPhone, job.message)
+                    BridgePrefs.recordOutboundTimestamp(
+                        this,
+                        srv.url,
+                        job.receiverPhone,
+                        dispatchNow
+                    )
+                    broadcastOutboundDispatch(job.receiverPhone, job.message, dispatchNow)
+
+                    val (sentOk, errText) = sendSmsViaSim(job.receiverPhone, job.message)
+                    if (sentOk) {
+                        BridgePrefs.markOutboxSent(this, job.outboxId)
+                    }
+
+                    val ackOk = runCatching {
+                        BridgeApiClient.ack(srv.url, srv.secret, job.outboxId, sentOk, errText)
+                    }.getOrDefault(false)
+
+                    if (!ackOk) {
+                        BridgePrefs.enqueuePendingAck(
+                            this,
+                            PendingAckItem(job.outboxId, sentOk, errText, srv.url, srv.secret)
+                        )
+                    }
+
+                    if (sentOk) {
+                        BridgePrefs.appendLog(this, "[${srv.label} 발송완료] ${job.receiverPhone} (${job.message.length}자)")
+                    } else {
+                        BridgePrefs.appendLog(this, "[${srv.label} 발송실패] ${job.receiverPhone}: $errText")
+                    }
+                }
+            }
+
+            if (connectedLabels.isEmpty()) {
+                val errMsg = lastPollErr ?: "연결 실패"
                 BridgePrefs.setStatusText(this, "연결 오류: $errMsg")
                 updateNotification("연결 확인 필요: $errMsg")
                 return
             }
 
-            BridgePrefs.setStatusText(this, "실시간 상시 연결됨 ($deviceName)")
-            updateNotification("어드민과 24시간 상시 동기화 중 (v${BridgePrefs.APP_VERSION})")
+            val connSummary = connectedLabels.joinToString("·")
+            BridgePrefs.setStatusText(this, "$connSummary 실시간 연결됨 ($deviceName)")
+            updateNotification("효원($connSummary) 24시간 상시 동기화 중 (v${BridgePrefs.APP_VERSION})")
 
-            // 2. 발송 대기 문자 실제 유심(SIM) 발송 처리 (중복 발송 방지 포함)
-            for (job in pollRes.jobs) {
-                if (BridgePrefs.wasOutboxSent(this, job.outboxId)) {
-                    val reAcked = runCatching {
-                        BridgeApiClient.ack(serverUrl, secret, job.outboxId, true, null)
-                    }.getOrDefault(false)
-                    if (!reAcked) {
-                        BridgePrefs.enqueuePendingAck(this, PendingAckItem(job.outboxId, true, null))
-                    }
-                    continue
-                }
-
-                SmsMmsScanner.recordBridgeDispatch(job.receiverPhone, job.message)
-                val (sentOk, errText) = sendSmsViaSim(job.receiverPhone, job.message)
-                if (sentOk) {
-                    BridgePrefs.markOutboxSent(this, job.outboxId)
-                }
-
-                val ackOk = runCatching {
-                    BridgeApiClient.ack(serverUrl, secret, job.outboxId, sentOk, errText)
-                }.getOrDefault(false)
-
-                if (!ackOk) {
-                    BridgePrefs.enqueuePendingAck(this, PendingAckItem(job.outboxId, sentOk, errText))
-                }
-
-                if (sentOk) {
-                    BridgePrefs.appendLog(this, "[어드민발송 완료] ${job.receiverPhone} (${job.message.length}자)")
-                } else {
-                    BridgePrefs.appendLog(this, "[어드민발송 실패] ${job.receiverPhone}: $errText")
-                }
-            }
-
-            // 3. 즉시 수신 큐 + 문자함(SMS/LMS) 증분 스캔 동기화
+            // 2. 즉시 수신 큐 + 문자함(SMS/LMS) 증분 스캔 동기화
             val immediateItems = mutableListOf<SyncItem>()
             while (true) {
                 val item = immediateInboundQueue.poll() ?: break
@@ -427,18 +555,48 @@ class SmsBridgeService : Service() {
             }
 
             if (combined.isNotEmpty()) {
-                val syncRes = BridgeApiClient.sync(serverUrl, secret, deviceName, combined)
-                if (syncRes.ok) {
-                    if (scanBatch != null) {
-                        BridgePrefs.setLastSmsId(this, scanBatch.nextSmsId)
-                        BridgePrefs.setLastMmsId(this, scanBatch.nextMmsId)
+                val grouped = LinkedHashMap<BridgeServerConfig, MutableList<SyncItem>>()
+                for (item in combined) {
+                    if (item.direction == "outbound" &&
+                        (SmsMmsScanner.isSonoMessage(item.message) ||
+                            SmsMmsScanner.wasDispatchedByBridge(item.phone, item.message))
+                    ) {
+                        if (SmsMmsScanner.isSonoMessage(item.message)) {
+                            BridgePrefs.recordOutboundTimestamp(
+                                this,
+                                BridgePrefs.EXTERNAL_OWNER,
+                                item.phone,
+                                item.timestamp
+                            )
+                        }
+                        continue
                     }
-                    if (syncRes.synced > 0) {
-                        BridgePrefs.appendLog(this, "[동기화 완료] 고객 문자 ${syncRes.synced}건 어드민 반영")
+
+                    val target = resolveTargetServer(item, servers) ?: continue
+                    grouped.getOrPut(target) { mutableListOf() }.add(item)
+                }
+
+                var allSyncSucceeded = true
+                for ((srv, batch) in grouped) {
+                    if (batch.isEmpty()) continue
+                    val syncRes = runCatching {
+                        BridgeApiClient.sync(srv.url, srv.secret, deviceName, batch)
+                    }.getOrElse {
+                        SyncResponse(ok = false, synced = 0, error = it.message ?: "동기화 오류")
                     }
-                } else {
-                    // 실패 시 커서를 전진시키지 않아 다음 주기에 자동 재시도
-                    BridgePrefs.appendLog(this, "[동기화 재시도 예정] ${syncRes.error}")
+                    if (syncRes.ok) {
+                        if (syncRes.synced > 0) {
+                            BridgePrefs.appendLog(this, "[${srv.label} 동기화] 고객 문자 ${syncRes.synced}건 반영")
+                        }
+                    } else {
+                        allSyncSucceeded = false
+                        BridgePrefs.appendLog(this, "[${srv.label} 동기화 재시도] ${syncRes.error}")
+                    }
+                }
+
+                if (allSyncSucceeded && scanBatch != null) {
+                    BridgePrefs.setLastSmsId(this, scanBatch.nextSmsId)
+                    BridgePrefs.setLastMmsId(this, scanBatch.nextMmsId)
                 }
             } else if (scanBatch != null) {
                 BridgePrefs.setLastSmsId(this, scanBatch.nextSmsId)

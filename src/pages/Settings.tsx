@@ -861,7 +861,7 @@ export default function Settings({ user }: { user?: any }) {
                               </span>
                             ) : lastSeenAt > 0 ? (
                               <span className="adm-pill orange !py-0.5 !px-2 !text-[10.5px]">
-                                구버전 앱 · v1.1.0 업데이트 권장
+                                구버전 앱 · v1.2.0 업데이트 권장
                               </span>
                             ) : null}
                           </div>
@@ -879,7 +879,7 @@ export default function Settings({ user }: { user?: any }) {
                         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[8px] bg-[#295e52] hover:bg-[#1f493f] text-white text-[12px] font-bold transition-colors shrink-0"
                       >
                         <Download className="w-3.5 h-3.5" />
-                        효원 문자연동 앱(v1.1.0 절전방지) 다운로드
+                        효원 문자연동 앱(v1.2.0 · 어드민 분리) 다운로드
                       </a>
                     </div>
 
@@ -1080,7 +1080,7 @@ export default function Settings({ user }: { user?: any }) {
                           1. 회사폰 기본 <strong>메시지 앱 설정 → 채팅+ 설정 → 채팅+ 기능 끄기</strong> (일반 문자로 송수신되어야 누락 없이 동기화됩니다)
                         </div>
                         <div>
-                          2. 위 <strong>앱(v1.1.0 절전방지) 다운로드</strong>를 회사폰에서 설치 후 실행합니다. (기존 v1.0.0이 설치되어 있어 충돌 안내가 뜨면 기존 앱 삭제 후 설치해주세요. 안드로이드 13 이상은 <code>설정 → 애플리케이션 → 효원 문자연동 → 우측 상단 ⋮ → 제한된 설정 허용</code> 후 권한 허용)
+                          2. 위 <strong>앱(v1.2.0 · 어드민 분리) 다운로드</strong>를 회사폰에서 설치 후 실행합니다. (기존 앱이 설치되어 있어 충돌 안내가 뜨면 기존 앱 삭제 후 설치해주세요. 안드로이드 13 이상은 <code>설정 → 애플리케이션 → 효원 문자연동 → 우측 상단 ⋮ → 제한된 설정 허용</code> 후 권한 허용)
                         </div>
                         <div>
                           3. 앱에서 <strong>배터리 제한 없음 허용하기</strong>를 누르고, 갤럭시 <code>설정 → 배터리 → 백그라운드 사용 제한 → 절전 상태가 되지 않는 앱</code>에도 <strong>효원 문자연동</strong>을 추가한 뒤 충전기를 연결해 두시면 가장 안정적입니다.

@@ -76,12 +76,12 @@ jobs:
         run: |
           if gh release view sms-bridge-latest >/dev/null 2>&1; then
             gh release edit sms-bridge-latest \
-              --title "효원 문자연동 안드로이드 앱 (v1.1.0 · 절전방지 패치)" \
-              --notes "화면 꺼짐 시 CPU 수면 방지(WakeLock/WifiLock) 및 45초 알람 워치독이 적용된 상시 동기화 버전입니다."
+              --title "효원 문자연동 안드로이드 앱 (v1.2.0 · 운영/개발·타사 분리 라우팅)" \
+              --notes "운영·개발 어드민 동시 연결 및 소노 문자연동 앱과의 동일 번호 답장 분리 라우팅이 적용된 최신 버전입니다."
             gh release upload sms-bridge-latest hyowon-sms-bridge.apk --clobber
           else
             gh release create sms-bridge-latest hyowon-sms-bridge.apk \
-              --title "효원 문자연동 안드로이드 앱 (v1.1.0 · 절전방지 패치)" \
+              --title "효원 문자연동 안드로이드 앱 (v1.2.0 · 운영/개발·타사 분리 라우팅)" \
               --notes "회사 안드로이드폰에 설치하여 효원 어드민과 양방향 문자를 실시간 동기화하는 전용 앱입니다." \
               --latest
           fi

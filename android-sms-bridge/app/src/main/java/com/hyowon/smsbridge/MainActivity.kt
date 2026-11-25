@@ -34,6 +34,8 @@ class MainActivity : Activity() {
     private lateinit var batteryStatusText: TextView
     private lateinit var serverUrlInput: EditText
     private lateinit var secretInput: EditText
+    private lateinit var devServerUrlInput: EditText
+    private lateinit var devSecretInput: EditText
     private lateinit var logsView: TextView
 
     private val prefListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -49,6 +51,8 @@ class MainActivity : Activity() {
 
         serverUrlInput.setText(BridgePrefs.getServerUrl(this))
         secretInput.setText(BridgePrefs.getSecret(this))
+        devServerUrlInput.setText(BridgePrefs.getDevServerUrl(this))
+        devSecretInput.setText(BridgePrefs.getDevSecret(this))
 
         BridgePrefs.prefs(this).registerOnSharedPreferenceChangeListener(prefListener)
         refreshDynamicState()
@@ -185,7 +189,7 @@ class MainActivity : Activity() {
         root.addView(title)
 
         val subtitle = TextView(this).apply {
-            text = "화면 꺼짐·절전 방지(WakeLock + 알람 워치독) 엔진이 적용되어 24시간 상시 동기화합니다."
+            text = "효원 어드민 전용 앱입니다. 소노 문자연동 앱과 동시 사용 가능하며, 발신한 어드민 기준으로 답장을 자동 분리 라우팅합니다."
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
             setTextColor(Color.parseColor("#6B7684"))
             setPadding(0, dp(4), 0, dp(12))
@@ -271,11 +275,11 @@ class MainActivity : Activity() {
             background = roundedBg("#FFFFFF", "#E6EAE3", 14)
             setPadding(dp(16), dp(16), dp(16), dp(16))
         }
-        configCard.addView(sectionTitle("2. 어드민 서버 연결 정보"))
+        configCard.addView(sectionTitle("2. 효원 어드민 서버 연결 정보"))
 
-        configCard.addView(fieldLabel("서버 주소 (환경설정 > 문자 연동 설정에서 확인)"))
+        configCard.addView(fieldLabel("운영 서버 주소 (환경설정 > 문자 연동 설정에서 확인)"))
         serverUrlInput = EditText(this).apply {
-            hint = "https://...convex.site"
+            hint = BridgePrefs.DEFAULT_SERVER_URL
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f)
             setTextColor(Color.parseColor("#191F28"))
@@ -285,9 +289,9 @@ class MainActivity : Activity() {
         }
         configCard.addView(serverUrlInput)
 
-        configCard.addView(fieldLabel("앱 연동 보안키 (hw-...)"))
+        configCard.addView(fieldLabel("운영 앱 연동 보안키 (hw-...)"))
         secretInput = EditText(this).apply {
-            hint = "어드민에서 생성·저장한 보안키 입력"
+            hint = "운영 어드민에서 생성·저장한 보안키 입력"
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f)
             setTextColor(Color.parseColor("#191F28"))
@@ -297,20 +301,70 @@ class MainActivity : Activity() {
         }
         configCard.addView(secretInput)
 
+        val devSectionLabel = TextView(this).apply {
+            text = "개발/테스트 어드민 동시 연동 (선택)"
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12.5f)
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.parseColor("#295E52"))
+            setPadding(0, dp(16), 0, dp(2))
+        }
+        configCard.addView(devSectionLabel)
+
+        val devHelpLabel = TextView(this).apply {
+            text = "운영·개발을 동시에 연결하거나 소노 앱과 함께 사용해도 가장 최근 발신한 어드민에만 답장이 표시됩니다."
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+            setTextColor(Color.parseColor("#6B7684"))
+        }
+        configCard.addView(devHelpLabel)
+
+        configCard.addView(fieldLabel("개발 서버 주소 (선택)"))
+        devServerUrlInput = EditText(this).apply {
+            hint = BridgePrefs.DEFAULT_DEV_SERVER_URL
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f)
+            setTextColor(Color.parseColor("#191F28"))
+            background = roundedBg("#F9FAFB", "#D1D6DB", 10)
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+            setSingleLine(true)
+        }
+        configCard.addView(devServerUrlInput)
+
+        configCard.addView(fieldLabel("개발 앱 연동 보안키 (선택)"))
+        devSecretInput = EditText(this).apply {
+            hint = "비워두면 운영 서버만 단독 연동"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f)
+            setTextColor(Color.parseColor("#191F28"))
+            background = roundedBg("#F9FAFB", "#D1D6DB", 10)
+            setPadding(dp(12), dp(10), dp(12), dp(10))
+            setSingleLine(true)
+        }
+        configCard.addView(devSecretInput)
+
         val actionRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             setPadding(0, dp(14), 0, 0)
         }
         val startBtn = styledButton("연동 시작 · 저장", "#295E52", "#FFFFFF").apply {
             setOnClickListener {
-                val url = serverUrlInput.text.toString().trim()
+                val url = serverUrlInput.text.toString().trim().trimEnd('/')
                 val secret = secretInput.text.toString().trim()
+                val devUrl = devServerUrlInput.text.toString().trim().trimEnd('/')
+                val devSecret = devSecretInput.text.toString().trim()
                 if (url.isBlank() || !url.startsWith("http")) {
-                    Toast.makeText(this@MainActivity, "올바른 서버 주소를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "올바른 운영 서버 주소를 입력해주세요.", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
                 if (secret.isBlank()) {
-                    Toast.makeText(this@MainActivity, "어드민의 연동 보안키를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "운영 어드민의 연동 보안키를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if ((devUrl.isNotBlank() && devSecret.isBlank()) || (devUrl.isBlank() && devSecret.isNotBlank())) {
+                    Toast.makeText(this@MainActivity, "개발 어드민 동시 연동 시 주소와 보안키를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if (devUrl.isNotBlank() && !devUrl.startsWith("http")) {
+                    Toast.makeText(this@MainActivity, "올바른 개발 서버 주소를 입력해주세요.", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
                 if (!hasRequiredSmsPermissions()) {
@@ -318,7 +372,7 @@ class MainActivity : Activity() {
                     return@setOnClickListener
                 }
 
-                BridgePrefs.saveConfig(this@MainActivity, url, secret)
+                BridgePrefs.saveConfig(this@MainActivity, url, secret, devUrl, devSecret)
                 SmsMmsScanner.ensureBaselineInitialized(this@MainActivity)
                 BridgePrefs.setEnabled(this@MainActivity, true)
                 BridgePrefs.appendLog(this@MainActivity, "연동 서비스를 시작합니다...")

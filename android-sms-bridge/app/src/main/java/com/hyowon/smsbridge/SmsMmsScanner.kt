@@ -1,6 +1,7 @@
 package com.hyowon.smsbridge
 
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -15,6 +16,7 @@ data class ScanBatch(
 object SmsMmsScanner {
 
     private data class DispatchedRecord(
+        val ownerKey: String,
         val normalizedPhone: String,
         val body: String,
         val atMillis: Long
@@ -32,11 +34,33 @@ object SmsMmsScanner {
         }
     }
 
-    fun recordBridgeDispatch(phone: String, message: String) {
+    fun isSonoMessage(body: String?): Boolean {
+        val trimmed = (body ?: "").trim()
+        if (trimmed.isEmpty()) return false
+        return trimmed.startsWith("[소노") ||
+            trimmed.contains("[소노") ||
+            trimmed.contains("소노아임레디") ||
+            trimmed.contains("더 해피 450") ||
+            trimmed.contains("스마트케어") ||
+            trimmed.contains("마음든든")
+    }
+
+    fun isExternalSonoCreator(creator: String?): Boolean {
+        val pkg = (creator ?: "").trim()
+        if (pkg.isEmpty() || pkg == "com.hyowon.smsbridge") return false
+        return pkg.startsWith("com.sono.") || pkg.contains("sono", ignoreCase = true)
+    }
+
+    fun isExternalSonoOutbound(creator: String?, body: String?): Boolean {
+        return isExternalSonoCreator(creator) || isSonoMessage(body)
+    }
+
+    fun recordBridgeDispatch(serverUrl: String, phone: String, message: String) {
         val now = System.currentTimeMillis()
         recentDispatches.removeIf { now - it.atMillis > 180_000L }
         recentDispatches.add(
             DispatchedRecord(
+                ownerKey = serverUrl,
                 normalizedPhone = normalizePhone(phone),
                 body = message.trim(),
                 atMillis = now
@@ -44,7 +68,20 @@ object SmsMmsScanner {
         )
     }
 
-    private fun wasDispatchedByBridge(phone: String, candidateBody: String): Boolean {
+    fun recordExternalDispatch(phone: String, message: String) {
+        val now = System.currentTimeMillis()
+        recentDispatches.removeIf { now - it.atMillis > 180_000L }
+        recentDispatches.add(
+            DispatchedRecord(
+                ownerKey = BridgePrefs.EXTERNAL_OWNER,
+                normalizedPhone = normalizePhone(phone),
+                body = message.trim(),
+                atMillis = now
+            )
+        )
+    }
+
+    fun wasDispatchedByBridge(phone: String, candidateBody: String): Boolean {
         val now = System.currentTimeMillis()
         val normPhone = normalizePhone(phone)
         val trimmed = candidateBody.trim()
@@ -55,6 +92,109 @@ object SmsMmsScanner {
             rec.normalizedPhone == normPhone &&
                 (rec.body == trimmed || (trimmed.length >= 8 && rec.body.contains(trimmed)))
         }
+    }
+
+    private fun queryWithOptionalCreator(
+        context: Context,
+        uri: Uri,
+        baseCols: Array<String>,
+        selection: String?,
+        selectionArgs: Array<String>?,
+        sortOrder: String?
+    ): Cursor? {
+        return try {
+            context.contentResolver.query(
+                uri,
+                baseCols + "creator",
+                selection,
+                selectionArgs,
+                sortOrder
+            )
+        } catch (_: Exception) {
+            try {
+                context.contentResolver.query(
+                    uri,
+                    baseCols,
+                    selection,
+                    selectionArgs,
+                    sortOrder
+                )
+            } catch (_: Exception) {
+                null
+            }
+        }
+    }
+
+    fun findLatestSonoOutboundAt(
+        context: Context,
+        normalizedPhone: String,
+        maxTimestampMs: Long
+    ): Long {
+        if (normalizedPhone.length < 9) return 0L
+        var latest = 0L
+        val since = System.currentTimeMillis() - 7L * 24L * 60L * 60L * 1000L
+        try {
+            queryWithOptionalCreator(
+                context,
+                Uri.parse("content://sms"),
+                arrayOf("address", "body", "date", "type"),
+                "type = 2 AND date >= ? AND date <= ?",
+                arrayOf(since.toString(), maxTimestampMs.toString()),
+                "date DESC"
+            )?.use { cursor ->
+                val addrIdx = cursor.getColumnIndexOrThrow("address")
+                val bodyIdx = cursor.getColumnIndexOrThrow("body")
+                val dateIdx = cursor.getColumnIndexOrThrow("date")
+                val creatorIdx = cursor.getColumnIndex("creator")
+                var checked = 0
+                while (cursor.moveToNext() && checked < 80) {
+                    checked++
+                    val addr = normalizePhone(cursor.getString(addrIdx))
+                    if (addr != normalizedPhone) continue
+                    val body = cursor.getString(bodyIdx) ?: ""
+                    val creator = if (creatorIdx >= 0) cursor.getString(creatorIdx) else null
+                    if (isExternalSonoOutbound(creator, body)) {
+                        val ts = cursor.getLong(dateIdx)
+                        if (ts > latest) latest = ts
+                        break
+                    }
+                }
+            }
+        } catch (_: Exception) {
+        }
+        try {
+            val sinceSec = since / 1000L
+            val maxSec = (maxTimestampMs / 1000L) + 1L
+            queryWithOptionalCreator(
+                context,
+                Uri.parse("content://mms"),
+                arrayOf("_id", "date", "msg_box"),
+                "msg_box = 2 AND date >= ? AND date <= ?",
+                arrayOf(sinceSec.toString(), maxSec.toString()),
+                "date DESC"
+            )?.use { cursor ->
+                val idIdx = cursor.getColumnIndexOrThrow("_id")
+                val dateIdx = cursor.getColumnIndexOrThrow("date")
+                val creatorIdx = cursor.getColumnIndex("creator")
+                var checked = 0
+                while (cursor.moveToNext() && checked < 30) {
+                    checked++
+                    val mmsId = cursor.getLong(idIdx)
+                    val phone = readMmsAddress(context, mmsId, isInbound = false)
+                    if (normalizePhone(phone) != normalizedPhone) continue
+                    val body = readMmsText(context, mmsId)
+                    val creator = if (creatorIdx >= 0) cursor.getString(creatorIdx) else null
+                    if (isExternalSonoOutbound(creator, body)) {
+                        val dateSec = cursor.getLong(dateIdx)
+                        val ts = if (dateSec in 1..9_999_999_999L) dateSec * 1000L else dateSec
+                        if (ts > latest) latest = ts
+                        break
+                    }
+                }
+            }
+        } catch (_: Exception) {
+        }
+        return latest
     }
 
     fun ensureBaselineInitialized(context: Context) {
@@ -96,7 +236,8 @@ object SmsMmsScanner {
 
         // 1. 단문(SMS) 스캔 (type 1 = 수신, type 2 = 발신, type 4 = 발신중)
         try {
-            context.contentResolver.query(
+            queryWithOptionalCreator(
+                context,
                 Uri.parse("content://sms"),
                 arrayOf("_id", "address", "body", "date", "type"),
                 "_id > ?",
@@ -108,6 +249,7 @@ object SmsMmsScanner {
                 val bodyIdx = cursor.getColumnIndexOrThrow("body")
                 val dateIdx = cursor.getColumnIndexOrThrow("date")
                 val typeIdx = cursor.getColumnIndexOrThrow("type")
+                val creatorIdx = cursor.getColumnIndex("creator")
 
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idIdx)
@@ -123,6 +265,8 @@ object SmsMmsScanner {
                     val address = cursor.getString(addrIdx) ?: ""
                     val body = (cursor.getString(bodyIdx) ?: "").trim()
                     if (address.isBlank() || body.isBlank()) continue
+                    val ts = if (dateMs > 0) dateMs else now
+                    val creator = if (creatorIdx >= 0) cursor.getString(creatorIdx) else null
 
                     if (type == 1) {
                         collected.add(
@@ -130,17 +274,24 @@ object SmsMmsScanner {
                                 direction = "inbound",
                                 phone = address,
                                 message = body,
-                                timestamp = if (dateMs > 0) dateMs else now
+                                timestamp = ts
                             )
                         )
                     } else if (type == 2) {
-                        if (!wasDispatchedByBridge(address, body)) {
+                        if (isExternalSonoOutbound(creator, body)) {
+                            BridgePrefs.recordOutboundTimestamp(
+                                context,
+                                BridgePrefs.EXTERNAL_OWNER,
+                                address,
+                                ts
+                            )
+                        } else if (!wasDispatchedByBridge(address, body)) {
                             collected.add(
                                 SyncItem(
                                     direction = "outbound",
                                     phone = address,
                                     message = body,
-                                    timestamp = if (dateMs > 0) dateMs else now
+                                    timestamp = ts
                                 )
                             )
                         }
@@ -152,7 +303,8 @@ object SmsMmsScanner {
 
         // 2. 한국 통신사 장문(LMS / 텍스트 MMS) 스캔 (msg_box 1 = 수신, 2 = 발신, 4 = 발신중)
         try {
-            context.contentResolver.query(
+            queryWithOptionalCreator(
+                context,
                 Uri.parse("content://mms"),
                 arrayOf("_id", "msg_box", "date"),
                 "_id > ?",
@@ -162,6 +314,7 @@ object SmsMmsScanner {
                 val idIdx = cursor.getColumnIndexOrThrow("_id")
                 val boxIdx = cursor.getColumnIndexOrThrow("msg_box")
                 val dateIdx = cursor.getColumnIndexOrThrow("date")
+                val creatorIdx = cursor.getColumnIndex("creator")
 
                 while (cursor.moveToNext()) {
                     val mmsId = cursor.getLong(idIdx)
@@ -178,12 +331,13 @@ object SmsMmsScanner {
                     val phone = readMmsAddress(context, mmsId, isInbound = (msgBox == 1))
 
                     if ((textBody.isBlank() || phone.isBlank()) && now - dateMs < 6_000L) {
-                        // 방금 도착해 part/addr 테이블이 아직 쓰이는 중이면 다음 주기에 다시 읽음
                         break
                     }
 
                     nextMmsId = mmsId
                     if (textBody.isBlank() || phone.isBlank()) continue
+                    val ts = if (dateMs > 0) dateMs else now
+                    val creator = if (creatorIdx >= 0) cursor.getString(creatorIdx) else null
 
                     if (msgBox == 1) {
                         collected.add(
@@ -191,17 +345,24 @@ object SmsMmsScanner {
                                 direction = "inbound",
                                 phone = phone,
                                 message = textBody,
-                                timestamp = if (dateMs > 0) dateMs else now
+                                timestamp = ts
                             )
                         )
                     } else if (msgBox == 2) {
-                        if (!wasDispatchedByBridge(phone, textBody)) {
+                        if (isExternalSonoOutbound(creator, textBody)) {
+                            BridgePrefs.recordOutboundTimestamp(
+                                context,
+                                BridgePrefs.EXTERNAL_OWNER,
+                                phone,
+                                ts
+                            )
+                        } else if (!wasDispatchedByBridge(phone, textBody)) {
                             collected.add(
                                 SyncItem(
                                     direction = "outbound",
                                     phone = phone,
                                     message = textBody,
-                                    timestamp = if (dateMs > 0) dateMs else now
+                                    timestamp = ts
                                 )
                             )
                         }
