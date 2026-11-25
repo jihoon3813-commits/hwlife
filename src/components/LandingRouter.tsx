@@ -17,6 +17,7 @@ import LgCareNewPage from '../pages/LgCareNewPage';
 import LgCareNew2Page from '../pages/LgCareNew2Page';
 import LivonCarePage from '../pages/LivonCarePage';
 import Special299NewPage from '../pages/Special299NewPage';
+import LandingGiftOverlay from './LandingGiftOverlay';
 
 export default function LandingRouter() {
   const [currentPath, setCurrentPath] = React.useState(() => window.location.pathname.toLowerCase());
@@ -28,6 +29,17 @@ export default function LandingRouter() {
     window.addEventListener('popstate', handleLocationChange);
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
+
+  const withGiftOverlay = (
+    element: React.ReactNode,
+    landingKey: string,
+    channelSubdomain?: string
+  ) => (
+    <>
+      {element}
+      <LandingGiftOverlay landingKey={landingKey} channelSubdomain={channelSubdomain} />
+    </>
+  );
 
   const path = currentPath;
 
@@ -41,7 +53,7 @@ export default function LandingRouter() {
     const sp = new URLSearchParams(window.location.search);
     const queryCh = sp.get('channel') || Array.from(sp.keys())[0];
     const sub = parts.length >= 2 ? parts[1] : (queryCh || undefined);
-    return <Special299NewPage channelSubdomain={sub} landingPath="/package60" />;
+    return withGiftOverlay(<Special299NewPage channelSubdomain={sub} landingPath="/package60" />, '/package60', sub);
   }
 
   // /special_new 경로 → 가전상조 60패키지 (기존 쇼핑몰 랜딩페이지 보관용)
@@ -50,7 +62,7 @@ export default function LandingRouter() {
     const sp = new URLSearchParams(window.location.search);
     const queryCh = sp.get('channel') || Array.from(sp.keys())[0];
     const sub = parts.length >= 2 ? parts[1] : (queryCh || undefined);
-    return <Package60Page channelSubdomain={sub} landingPath="/special_new" />;
+    return withGiftOverlay(<Package60Page channelSubdomain={sub} landingPath="/special_new" />, '/special_new', sub);
   }
   
   // /triplecare, /triple_care, /triple-care, /careplus, /care_plus, /care-plus, /livon, /livoncare 경로 → 효원상조 트리플케어 (리본케어 결합) 랜딩페이지
@@ -64,7 +76,7 @@ export default function LandingRouter() {
       path === '/livoncare' || path.startsWith('/livoncare/')) {
     const parts = path.split('/').filter(Boolean);
     const sub = parts.length >= 2 ? parts[1] : undefined;
-    return <LivonCarePage channelSubdomain={sub} landingPath={path} />;
+    return withGiftOverlay(<LivonCarePage channelSubdomain={sub} landingPath={path} />, '/triplecare', sub);
   }
 
   // /lg_new2, /lg-new2 경로 → 기존 LG가전 구독 할인 전용 (new) 랜딩페이지 (LgCareNewPage)
@@ -74,7 +86,7 @@ export default function LandingRouter() {
     const sp = new URLSearchParams(window.location.search);
     const queryCh = sp.get('channel') || Array.from(sp.keys())[0];
     const sub = parts.length >= 2 ? parts[1] : (queryCh || undefined);
-    return <LgCareNewPage channelSubdomain={sub} landingPath="/lg_new2" />;
+    return withGiftOverlay(<LgCareNewPage channelSubdomain={sub} landingPath="/lg_new2" />, '/lg_new2', sub);
   }
 
   // /lg_new, /lg-new 경로 → LG가전 구독 매월 10% 할인 (feat. 효원상조) detail 랜딩페이지 (LgCareNew2Page)
@@ -94,7 +106,7 @@ export default function LandingRouter() {
       path === '/lgsub_new' || path.startsWith('/lgsub_new')) {
     const parts = path.split('/').filter(Boolean);
     const sub = parts.length >= 2 ? parts[1] : undefined;
-    return <LgCareNewPage channelSubdomain={sub} landingPath={path} />;
+    return withGiftOverlay(<LgCareNewPage channelSubdomain={sub} landingPath={path} />, '/care_new', sub);
   }
 
   // /lgsub, /care, /care10, /care_copy, /care-solutions, /lg 경로 → LG가전 구독 할인 전용 랜딩페이지
@@ -104,26 +116,27 @@ export default function LandingRouter() {
       path === '/lg' || path.startsWith('/lg')) {
     const parts = path.split('/').filter(Boolean);
     const sub = parts.length >= 2 ? parts[1] : undefined;
-    return <LgCarePage channelSubdomain={sub} landingPath={path} />;
+    const careKey = path.startsWith('/care10') ? '/care10' : '/care';
+    return withGiftOverlay(<LgCarePage channelSubdomain={sub} landingPath={path} />, careKey, sub);
   }
 
   // /package_up 경로 → 가전상조 60패키지 (UP가전) 쇼핑몰 랜딩페이지
   if (path === '/package_up' || path.startsWith('/package_up/')) {
     const parts = path.split('/').filter(Boolean);
     const sub = parts.length >= 2 ? parts[1] : undefined;
-    return <Package60Page channelSubdomain={sub} landingPath="/package_up" />;
+    return withGiftOverlay(<Package60Page channelSubdomain={sub} landingPath="/package_up" />, '/package_up', sub);
   }
 
   // /special60 경로 → 가전상조 60패키지(new) 쇼핑몰 랜딩페이지 (/package60과 동일 구성)
   if (path === '/special60' || path.startsWith('/special60/')) {
     const parts = path.split('/').filter(Boolean);
     const sub = parts.length >= 2 ? parts[1] : undefined;
-    return <Package60Page channelSubdomain={sub} landingPath="/special60" />;
+    return withGiftOverlay(<Package60Page channelSubdomain={sub} landingPath="/special60" />, '/special60', sub);
   }
 
   // /kcc 경로 → B2B 제휴 랜딩페이지
   if (path === '/kcc' || path.startsWith('/kcc/')) {
-    return <KccPage channelSubdomain="kcc" />;
+    return withGiftOverlay(<KccPage channelSubdomain="kcc" />, '/kcc', 'kcc');
   }
   
   // /lecture 경로 → 영업자 교육용 슬라이드
@@ -184,32 +197,33 @@ export default function LandingRouter() {
 
   // Routing
   if (isCarePath) {
-    return <LgCarePage channelSubdomain={channel?.subdomain} landingPath="/care" />;
+    const careKey = path.startsWith('/care10') ? '/care10' : '/care';
+    return withGiftOverlay(<LgCarePage channelSubdomain={channel?.subdomain} landingPath="/care" />, careKey, channel?.subdomain);
   }
   if (isPackageUpPath) {
-    return <Package60Page channelSubdomain={channel?.subdomain} landingPath="/package_up" />;
+    return withGiftOverlay(<Package60Page channelSubdomain={channel?.subdomain} landingPath="/package_up" />, '/package_up', channel?.subdomain);
   }
   if (isPackage60Path) {
-    return <Special299NewPage channelSubdomain={channel?.subdomain} landingPath="/package60" />;
+    return withGiftOverlay(<Special299NewPage channelSubdomain={channel?.subdomain} landingPath="/package60" />, '/package60', channel?.subdomain);
   }
   if (isSpecialNewPath) {
-    return <Package60Page channelSubdomain={channel?.subdomain} landingPath="/special_new" />;
+    return withGiftOverlay(<Package60Page channelSubdomain={channel?.subdomain} landingPath="/special_new" />, '/special_new', channel?.subdomain);
   }
   if (isSpecial60Path) {
-    return <Package60Page channelSubdomain={channel?.subdomain} landingPath="/special60" />;
+    return withGiftOverlay(<Package60Page channelSubdomain={channel?.subdomain} landingPath="/special60" />, '/special60', channel?.subdomain);
   }
   if (isLiving2Path) {
-    return <LivingPage2 channelSubdomain={channel?.subdomain} />;
+    return withGiftOverlay(<LivingPage2 channelSubdomain={channel?.subdomain} />, '/living2', channel?.subdomain);
   }
   if (isLivingPath) {
-    return <LivingPage channelSubdomain={channel?.subdomain} />;
+    return withGiftOverlay(<LivingPage channelSubdomain={channel?.subdomain} />, '/living', channel?.subdomain);
   }
 
   if (isSpecial2Path) {
-    return <SpecialPage2 channelSubdomain={channel?.subdomain} />;
+    return withGiftOverlay(<SpecialPage2 channelSubdomain={channel?.subdomain} />, '/special2', channel?.subdomain);
   }
   if (isSpecialPath) {
-    return <SpecialPage channelSubdomain={channel?.subdomain} />;
+    return withGiftOverlay(<SpecialPage channelSubdomain={channel?.subdomain} />, '/special', channel?.subdomain);
   }
 
   // 3. If it's a channel subdomain, check its primary landing
@@ -218,48 +232,51 @@ export default function LandingRouter() {
     const primaryPath = assignedPaths[0] || '/';
     
     if (primaryPath === '/package60' || primaryPath === '/special299' || primaryPath === '/special-new') {
-      return <Special299NewPage channelSubdomain={channel.subdomain} landingPath="/package60" />;
+      return withGiftOverlay(<Special299NewPage channelSubdomain={channel.subdomain} landingPath="/package60" />, '/package60', channel.subdomain);
     }
     if (primaryPath === '/special_new') {
-      return <Package60Page channelSubdomain={channel.subdomain} landingPath="/special_new" />;
+      return withGiftOverlay(<Package60Page channelSubdomain={channel.subdomain} landingPath="/special_new" />, '/special_new', channel.subdomain);
     }
     if (primaryPath === '/triplecare' || primaryPath === '/triple_care' || primaryPath === '/triple-care' || primaryPath === '/careplus' || primaryPath === '/care_plus' || primaryPath === '/livon') {
-      return <LivonCarePage channelSubdomain={channel.subdomain} landingPath={primaryPath} />;
+      return withGiftOverlay(<LivonCarePage channelSubdomain={channel.subdomain} landingPath={primaryPath} />, '/triplecare', channel.subdomain);
     }
     if (primaryPath === '/lg_new2' || primaryPath === '/lg-new2') {
-      return <LgCareNewPage channelSubdomain={channel.subdomain} landingPath="/lg_new2" />;
+      return withGiftOverlay(<LgCareNewPage channelSubdomain={channel.subdomain} landingPath="/lg_new2" />, '/lg_new2', channel.subdomain);
     }
     if (primaryPath === '/lg_new' || primaryPath === '/lg-new') {
       return <LgCareNew2Page channelSubdomain={channel.subdomain} landingPath="/lg_new" />;
     }
     if (primaryPath === '/care_new' || primaryPath === '/care-new') {
-      return <LgCareNewPage channelSubdomain={channel.subdomain} landingPath={primaryPath} />;
+      return withGiftOverlay(<LgCareNewPage channelSubdomain={channel.subdomain} landingPath={primaryPath} />, '/care_new', channel.subdomain);
     }
     if (primaryPath === '/care' || primaryPath === '/care-solutions' || primaryPath === '/lg') {
-      return <LgCarePage channelSubdomain={channel.subdomain} landingPath="/care" />;
+      return withGiftOverlay(<LgCarePage channelSubdomain={channel.subdomain} landingPath="/care" />, '/care', channel.subdomain);
+    }
+    if (primaryPath === '/care10') {
+      return withGiftOverlay(<LgCarePage channelSubdomain={channel.subdomain} landingPath="/care" />, '/care10', channel.subdomain);
     }
     if (primaryPath === '/package_up') {
-      return <Package60Page channelSubdomain={channel.subdomain} landingPath="/package_up" />;
+      return withGiftOverlay(<Package60Page channelSubdomain={channel.subdomain} landingPath="/package_up" />, '/package_up', channel.subdomain);
     }
     if (primaryPath === '/special60') {
-      return <Package60Page channelSubdomain={channel.subdomain} landingPath="/special60" />;
+      return withGiftOverlay(<Package60Page channelSubdomain={channel.subdomain} landingPath="/special60" />, '/special60', channel.subdomain);
     }
     if (primaryPath === '/living') {
-      return <LivingPage channelSubdomain={channel.subdomain} />;
+      return withGiftOverlay(<LivingPage channelSubdomain={channel.subdomain} />, '/living', channel.subdomain);
     }
     if (primaryPath === '/living2') {
-      return <LivingPage2 channelSubdomain={channel.subdomain} />;
+      return withGiftOverlay(<LivingPage2 channelSubdomain={channel.subdomain} />, '/living2', channel.subdomain);
     }
     if (primaryPath === '/special') {
-      return <SpecialPage channelSubdomain={channel.subdomain} />;
+      return withGiftOverlay(<SpecialPage channelSubdomain={channel.subdomain} />, '/special', channel.subdomain);
     }
     if (primaryPath === '/special2') {
-      return <SpecialPage2 channelSubdomain={channel.subdomain} />;
+      return withGiftOverlay(<SpecialPage2 channelSubdomain={channel.subdomain} />, '/special2', channel.subdomain);
     }
   }
 
   // 4. Default to main App
-  return <App />;
+  return withGiftOverlay(<App />, '/', channel?.subdomain);
 }
 
 

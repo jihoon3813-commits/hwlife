@@ -22,6 +22,7 @@ import {
   Building2,
   ArrowUpRight,
   RotateCcw,
+  Gift,
 } from 'lucide-react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -129,6 +130,7 @@ export default function AdminLayout({
     { id: 'lg_products', label: 'LG구독 제품관리', group: '운영 관리', icon: Sparkles },
     { id: 'discount_codes', label: '할인코드 관리', group: '운영 관리', icon: KeyRound },
     { id: 'landings', label: '랜딩페이지 관리', group: '운영 관리', icon: Globe },
+    { id: 'gifts', label: '사은품 관리', group: '운영 관리', icon: Gift },
     { id: 'statistics', label: '통계분석', group: '운영 관리', icon: BarChart3 },
   ];
 

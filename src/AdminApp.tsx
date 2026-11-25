@@ -13,6 +13,7 @@ import LandingManagement from './pages/LandingManagement';
 import ConsentManagement from './pages/ConsentManagement';
 import LgProductManagement from './pages/LgProductManagement';
 import DiscountCodeManagement from './pages/DiscountCodeManagement';
+import GiftManagement from './pages/GiftManagement';
 
 export default function AdminApp() {
   const [activeMenu, setActiveMenu] = useState('dashboard');
@@ -143,6 +144,8 @@ export default function AdminApp() {
         );
       case 'landings':
         return <LandingManagement userType={user.type} subdomain={user.subdomain} />;
+      case 'gifts':
+        return <GiftManagement />;
       case 'statistics':
         return <Statistics channelId={channelScopeId} />;
       case 'settings':

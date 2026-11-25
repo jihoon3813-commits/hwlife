@@ -62,12 +62,17 @@ export const create = mutation({
     callTime: v.optional(v.string()),
     landingPath: v.optional(v.string()),
     memo: v.optional(v.string()),
+    selectedGift: v.optional(v.string()),
+    selectedGiftId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const effectiveChannelId = args.channelId || args.subdomain;
     
     // Compose clean message if extra fields are provided
     let combinedMessage = args.message || args.memo || "";
+    if (args.selectedGift && !combinedMessage.includes(args.selectedGift)) {
+      combinedMessage = combinedMessage ? `🎁 선택 사은품: ${args.selectedGift} | ${combinedMessage}` : `🎁 선택 사은품: ${args.selectedGift}`;
+    }
     if (args.callTime && !combinedMessage.includes(args.callTime)) {
       combinedMessage = combinedMessage ? `${combinedMessage} | 희망시간: ${args.callTime}` : `희망시간: ${args.callTime}`;
     }
@@ -100,6 +105,8 @@ export const create = mutation({
     if (args.subscriptionPeriod) insertData.subscriptionPeriod = args.subscriptionPeriod;
     if (args.careCycle) insertData.careCycle = args.careCycle;
     if (args.careType) insertData.careType = args.careType;
+    if (args.selectedGift) insertData.selectedGift = args.selectedGift;
+    if (args.selectedGiftId) insertData.selectedGiftId = args.selectedGiftId;
     if (args.source) insertData.source = args.source;
     if (args.inflow) {
       insertData.inflow = args.inflow;
@@ -171,20 +178,29 @@ export const sendDiscordNotification = internalAction({
     trafficLabel: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-    if (!webhookUrl) return;
+    const rawWebhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    if (!rawWebhookUrl) {
+      console.error("DISCORD_WEBHOOK_URL is not configured");
+      return;
+    }
+    const webhookUrl = rawWebhookUrl.replace("https://discordapp.com/", "https://discord.com/");
+
+    const clampField = (val: string | undefined, fallback: string) => {
+      const trimmed = (val || "").trim();
+      return (trimmed || fallback).slice(0, 1024);
+    };
 
     const fields = [
-      { name: "👤 성함", value: args.name, inline: true },
-      { name: "📞 연락처", value: args.phone, inline: true },
-      { name: "🏢 유입 채널", value: args.channelName || "기본", inline: true },
+      { name: "👤 성함", value: clampField(args.name, "미입력"), inline: true },
+      { name: "📞 연락처", value: clampField(args.phone, "미입력"), inline: true },
+      { name: "🏢 유입 채널", value: clampField(args.channelName, "기본"), inline: true },
     ];
-    if (args.trafficLabel) {
-      fields.push({ name: "🧭 상세 유입경로", value: args.trafficLabel, inline: true });
+    if (args.trafficLabel?.trim()) {
+      fields.push({ name: "🧭 상세 유입경로", value: clampField(args.trafficLabel, "-"), inline: true });
     }
     fields.push(
-      { name: "📦 신청 상품", value: args.productName, inline: false },
-      { name: "💬 문의 내용", value: args.message || "내용 없음", inline: false },
+      { name: "📦 신청 상품", value: clampField(args.productName, "미지정"), inline: false },
+      { name: "💬 문의 내용", value: clampField(args.message, "내용 없음"), inline: false },
     );
 
     const discordMessage = {
@@ -197,11 +213,17 @@ export const sendDiscordNotification = internalAction({
       }]
     };
 
-    await fetch(webhookUrl, {
+    const res = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(discordMessage),
     });
+
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => "");
+      console.error(`Discord webhook failed (${res.status}):`, errorText);
+      throw new Error(`Discord webhook failed (${res.status}): ${errorText}`);
+    }
   },
 });
 

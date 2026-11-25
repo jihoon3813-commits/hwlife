@@ -161,6 +161,8 @@ export default defineSchema({
     payloadHash: v.optional(v.string()),
     consentVersion: v.optional(v.string()),
     googleContactsSyncedAt: v.optional(v.number()),
+    selectedGift: v.optional(v.string()),
+    selectedGiftId: v.optional(v.string()),
   }).index("by_requestKey", ["requestKey"]),
   shorts: defineTable({
     title: v.string(),
@@ -380,4 +382,46 @@ export default defineSchema({
     .index("by_status_and_createdAt", ["status", "createdAt"])
     .index("by_smsLogId", ["smsLogId"])
     .index("by_createdAt", ["createdAt"]),
+
+  // 랜딩별 사은품 증정 이벤트 설정 테이블
+  giftEventConfig: defineTable({
+    landingKey: v.string(), // 랜딩 경로 (예: "/", "/living", "/special")
+    isEnabled: v.boolean(),
+    badgeText: v.optional(v.string()),
+    title: v.string(),
+    subtitle: v.optional(v.string()),
+    startDate: v.optional(v.string()), // YYYY-MM-DD
+    endDate: v.optional(v.string()), // YYYY-MM-DD
+    commonNotice: v.optional(v.string()),
+    slideIntervalMs: v.optional(v.number()), // 자동 슬라이드 속도 (ms, 기본 1500)
+    updatedAt: v.string(),
+  }).index("by_landingKey", ["landingKey"]),
+
+  // 랜딩별 사은품 목록 테이블
+  gifts: defineTable({
+    landingKey: v.string(), // 대표 랜딩 경로
+    landingKeys: v.optional(v.array(v.string())), // 노출할 랜딩 경로 목록
+    name: v.string(), // 사은품 제품명
+    thumbnailUrl: v.string(), // 대표 섬네일 이미지 URL
+    thumbnailStorageId: v.optional(v.id("_storage")), // 대표 섬네일 업로드 파일 ID
+    thumbnailImages: v.optional(
+      v.array(
+        v.object({
+          url: v.optional(v.string()),
+          storageId: v.optional(v.id("_storage")),
+        })
+      )
+    ), // 다중 섬네일 이미지 목록 (좌우 슬라이드용)
+    detailImageUrl: v.optional(v.string()), // 상세 이미지 URL
+    detailImageStorageId: v.optional(v.id("_storage")), // 상세 이미지 업로드 파일 ID
+    notice: v.optional(v.string()), // 사은품 유의사항
+    startDate: v.optional(v.string()), // 개별 진행 시작일 (YYYY-MM-DD)
+    endDate: v.optional(v.string()), // 개별 진행 종료일 (YYYY-MM-DD)
+    isActive: v.boolean(), // 노출 여부
+    order: v.number(), // 정렬 순서
+    createdAt: v.string(),
+    updatedAt: v.string(),
+  })
+    .index("by_landingKey", ["landingKey"])
+    .index("by_order", ["order"]),
 });

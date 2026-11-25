@@ -8,6 +8,16 @@ import PrivacyModal from '../components/PrivacyModal';
 import { formatPhoneNumber } from '../utils/phone';
 import { X, CheckCircle2, ArrowUpRight, Phone, Sparkles } from 'lucide-react';
 import LgCareCatalogModal, { SelectedProductPlan } from '../components/LgCareCatalogModal';
+import {
+  escapeGiftHtml,
+  FloatingGiftWidget,
+  formatGiftPeriodText,
+  getGiftThumbnails,
+  GiftConsultModal,
+  GiftDetailModal,
+  LandingGiftSection,
+  useLandingGiftState,
+} from '../components/LandingGiftOverlay';
 
 interface LgCareNew2PageProps {
   channelSubdomain?: string;
@@ -59,6 +69,20 @@ export default function LgCareNew2Page({
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [iframeHeight, setIframeHeight] = useState<number>(12000);
+  const [iframeReady, setIframeReady] = useState(false);
+
+  const {
+    giftEvent,
+    gifts: giftList,
+    config: giftConfig,
+    selectedGiftId,
+    detailModalGift,
+    setDetailModalGift,
+    consultGift,
+    setConsultGift,
+    handleSelectGift,
+    handleApplyWithGift,
+  } = useLandingGiftState(landingPath);
 
   // Inquiry Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,6 +112,290 @@ export default function LgCareNew2Page({
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, []);
+
+  // 중간(iframe 내부 #hyowon-gift-mid) 사은품 증정 이벤트 섹션 렌더링
+  useEffect(() => {
+    if (!iframeReady) return;
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+
+    let doc: Document | null = null;
+    try {
+      doc = iframe.contentDocument || iframe.contentWindow?.document || null;
+    } catch {
+      doc = null;
+    }
+    if (!doc) return;
+
+    let midEl = doc.getElementById('hyowon-gift-mid');
+    if (!midEl) {
+      const anchor = doc.getElementById('s09') || doc.getElementById('s10');
+      if (!anchor || !anchor.parentNode) return;
+      midEl = doc.createElement('div');
+      midEl.id = 'hyowon-gift-mid';
+      anchor.parentNode.insertBefore(midEl, anchor.nextSibling);
+    }
+
+    if (!giftEvent?.isEventActive || !giftConfig || giftList.length === 0) {
+      midEl.style.display = 'none';
+      midEl.innerHTML = '';
+      return;
+    }
+
+    const periodText = formatGiftPeriodText(giftConfig.startDate, giftConfig.endDate);
+    const badgeText = escapeGiftHtml(
+      giftConfig.badgeText || 'SPECIAL GIFT EVENT · 사은품 증정 이벤트 진행중'
+    );
+    const rawTitle = giftConfig.title || '지금 상담·가입 시 특별 사은품 증정!';
+    const titleHtml =
+      rawTitle === '지금 상담·가입 시 특별 사은품 증정!'
+        ? '지금 상담·가입 시<br class="hg-mob-br" /> 특별 사은품 증정!'
+        : escapeGiftHtml(rawTitle);
+    const subtitleText = giftConfig.subtitle ? escapeGiftHtml(giftConfig.subtitle) : '';
+    const pcCols = giftList.length === 2 ? 2 : giftList.length === 3 ? 3 : 4;
+
+    const buildSliderHtml = (g: (typeof giftList)[number], extraOverlayHtml: string) => {
+      const thumbs = getGiftThumbnails(g);
+      const imgsHtml = thumbs
+        .map(
+          (src, idx) =>
+            `<img src="${escapeGiftHtml(src)}" alt="${escapeGiftHtml(g.name)} ${idx + 1}" class="hg-slide-img" />`
+        )
+        .join('');
+      const thumbsStrip =
+        thumbs.length > 1
+          ? `<div class="hg-thumb-strip">${thumbs
+              .map(
+                (src, idx) =>
+                  `<button type="button" class="hg-thumb-btn${idx === 0 ? ' is-active' : ''}" data-thumb-idx="${idx}"><img src="${escapeGiftHtml(src)}" alt="" /></button>`
+              )
+              .join('')}</div>`
+          : '';
+      const navBtns =
+        thumbs.length > 1
+          ? `<button type="button" class="hg-nav hg-prev" aria-label="이전">‹</button><button type="button" class="hg-nav hg-next" aria-label="다음">›</button>`
+          : '';
+      return `
+        <div class="hg-slider-wrap" data-count="${thumbs.length}">
+          <div class="hg-slider-stage">
+            <div class="hg-slides">${imgsHtml}</div>
+            ${extraOverlayHtml}
+            ${navBtns}
+          </div>
+          ${thumbsStrip}
+        </div>
+      `;
+    };
+
+    const cardsHtml =
+      giftList.length === 1
+        ? (() => {
+            const g = giftList[0];
+            const hasDetail = Boolean(g.resolvedDetailImageUrl || g.detailImageUrl);
+            const gPeriod =
+              g.startDate || g.endDate
+                ? formatGiftPeriodText(g.startDate, g.endDate)
+                : periodText;
+            return `
+              <div class="hg-single">
+                <div class="hg-single-media">
+                  ${buildSliderHtml(g, '<span class="hg-tag">증정 사은품</span>')}
+                </div>
+                <div class="hg-single-body">
+                  <div>
+                    <div class="hg-period">행사기간 · ${escapeGiftHtml(gPeriod)}</div>
+                    <h3 class="hg-name">${escapeGiftHtml(g.name)}</h3>
+                    ${
+                      g.notice
+                        ? `<div class="hg-notice"><strong>※ 사은품 유의사항</strong><div>${escapeGiftHtml(g.notice).replace(/\n/g, '<br>')}</div></div>`
+                        : ''
+                    }
+                  </div>
+                  <div class="hg-actions">
+                    ${
+                      hasDetail
+                        ? `<button type="button" class="hg-btn-sec" data-action="detail" data-gift-id="${escapeGiftHtml(g._id)}">상세이미지 보기</button>`
+                        : ''
+                    }
+                    <button type="button" class="hg-btn-pri" data-action="apply" data-gift-id="${escapeGiftHtml(g._id)}">이 사은품으로 상담 신청하기 →</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          })()
+        : `<div class="hg-grid hg-cols-${pcCols}">
+            ${giftList
+              .map((g, idx) => {
+                const hasDetail = Boolean(g.resolvedDetailImageUrl || g.detailImageUrl);
+                return `
+                  <article class="hg-card">
+                    <div class="hg-card-media">
+                      ${buildSliderHtml(g, `<span class="hg-tag">혜택 ${String(idx + 1).padStart(2, '0')}</span>`)}
+                    </div>
+                    <div class="hg-card-body">
+                      <div>
+                        <h3 class="hg-card-name">${escapeGiftHtml(g.name)}</h3>
+                        ${g.notice ? `<p class="hg-card-notice">${escapeGiftHtml(g.notice)}</p>` : ''}
+                      </div>
+                      <div class="hg-card-actions">
+                        ${
+                          hasDetail
+                            ? `<button type="button" class="hg-btn-sec" data-action="detail" data-gift-id="${escapeGiftHtml(g._id)}">상세이미지 / 유의사항</button>`
+                            : ''
+                        }
+                        <button type="button" class="hg-btn-pri" data-action="apply" data-gift-id="${escapeGiftHtml(g._id)}">선택하고 상담신청 →</button>
+                      </div>
+                    </div>
+                  </article>
+                `;
+              })
+              .join('')}
+          </div>`;
+
+    midEl.style.display = 'block';
+    midEl.innerHTML = `
+      <style>
+        #hyowon-gift-mid { padding: 36px 20px; background: #e9dfd1; font-family: 'Pretendard', -apple-system, sans-serif; }
+        #hyowon-gift-mid .hg-box { max-width: 820px; margin: 0 auto; border-radius: 22px; border: 2px solid #b98a6a; background: linear-gradient(135deg, #2b2119 0%, #36281e 55%, #241b14 100%); color: #faf5ef; padding: 28px 24px; box-shadow: 0 18px 42px rgba(43,33,25,0.25); }
+        #hyowon-gift-mid .hg-head { text-align: center; margin-bottom: 22px; }
+        #hyowon-gift-mid .hg-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 10px; }
+        #hyowon-gift-mid .hg-badge { display: inline-block; padding: 5px 14px; border-radius: 999px; background: #b98a6a; color: #1a130e; font-weight: 800; font-size: 11px; }
+        #hyowon-gift-mid .hg-date { display: inline-block; padding: 5px 12px; border-radius: 999px; background: rgba(255,255,255,0.1); border: 1px solid rgba(185,138,106,0.4); color: #f3dcc9; font-weight: 700; font-size: 11px; }
+        #hyowon-gift-mid .hg-title { margin: 0; font-size: 24px; font-weight: 800; color: #fff9f2; line-height: 1.3; }
+        #hyowon-gift-mid .hg-sub { margin: 6px 0 0; font-size: 13px; color: #d9cbbd; }
+        #hyowon-gift-mid .hg-single { display: grid; grid-template-columns: 5fr 7fr; background: #fbf6ee; color: #2b2119; border-radius: 16px; overflow: hidden; border: 1px solid #dccfbc; }
+        #hyowon-gift-mid .hg-single-media { position: relative; background: #efe5d7; min-height: 240px; }
+        #hyowon-gift-mid .hg-single-body { padding: 22px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; }
+        #hyowon-gift-mid .hg-period { font-size: 11px; font-weight: 700; color: #8a5d3b; margin-bottom: 6px; }
+        #hyowon-gift-mid .hg-name { margin: 0; font-size: 21px; font-weight: 900; color: #2b2119; line-height: 1.3; }
+        #hyowon-gift-mid .hg-notice { margin-top: 12px; padding: 12px; border-radius: 12px; background: #f3eadc; border: 1px solid #e2d4c0; font-size: 12px; color: #5e4f42; line-height: 1.5; }
+        #hyowon-gift-mid .hg-notice strong { display: block; color: #2b2119; margin-bottom: 4px; }
+        #hyowon-gift-mid .hg-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        #hyowon-gift-mid .hg-grid { display: grid; gap: 14px; }
+        #hyowon-gift-mid .hg-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        #hyowon-gift-mid .hg-cols-3 { grid-template-columns: repeat(3, 1fr); }
+        #hyowon-gift-mid .hg-cols-4 { grid-template-columns: repeat(4, 1fr); }
+        #hyowon-gift-mid .hg-card { background: #fbf6ee; color: #2b2119; border-radius: 16px; overflow: hidden; border: 1px solid #dccfbc; display: flex; flex-direction: column; }
+        #hyowon-gift-mid .hg-card-media { position: relative; aspect-ratio: 4/3; background: #efe5d7; }
+        #hyowon-gift-mid .hg-card-body { padding: 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
+        #hyowon-gift-mid .hg-card-name { margin: 0; font-size: 14px; font-weight: 800; color: #2b2119; line-height: 1.35; }
+        #hyowon-gift-mid .hg-card-notice { margin: 6px 0 0; font-size: 11px; color: #6d5c4e; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        #hyowon-gift-mid .hg-card-actions { display: flex; flex-direction: column; gap: 6px; }
+        #hyowon-gift-mid .hg-slider-wrap { display: flex; flex-direction: column; width: 100%; height: 100%; }
+        #hyowon-gift-mid .hg-slider-stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+        #hyowon-gift-mid .hg-slides { display: flex; width: 100%; height: 100%; transition: transform 0.3s ease; }
+        #hyowon-gift-mid .hg-slide-img { width: 100%; height: 100%; object-fit: cover; flex-shrink: 0; }
+        #hyowon-gift-mid .hg-tag { position: absolute; top: 10px; left: 10px; padding: 4px 10px; border-radius: 999px; background: rgba(43,33,25,0.85); color: #f6efe4; font-size: 10px; font-weight: 700; z-index: 2; }
+        #hyowon-gift-mid .hg-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(0,0,0,0.55); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; z-index: 2; }
+        #hyowon-gift-mid .hg-prev { left: 6px; }
+        #hyowon-gift-mid .hg-next { right: 6px; }
+        #hyowon-gift-mid .hg-thumb-strip { display: flex; gap: 6px; padding: 6px 8px; background: #e8dccb; border-top: 1px solid #dccfbc; overflow-x: auto; }
+        #hyowon-gift-mid .hg-thumb-btn { width: 38px; height: 30px; padding: 0; border-radius: 6px; overflow: hidden; border: 1px solid #cbb9a4; opacity: 0.65; cursor: pointer; flex-shrink: 0; background: #fff; }
+        #hyowon-gift-mid .hg-thumb-btn.is-active { border-color: #2b2119; box-shadow: 0 0 0 2px #b98a6a; opacity: 1; }
+        #hyowon-gift-mid .hg-thumb-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        #hyowon-gift-mid .hg-btn-sec { padding: 9px 12px; border-radius: 10px; border: 1px solid #cbb9a4; background: #fff; color: #2b2119; font-weight: 700; font-size: 12px; cursor: pointer; }
+        #hyowon-gift-mid .hg-btn-pri { flex: 1; padding: 10px 14px; border-radius: 10px; border: none; background: #2b2119; color: #faf5ef; font-weight: 800; font-size: 12px; cursor: pointer; }
+        #hyowon-gift-mid .hg-common { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: rgba(0,0,0,0.25); border: 1px solid rgba(185,138,106,0.3); font-size: 11.5px; color: #dfd2c3; line-height: 1.5; }
+        #hyowon-gift-mid .hg-mob-br { display: none; }
+        #hyowon-gift-mid .hg-common strong { display: block; color: #f3dcc9; margin-bottom: 4px; }
+        @media (max-width: 680px) {
+          #hyowon-gift-mid { padding: 18px 12px; word-break: keep-all; }
+          #hyowon-gift-mid .hg-mob-br { display: inline; }
+          #hyowon-gift-mid .hg-box { padding: 16px 12px; border-radius: 18px; }
+          #hyowon-gift-mid .hg-head { margin-bottom: 14px; }
+          #hyowon-gift-mid .hg-badges { flex-direction: column; align-items: center; gap: 6px; margin-bottom: 8px; }
+          #hyowon-gift-mid .hg-badge { font-size: 10px; padding: 4px 10px; white-space: nowrap; }
+          #hyowon-gift-mid .hg-date { font-size: 10px; padding: 4px 10px; white-space: nowrap; }
+          #hyowon-gift-mid .hg-title { font-size: 18px; word-break: keep-all; }
+          #hyowon-gift-mid .hg-sub { font-size: 11px; max-width: 260px; margin: 6px auto 0; word-break: keep-all; }
+          #hyowon-gift-mid .hg-single { grid-template-columns: 1fr; }
+          #hyowon-gift-mid .hg-single-media { min-height: 180px; }
+          #hyowon-gift-mid .hg-single-body { padding: 14px; gap: 10px; }
+          #hyowon-gift-mid .hg-name { font-size: 17px; word-break: keep-all; }
+          #hyowon-gift-mid .hg-notice { margin-top: 8px; padding: 10px; font-size: 11px; line-height: 1.4; word-break: keep-all; }
+          #hyowon-gift-mid .hg-actions { flex-wrap: wrap; gap: 6px; }
+          #hyowon-gift-mid .hg-btn-sec { padding: 8px 10px; font-size: 11px; white-space: nowrap; }
+          #hyowon-gift-mid .hg-btn-pri { min-width: 140px; padding: 8px 10px; font-size: 11px; white-space: normal; word-break: keep-all; text-align: center; }
+          #hyowon-gift-mid .hg-common { margin-top: 10px; padding: 10px 12px; font-size: 11px; line-height: 1.45; word-break: keep-all; }
+          #hyowon-gift-mid .hg-cols-2, #hyowon-gift-mid .hg-cols-3, #hyowon-gift-mid .hg-cols-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+      </style>
+      <div class="hg-box">
+        <div class="hg-head">
+          <div class="hg-badges">
+            <span class="hg-badge">${badgeText}</span>
+            <span class="hg-date">📅 ${escapeGiftHtml(periodText)}</span>
+          </div>
+          <h2 class="hg-title">${titleHtml}</h2>
+          ${subtitleText ? `<p class="hg-sub">${subtitleText}</p>` : ''}
+        </div>
+        ${cardsHtml}
+        ${
+          giftConfig.commonNotice
+            ? `<div class="hg-common"><strong>[이벤트 유의사항]</strong><div>${escapeGiftHtml(giftConfig.commonNotice).replace(/\n/g, '<br>')}</div></div>`
+            : ''
+        }
+      </div>
+    `;
+
+    // 슬라이더 & 버튼 이벤트 연결
+    const intervalMs =
+      typeof giftConfig.slideIntervalMs === 'number' && giftConfig.slideIntervalMs >= 300
+        ? giftConfig.slideIntervalMs
+        : 1500;
+    const timers: ReturnType<typeof setInterval>[] = [];
+
+    midEl.querySelectorAll<HTMLElement>('.hg-slider-wrap').forEach((wrap) => {
+      const count = Number(wrap.dataset.count || '1');
+      if (count <= 1) return;
+      let idx = 0;
+      const slides = wrap.querySelector<HTMLElement>('.hg-slides');
+      const thumbBtns = Array.from(wrap.querySelectorAll<HTMLElement>('.hg-thumb-btn'));
+      const renderSlide = (nextIdx: number) => {
+        idx = (nextIdx + count) % count;
+        if (slides) slides.style.transform = `translateX(-${idx * 100}%)`;
+        thumbBtns.forEach((b, bi) => b.classList.toggle('is-active', bi === idx));
+      };
+      wrap.querySelector('.hg-prev')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        renderSlide(idx - 1);
+      });
+      wrap.querySelector('.hg-next')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        renderSlide(idx + 1);
+      });
+      thumbBtns.forEach((btn, bi) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          renderSlide(bi);
+        });
+      });
+      timers.push(setInterval(() => renderSlide(idx + 1), intervalMs));
+    });
+
+    const onMidClick = (e: Event) => {
+      const target = (e.target as HTMLElement)?.closest<HTMLElement>('[data-action]');
+      if (!target) return;
+      const giftId = target.dataset.giftId;
+      const action = target.dataset.action;
+      const found = giftList.find((g) => g._id === giftId);
+      if (!found) return;
+      if (action === 'detail') setDetailModalGift(found);
+      if (action === 'apply') handleApplyWithGift(found);
+    };
+    midEl.addEventListener('click', onMidClick);
+
+    const fitEl = doc.getElementById('fit');
+    if (fitEl) {
+      const h = Math.ceil(fitEl.getBoundingClientRect().height);
+      if (h > 200) setIframeHeight(h);
+    }
+
+    return () => {
+      timers.forEach((t) => clearInterval(t));
+      midEl?.removeEventListener('click', onMidClick);
+    };
+  }, [iframeReady, giftEvent, giftConfig, giftList, handleApplyWithGift, setDetailModalGift]);
 
   const handleSelectCatalogPlan = (plan: SelectedProductPlan) => {
     setSelectedCatalogPlan(plan);
@@ -153,6 +461,19 @@ export default function LgCareNew2Page({
         image="/assets/lg-care/original-0.png"
       />
 
+      {/* 상단 사은품 증정 이벤트 섹션 */}
+      {giftConfig && giftList.length > 0 && (
+        <LandingGiftSection
+          position="top"
+          config={giftConfig}
+          gifts={giftList}
+          selectedGiftId={selectedGiftId}
+          onSelectGift={handleSelectGift}
+          onOpenDetail={setDetailModalGift}
+          onApplyWithGift={handleApplyWithGift}
+        />
+      )}
+
       {/* Detail HTML Iframe */}
       <div className="w-full flex justify-center">
         <iframe
@@ -160,6 +481,7 @@ export default function LgCareNew2Page({
           src="/lg_new2/detail.html"
           title="LG가전 구독 매월 10% 할인 (feat. 효원상조)"
           scrolling="no"
+          onLoad={() => setIframeReady(true)}
           style={{
             width: '100%',
             height: `${iframeHeight}px`,
@@ -169,6 +491,19 @@ export default function LgCareNew2Page({
           }}
         />
       </div>
+
+      {/* 하단 사은품 증정 이벤트 섹션 (푸터 위, 본문과 동일 배경) */}
+      {giftConfig && giftList.length > 0 && (
+        <LandingGiftSection
+          position="bottom"
+          config={giftConfig}
+          gifts={giftList}
+          selectedGiftId={selectedGiftId}
+          onSelectGift={handleSelectGift}
+          onOpenDetail={setDetailModalGift}
+          onApplyWithGift={handleApplyWithGift}
+        />
+      )}
 
       {/* Footer */}
       <footer className="w-full max-w-[860px] mx-auto px-6 pt-8 pb-28 text-[#76675a] text-[12px] border-t border-[#dccfbc]">
@@ -428,6 +763,32 @@ export default function LgCareNew2Page({
 
       {/* Privacy Modal */}
       <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
+
+      {/* 사은품 플로팅 위젯 & 모달 */}
+      {giftConfig && giftList.length > 0 && (
+        <>
+          <FloatingGiftWidget
+            config={giftConfig}
+            gifts={giftList}
+            selectedGiftId={selectedGiftId}
+            onSelectGift={handleSelectGift}
+            onOpenDetail={setDetailModalGift}
+            onApplyWithGift={handleApplyWithGift}
+          />
+          <GiftDetailModal
+            gift={detailModalGift}
+            commonNotice={giftConfig.commonNotice}
+            onClose={() => setDetailModalGift(null)}
+            onApplyWithGift={handleApplyWithGift}
+          />
+          <GiftConsultModal
+            gift={consultGift}
+            landingKey={landingPath}
+            channelSubdomain={channelSubdomain}
+            onClose={() => setConsultGift(null)}
+          />
+        </>
+      )}
     </div>
   );
 }
