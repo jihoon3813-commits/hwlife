@@ -13,6 +13,7 @@ import {
   Ban,
   X,
   Save,
+  Search,
 } from 'lucide-react';
 
 export default function LandingManagement({
@@ -39,6 +40,7 @@ export default function LandingManagement({
   const [modalMode, setModalMode] = useState<'create' | 'edit' | 'duplicate'>('create');
   const [hasChecked, setHasChecked] = useState(false);
   const [sortOrder, setSortOrder] = useState<'latest' | 'oldest' | 'name'>('latest');
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     _id: '',
     name: '',
@@ -57,19 +59,29 @@ export default function LandingManagement({
       : landings.filter((l) => assignedPaths.includes(l.path) && l.isActive);
 
   const displayLandings = useMemo(() => {
-    return [...rawLandings].sort((a, b) => {
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = q
+      ? rawLandings.filter(
+          (l) =>
+            (l.name || '').toLowerCase().includes(q) ||
+            (l.path || '').toLowerCase().includes(q) ||
+            (l.description || '').toLowerCase().includes(q)
+        )
+      : rawLandings;
+
+    return [...filtered].sort((a, b) => {
       if (sortOrder === 'latest') return (b._creationTime || 0) - (a._creationTime || 0);
       if (sortOrder === 'oldest') return (a._creationTime || 0) - (b._creationTime || 0);
       if (sortOrder === 'name') return (a.name || '').localeCompare(b.name || '');
       return 0;
     });
-  }, [rawLandings, sortOrder]);
+  }, [rawLandings, sortOrder, searchQuery]);
 
   const counts = useMemo(() => {
-    const active = displayLandings.filter((l) => l.isActive).length;
-    const inactive = displayLandings.length - active;
-    return { total: displayLandings.length, active, inactive };
-  }, [displayLandings]);
+    const active = rawLandings.filter((l) => l.isActive).length;
+    const inactive = rawLandings.length - active;
+    return { total: rawLandings.length, active, inactive };
+  }, [rawLandings]);
 
   useEffect(() => {
     if (userType === 'admin') {
@@ -277,142 +289,140 @@ export default function LandingManagement({
         </div>
       </div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-        {displayLandings.map((landing) => (
-          <div
-            key={landing._id}
-            className="adm-panel flex flex-col transition-shadow hover:shadow-[0_10px_28px_rgba(25,63,57,0.06)]"
-          >
-            <div className="w-full aspect-[16/10] bg-[#f3f5ef] border-b border-[#edf0e7] flex items-center justify-center relative group overflow-hidden">
-              {landing.thumbnail ? (
-                <img
-                  src={landing.thumbnail}
-                  alt={landing.name}
-                  className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
-                />
-              ) : (
-                <Globe className="w-10 h-10 text-[#b7c2b0]" />
-              )}
+      {/* 1-Column List */}
+      <div className="adm-panel overflow-hidden">
+        <div className="adm-panel-top flex-wrap gap-3">
+          <div className="flex items-center gap-2.5">
+            <h2>랜딩페이지 목록</h2>
+            <span className="adm-pill teal font-mono">{displayLandings.length}개</span>
+          </div>
+          <div className="relative w-full sm:w-72">
+            <Search className="w-3.5 h-3.5 text-[#8c9686] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="랜딩명, 경로, 설명 검색..."
+              className="adm-input !pl-8 !py-1.5 !text-[12.5px] w-full"
+            />
+          </div>
+        </div>
 
-              <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                {landing.isActive ? (
-                  <span className="adm-pill green shadow-xs">활성 운영중</span>
+        <div className="divide-y divide-[#eef1e8]">
+          {displayLandings.map((landing) => (
+            <div
+              key={landing._id}
+              className="px-5 py-3.5 flex flex-col md:flex-row md:items-center gap-4 hover:bg-[#fbfcf8] transition-colors"
+            >
+              {/* Thumbnail */}
+              <a
+                href={getCustomUrl(landing.path)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full md:w-24 h-36 md:h-15 rounded-lg bg-[#f3f5ef] border border-[#edf0e7] flex items-center justify-center overflow-hidden shrink-0 group"
+                title="새창에서 랜딩페이지 열기"
+              >
+                {landing.thumbnail ? (
+                  <img
+                    src={landing.thumbnail}
+                    alt={landing.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 ) : (
-                  <span className="adm-pill red shadow-xs">사용 안 함</span>
+                  <Globe className="w-6 h-6 text-[#b7c2b0]" />
                 )}
-              </div>
+              </a>
 
-              <div className="absolute inset-0 bg-[#193f39]/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2.5">
-                <a
-                  href={getCustomUrl(landing.path)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="adm-btn small"
-                  title="새창에서 랜딩페이지 열기"
-                >
-                  <ExternalLink />
-                  <span>열기</span>
-                </a>
-                {userType === 'admin' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => openEditModal(landing)}
-                      className="adm-btn primary small"
-                    >
-                      <Edit2 />
-                      <span>수정</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => openDuplicateModal(landing)}
-                      className="adm-btn sage small"
-                    >
-                      <Copy />
-                      <span>복제</span>
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="p-5 flex-1 flex flex-col">
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <h3 className="text-[15.5px] font-bold text-[#263d36] leading-snug">{landing.name}</h3>
-                <span className="adm-pill teal font-mono shrink-0">{getCustomUrl(landing.path)}</span>
-              </div>
-
-              <p className="text-[12.5px] text-[#6d786c] leading-relaxed mb-5 flex-1 break-keep">
-                {landing.description || '등록된 상세 설명이 없습니다.'}
-              </p>
-
-              <div className="mt-auto space-y-3">
-                <div className="grid grid-cols-2 gap-2">
-                  <a
-                    href={getCustomUrl(landing.path)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="adm-btn primary justify-center"
-                  >
-                    <ExternalLink />
-                    <span>바로가기</span>
-                  </a>
-                  {userType === 'admin' ? (
-                    <button
-                      type="button"
-                      onClick={() => openDuplicateModal(landing)}
-                      className="adm-btn sage justify-center"
-                    >
-                      <Copy />
-                      <span>복제하기</span>
-                    </button>
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  {landing.isActive ? (
+                    <span className="adm-pill green">활성 운영중</span>
                   ) : (
-                    <span className="adm-btn justify-center cursor-default">공식 할당 랜딩</span>
+                    <span className="adm-pill red">사용 안 함</span>
                   )}
+                  <h3 className="text-[14.5px] font-bold text-[#263d36] leading-snug truncate">
+                    {landing.name}
+                  </h3>
+                  <span className="adm-pill teal font-mono shrink-0">{getCustomUrl(landing.path)}</span>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-[#edf0e7] text-[11.5px] text-[#86918a]">
-                  <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#6d786c]">
+                  <p className="truncate max-w-2xl">
+                    {landing.description || '등록된 상세 설명이 없습니다.'}
+                  </p>
+                  <span className="text-[11px] text-[#86918a] flex items-center gap-1 shrink-0">
                     <ShieldCheck className="w-3.5 h-3.5 text-[#295e52]" />
                     <span>효원 공식 랜딩</span>
                     {landing._creationTime && (
                       <span className="font-mono">
-                        · {new Date(landing._creationTime).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' })}
+                        ·{' '}
+                        {new Date(landing._creationTime).toLocaleDateString('ko-KR', {
+                          year: '2-digit',
+                          month: '2-digit',
+                          day: '2-digit',
+                        })}
                       </span>
                     )}
-                  </div>
-                  {userType === 'admin' && (
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => openEditModal(landing)}
-                        className="adm-icon-btn !p-1.5"
-                        title="수정"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(landing._id)}
-                        className="adm-icon-btn !p-1.5 hover:!text-[#a85042]"
-                        title="삭제"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  )}
+                  </span>
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
 
-        {displayLandings.length === 0 && (
-          <div className="col-span-full adm-panel py-20 text-center text-[#86918a]">
-            등록된 랜딩페이지가 없습니다.
-          </div>
-        )}
+              {/* Actions */}
+              <div className="flex items-center gap-1.5 shrink-0 pt-1 md:pt-0">
+                <a
+                  href={getCustomUrl(landing.path)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="adm-btn primary small"
+                  title="새창에서 랜딩페이지 열기"
+                >
+                  <ExternalLink />
+                  <span>바로가기</span>
+                </a>
+                {userType === 'admin' ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => openDuplicateModal(landing)}
+                      className="adm-btn sage small"
+                      title="복제하기"
+                    >
+                      <Copy />
+                      <span>복제</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(landing)}
+                      className="adm-icon-btn !p-2"
+                      title="수정"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(landing._id)}
+                      className="adm-icon-btn !p-2 hover:!text-[#a85042]"
+                      title="삭제"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                ) : (
+                  <span className="adm-btn small cursor-default">공식 할당 랜딩</span>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {displayLandings.length === 0 && (
+            <div className="py-16 text-center text-[#86918a] text-[13px]">
+              {searchQuery.trim()
+                ? '검색 조건에 일치하는 랜딩페이지가 없습니다.'
+                : '등록된 랜딩페이지가 없습니다.'}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Create / Edit / Duplicate Modal */}
